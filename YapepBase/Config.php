@@ -59,11 +59,19 @@ class Config {
     /**
      * Sets a configuration value
      *
-     * @param string $data   Associative array containing the settings.
-     *                       The key can be divided to sections with '.' as a separator.
+     * Can set a single option when using both parameters, or multiple configuration options as an associative array.
+     *
+     * @param string|array $data    Name of the setting or an associative array containing the settings.
+     *                              The key can be divided to sections with '.' as a separator.
+     * @param mixed        $value   The value of the setting if setting a single configuration option.
+     *                              Not used when setting multiple options.
      */
-    public function set(array $data) {
-        $this->configurationData = array_merge($this->configurationData, $data);
+    public function set($dataOrName, $value = null) {
+        if (is_array($dataOrName)) {
+            $this->configurationData = array_merge($this->configurationData, $dataOrName);
+        } else {
+            $this->configurationData[(string)$dataOrName] = $value;
+        }
     }
 
     /**
@@ -81,7 +89,7 @@ class Config {
      *
      * @return mixed|array   The result.
      */
-    public function get($name, $default, $keepOriginalName = false) {
+    public function get($name, $default = null, $keepOriginalName = false) {
         if (empty($name)) {
             return $default;
         }
@@ -102,9 +110,9 @@ class Config {
             foreach($this->configurationData as $key => $value) {
                 if (0 === strpos($key, $name)) {
                     if (!$keepOriginalName) {
-                        $key = substr($key, strlen($name) -2);
+                        $key = substr($key, strlen($name));
                     }
-                    $result[$key] = $this->configurationData[$value];
+                    $result[$key] = $value;
                 }
             }
             return (empty($result) ? $default : $result);
@@ -112,6 +120,24 @@ class Config {
 
         // No matches, return the default
         return $default;
+    }
+
+    /**
+     * Removes a configuration setting
+     *
+     * @param string $name
+     */
+    public function delete($name) {
+        if (isset($this->configurationData[$name])) {
+            unset($this->configurationData[$name]);
+        }
+    }
+
+    /**
+     * Clears all configuration.
+     */
+    public function clear() {
+        $this->configurationData = array();
     }
 
 }
