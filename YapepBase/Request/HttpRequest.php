@@ -22,10 +22,30 @@ use YapepBase\UtilityFunctions;
  */
 class HttpRequest implements IRequest {
 
+    /**
+     * The GET parameters received with the request.
+     *
+     * @var array
+     */
     protected $getParams;
+    
+    /**
+     * The POST parameters received with the request.
+     *
+     * @var array
+     */
     protected $postParams;
+    
+    /**
+     * The cookies received with the request.
+     *
+     * @var array
+     */
     protected $cookies;
 
+    /**
+     * Constructor.
+     */
     public function __construct() {
         if (get_magic_quotes_gpc()) {
             $this->getParams = UtilityFunctions::recursiveStripSlashes($_GET);
