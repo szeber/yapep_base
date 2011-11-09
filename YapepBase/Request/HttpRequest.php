@@ -58,6 +58,14 @@ class HttpRequest implements IRequest {
         }
     }
 
+    /**
+     * Returns the GET parameter specified, or the default value, if it's not set.
+     *
+     * @param string $name      The name of the parameter.
+     * @param mixed  $default   The default value, if the parameter is not set.
+     * 
+     * @return mixed
+     */
     public function getGet($name, $default = null) {
         if (isset($this->getParams[$name])) {
             return $this->getParams[$name];
@@ -65,6 +73,14 @@ class HttpRequest implements IRequest {
         return $default;
     }
 
+    /**
+     * Returns the POST parameter specified, or the default value, if it's not set.
+     *
+     * @param string $name      The name of the parameter.
+     * @param mixed  $default   The default value, if the parameter is not set.
+     * 
+     * @return mixed
+     */
     public function getPost($name, $default = null) {
         if (isset($this->postParams[$name])) {
             return $this->postParams[$name];
@@ -72,6 +88,14 @@ class HttpRequest implements IRequest {
         return $default;
     }
 
+    /**
+     * Returns the specified cookie, or the default value, if it's not set.
+     *
+     * @param string $name      The name of the cookie.
+     * @param mixed  $default   The default value, if the parameter is not set.
+     * 
+     * @return mixed
+     */
     public function getCookie($name, $default = null) {
         if (isset($this->cookies[$name])) {
             return $this->cookies[$name];
@@ -87,6 +111,17 @@ class HttpRequest implements IRequest {
 
     }
 
+    /**
+     * Returns the specified request parameter from the specified source, or the default value.
+     *
+     * Search order is GPC, so a POST value will overwrite a GET value with the same name.
+     *
+     * @param string $name      The name of the cookie.
+     * @param mixed  $default   The default value, if the parameter is not set.
+     * @param string $source    The sources of the parameter. 'G' for GET, 'P' for POST, 'C' for Cookie.
+     *
+     * @return mixed
+     */
     public function get($name, $default = null, $source = 'GP') {
         $source = strtoupper($source);
         $result = $default;
