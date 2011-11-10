@@ -9,8 +9,10 @@
  * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
-
 namespace YapepBase\Autoloader;
+
+/** Require parent class */
+require_once BASE_DIR . 'YapepBase/Autoloader/AutoloaderBase.php';
 
 /**
  * SimpleAutoloader class
@@ -35,11 +37,15 @@ class SimpleAutoloader extends AutoloaderBase {
      * @return bool   TRUE if the class was loaded, FALSE if it can't be loaded.
      */
     public function load($className) {
-        $classPath = $this->sanitizeClassPath(explode('\\'. $className));
-        if (empty($classPath)) {
+        $namespacePath = $this->sanitizeClassPath(explode('\\', $className));
+        if (empty($namespacePath)) {
             return false;
         }
-        $fileName = BASE_DIR . $classPath . '.php';
+        $classnamePath = $this->sanitizeClassPath(explode('_', array_pop($namespacePath)));
+        if (empty($classnamePath)) {
+            return false;
+        }
+        $fileName = BASE_DIR . implode(DIRECTORY_SEPARATOR, array_merge($namespacePath, $classnamePath)) . '.php';
         if (is_file($fileName) || is_readable($fileName)) {
             require $fileName;
             return true;

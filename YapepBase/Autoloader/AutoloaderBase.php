@@ -26,7 +26,7 @@ abstract class AutoloaderBase {
      *
      * @var AutoloaderBase
      */
-    static $instance;
+    protected static $instance;
 
     /**
      * Loads the specified class if it can be found by name.
