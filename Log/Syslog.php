@@ -90,7 +90,7 @@ class Syslog extends LoggerAbstract {
      * @throws \YapepBase\Exception\ConfigException   On configuration errors.
      */
     protected function verifyConfig($configName) {
-        parent::verifyConfig();
+        parent::verifyConfig($configName);
         if (
             !is_array($this->configOptions) || empty($this->configOptions['facility'])
             || empty($this->configOptions['applicationIdent'])

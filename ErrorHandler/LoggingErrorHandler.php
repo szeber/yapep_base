@@ -53,7 +53,7 @@ class LoggingErrorHandler implements IErrorHandler {
         $helper = new ErrorHandlerHelper();
         $errorLevelDescription = $helper->getPhpErrorLevelDescription($errorLevel);
 
-        $errorMessage = '[' . $errorLevelDescription . '(' . $errorLevel . ']: ' . $message . ' on line ' . $line
+        $errorMessage = '[' . $errorLevelDescription . '(' . $errorLevel . ')]: ' . $message . ' on line ' . $line
             . ' in ' . $file;
 
         $message = SystemContainer::getInstance()->getErrorLogMessage();
@@ -93,7 +93,7 @@ class LoggingErrorHandler implements IErrorHandler {
         $helper = new ErrorHandlerHelper();
         $errorLevelDescription = $helper->getPhpErrorLevelDescription($errorLevel);
 
-        $errorMessage = '[' . $errorLevelDescription . '(' . $errorLevel . ']: ' . $message . ' on line ' . $line
+        $errorMessage = '[' . $errorLevelDescription . '(' . $errorLevel . ')]: ' . $message . ' on line ' . $line
         . ' in ' . $file;
 
         $message = SystemContainer::getInstance()->getErrorLogMessage();

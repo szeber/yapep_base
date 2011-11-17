@@ -35,16 +35,16 @@ abstract class LoggerAbstract implements ILogger {
      */
     public function __construct($configName) {
         $config = Config::getInstance();
-        $result = $config->get($configName);
+        $result = $config->get($configName, false);
         if (false === $result) {
             // Config not found by name, try with a wildcard query
             $result = $config->get($configName . '.*');
             if (false === $result) {
                 throw new ConfigException('Configuration not found: ' . $configName);
             }
-            $this->configOptions = $result;
-            $this->verifyConfig($configName);
         }
+        $this->configOptions = $result;
+        $this->verifyConfig($configName);
     }
 
     /**
