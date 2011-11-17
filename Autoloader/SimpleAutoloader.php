@@ -11,8 +11,7 @@
 
 namespace YapepBase\Autoloader;
 
-/** Require parent class */
-require_once BASE_DIR . 'YapepBase/Autoloader/AutoloaderBase.php';
+require_once BASE_DIR . '/YapepBase/Autoloader/AutoloaderBase.php';
 
 /**
  * SimpleAutoloader class
@@ -37,15 +36,11 @@ class SimpleAutoloader extends AutoloaderBase {
      * @return bool   TRUE if the class was loaded, FALSE if it can't be loaded.
      */
     public function load($className) {
-        $namespacePath = $this->sanitizeClassPath(explode('\\', $className));
-        if (empty($namespacePath)) {
+        $classPath = $this->sanitizeClassPath(explode('\\', $className));
+        if (empty($classPath)) {
             return false;
         }
-        $classnamePath = $this->sanitizeClassPath(explode('_', array_pop($namespacePath)));
-        if (empty($classnamePath)) {
-            return false;
-        }
-        $fileName = BASE_DIR . implode(DIRECTORY_SEPARATOR, array_merge($namespacePath, $classnamePath)) . '.php';
+        $fileName = BASE_DIR . implode(DIRECTORY_SEPARATOR, $classPath) . '.php';
         if (is_file($fileName) || is_readable($fileName)) {
             require $fileName;
             return true;
