@@ -36,11 +36,15 @@ class SimpleAutoloader extends AutoloaderBase {
      * @return bool   TRUE if the class was loaded, FALSE if it can't be loaded.
      */
     public function load($className) {
-        $classPath = $this->sanitizeClassPath(explode('\\', $className));
-        if (empty($classPath)) {
+        $namespacePath = $this->sanitizeClassPath(explode('\\', $className));
+        if (empty($namespacePath)) {
             return false;
         }
-        $fileName = BASE_DIR . implode(DIRECTORY_SEPARATOR, $classPath) . '.php';
+        $classnamePath = $this->sanitizeClassPath(explode('_', array_pop($namespacePath)));
+        if (empty($classnamePath)) {
+            return false;
+        }
+        $fileName = BASE_DIR . implode(DIRECTORY_SEPARATOR, array_merge($namespacePath, $classnamePath)) . '.php';
         if (is_file($fileName) || is_readable($fileName)) {
             require $fileName;
             return true;
