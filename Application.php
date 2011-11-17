@@ -10,6 +10,8 @@
 
 
 namespace YapepBase;
+use YapepBase\DependencyInjection\SystemContainer;
+
 use YapepBase\Debugger\IDebugger;
 use YapepBase\Exception\Exception;
 
@@ -29,6 +31,7 @@ class Application {
     protected $debuggers = array();
 
     protected function __construct() {
+        $this->systemDiContainer = new SystemContainer();
     }
 
     protected function __clone() {}
