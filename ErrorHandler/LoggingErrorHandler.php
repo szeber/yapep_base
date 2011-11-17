@@ -46,7 +46,7 @@ class LoggingErrorHandler implements IErrorHandler {
      * @param string $message      The error message.
      * @param string $file         The file where the error occured.
      * @param int    $line         The line in the file where the error occured.
-     * @param string $context      The context of the error. (All variables that exist in the scope the error occured)
+     * @param array  $context      The context of the error. (All variables that exist in the scope the error occured)
      * @param string $errorId      The internal ID of the error.
      */
     public function handleError($errorLevel, $message, $file, $line, $context, $errorId) {

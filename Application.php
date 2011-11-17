@@ -10,8 +10,9 @@
 
 
 namespace YapepBase;
+use YapepBase\ErrorHandler\IErrorHandler;
+use YapepBase\Router\IRouter;
 use YapepBase\DependencyInjection\SystemContainer;
-
 use YapepBase\Debugger\IDebugger;
 use YapepBase\Exception\Exception;
 
@@ -22,20 +23,77 @@ use YapepBase\Exception\Exception;
  */
 class Application {
 
+    /** The default timeout for the error ID in seconds. */
+    const ERROR_HANDLING_DEFAULT_ID_TIMEOUT = 600;   // 10 minutes
+
+    /**
+     * Singleton instance
+     *
+     * @var \YapepBase\Application
+     */
     protected static $instance;
 
+    /**
+     * The router instance
+     *
+     * @var \YapepBase\Router\IRouter
+     */
     protected $router;
 
+    /**
+     * Array containing the assigned error handlers.
+     *
+     * @var array
+     */
     protected $errorHandlers = array();
 
+    /**
+     * Array containing the assigned debuggers.
+     *
+     * @var array
+     */
     protected $debuggers = array();
 
+    /**
+     * Set to TRUE by the destructor, to signal a normal shutdown to the shutdown handler.
+     *
+     * @var bool
+     */
+    protected $isDestructed = false;
+
+    /**
+     * The configuration instance
+     *
+     * @var \YapepBase\Config
+     */
+    protected $config;
+
+    /**
+     * Singleton constructor
+     */
     protected function __construct() {
-        $this->systemDiContainer = new SystemContainer();
+        // Set up error handling
+        $this->config = Config::getInstance();
+        set_error_handler(array($this, 'handleError'));
+        set_exception_handler(array($this, 'handleException'));
+        register_shutdown_function(array($this, 'handleShutdown'));
     }
 
+    /**
+     * Singleton __clone() method
+     */
     protected function __clone() {}
 
+    /**
+     * Destructor.
+     */
+    public function __destruct() {
+        $this->isDestructed = true;
+    }
+
+    /**
+     * Singleton getter
+     */
     public static function getInstance() {
         if (is_null(static::$instance)) {
             static::$instance = new static();
@@ -43,35 +101,203 @@ class Application {
         return static::$instance;
     }
 
-    public function setRouter(YapepBase\Router\IRouter $router) {
+    /**
+     * Sets the router used by the application
+     *
+     * @param IRouter $router
+     */
+    public function setRouter(IRouter $router) {
         $this->router = $router;
     }
 
-    public function addErrorHandler(YapepBase\ErrorHandler\IErrorHandler $errorHandler) {
+    /**
+     * Adds an error handler to the application
+     *
+     * @param IErrorHandler $errorHandler
+     */
+    public function addErrorHandler(IErrorHandler $errorHandler) {
         $this->errorHandlers[] = $errorHandler;
     }
 
-    public function removeErrorHandler(YapepBase\ErrorHandler\IErrorHandler $errorHandler) {
+    /**
+     * Removes an error handler from the application
+     *
+     * @param IErrorHandler $errorHandler
+     *
+     * @return bool   TRUE if the error handler was removed successfully, FALSE otherwise.
+     */
+    public function removeErrorHandler(IErrorHandler $errorHandler) {
         $index = array_search($errorHandler, $this->errorHandlers);
         if (false === $index) {
             return false;
         }
         unset($this->errorHandlers[$index]);
+        return true;
     }
 
+    /**
+     * Returns the error handlers assigned to the application.
+     *
+     * @return array:
+     */
     public function getErrorHandlers() {
         return $this->errorHandlers;
     }
 
+    /**
+     * Adds a debugger to the application
+     *
+     * @param IDebugger $debugger
+     */
     public function addDebugger(IDebugger $debugger) {
         $this->debuggers[] = $debugger;
     }
 
-    public function run() {
+    /**
+     * Sends an error to the output.
+     */
+    protected function outputError() {
 
     }
 
-    public function outputError() {
+    /**
+     * Handles an error.
+     *
+     * Should not be called manually, only by PHP.
+     *
+     * @param int    $errorLevel   The error code {@uses E_*}
+     * @param string $message      The error message.
+     * @param string $file         The file where the error occured.
+     * @param int    $line         The line in the file where the error occured.
+     * @param array  $context      The context of the error. (All variables that exist in the scope the error occured)
+     *
+     * @return bool   TRUE if we were able to handle the error, FALSE otherwise.
+     */
+    public function handleError($errorLevel, $message, $file, $line, $context) {
+        $errorReporting = error_reporting();
+        if (!($errorLevel & $errorReporting)) {
+            // The error should not be reported
+            return false;
+        }
 
+        if (empty($this->errorHandlers)) {
+            // We have no error handlers, let the standard PHP error handler handle it
+            return false;
+        }
+
+        $errorId = $this->generateErrorId($message, $file, $line);
+
+        foreach($this->errorHandlers as $errorHandler) {
+            $errorHandler->handleError($errorLevel, $message, $file, $line, $context, $errorId);
+        }
+
+        if ($this->isErrorFatal($errorLevel)) {
+            // We encountered a fatal error, so we output an error and exit
+            restore_error_handler();
+            restore_exception_handler();
+            $this->outputError();
+            exit;
+        }
+
+        return true;
+    }
+
+    /**
+     * Handles an unhandled exception
+     *
+     *
+     * Should not be called manually, only by PHP.
+     * @param Exception $exception
+     */
+    public function handleException($exception) {
+        if (!($exception instanceof \Exception)) {
+            // The error handlers can only handle exceptions that are descendants of the Exception built in class
+            trigger_error('Unable to handle exception of type: ' . get_class($exception), E_USER_ERROR);
+            return;
+        }
+
+        if (empty($this->errorHandlers)) {
+            // We have no error handlers, trigger an error and let the default error handler handle it
+            restore_error_handler();
+            trigger_error('Unhandled exception: ' . $exception->getMessage(), E_USER_ERROR);
+            return;
+        }
+
+        $errorId = $this->generateErrorId($exception->getMessage(), $exception->getFile(), $exception->getLine());
+
+        foreach($this->errorHandlers as $errorHandler) {
+            $errorHandler->handleException($exception, $errorId);
+        }
+    }
+
+    /**
+     * Returns an error ID based on the message, file, line, hostname and current time.
+     *
+     * Generates the same error ID if the same error occurs within the timeframe set in the
+     * 'system.errorHandling.defaultIdTimeout' configuration option. If that option is not set, it will default to the
+     * value of the self::ERROR_HANDLING_DEFAULT_ID_TIMEOUT constant. The value should be set as seconds.
+     *
+     * @param string $message      The message of the error.
+     * @param string $file         The file where the error occured.
+     * @param int    $line         The line where the error occured.
+     *
+     * @return string
+     */
+    protected function generateErrorId($message, $file, $line) {
+        $uname = posix_uname();
+        $idTimeout = $this->config->get('system.errorHandling.defaultIdTimeout',
+            self::ERROR_HANDLING_DEFAULT_ID_TIMEOUT);
+
+        return md5($message . $file . (string)$line . $uname['nodename'] . floor(time() / $idTimeout));
+    }
+
+    /**
+     * Returns if the error should be considered fatal by the error level
+     *
+     * @param int $errorLevel
+     *
+     * @return bool
+     */
+    protected function isErrorFatal($errorLevel) {
+        switch($errorLevel) {
+            case E_ERROR:
+            case E_PARSE:
+            case E_CORE_ERROR:
+            case E_COMPILE_ERROR:
+            case E_USER_ERROR:
+            case E_RECOVERABLE_ERROR:
+                return true;
+                break;
+        }
+
+        return false;
+    }
+
+    /**
+     * Handles script shutdown.
+     */
+    public function handleShutdown() {
+        $error = error_get_last();
+        if (!$error || $this->isDestructed) {
+            // Normal shutdown
+            return;
+        }
+
+        // We are shutting down because of a fatal error, if any more errors occur, they should be handled by
+        // the default error handler.
+        restore_error_handler();
+
+        // Shutdown because of a fatal error
+        if (empty($this->errorHandlers)) {
+            // We have no error handlers defined, send the fatal error to the SAPI's logger.
+            error_log('No errorhandlers are defined and a fatal error occured: ' . $error['message'], 4);
+            return;
+        }
+
+        $errorId = $this->generateErrorId($error['message'], $error['file'], $error['line']);
+
+        foreach($this->errorHandlers as $errorHandler) {
+            $errorHandler->handleShutdown($error['type'], $error['message'], $error['file'], $error['line'], $errorId);
+        }
     }
 }

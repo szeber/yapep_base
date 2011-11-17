@@ -35,7 +35,9 @@ interface IErrorHandler {
     const E_RECOVERABLE_ERROR_DESCRIPTION = 'Catchable fatal error';
     const E_DEPRECATED_DESCRIPTION        = 'Deprecated';
     const E_USER_DEPRECATED_DESCRIPTION   = 'User deprecated';
+    /** Exception description */
     const EXCEPTION_DESCRIPTION           = 'Exception';
+    /** Unknown error level description */
     const UNKNOWN_DESCRIPTION             = 'Unknown';
 
     /**
@@ -45,7 +47,7 @@ interface IErrorHandler {
      * @param string $message      The error message.
      * @param string $file         The file where the error occured.
      * @param int    $line         The line in the file where the error occured.
-     * @param string $context      The context of the error. (All variables that exist in the scope the error occured)
+     * @param array  $context      The context of the error. (All variables that exist in the scope the error occured)
      * @param string $errorId      The internal ID of the error.
      */
     function handleError($errorLevel, $message, $file, $line, $context, $errorId);
