@@ -14,32 +14,35 @@ use YapepBase\Exception\StorageException;
 use YapepBase\Exception\ConfigException;
 
 /**
- * MemcacheStorage class
+ * MemcachedStorage class
  *
- * Storage backend, that uses the memcache extension. For the memcached extension {@see MemcachedStorage}.
- * Use the MemcachedStorage class that uses the newer, more complete memcached extension if it is available on your
- * system.
+ * Storage backend, that uses the memcached extension. For the memcache extension {@see MemcacheStorage}.
+ * This is the preferred memcache implementation if the memcached extension is available on your system.
  *
  * Configuration options:
  *     <li>
- *         <ul>host:        The memcache server's hostname or IP.</ul>
- *         <ul>port:        The port of the memcache server. Optional, defaults to 11211</ul>
- *         <ul>keyPrefix:   The keys will be prefixed with this string. Optional, defaults to empty string.</ul>
- *         <ul>keySuffix:   The keys will be suffixed with this string. Optional, defaults to empty string.</ul>
- *         <ul>hashKey:     If TRUE, the key will be hashed before being stored. Optional, defaults to FALSE.</ul>
+ *         <ul>host:           The memcache server's hostname or IP.</ul>
+ *         <ul>port:           The port of the memcache server. Optional, defaults to 11211</ul>
+ *         <ul>persistentId:   The persistent ID to use for the connection. Connections with the same persistent ID
+ *                             are shared between requests. Optional, defaults to NULL, which means the connection will
+ *                             not be shared. See the comments in the PHP manual for the risks involved in using
+ *                             persistent connections. {@link php.net/manual/en/memcached.construct.php}</ul>
+ *         <ul>keyPrefix:      The keys will be prefixed with this string. Optional, defaults to empty string.</ul>
+ *         <ul>keySuffix:      The keys will be suffixed with this string. Optional, defaults to empty string.</ul>
+ *         <ul>hashKey:        If TRUE, the key will be hashed before being stored. Optional, defaults to FALSE.</ul>
  *     </li>
  *
  * @package    YapepBase
  * @subpackage Storage
  */
-class MemcacheStorage extends StorageAbstract {
+class MemcachedStorage extends StorageAbstract {
 
     /**
      * The memcache connection instance
      *
-     * @var \Memcache
+     * @var \Memcached
      */
-    protected $memcache;
+    protected $memcached;
 
     /**
      * The memcache host
@@ -54,6 +57,13 @@ class MemcacheStorage extends StorageAbstract {
      * @var int
      */
     protected $port;
+
+    /**
+     * The persistent ID for the connection.
+     *
+     * @var string
+     */
+    protected $persistentId;
 
     /**
      * The string to prefix the keys with
@@ -90,13 +100,14 @@ class MemcacheStorage extends StorageAbstract {
         }
         $this->host = $config['host'];
         $this->port = (isset($config['port']) ? (int)$config['port'] : 11211);
+        $this->persistentId = (isset($config['persistentId']) ? $config['persistentId'] : null);
         $this->keyPrefix = (isset($config['keyPrefix']) ? $config['keyPrefix'] : '');
         $this->keySuffix = (isset($config['keySuffix']) ? $config['keySuffix'] : '');
         $this->hashKey = (isset($config['hashKey']) ? (bool)$config['hashKey'] : false);
 
-        $this->memcache = new \Memcache();
-        if (!$this->memcache->connect($this->host, $this->port)) {
-            throw new StorageException('MemcacheStorage is unable to connect to server');
+        $this->memcache = new \Memcached($this->persistentId);
+        if (!$this->persistentId || empty($this->memcached->getServerList())) {
+            $this->memcache->addServer($this->host, $this->port);
         }
     }
 
@@ -126,7 +137,7 @@ class MemcacheStorage extends StorageAbstract {
      * @throws \YapepBase\Exception\ParameterException    If TTL is set and not supported by the backend.
      */
     public function set($key, $data, $ttl = 0) {
-        $this->memcache->set($this->makeKey($key), $data, 0, $ttl);
+        $this->memcache->set($this->makeKey($key), $data, $ttl);
 
     }
 
