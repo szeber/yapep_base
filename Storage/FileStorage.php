@@ -39,7 +39,7 @@ use YapepBase\Config;
  * @package    YapepBase
  * @subpackage Storage
  */
-class FileStorage implements IStorage {
+class FileStorage extends StorageAbstract {
 
     /**
      * The path to use for the file storage.
@@ -65,7 +65,7 @@ class FileStorage implements IStorage {
     /**
      * The suffix for the files.
      *
-     * @var unknown_type
+     * @var string
      */
     protected $fileSuffix;
 
@@ -84,22 +84,6 @@ class FileStorage implements IStorage {
      * @var bool
      */
     protected $hashKey;
-
-    /**
-     * Constructor.
-     *
-     * @param string $configName   The name of the configuration to use.
-     *
-     * @throws \YapepBase\Exception\ConfigException    On configuration errors.
-     * @throws \YapepBase\Exception\StorageException   On storage errors.
-     */
-    public function __construct($configName) {
-        $config = Config::getInstance()->get($configName, false);
-        if (false === $config) {
-            throw new ConfigException('Configuration not found: ' . $configName);
-        }
-        $this->setupConfig($config);
-    }
 
     /**
      * Sets up the backend.
@@ -146,13 +130,14 @@ class FileStorage implements IStorage {
      * @throws StorageException   On invalid filename.
      */
     protected function makeFullPath($fileName) {
+        $fileName = $this->filePrefix . $fileName  . $this->fileSuffix;
         if ($this->hashKey) {
             $fileName = md5($fileName);
         }
         if (!preg_match('^[-_.a-zA-Z0-9]+$')) {
             throw new StorageException('Invalid filename');
         }
-        return $this->path . $this->filePrefix . $fileName . $this->fileSuffix;
+        return $this->path . $fileName;
     }
 
     /**

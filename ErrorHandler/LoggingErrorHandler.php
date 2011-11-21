@@ -95,11 +95,9 @@ class LoggingErrorHandler implements IErrorHandler {
 
         $errorMessage = '[' . $errorLevelDescription . '(' . $errorLevel . ')]: ' . $message . ' on line ' . $line
         . ' in ' . $file;
-
         $message = SystemContainer::getInstance()->getErrorLogMessage();
         $message->set($errorMessage, $errorLevelDescription, $errorId,
                 $helper->getLogPriorityForErrorLevel($errorLevel));
-
         $this->logger->log($message);
     }
 
