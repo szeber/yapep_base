@@ -187,8 +187,12 @@ class Application {
 
         $errorId = $this->generateErrorId($message, $file, $line);
 
+        $backTrace = debug_backtrace();
+        // We are the first element, remove it from the trace
+        array_shift($backTrace);
+
         foreach($this->errorHandlers as $errorHandler) {
-            $errorHandler->handleError($errorLevel, $message, $file, $line, $context, $errorId);
+            $errorHandler->handleError($errorLevel, $message, $file, $line, $context, $errorId, $backTrace);
         }
 
         if ($this->isErrorFatal($errorLevel)) {

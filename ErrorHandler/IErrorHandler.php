@@ -49,8 +49,9 @@ interface IErrorHandler {
      * @param int    $line         The line in the file where the error occured.
      * @param array  $context      The context of the error. (All variables that exist in the scope the error occured)
      * @param string $errorId      The internal ID of the error.
+     * @param array  $backTrace    The debug backtrace of the error.
      */
-    function handleError($errorLevel, $message, $file, $line, $context, $errorId);
+    public function handleError($errorLevel, $message, $file, $line, $context, $errorId, array $backTrace = array());
 
     /**
      * Handles an uncaught exception. The exception must extend the \Exception class to be handled.
@@ -58,7 +59,7 @@ interface IErrorHandler {
      * @param Exception $exception   The exception to handle.
      * @param string $errorId        The internal ID of the error.
      */
-    function handleException(\Exception $exception, $errorId);
+    public function handleException(\Exception $exception, $errorId);
 
     /**
      * Called at script shutdown if the shutdown is because of a fatal error.
@@ -69,5 +70,5 @@ interface IErrorHandler {
      * @param int    $line         The line in the file where the error occured.
      * @param string $errorId      The internal ID of the error.
      */
-    function handleShutdown($errorLevel, $message, $file, $line, $errorId);
+    public function handleShutdown($errorLevel, $message, $file, $line, $errorId);
 }

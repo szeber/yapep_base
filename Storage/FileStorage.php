@@ -103,7 +103,7 @@ class FileStorage extends StorageAbstract {
         }
         $this->storePlainText = (isset($config['storePlainText']) && $config['storePlainText']);
         $this->filePrefix = (isset($config['filePrefix']) ? $config['filePrefix'] : '');
-        $this->fileSuffix = (isset($config['fileSuffix']) ? $config['filePrefix'] : '');
+        $this->fileSuffix = (isset($config['fileSuffix']) ? $config['fileSuffix'] : '');
         $this->fileMode = (empty($config['fileMode']) ? 0755 : $config['fileMode']);
         $this->hashKey = (isset($config['hashKey']) ? (bool)$config['hashKey'] : false);
 
@@ -134,7 +134,7 @@ class FileStorage extends StorageAbstract {
         if ($this->hashKey) {
             $fileName = md5($fileName);
         }
-        if (!preg_match('^[-_.a-zA-Z0-9]+$')) {
+        if (!preg_match('/^[-_.a-zA-Z0-9]+$/', $fileName)) {
             throw new StorageException('Invalid filename');
         }
         return $this->path . $fileName;
@@ -152,7 +152,7 @@ class FileStorage extends StorageAbstract {
      */
     public function set($key, $data, $ttl = 0) {
         $fileName = $this->makeFullPath($key);
-        if (false === file_put_contents($fileName, $this->prepareData($data, $ttl))) {
+        if (false === file_put_contents($fileName, $this->prepareData($key, $data, $ttl))) {
             throw new StorageException('Unable to write data to FileStorage');
         }
         chmod($fileName, $this->fileMode);
