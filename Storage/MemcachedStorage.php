@@ -20,17 +20,17 @@ use YapepBase\Exception\ConfigException;
  * This is the preferred memcache implementation if the memcached extension is available on your system.
  *
  * Configuration options:
- *     <li>
- *         <ul>host:           The memcache server's hostname or IP.</ul>
- *         <ul>port:           The port of the memcache server. Optional, defaults to 11211</ul>
- *         <ul>persistentId:   The persistent ID to use for the connection. Connections with the same persistent ID
+ *     <ul>
+ *         <li>host:           The memcache server's hostname or IP.</li>
+ *         <li>port:           The port of the memcache server. Optional, defaults to 11211</li>
+ *         <li>persistentId:   The persistent ID to use for the connection. Connections with the same persistent ID
  *                             are shared between requests. Optional, defaults to NULL, which means the connection will
  *                             not be shared. See the comments in the PHP manual for the risks involved in using
- *                             persistent connections. {@link php.net/manual/en/memcached.construct.php}</ul>
- *         <ul>keyPrefix:      The keys will be prefixed with this string. Optional, defaults to empty string.</ul>
- *         <ul>keySuffix:      The keys will be suffixed with this string. Optional, defaults to empty string.</ul>
- *         <ul>hashKey:        If TRUE, the key will be hashed before being stored. Optional, defaults to FALSE.</ul>
- *     </li>
+ *                             persistent connections. {@link php.net/manual/en/memcached.construct.php}</li>
+ *         <li>keyPrefix:      The keys will be prefixed with this string. Optional, defaults to empty string.</li>
+ *         <li>keySuffix:      The keys will be suffixed with this string. Optional, defaults to empty string.</li>
+ *         <li>hashKey:        If TRUE, the key will be hashed before being stored. Optional, defaults to FALSE.</li>
+ *     </ul>
  *
  * @package    YapepBase
  * @subpackage Storage

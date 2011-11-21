@@ -22,19 +22,19 @@ use YapepBase\Config;
  * FileStorage class
  *
  * Configuration options:
- *     <li>
- *         <ul>path:           The full path to the directory to use. It must be writable.</ul>
- *         <ul>storePlainText: If TRUE, the data will be stored as plain text, not serialized.
- *                             Disables TTL functionality. Optional, defaults to FALSE.</ul>
- *         <ul>filePrefix:     The files will be prefixed with this string.
- *                             No checking is done on the string. Optional, defaults to empty string.</ul>
- *         <ul>fileSuffix:     The files will be suffixed with this string.
- *                             No checking is done on the string. Optional, defaults to empty string.</ul>
- *         <ul>fileMode:       The mode of the files in unix octal notation. If path does not exists,
- *                             and will be created, this mode will be set for it. Optional, defaults to 0755.</ul>
- *         <ul>hashKey:        If TRUE, the key will be hashed before being used for the filename.
- *                             Optional, defaults to FALSE.</ul>
- *     </li>
+ *     <ul>
+ *         <li>path:           The full path to the directory to use. It must be writable.</li>
+ *         <li>storePlainText: If TRUE, the data will be stored as plain text, not serialized.
+ *                             Disables TTL functionality. Optional, defaults to FALSE.</li>
+ *         <li>filePrefix:     The files will be prefixed with this string.
+ *                             No checking is done on the string. Optional, defaults to empty string.</li>
+ *         <li>fileSuffix:     The files will be suffixed with this string.
+ *                             No checking is done on the string. Optional, defaults to empty string.</li>
+ *         <li>fileMode:       The mode of the files in unix octal notation. If path does not exists,
+ *                             and will be created, this mode will be set for it. Optional, defaults to 0755.</li>
+ *         <li>hashKey:        If TRUE, the key will be hashed before being used for the filename.
+ *                             Optional, defaults to FALSE.</li>
+ *     </ul>
  *
  * @package    YapepBase
  * @subpackage Storage
