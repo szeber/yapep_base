@@ -61,10 +61,10 @@ class Config {
      *
      * Can set a single option when using both parameters, or multiple configuration options as an associative array.
      *
-     * @param string|array $data    Name of the setting or an associative array containing the settings.
-     *                              The key can be divided to sections with '.' as a separator.
-     * @param mixed        $value   The value of the setting if setting a single configuration option.
-     *                              Not used when setting multiple options.
+     * @param string|array $dataOrName    Name of the setting or an associative array containing the settings.
+     *                                    The key can be divided to sections with '.' as a separator.
+     * @param mixed        $value         The value of the setting if setting a single configuration option.
+     *                                    Not used when setting multiple options.
      */
     public function set($dataOrName, $value = null) {
         if (is_array($dataOrName)) {

@@ -136,7 +136,7 @@ abstract class DbConnection {
     }
 
     /**
-     * Bedins a transaction.
+     * Begins a transaction.
      *
      * If there already is an open transaction, it just increments the transaction counter.
      *

@@ -11,6 +11,8 @@
 
 
 namespace YapepBase\Storage;
+use YapepBase\Exception\ConfigException;
+use YapepBase\Config;
 
 /**
  * StorageAbstract class
@@ -18,10 +20,6 @@ namespace YapepBase\Storage;
  * @package    YapepBase
  * @subpackage Storage
  */
-use YapepBase\Exception\ConfigException;
-
-use YapepBase\Config;
-
 abstract class StorageAbstract implements IStorage {
 
     /**

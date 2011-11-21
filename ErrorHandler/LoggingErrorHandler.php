@@ -30,11 +30,17 @@ use YapepBase\Log\ILogger;
 class LoggingErrorHandler implements IErrorHandler {
 
     /**
+     * The logger to use
      *
-     * @var YapepBase\Log\ILogger
+     * @var \YapepBase\Log\ILogger
      */
     protected $logger;
 
+    /**
+     * Constructor
+     *
+     * @param \YapepBase\Log\ILogger $logger
+     */
     public function __construct(ILogger $logger) {
         $this->logger = $logger;
     }

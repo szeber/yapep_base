@@ -23,6 +23,7 @@ use YapepBase\Log\Message\ErrorMessage;
 class SystemContainer extends Pimple {
 
     // Container keys
+    /** Error log message key. */
     const KEY_ERROR_LOG_MESSAGE = 'errorLogMessage';
 
     /**

@@ -109,7 +109,7 @@ class DbFactory {
     /**
      * Validates the database connection config.
      *
-     * @param array $config   The config to validate
+     * @param array $configuration   The config to validate.
      *
      * @throws DatabaseException   On configuration errors.
      */
