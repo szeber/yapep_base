@@ -109,7 +109,7 @@ class Pimple implements \ArrayAccess
     function share(\Closure $callable)
     {
         return function ($c) use ($callable) {
-            static $object;
+            static $object = null;
 
             if (is_null($object)) {
                 $object = $callable($c);
