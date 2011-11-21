@@ -11,6 +11,8 @@
 
 
 namespace YapepBase\Log;
+use YapepBase\Exception\ConfigException;
+use YapepBase\Config;
 
 /**
  * LoggerAbstract class
@@ -18,12 +20,13 @@ namespace YapepBase\Log;
  * @package    YapepBase
  * @subpackage Log
  */
-use YapepBase\Exception\ConfigException;
-
-use YapepBase\Config;
-
 abstract class LoggerAbstract implements ILogger {
 
+    /**
+     * Stores the configuration options
+     *
+     * @var array
+     */
     protected $configOptions;
 
     /**
