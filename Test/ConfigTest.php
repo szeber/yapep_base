@@ -2,8 +2,10 @@
 
 namespace YapepBase\Test;
 use YapepBase\Config;
-require_once 'YapepBase/Config.php';
-require_once 'PHPUnit/Framework/TestCase.php';
+
+require_once dirname(__FILE__) . '/../bootstrap.php';
+
+
 /**
  * Config test case.
  */
@@ -42,19 +44,19 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
      */
     public function testBasics() {
         $result = $this->Config->get('*');
-        $this->assertType('array', $result, 'Result is not an array');
+        $this->assertInternalType('array', $result, 'Result is not an array');
         $this->assertTrue(empty($result), 'Result is not empty');
 
         $this->Config->set('test', 'value');
 
         $result = $this->Config->get('*');
-        $this->assertType('array', $result, 'Result is not an array');
+        $this->assertInternalType('array', $result, 'Result is not an array');
         $this->assertFalse(empty($result), 'Result is empty after setting value');
 
         $this->Config->clear();
 
         $result = $this->Config->get('*');
-        $this->assertType('array', $result, 'Result is not an array');
+        $this->assertInternalType('array', $result, 'Result is not an array');
         $this->assertTrue(empty($result), 'Result is not empty after clearing value');
 
     }
@@ -114,13 +116,13 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($this->Config->get('test*', null), 'Returning invalid wildcard returns the default');
 
         $result = $this->Config->get('test.*');
-        $this->assertType('array', $result);
+        $this->assertInternalType('array', $result);
         $this->assertEquals(4, count($result));
         $this->assertArrayHasKey('first', $result);
         $this->assertSame(1, $result['first']);
 
         $result = $this->Config->get('test.*', null, true);
-        $this->assertType('array', $result);
+        $this->assertInternalType('array', $result);
         $this->assertEquals(4, count($result));
         $this->assertArrayHasKey('test.first', $result);
         $this->assertSame(1, $result['test.first']);

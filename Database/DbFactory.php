@@ -33,7 +33,6 @@ use YapepBase\Config;
  * Generic configuration:
  *     <ul>
  *         <li>backendType: The database backend type. {@uses self::BACKEND_TYPE_*}</li>
- *         <li>database: The database name.</li>
  *         <li>options: Associative array with options for the connection.</li>
  *     </ul>
  *
@@ -42,10 +41,16 @@ use YapepBase\Config;
  *         <li>host: The database host.</li>
  *         <li>user: The username.</li>
  *         <li>password: The password.</li>
+ *         <li>database: The database name.</li>
  *         <li>charset: The character set of the connection.</li>
  *         <li>isPersistent: If TRUE, the connection will be persistent. Optional, defaults to FALSE.</li>
  *     </ul>
-
+ *
+ * SQLite configuration
+ *     <ul>
+ *         <li>path: The full path to the database, or ':memory:' for memory databases.
+ *     </ul>
+ *
  * @package    YapepBase
  * @subpackage Database
  */
@@ -92,7 +97,7 @@ class DbFactory {
             }
             $data = $config->get('application.database.' . $connectionName . '.' . $connectionType . '.*');
             if (empty($data) || !is_array($data)) {
-                throw new DatabaseException('Database connection configuration not found.');
+                throw new DatabaseException('Database connection configuration not found');
             }
             static::validateConnectionConfig($data);
             static::$connections[$connectionName][$connectionType] = static::makeConnection($data, $connectionName, $connectionType);
@@ -114,25 +119,31 @@ class DbFactory {
      * @throws DatabaseException   On configuration errors.
      */
     protected static function validateConnectionConfig(array $configuration) {
-        if (!isset($configuration['backendType']) || empty($configuration['database'])) {
+        if (!isset($configuration['backendType'])) {
             throw new DatabaseException('Invalid database config');
         }
         switch ($configuration['backendType']) {
             case self::BACKEND_TYPE_MYSQL:
-                if (empty($configuration['host']) || empty($configuration['user']) || !isset($configuration['password']) || empty($configuration['charset'])) {
+                if (
+                    empty($configuration['host'])
+                    || empty($configuration['user'])
+                    || !isset($configuration['password'])
+                    || empty($configuration['charset'])
+                    || empty($configuration['database'])
+                ) {
                     throw new DatabaseException('Invalid database config');
                 }
-                $dsn = 'mysql:dbName=' . $configuration['database'] .';host=' . $configuration['host'];
                 break;
 
             case self::BACKEND_TYPE_SQLITE:
-                throw new DatabaseException('SQLite is not implemented yet');
+                if (empty($configuration['path'])) {
+                    throw new DatabaseException('Invalid database config');
+                }
                 break;
 
             default:
                 throw new DatabaseException('Invalid database config');
         }
-        return $dsn;
     }
 
     /**
@@ -149,7 +160,11 @@ class DbFactory {
     protected static function makeConnection(array $configuration, $connectionName, $connectionType) {
         switch ($configuration['backendType']) {
             case self::BACKEND_TYPE_MYSQL:
-                return new MysqlConnection($configuration, $connectionName, $connectionType, static::$paramPrefix);
+                return new MysqlConnection($configuration, $connectionName, static::$paramPrefix);
+                break;
+
+            case self::BACKEND_TYPE_SQLITE:
+                return new SqliteConnection($configuration, $connectionName, static::$paramPrefix);
                 break;
 
             default:

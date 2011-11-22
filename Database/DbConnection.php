@@ -74,7 +74,7 @@ abstract class DbConnection {
         try {
             $this->connect($configuration);
         } catch (PDOException $exception) {
-            throw new DatabaseException($exception->getMessage(), $exception->getCode(), $exception);
+            throw new DatabaseException($exception->getMessage(),0, $exception);
         }
         $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
@@ -109,7 +109,7 @@ abstract class DbConnection {
         }
         catch (PDOException $exception) {
             $this->transactionFailed = true;
-            throw new DatabaseException($exception->getMessage(), $exception->getCode(), $exception);
+            throw new DatabaseException($exception->getMessage(), 0, $exception);
         }
     }
 
