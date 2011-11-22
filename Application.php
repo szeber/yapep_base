@@ -46,13 +46,6 @@ class Application {
     protected $debuggers = array();
 
     /**
-     * Set to TRUE by the destructor, to signal a normal shutdown to the shutdown handler.
-     *
-     * @var bool
-     */
-    protected $isDestructed = false;
-
-    /**
      * The configuration instance
      *
      * @var \YapepBase\Config
@@ -80,13 +73,6 @@ class Application {
      * Singleton __clone() method
      */
     protected function __clone() {}
-
-    /**
-     * Destructor.
-     */
-    public function __destruct() {
-        $this->isDestructed = true;
-    }
 
     /**
      * Singleton getter
