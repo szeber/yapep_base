@@ -11,6 +11,7 @@
 
 
 namespace YapepBase\DependencyInjection;
+use YapepBase\ErrorHandler\ErrorHandlerContainer;
 use YapepBase\Lib\Pimple\Pimple;
 use YapepBase\Log\Message\ErrorMessage;
 
@@ -25,6 +26,8 @@ class SystemContainer extends Pimple {
     // Container keys
     /** Error log message key. */
     const KEY_ERROR_LOG_MESSAGE = 'errorLogMessage';
+    /** Error handler container key. */
+    const KEY_ERROR_HANDLER_CONTAINER = 'errorHandlerContainer';
 
     /**
      * The singleton instance
@@ -41,6 +44,9 @@ class SystemContainer extends Pimple {
     protected function __construct() {
         $this[self::KEY_ERROR_LOG_MESSAGE] = function($container) {
             return new ErrorMessage();
+        };
+        $this[self::KEY_ERROR_HANDLER_CONTAINER] = function($container) {
+            return new ErrorHandlerContainer();
         };
     }
 
@@ -68,6 +74,15 @@ class SystemContainer extends Pimple {
      */
     public function getErrorLogMessage() {
         return $this[self::KEY_ERROR_LOG_MESSAGE];
+    }
+
+    /**
+     * Returns an error handler container instance
+     *
+     * @return \YapepBase\ErrorHandler\ErrorHandlerContainer
+     */
+    public function getErrorHandlerContainer() {
+        return $this[self::KEY_ERROR_HANDLER_CONTAINER];
     }
 
 }
