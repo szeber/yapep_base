@@ -218,7 +218,11 @@ class FileStorage extends StorageAbstract {
             if (!is_readable($fileName) || false === ($contents = file_get_contents($fileName))) {
                 throw new StorageException('Unable to read file');
             }
-            return $contents;
+            $data = $this->readData($contents);
+            if (false === $data) {
+                unlink($fileName);
+            }
+            return $data;
         }
         return false;
     }
