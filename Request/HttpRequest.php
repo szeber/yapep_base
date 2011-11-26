@@ -28,20 +28,34 @@ class HttpRequest implements IRequest {
      * @var array
      */
     protected $getParams;
-    
+
     /**
      * The POST parameters received with the request.
      *
      * @var array
      */
     protected $postParams;
-    
+
     /**
      * The cookies received with the request.
      *
      * @var array
      */
     protected $cookies;
+
+    /**
+     * The target URI
+     *
+     * @var string
+     */
+    protected $targetUri;
+
+    /**
+     * The route params
+     *
+     * @var array
+     */
+    protected $routeParams = array();
 
     /**
      * Constructor.
@@ -56,6 +70,7 @@ class HttpRequest implements IRequest {
             $this->postParams = $_POST;
             $this->cookies = $_COOKIE;
         }
+        list($this->targetUri) = explode('?', $_SERVER['REQUEST_URI'], 2);
     }
 
     /**
@@ -63,7 +78,7 @@ class HttpRequest implements IRequest {
      *
      * @param string $name      The name of the parameter.
      * @param mixed  $default   The default value, if the parameter is not set.
-     * 
+     *
      * @return mixed
      */
     public function getGet($name, $default = null) {
@@ -78,7 +93,7 @@ class HttpRequest implements IRequest {
      *
      * @param string $name      The name of the parameter.
      * @param mixed  $default   The default value, if the parameter is not set.
-     * 
+     *
      * @return mixed
      */
     public function getPost($name, $default = null) {
@@ -93,12 +108,27 @@ class HttpRequest implements IRequest {
      *
      * @param string $name      The name of the cookie.
      * @param mixed  $default   The default value, if the parameter is not set.
-     * 
+     *
      * @return mixed
      */
     public function getCookie($name, $default = null) {
         if (isset($this->cookies[$name])) {
             return $this->cookies[$name];
+        }
+        return $default;
+    }
+
+    /**
+     * Retruns the specified route param, or the default value if it's not set.
+     *
+     * @param string $name      The name of the cookie.
+     * @param mixed  $default   The default value, if the parameter is not set.
+     *
+     * @return mixed
+     */
+    public function getParam($name, $default = null) {
+        if (isset($this->routeParams[$name])) {
+            return $this->routeParams[$name];
         }
         return $default;
     }
@@ -141,8 +171,34 @@ class HttpRequest implements IRequest {
         return $result;
     }
 
-    public function getTarget() {
 
+
+    /**
+     * Returns the target of the request.
+     *
+     * @return string   The target of the request.
+     */
+    public function getTarget() {
+        return $this->targetUri;
+    }
+
+    /**
+     * Returns the method of the request
+     *
+     * @return string   {@uses self::METHOD_*}
+     */
+    public function getMethod() {
+        return $_SERVER['REQUEST_METHOD'];
+    }
+
+    /**
+     * Sets a route param
+     *
+     * @param string $name
+     * @param mices $value
+     */
+    public function setParam($name, $value) {
+        $this->routeParams[$name] = $value;
     }
 
     public function isAjaxRequest() {

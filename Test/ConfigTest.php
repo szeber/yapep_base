@@ -12,7 +12,7 @@ require_once dirname(__FILE__) . '/../bootstrap.php';
 class ConfigTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var Config
+     * @var \YapepBase\Config
      */
     private $Config;
 
@@ -43,6 +43,9 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
      * Tests setting a single value, clearing and returning all items
      */
     public function testBasics() {
+        $config = Config::getInstance();
+        $this->assertInstanceOf('\YapepBase\Config', $config, 'Retrieved object is not a Config instance');
+
         $result = $this->Config->get('*');
         $this->assertInternalType('array', $result, 'Result is not an array');
         $this->assertTrue(empty($result), 'Result is not empty');
@@ -57,15 +60,34 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
 
         $result = $this->Config->get('*');
         $this->assertInternalType('array', $result, 'Result is not an array');
-        $this->assertTrue(empty($result), 'Result is not empty after clearing value');
+        $this->assertTrue(empty($result), 'Result is not empty after clearing');
 
+        $this->Config->set('test', 'value');
+
+        $result = $this->Config->get('test');
+        $this->assertSame('value', $result, 'Result not the previously set value');
+
+        $this->Config->delete('test');
+
+        $result = $this->Config->get('test', false);
+        $this->assertFalse($result, 'Result is not empty after deleting value');
+
+    }
+
+    /**
+     * Tests default handling
+     */
+    public function testDefault() {
+        $this->assertNull($this->Config->get(''), 'Empty request does not return not specified default');
+
+        $this->assertNull($this->Config->get('nonexistent'), 'Not specified default is not NULL');
+        $this->assertSame('test', $this->Config->get('nonexistent', 'test'), 'Specified default does not match');
     }
 
     /**
      * Tests setting simple values
      */
-    public function testSimpleValues ()
-    {
+    public function testSimpleValues () {
         $this->Config->set('test1', '123');
         $this->assertSame('123', $this->Config->get('test1'), 'Setting simple value failed');
 
@@ -101,8 +123,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     /**
      * Test configuration section handling
      */
-    public function testSections ()
-    {
+    public function testSections () {
         $testData = array(
             'test.first' => 1,
             'test.second' => 2,

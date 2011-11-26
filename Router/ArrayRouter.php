@@ -13,12 +13,33 @@
 namespace YapepBase\Router;
 
 /**
- * Router interface
+ * ArrayRouter class
+ *
+ * Routes a request based on the specified array.
  *
  * @package    YapepBase
  * @subpackage Router
  */
-interface IRouter {
+use YapepBase\Request\IRequest;
+
+class ArrayRouter implements IRouter{
+
+    /**
+     * The request instance
+     *
+     * @var IRequest
+     */
+    protected $request;
+
+    /**
+     * Constructor
+     *
+     * @param IRequest $request   The request instance
+     * @param array    $routes    The list of available routes
+     */
+    public function __construct(IRequest $request, array $routes) {
+        $this->request = $request;
+    }
 
     /**
      * Returns a controller and an action.
@@ -28,5 +49,10 @@ interface IRouter {
      *
      * @return string   The controller and action separated by a '/' character.
      */
-    public function getControllerAction(&$controller = null, &$action = null);
+    public function getControllerAction ($controller = null, $action = null)
+    {
+        // TODO implement
+    }
+
+
 }

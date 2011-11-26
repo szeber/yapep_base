@@ -76,5 +76,31 @@ class DbFactoryTest extends \PHPUnit_Framework_TestCase {
         DbFactory::getConnection('test2', DbFactory::TYPE_READ_WRITE);
     }
 
+    /**
+     * Tests if the factory produces an error on trying to create a connection without a backendType.
+     */
+    public function testMissingConnectionName() {
+        $this->setExpectedException('\YapepBase\Exception\DatabaseException', 'Invalid database config');
+
+        $this->config->set(array(
+            'application.database.test2.rw.path'        => ':memory:',
+        ));
+
+        DbFactory::getConnection('test2', DbFactory::TYPE_READ_WRITE);
+    }
+
+    /**
+     * Tests if the factory produces an error on trying to create a connection to an invalid backend.
+     */
+    public function testBadConnectionBackendType() {
+        $this->setExpectedException('\YapepBase\Exception\DatabaseException', 'Invalid database config');
+
+        $this->config->set(array(
+            'application.database.test2.rw.backendType' => 'invalid',
+        ));
+
+        DbFactory::getConnection('test2', DbFactory::TYPE_READ_WRITE);
+    }
+
 }
 
