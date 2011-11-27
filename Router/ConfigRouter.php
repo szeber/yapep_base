@@ -11,25 +11,33 @@
 
 
 namespace YapepBase\Router;
+use YapepBase\Exception\RouterException;
+use YapepBase\Config;
+use YapepBase\Request\IRequest;
 
 /**
  * ConfigRouter class.
  *
  * Routes a request based on an array stored in a config variable.
+ * The config variable's structure should match the config for an ArrayRouter {@see \YapepBase\Router\ArrayRouter}.
  *
  * @package    YapepBase
  * @subpackage Router
  */
-use YapepBase\Config;
-
-use YapepBase\Request\IRequest;
-
 class ConfigRouter extends ArrayRouter {
 
+    /**
+     * Constructor.
+     *
+     * @param IRequest $request
+     * @param string   $configName   The name of the configuration where the routes are stored
+     *
+     * @throws RouterException   On error
+     */
     public function __construct(IRequest $request, $configName) {
         $routes = Config::getInstance()->get($configName, false);
         if (!is_array($routes)) {
-            // TODO throw exception
+            throw new RouterException('No route config found');
         }
         parent::__construct($request, $routes);
     }

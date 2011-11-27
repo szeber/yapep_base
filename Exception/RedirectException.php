@@ -21,4 +21,17 @@ namespace YapepBase\Exception;
  * @package    YapepBase
  * @subpackage Exception
  */
-class RedirectException extends \Exception {}
+class RedirectException extends \Exception {
+
+    protected $controller;
+
+    protected $action;
+
+    public function __construct($controller, $action, $previous) {
+        $message = 'Redirecting to ' . $controller . '/' . $action;
+        $this->controller = $controller;
+        $this->action = $action;
+
+        parent::__construct($message, 0, $previous);
+    }
+}

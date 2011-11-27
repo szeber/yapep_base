@@ -11,6 +11,7 @@
 
 
 namespace YapepBase\Router;
+use YapepBase\Request\IRequest;
 
 /**
  * ArrayRouter class
@@ -20,8 +21,6 @@ namespace YapepBase\Router;
  * @package    YapepBase
  * @subpackage Router
  */
-use YapepBase\Request\IRequest;
-
 class ArrayRouter implements IRouter{
 
     /**
@@ -30,6 +29,13 @@ class ArrayRouter implements IRouter{
      * @var IRequest
      */
     protected $request;
+
+    /**
+     * The available routes
+     *
+     * @var array
+     */
+    protected $routes;
 
     /**
      * Constructor
