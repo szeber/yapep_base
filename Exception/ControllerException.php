@@ -13,13 +13,12 @@
 namespace YapepBase\Exception;
 
 /**
- * RouterException class
+ * ControllerException class
  *
  * @package    YapepBase
  * @subpackage Exception
  */
-class RouterException extends Exception {
-    const ERR_NO_ROUTE_FOUND = 101;
-    const ERR_SYNTAX_PARAM = 201;
-    const ERR_MISSING_PARAM = 301;
+class ControllerException extends Exception {
+    const ERR_INCOMPATIBLE_REQUEST = 101;
+    const ERR_INCOMPATIBLE_RESPONSE = 102;
 }

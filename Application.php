@@ -87,12 +87,21 @@ class Application {
     }
 
     /**
-     * Sets the router used by the application
+     * Sets the router used by the application.
      *
-     * @param IRouter $router
+     * @param \YapepBase\Router\IRouter $router
      */
     public function setRouter(IRouter $router) {
         $this->router = $router;
+    }
+
+    /**
+     * Returns the router used by the application.
+     *
+     * @return \YapepBase\Router\IRouter
+     */
+    public function getRouter() {
+        return $this->router;
     }
 
     /**

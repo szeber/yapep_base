@@ -65,14 +65,16 @@ class ArrayRouter implements IRouter {
     }
 
     /**
-     * Returns a controller and an action.
+     * Returns a controller and an action for the request's target.
      *
      * @param string $controller   $he controller class name. (Outgoing parameter)
      * @param string $action       The action name in the controller class. (Outgoing parameter)
      *
      * @return string   The controller and action separated by a '/' character.
+     *
+     * @throws RouterException   On errors. (Includig if the route is not found)
      */
-    public function getControllerAction ($controller = null, $action = null) {
+    public function getRoute (&$controller = null, &$action = null) {
         $target = $this->request->getTarget();
         $method = $this->request->getMethod();
 
@@ -137,7 +139,7 @@ class ArrayRouter implements IRouter {
      *
      * @return string   The regex created for the path
      *
-     * @throws RouterException   On
+     * @throws RouterException   On errors.
      */
     protected function getRegexForPath($path) {
         $matches = array();
@@ -192,5 +194,32 @@ class ArrayRouter implements IRouter {
         return $pathRegex;
     }
 
-
+    /**
+     * Returns the target (eg. URL) for the controller and action
+     *
+     * @param string $controller   The name of the controller
+     * @param string $action       The name of the action
+     * @param array  $param        Associative array with the route params, if they are required.
+     *
+     * @return string   The target.
+     *
+     * @throws RouterException   On errors. (Includig if the route is not found)
+     */
+    public function getTargetForControllerAction($controller, $action, $params = array()) {
+        $key = $controller . '/' . $action;
+        if (!isset($this->routes[$key])) {
+            throw new RouterException('No route found for controller and action', RouterException::ERR_NO_ROUTE_FOUND);
+        }
+        $target = preg_replace('/^\s*\[[^\]]+\]\s*/', '', $this->routes[$key]);
+        if (!strstr($this->routes[$key], '{')) {
+            return $target;
+        }
+        foreach($params as $key => $value) {
+            $target = preg_replace('/\{' . preg_quote($key, '/') . ':[^}]+\}/', $value, $target);
+        }
+        if (strstr($this->routes[$key], '{')) {
+            throw new RouterException('Missing route params.', RouterException::ERR_MISSING_PARAM);
+        }
+        return $target;
+    }
 }

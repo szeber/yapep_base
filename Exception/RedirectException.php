@@ -15,23 +15,47 @@ namespace YapepBase\Exception;
 /**
  * RedirectException class.
  *
- * Not descendant of Yapep\Exception\Exception, and it should only be catched by the Application
+ * Not descendant of YapepBase\Exception\Exception, and it should only be catched by the Application
  * or a controller if neccessary.
  *
  * @package    YapepBase
  * @subpackage Exception
  */
 class RedirectException extends \Exception {
+    /** Internal redirect type. */
+    const TYPE_INTERNAL = 1;
+    /** External redirect type. */
+    const TYPE_EXTERNAL = 2;
 
-    protected $controller;
+    /**
+     * The target of the redirect.
+     *
+     * @var string
+     */
+    protected $target;
 
-    protected $action;
-
-    public function __construct($controller, $action, $previous) {
-        $message = 'Redirecting to ' . $controller . '/' . $action;
-        $this->controller = $controller;
-        $this->action = $action;
-
-        parent::__construct($message, 0, $previous);
+    /**
+     * Constructor.
+     *
+     * @param string     $target     The target of the redirect. An URL for external, or a route for internal redirects.
+     * @param int        $type       The type of the redirect. {@uses self::TYPE_*}
+     * @param \Exception $previous   The previous exception, if the redirect is caused by one.
+     *
+     * @return return_type
+     */
+    public function __construct($target, $type, \Exception $previous = null) {
+        $message = 'Redirecting to: ' . $target;
+        $this->target = $target;
+        parent::__construct($message, $type, $previous);
     }
+
+    /**
+     * Returns the target of the redirect. (URL or route)
+     *
+     * @return string
+     */
+    public function getTarget() {
+        return $this->target;
+    }
+
 }
