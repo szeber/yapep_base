@@ -13,7 +13,7 @@
 namespace YapepBase\Request;
 
 /**
- * Router interface
+ * Request interface
  *
  * @package    YapepBase
  * @subpackage Request

@@ -168,7 +168,7 @@ class HttpRequest {
      *
      * Search order is GPC, so a POST value will overwrite a GET value with the same name.
      *
-     * @param string $name      The name of the cookie.
+     * @param string $name      The name of the param.
      * @param mixed  $default   The default value, if the parameter is not set.
      * @param string $source    The sources of the parameter. 'G' for GET, 'P' for POST, 'C' for Cookie.
      *
@@ -183,7 +183,7 @@ class HttpRequest {
         }
 
         if (strstr($source, 'P') && isset($this->postParams[$name])) {
-            $result = $this->getParams[$name];
+            $result = $this->postParams[$name];
         }
 
         if (strstr($source, 'C') && isset($this->cookies[$name])) {
