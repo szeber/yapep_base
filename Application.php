@@ -10,6 +10,10 @@
 
 
 namespace YapepBase;
+use YapepBase\Response\IResponse;
+
+use YapepBase\Request\IRequest;
+
 use YapepBase\ErrorHandler\IErrorHandler;
 use YapepBase\Router\IRouter;
 use YapepBase\DependencyInjection\SystemContainer;
@@ -21,6 +25,8 @@ use YapepBase\ErrorHandler\ErrorHandlerContainer;
  * Application singleton class
  *
  * @package    YapepBase
+ *
+ * @tood debugger support
  */
 class Application {
 
@@ -39,11 +45,18 @@ class Application {
     protected $router;
 
     /**
-     * Array containing the assigned debuggers.
+     * The request instance for the application.
      *
-     * @var array
+     * @var \YapepBase\Request\IRequest
      */
-    protected $debuggers = array();
+    protected $request;
+
+    /**
+     * The response instance for the application.
+     *
+     * @var \YapepBase\Response\IResponse
+     */
+    protected $response;
 
     /**
      * The configuration instance
@@ -132,6 +145,42 @@ class Application {
         return $this->diContainer;
     }
 
+	/**
+	 * Returns the request object used by the application.
+	 *
+     * @return \YapepBase\Request\
+     */
+    public function getRequest() {
+        return $this->request;
+    }
+
+	/**
+	 * Sets the request object used by the application.
+	 *
+     * @param \YapepBase\Request\IRequest $request
+     */
+    public function setRequest(IRequest $request) {
+        $this->request = $request;
+    }
+
+	/**
+	 * Returns the response object used by the application.
+	 *
+     * @return \YapepBase\Response\
+     */
+    public function getResponse() {
+        return $this->response;
+    }
+
+	/**
+	 * Sets the response object used by the application.
+	 *
+     * @param \YapepBase\Response\IResponse $response
+     */
+    public function setResponse(IResponse $response) {
+        $this->response = $response;
+    }
+
     /**
      * Returns the errorhandler container instance
      *
@@ -142,18 +191,30 @@ class Application {
     }
 
     /**
-     * Adds a debugger to the application
-     *
-     * @param IDebugger $debugger
+     * Runs the request on the application
      */
-    public function addDebugger(IDebugger $debugger) {
-        $this->debuggers[] = $debugger;
+    public function run() {
+        try {
+            $controllerName = null;
+            $action = null;
+            $this->router->getRoute($controllerName, $action);
+            $controller = $this->getDiContainer()->getController($controllerName, $this->request, $this->response);
+            $controller->run($action);
+        } catch (\Exception $exception) {
+            // FIXME refine exception handling
+            $this->outputError();
+        }
     }
 
     /**
      * Sends an error to the output.
      */
     public function outputError() {
-
+        try {
+            $this->response->sendError();
+        } catch (\Exception $exception) {
+            error_log('Uncaught exception during error shutdown: ' . $exception->getMessage());
+            exit;
+        }
     }
 }
