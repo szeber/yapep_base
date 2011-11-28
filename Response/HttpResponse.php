@@ -22,7 +22,7 @@ use YapepBase\Config;
  *
  * Configuration options:
  *     <ul>
- *         <li>system.response.defaultCharset:        Sets the default charset for the response.
+ *         <li>system.defaultCharset:                 Sets the default charset for the response.
  *                                                    Only used for HTML content types.</li>
  *         <li>system.response.gzip:                  If set to TRUE, enables GZIP compression.</li>
  *         <li>system.response.defaultCookieDomain:   The default domain for the cookies.</li>
@@ -189,7 +189,7 @@ class HttpResponse implements IResponse {
      *
      * @param string $type      The content type for the response. {@uses self::CONTENT_TYPE} or any valid content type.
      * @param string $charset   The charset of the response. For HTML content this will be set to the system default
-     *                          charset. See config option 'system.response.defaultCharset'.
+     *                          charset. See config option 'system.defaultCharset'.
      */
     public function setContentType($contentType, $charset = null) {
         $this->contentType = $contentType;
@@ -197,7 +197,7 @@ class HttpResponse implements IResponse {
 
         if (self::CONTENT_TYPE_HTML == $contentType && empty($charset)) {
             // For HTML content set the default charset to the sytem default.
-            $charset = Config::getInstance()->get('system.response.defaultCharset', 'UTF-8');
+            $charset = Config::getInstance()->get('system.defaultCharset', 'UTF-8');
         }
 
         if (!empty($charset)) {

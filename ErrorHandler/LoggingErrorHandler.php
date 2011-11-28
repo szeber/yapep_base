@@ -11,12 +11,9 @@
 
 
 namespace YapepBase\ErrorHandler;
+use YapepBase\Application;
 use YapepBase\Config;
-
 use YapepBase\Log\Message\ErrorMessage;
-
-use YapepBase\DependencyInjection\SystemContainer;
-
 use YapepBase\Log\ILogger;
 
 /**
@@ -63,7 +60,7 @@ class LoggingErrorHandler implements IErrorHandler {
         $errorMessage = '[' . $errorLevelDescription . '(' . $errorLevel . ')]: ' . $message . ' on line ' . $line
             . ' in ' . $file;
 
-        $message = SystemContainer::getInstance()->getErrorLogMessage();
+        $message = Application::getInstance()->getDiContainer()->getErrorLogMessage();
         $message->set($errorMessage, $errorLevelDescription, $errorId,
             $helper->getLogPriorityForErrorLevel($errorLevel));
 
@@ -81,7 +78,7 @@ class LoggingErrorHandler implements IErrorHandler {
             . $exception->getMessage() . '(' . $exception->getCode() .') on line ' . $exception->getLine() . ' in '
             . $exception->getFile();
 
-        $message = SystemContainer::getInstance()->getErrorLogMessage();
+        $message = Application::getInstance()->getDiContainer()->getErrorLogMessage();
         $message->set($errorMessage, self::EXCEPTION_DESCRIPTION, $errorId, LOG_ERR);
 
         $this->logger->log($message);
@@ -102,7 +99,7 @@ class LoggingErrorHandler implements IErrorHandler {
 
         $errorMessage = '[' . $errorLevelDescription . '(' . $errorLevel . ')]: ' . $message . ' on line ' . $line
         . ' in ' . $file;
-        $message = SystemContainer::getInstance()->getErrorLogMessage();
+        $message = Application::getInstance()->getDiContainer()->getErrorLogMessage();
         $message->set($errorMessage, $errorLevelDescription, $errorId,
                 $helper->getLogPriorityForErrorLevel($errorLevel));
         $this->logger->log($message);

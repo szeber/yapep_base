@@ -24,8 +24,10 @@ interface IView {
      * Renders the view and returns it.
      *
      * @param string $contentType   The content type of the response.
+     *                              {@uses \YapepBase\Response\HttpResponse::CONTENT_TYPE_*}
+     * @param bool   $return        If TRUE, the method will return the output, otherwise it will print it.
      *
-     * @return string   The rendered view
+     * @return string   The rendered view or NULL if not returned
      */
-    public function render($contentType);
+    public function render($contentType, $return = true);
 }

@@ -60,12 +60,19 @@ class Application {
     protected $errorHandlerContainer;
 
     /**
+     * Stores the system DI container
+     *
+     * @var \YapepBase\DependencyInjection\SystemContainer
+     */
+    protected $diContainer;
+
+    /**
      * Singleton constructor
      */
     protected function __construct() {
         $this->config = Config::getInstance();
         // Set up error handling
-        $this->errorHandlerContainer = SystemContainer::getInstance()->getErrorHandlerContainer();
+        $this->errorHandlerContainer = $this->getDiContainer()->getErrorHandlerContainer();
         $this->errorHandlerContainer->register();
     }
 
@@ -102,6 +109,27 @@ class Application {
      */
     public function getRouter() {
         return $this->router;
+    }
+
+    /**
+     * Sets the DI contianer to be used by the application
+     *
+     * @param \YapepBase\DependencyInjection\SystemContainer $diContainer
+     */
+    public function setDiContainer(SystemContainer $diContainer) {
+        $this->diContainer;
+    }
+
+    /**
+     * Returns the DI container used by the application
+     *
+     * @return \YapepBase\DependencyInjection\SystemContainer
+     */
+    public function getDiContainer() {
+        if (empty($this->diContainer)) {
+            $this->diContainer = new SystemContainer();
+        }
+        return $this->diContainer;
     }
 
     /**

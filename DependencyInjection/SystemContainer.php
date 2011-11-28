@@ -20,6 +20,8 @@ use YapepBase\Log\Message\ErrorMessage;
  *
  * @package    YapepBase
  * @subpackage DependencyInjection
+ *
+ * @todo Fix getController() and getBlock() implementation to use the namespace set in the config
  */
 class SystemContainer extends Pimple {
 
@@ -30,41 +32,17 @@ class SystemContainer extends Pimple {
     const KEY_ERROR_HANDLER_CONTAINER = 'errorHandlerContainer';
 
     /**
-     * The singleton instance
-     *
-     * @var SystemContainer
-     */
-    protected static $instance;
-
-    /**
-     * Singleton constructor. Sets up the system DI objects.
+     * Constructor. Sets up the system DI objects.
      *
      * @return \YapepBase\Log\Message\ErrorMessage
      */
-    protected function __construct() {
+    public function __construct() {
         $this[self::KEY_ERROR_LOG_MESSAGE] = function($container) {
             return new ErrorMessage();
         };
         $this[self::KEY_ERROR_HANDLER_CONTAINER] = function($container) {
             return new ErrorHandlerContainer();
         };
-    }
-
-    /**
-     * Singleton clone method.
-     */
-    protected function __clone() {}
-
-    /**
-     * Singleton getter method.
-     *
-     * @return \YapepBase\DependencyInjection\SystemContainer
-     */
-    public static function getInstance() {
-        if (is_null(static::$instance)) {
-            static::$instance = new static();
-        }
-        return static::$instance;
     }
 
     /**
@@ -83,6 +61,30 @@ class SystemContainer extends Pimple {
      */
     public function getErrorHandlerContainer() {
         return $this[self::KEY_ERROR_HANDLER_CONTAINER];
+    }
+
+    /**
+     * Returns a controller by it's name
+     *
+     * @param stirng $className   The name of the controller class to return. (Without the namespace)
+     *
+     * @return return_type
+     */
+    public function getController($className) {
+        $fullClassName = '\YapepBase\Controller\\' . $className;
+        return new $fullClassName;
+    }
+
+    /**
+     * Returns a block by it's name
+     *
+     * @param string $className   The name of the block class to return.
+     *
+     * @return \YapepBase\View\Block
+     */
+    public function getBlock($className) {
+        $fullClassName = '\YapepBase\View\Block\\' . $className;
+        return new $fullClassName;
     }
 
 }
