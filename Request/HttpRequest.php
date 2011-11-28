@@ -1,6 +1,6 @@
 <?php
 /**
- * This file is part of YAPEPBase.
+ * This file is part of YAPEPBase .
  *
  * @package      YapepBase
  * @subpackage   Request
