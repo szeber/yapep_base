@@ -124,6 +124,7 @@ class HttpResponse implements IResponse {
         ob_clean();
         echo $this->body->render($this->contentType);
         echo $obContents;
+        ob_end_flush();
     }
 
     /**
@@ -136,6 +137,7 @@ class HttpResponse implements IResponse {
     public function sendError() {
         $this->setStatusCode(500);
         echo '<h1>Internal server error</h1>';
+        ob_end_flush();
     }
 
     /**
