@@ -1,7 +1,6 @@
 <?php
 /**
  * This file is part of YAPEPBase.
- * Test from bpinter
  *
  * @package      YapepBase
  * @subpackage   Request
