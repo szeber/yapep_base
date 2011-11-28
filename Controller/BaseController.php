@@ -10,8 +10,9 @@
  */
 
 namespace YapepBase\Controller;
+use YapepBase\View\IView;
+use YapepBase\Application;
 use YapepBase\Exception\RedirectException;
-
 use YapepBase\Exception\ControllerException;
 use YapepBase\Response\IResponse;
 use YapepBase\Request\IRequest;
@@ -95,11 +96,31 @@ abstract class BaseController implements IController {
         }
         try {
             $this->before();
-            $this->$methodName();
+            $result = $this->runAction($methodName);
+            if (!empty($result) && !($result instanceof IView)) {
+                throw new ControllerException('Result of the action is not an instance of IView',
+                    ControllerException::ERR_INVALID_ACTION_RESULT);
+            }
+            if (!empty($result)) {
+                $this->response->setBody($result);
+            }
             $this->after();
         } catch (RedirectException $exception) {
-            // This is a redirect, we don't have to do handle it.
+            // This is a redirect, we don't have to do anything with it.
         }
+    }
+
+    /**
+     * Runs the action and returns the result as an IView instance
+     *
+     * @param string $methodName
+     *
+     * @return IView
+     *
+     * @throws
+     */
+    protected function runAction($methodName) {
+        return $this->$methodName();
     }
 
     /**
@@ -117,9 +138,9 @@ abstract class BaseController implements IController {
      * @throws \Exception                                 On non-framework related errors.
      */
     protected function internalRedirect($controller, $action) {
-        // TODO implement
-        // get controller instance
-        // run($action);
+        $controller = Application::getInstance()->getDiContainer()->getController($controller, $this->request,
+            $this->response);
+        $controller->run($action);
         throw new RedirectException($controller . '/' . $action, RedirectException::TYPE_INTERNAL);
     }
 }

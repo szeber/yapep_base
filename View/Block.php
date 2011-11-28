@@ -35,6 +35,23 @@ abstract class Block extends ViewAbstract {
     private $params = array();
 
     /**
+     * Constructor.
+     *
+     * Final, so the signature stays the same for all blocks. Any initialization code should be placed in the
+     * init() method.
+     */
+    final public function __construct() {
+        $this->init();
+    }
+
+    /**
+     * Called from the constructor.
+     */
+    protected function init() {
+        // Implemented in descendant classes if needed.
+    }
+
+    /**
      * Sets a parameter for the block
      *
      * @param string $name       The name of the parameter.

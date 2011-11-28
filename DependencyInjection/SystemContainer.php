@@ -11,6 +11,10 @@
 
 
 namespace YapepBase\DependencyInjection;
+use YapepBase\Response\IResponse;
+
+use YapepBase\Request\IRequest;
+
 use YapepBase\ErrorHandler\ErrorHandlerContainer;
 use YapepBase\Lib\Pimple\Pimple;
 use YapepBase\Log\Message\ErrorMessage;
@@ -68,11 +72,11 @@ class SystemContainer extends Pimple {
      *
      * @param stirng $className   The name of the controller class to return. (Without the namespace)
      *
-     * @return return_type
+     * @return \YapepBase\Controller\IController
      */
-    public function getController($className) {
+    public function getController($className, IRequest $request, IResponse $response) {
         $fullClassName = '\YapepBase\Controller\\' . $className;
-        return new $fullClassName;
+        return new $fullClassName($request, $response);
     }
 
     /**
@@ -84,7 +88,7 @@ class SystemContainer extends Pimple {
      */
     public function getBlock($className) {
         $fullClassName = '\YapepBase\View\Block\\' . $className;
-        return new $fullClassName;
+        return new $fullClassName();
     }
 
 }
