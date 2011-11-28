@@ -20,4 +20,16 @@ namespace YapepBase\Response;
  */
 class HttpResponse {
 
+    public function setStatusCode($statusCode, $statuMessage = '') {
+
+    }
+
+    public function setResponseBody($responseBody) {
+
+    }
+
+    public function getRenderedResponse() {
+
+    }
+
 }

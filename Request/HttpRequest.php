@@ -20,7 +20,7 @@ use YapepBase\UtilityFunctions;
  * @package    YapepBase
  * @subpackage Request
  */
-class HttpRequest implements IRequest {
+class HttpRequest {
 
     /**
      * The GET parameters received with the request.
@@ -133,12 +133,34 @@ class HttpRequest implements IRequest {
         return $default;
     }
 
-    public function getHeader() {
-
+    /**
+     * Returns a value from the PHP server array. {@uses $_SERVER}
+     *
+     * @param string $name      The key of the value to return.
+     * @param mixed  $default   The default value, if the key is not set.
+     *
+     * @return mixed   The value, or the provided default, if the key is not found.
+     */
+    public function getServer($name, $default = null) {
+        if (isset($_SERVER[$name])) {
+            return $_SERVER[$name];
+        }
+        return $default;
     }
 
-    public function getEnv() {
-
+    /**
+     * Returns a value from the running environment. {@uses $_ENV}
+     *
+     * @param string $name      The key of the value to return.
+     * @param mixed  $default   The default value, if the key is not set.
+     *
+     * @return mixed   The value, or the provided default, if the key is not found.
+     */
+    public function getEnv($name, $default = null) {
+        if (isset($_ENV[$name])) {
+            return $_ENV[$name];
+        }
+        return $default;
     }
 
     /**
@@ -171,8 +193,6 @@ class HttpRequest implements IRequest {
         return $result;
     }
 
-
-
     /**
      * Returns the target of the request.
      *
@@ -201,19 +221,13 @@ class HttpRequest implements IRequest {
         $this->routeParams[$name] = $value;
     }
 
+    /**
+     * Returns TRUE if the request was made as an AJAX request.
+     *
+     * @return bool
+     */
     public function isAjaxRequest() {
-
-    }
-
-    public function isIe() {
-
-    }
-
-    public function isGecko() {
-
-    }
-
-    public function isWebkit() {
-
+        return (!empty($_SERVER['HTTP_X_REQUESTED_WITH'])
+            && 'xmlhttprequest' == strtolower($_SERVER['HTTP_X_REQUESTED_WITH']));
     }
 }
