@@ -20,17 +20,28 @@ use YapepBase\Config;
 /**
  * HttpResponse class
  *
+ * Configuration options:
+ *     <ul>
+ *         <li>system.response.defaultCharset:        Sets the default charset for the response.
+ *                                                    Only used for HTML content types.</li>
+ *         <li>system.response.gzip:                  If set to TRUE, enables GZIP compression.</li>
+ *         <li>system.response.defaultCookieDomain:   The default domain for the cookies.</li>
+ *     </ul>
+ *
  * @package    YapepBase
  * @subpackage Response
- *
- * @todo phpdoc!
  */
 class HttpResponse implements IResponse {
 
+    /** HTML content type */
     const CONTENT_TYPE_HTML = 'text/html';
+    /** CSS content type */
     const CONTENT_TYPE_CSS = 'text/css';
-    const CONTENT_TYPE_JAVASCRIPT = 'text/javascript';
+    /** Javascript content type */
+    const CONTENT_TYPE_JAVASCRIPT = 'appliation/javascript';
+    /** JSON content type */
     const CONTENT_TYPE_JSON = 'application/json';
+    /** XML content type */
     const CONTENT_TYPE_XML = 'application/xml';
 
     /**
@@ -40,14 +51,44 @@ class HttpResponse implements IResponse {
      */
     protected $body;
 
+    /**
+     * Stores te cookies to be set in the  response.
+     *
+     * @var array
+     */
     protected $cookies = array();
 
+    /**
+     * Stores the headers to be sent out in the response.
+     *
+     * @var array
+     */
     protected $headers = array();
 
+    /**
+     * Stores the status header
+     *
+     * @var string
+     */
     protected $statusHeader;
 
-    protected $contentType = self::CONTENT_TYPE_HTML;
+    /**
+     * Stores the content type. {@uses self::CONTENT_TYPE_*}
+     *
+     * @var string
+     */
+    protected $contentType;
 
+    /**
+     * Stores the content type header
+     *
+     * @var string
+     */
+    protected $contentTypeHeader;
+
+    /**
+     * Constructor.
+     */
     public function __construct() {
         $this->setContentType(self::CONTENT_TYPE_HTML);
         $this->startOutputBuffer();
@@ -81,7 +122,7 @@ class HttpResponse implements IResponse {
         }
         $obContents = ob_get_contents();
         ob_clean();
-        echo $this->body->render();
+        echo $this->body->render($this->contentType);
         echo $obContents;
     }
 
@@ -93,7 +134,8 @@ class HttpResponse implements IResponse {
      * @throws \YapepBase\Exception\Exception   If called after send()
      */
     public function sendError() {
-
+        $this->setStatusCode(500);
+        echo '<h1>Internal server error</h1>';
     }
 
     /**
@@ -145,20 +187,21 @@ class HttpResponse implements IResponse {
     /**
      * Sets the content type for the response
      *
-     * @param string $type      The content type for the response.
+     * @param string $type      The content type for the response. {@uses self::CONTENT_TYPE} or any valid content type.
      * @param string $charset   The charset of the response. For HTML content this will be set to the system default
      *                          charset. See config option 'system.response.defaultCharset'.
      */
-    public function setContentType($type, $charset = null) {
-        $this->contentType = 'Content-type: ' . $type;
+    public function setContentType($contentType, $charset = null) {
+        $this->contentType = $contentType;
+        $this->contentTypeHeader = 'Content-type: ' . $contentType;
 
-        if (self::CONTENT_TYPE_HTML == $type && empty($charset)) {
+        if (self::CONTENT_TYPE_HTML == $contentType && empty($charset)) {
             // For HTML content set the default charset to the sytem default.
             $charset = Config::getInstance()->get('system.response.defaultCharset', 'UTF-8');
         }
 
         if (!empty($charset)) {
-            $this->contentType .= '; charset=' . $charset;
+            $this->contentTypeHeader .= '; charset=' . $charset;
         }
     }
 
