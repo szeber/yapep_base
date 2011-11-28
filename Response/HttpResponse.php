@@ -11,6 +11,8 @@
 
 
 namespace YapepBase\Response;
+use YapepBase\Exception\Exception;
+
 use YapepBase\Exception\RedirectException;
 
 use YapepBase\Request\HttpRequest;
@@ -86,6 +88,8 @@ class HttpResponse implements IResponse {
      */
     protected $contentTypeHeader;
 
+    protected $isResponseSent = false;
+
     /**
      * Constructor.
      */
@@ -109,6 +113,12 @@ class HttpResponse implements IResponse {
      * Sends the response
      */
     public function send() {
+        if ($this->isResponseSent) {
+            throw new Exception('Send called after the response has been sent');
+        }
+
+        $this->isResponseSent = true;
+
         if (!empty($this->statusHeader)) {
             header($this->statusHeader);
         }
@@ -122,7 +132,7 @@ class HttpResponse implements IResponse {
         }
         $obContents = ob_get_contents();
         ob_clean();
-        echo $this->body->render($this->contentType);
+        $this->body->render($this->contentType, false);
         echo $obContents;
         ob_end_flush();
     }
@@ -135,6 +145,12 @@ class HttpResponse implements IResponse {
      * @throws \YapepBase\Exception\Exception   If called after send()
      */
     public function sendError() {
+        if ($this->isResponseSent) {
+            throw new Exception('SendError called after the response has been sent');
+        }
+
+        $this->isResponseSent = true;
+
         $this->setStatusCode(500);
         echo '<h1>Internal server error</h1>';
         ob_end_flush();
@@ -146,7 +162,6 @@ class HttpResponse implements IResponse {
      * @param \YapepBase\View\IView $body
      */
     public function setBody(IView $body) {
-        // TODO checks
         $this->body = $body;
     }
 
