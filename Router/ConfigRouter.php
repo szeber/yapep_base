@@ -9,7 +9,6 @@
  * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
-
 namespace YapepBase\Router;
 use YapepBase\Exception\RouterException;
 use YapepBase\Config;

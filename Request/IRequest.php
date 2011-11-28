@@ -48,4 +48,22 @@ interface IRequest {
      * @return string   {@uses self::METHOD_*}
      */
     public function getMethod();
+
+    /**
+     * Retruns the specified route param, or the default value if it's not set.
+     *
+     * @param string $name      The name of the cookie.
+     * @param mixed  $default   The default value, if the parameter is not set.
+     *
+     * @return mixed
+     */
+    public function getParam($name, $default = null);
+
+    /**
+     * Sets a route param
+     *
+     * @param string $name
+     * @param mixed $value
+     */
+    public function setParam($name, $value);
 }

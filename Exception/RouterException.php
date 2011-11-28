@@ -19,5 +19,6 @@ namespace YapepBase\Exception;
  * @subpackage Exception
  */
 class RouterException extends Exception {
-
+    const ERR_NO_ROUTE_FOUND = 101;
+    const ERR_SYNTAX_PARAM = 201;
 }

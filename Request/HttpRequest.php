@@ -215,7 +215,7 @@ class HttpRequest {
      * Sets a route param
      *
      * @param string $name
-     * @param mices $value
+     * @param mixed $value
      */
     public function setParam($name, $value) {
         $this->routeParams[$name] = $value;
