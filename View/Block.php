@@ -42,6 +42,7 @@ abstract class Block extends ViewAbstract {
      */
     final public function __construct() {
         $this->init();
+        parent::__construct();
     }
 
     /**

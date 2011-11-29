@@ -97,12 +97,16 @@ abstract class BaseController implements IController {
         try {
             $this->before();
             $result = $this->runAction($methodName);
-            if (!empty($result) && !($result instanceof IView)) {
-                throw new ControllerException('Result of the action is not an instance of IView',
+            if (!empty($result) && !is_string($result) && !($result instanceof IView)) {
+                throw new ControllerException('Result of the action is not an instance of IView or string',
                     ControllerException::ERR_INVALID_ACTION_RESULT);
             }
             if (!empty($result)) {
-                $this->response->setBody($result);
+                if (is_string($result)) {
+                    $this->response->setRenderedBody($result);
+                } else {
+                    $this->response->setBody($result);
+                }
             }
             $this->after();
         } catch (RedirectException $exception) {
@@ -117,7 +121,9 @@ abstract class BaseController implements IController {
      *
      * @return IView
      *
-     * @throws
+     * @throws \YapepBase\Exception\ControllerException   On controller specific error. (eg. action not found)
+     * @throws \YapepBase\Exception\Exception             On framework related errors.
+     * @throws \Exception                                 On non-framework related errors.
      */
     protected function runAction($methodName) {
         return $this->$methodName();

@@ -21,4 +21,5 @@ namespace YapepBase\Exception;
 class ControllerException extends Exception {
     const ERR_INCOMPATIBLE_REQUEST = 101;
     const ERR_INCOMPATIBLE_RESPONSE = 102;
+    const ERR_INVALID_ACTION_RETURN_VALUE = 201;
 }

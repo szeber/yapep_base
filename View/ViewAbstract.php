@@ -100,16 +100,22 @@ abstract class ViewAbstract implements IView {
     }
 
     /**
-     * Recursively escapes the data
+     * Recursively escapes the data.
      *
-     * @param mixed $data
+     * @param mixed $data         The data to escape.
+     * @param bool  $escapeKeys   If TRUE then the keys will be escaped too.
      *
-     * @return mixed
+     * @return mixed   The escaped data.
      */
-    protected function escape($data) {
+    protected function escape($data, $escapeKeys = false) {
         if (is_array($data) || (($data instanceof \Iterator) && ($data instanceof \ArrayAccess))) {
             foreach($data as $key => $value) {
-                $data[$key] = $this->escape($value);
+                if ($escapeKeys) {
+                    unset($data[$key]);
+                    $data[$this->escapeSimpleValue($key)] = $this->escape($value);
+                } else {
+                    $data[$key] = $this->escape($value);
+                }
             }
             return $data;
         } else {

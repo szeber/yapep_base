@@ -21,11 +21,18 @@ use YapepBase\View\IView;
 interface IResponse {
 
     /**
-     * Sets the response body
+     * Sets the response body.
      *
      * @param \YapepBase\View\IView $body
      */
     public function setBody(IView $body);
+
+    /**
+     * Sets the already rendered body.
+     *
+     * @param string $body
+     */
+    public function setRenderedBody($body);
 
     /**
      * Sends the response

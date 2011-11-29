@@ -11,6 +11,8 @@
 
 
 namespace YapepBase\Response;
+use YapepBase\View\IView;
+
 use YapepBase\Exception\Exception;
 
 use YapepBase\Exception\RedirectException;
@@ -88,6 +90,11 @@ class HttpResponse implements IResponse {
      */
     protected $contentTypeHeader;
 
+    /**
+     * TRUE if the response has already been sent.
+     *
+     * @var bool
+     */
     protected $isResponseSent = false;
 
     /**
@@ -132,7 +139,11 @@ class HttpResponse implements IResponse {
         }
         $obContents = ob_get_contents();
         ob_clean();
-        $this->body->render($this->contentType, false);
+        if ($this->body instanceof IView) {
+            $this->body->render($this->contentType, false);
+        } else {
+            echo $this->body;
+        }
         echo $obContents;
         ob_end_flush();
     }
@@ -163,6 +174,15 @@ class HttpResponse implements IResponse {
      */
     public function setBody(IView $body) {
         $this->body = $body;
+    }
+
+    /**
+     * Sets the already rendered body.
+     *
+     * @param string $body
+     */
+    public function setRenderedBody($body) {
+        $this->body = (string)$body;
     }
 
     /**

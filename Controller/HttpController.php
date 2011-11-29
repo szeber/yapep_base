@@ -30,7 +30,7 @@ abstract class HttpController extends BaseController {
     /**
      * The request instance
      *
-     * @var \YapepBase\Request\HttpRequest;
+     * @var \YapepBase\Request\HttpRequest
      */
     protected $request;
 
