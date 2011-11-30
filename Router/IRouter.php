@@ -37,7 +37,7 @@ interface IRouter {
      *
      * @param string $controller   The name of the controller
      * @param string $action       The name of the action
-     * @param array  $param        Associative array with the route params, if they are required.
+     * @param array  $params       Associative array with the route params, if they are required.
      *
      * @return string   The target.
      *

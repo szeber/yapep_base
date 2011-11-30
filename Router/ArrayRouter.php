@@ -199,7 +199,7 @@ class ArrayRouter implements IRouter {
      *
      * @param string $controller   The name of the controller
      * @param string $action       The name of the action
-     * @param array  $param        Associative array with the route params, if they are required.
+     * @param array  $params       Associative array with the route params, if they are required.
      *
      * @return string   The target.
      *
@@ -219,6 +219,9 @@ class ArrayRouter implements IRouter {
         }
         if (strstr($this->routes[$key], '{')) {
             throw new RouterException('Missing route params.', RouterException::ERR_MISSING_PARAM);
+        }
+        if ('/' != substr($target, 0, 1)) {
+            $target = '/' . $target;
         }
         return $target;
     }

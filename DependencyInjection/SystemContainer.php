@@ -68,14 +68,15 @@ class SystemContainer extends Pimple {
     }
 
     /**
-     * Returns a controller by it's name
+     * Returns a controller by it's name.
      *
-     * @param stirng $className   The name of the controller class to return. (Without the namespace)
+     * @param stirng $controllerName   The name of the controller class to return.
+     *                                 (Without the namespace and Controller suffix)
      *
      * @return \YapepBase\Controller\IController
      */
-    public function getController($className, IRequest $request, IResponse $response) {
-        $fullClassName = '\YapepBase\Controller\\' . $className;
+    public function getController($controllerName, IRequest $request, IResponse $response) {
+        $fullClassName = '\YapepBase\Controller\\' . $controllerName . 'Controller';
         return new $fullClassName($request, $response);
     }
 
@@ -83,11 +84,12 @@ class SystemContainer extends Pimple {
      * Returns a block by it's name
      *
      * @param string $className   The name of the block class to return.
+     *                            (Without the namespace and Block suffix)
      *
      * @return \YapepBase\View\Block
      */
-    public function getBlock($className) {
-        $fullClassName = '\YapepBase\View\Block\\' . $className;
+    public function getBlock($blockName) {
+        $fullClassName = '\YapepBase\View\Block\\' . $blockName . 'Block';
         return new $fullClassName();
     }
 
