@@ -143,16 +143,16 @@ class ArrayRouter implements IRouter {
      */
     protected function getRegexForPath($path) {
         $matches = array();
-        if (!preg_match_all('/\{([-_.a-zA-Z0-9]+):([-_.a-zA-Z0-9]+)\(([^}]*)\)?\}/', $path, $matches, PREG_SET_ORDER)) {
+        if (!preg_match_all('/\{([-_.a-zA-Z0-9]+):([-_.a-zA-Z0-9]+)(\(([^}]*)\))?\}/', $path, $matches, PREG_SET_ORDER)) {
             throw new RouterException('Invalid param syntax in route', RouterException::ERR_SYNTAX_PARAM);
         }
 
-        $pathRegex = '/' . preg_quote($path, '/') . '/';
+        $pathRegex = '/^' . preg_quote($path, '/') . '$/';
         $params = array();
         foreach ($matches as $match) {
             switch ($match[2]) {
                 case 'alpha':
-                    $pattern = '[:alpha:]+';
+                    $pattern = '[[:alpha:]]+';
                     break;
 
                 case 'num':
@@ -160,7 +160,7 @@ class ArrayRouter implements IRouter {
                     break;
 
                 case 'alnum':
-                    $pattern = '[:alnum"]+';
+                    $pattern = '[[:alnum:]]+';
                     break;
 
                 case 'regex':
@@ -185,8 +185,8 @@ class ArrayRouter implements IRouter {
                     break;
             }
             $count = 0;
-            $pathRegex = str_replace(preg_quote($match[0], '/'), '(?P<' . preg_quote($match[1], '/') . '>' . $pattern,
-                $pathRegex, $count);
+            $pathRegex = str_replace(preg_quote($match[0], '/'), '(?P<' . preg_quote($match[1], '/') . '>' . $pattern
+                . ')', $pathRegex, $count);
             if (1 != $count) {
                 throw new RouterException('Duplicate route param name', RouterException::ERR_SYNTAX_PARAM);
             }
@@ -211,14 +211,13 @@ class ArrayRouter implements IRouter {
             throw new RouterException('No route found for controller and action', RouterException::ERR_NO_ROUTE_FOUND);
         }
         $target = preg_replace('/^\s*\[[^\]]+\]\s*/', '', $this->routes[$key]);
-        if (!strstr($this->routes[$key], '{')) {
-            return $target;
-        }
-        foreach($params as $key => $value) {
-            $target = preg_replace('/\{' . preg_quote($key, '/') . ':[^}]+\}/', $value, $target);
-        }
         if (strstr($this->routes[$key], '{')) {
-            throw new RouterException('Missing route params.', RouterException::ERR_MISSING_PARAM);
+            foreach($params as $key => $value) {
+                $target = preg_replace('/\{' . preg_quote($key, '/') . ':[^}]+\}/', $value, $target);
+            }
+            if (strstr($target, '{')) {
+                throw new RouterException('Missing route params.', RouterException::ERR_MISSING_PARAM);
+            }
         }
         if ('/' != substr($target, 0, 1)) {
             $target = '/' . $target;

@@ -11,7 +11,6 @@
 
 
 namespace YapepBase\Request;
-
 use YapepBase\UtilityFunctions;
 
 /**
@@ -20,7 +19,7 @@ use YapepBase\UtilityFunctions;
  * @package    YapepBase
  * @subpackage Request
  */
-class HttpRequest {
+class HttpRequest implements IRequest {
 
     /**
      * The GET parameters received with the request.

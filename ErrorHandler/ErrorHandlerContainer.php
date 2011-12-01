@@ -11,6 +11,8 @@
 
 
 namespace YapepBase\ErrorHandler;
+use YapepBase\Application;
+use YapepBase\Config;
 
 /**
  * ErrorHandlerContainer class
@@ -18,10 +20,6 @@ namespace YapepBase\ErrorHandler;
  * @package    YapepBase
  * @subpackage ErrorHandler
  */
-use YapepBase\Application;
-
-use YapepBase\Config;
-
 class ErrorHandlerContainer {
 
     /** The default timeout for the error ID in seconds. */

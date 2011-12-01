@@ -210,8 +210,8 @@ class HttpResponse implements IResponse {
     /**
      * Redirects the client to the specified URL
      *
-     * @param string $url            The URL to redirect to.
-     * @param int    $redirectCode   The status code for the redirect.
+     * @param string $url          The URL to redirect to.
+     * @param int    $statusCode   The status code for the redirect.
      *
      * @throws \YapepBase\Exception\RedirectException   To stop execution of the controller.
      */
@@ -224,9 +224,10 @@ class HttpResponse implements IResponse {
     /**
      * Sets the content type for the response
      *
-     * @param string $type      The content type for the response. {@uses self::CONTENT_TYPE} or any valid content type.
-     * @param string $charset   The charset of the response. For HTML content this will be set to the system default
-     *                          charset. See config option 'system.defaultCharset'.
+     * @param string $contentType   The content type for the response. {@uses self::CONTENT_TYPE} or any valid content
+     *                              type.
+     * @param string $charset       The charset of the response. For HTML content this will be set to the system default
+     *                              charset. See config option 'system.defaultCharset'.
      */
     public function setContentType($contentType, $charset = null) {
         $this->contentType = $contentType;

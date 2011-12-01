@@ -19,7 +19,14 @@ namespace YapepBase\Exception;
  * @subpackage Exception
  */
 class ControllerException extends Exception {
+
+    // Controller compatibility errors
+    /** The received request object is not compatible with the controller. */
     const ERR_INCOMPATIBLE_REQUEST = 101;
+    /** The received response object is not compatible with the controller. */
     const ERR_INCOMPATIBLE_RESPONSE = 102;
+
+    // Action related errors
+    /** The return value received from the action is invalid. */
     const ERR_INVALID_ACTION_RETURN_VALUE = 201;
 }

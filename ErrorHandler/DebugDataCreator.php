@@ -21,6 +21,11 @@ use YapepBase\Storage\IStorage;
  */
 class DebugDataCreator implements IErrorHandler  {
 
+    /**
+     * The storage instance
+     *
+     * @var \YapepBase\Storage\IStorage
+     */
     protected $storage;
 
     /**

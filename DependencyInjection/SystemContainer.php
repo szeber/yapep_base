@@ -70,8 +70,10 @@ class SystemContainer extends Pimple {
     /**
      * Returns a controller by it's name.
      *
-     * @param stirng $controllerName   The name of the controller class to return.
-     *                                 (Without the namespace and Controller suffix)
+     * @param stirng    $controllerName   The name of the controller class to return.
+     *                                    (Without the namespace and Controller suffix)
+     * @param IRequest  $request          The request object for the controller.
+     * @param IResponse $response         The response object for the controller.
      *
      * @return \YapepBase\Controller\IController
      */
@@ -83,7 +85,7 @@ class SystemContainer extends Pimple {
     /**
      * Returns a block by it's name
      *
-     * @param string $className   The name of the block class to return.
+     * @param string $blockName   The name of the block class to return.
      *                            (Without the namespace and Block suffix)
      *
      * @return \YapepBase\View\Block

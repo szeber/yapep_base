@@ -36,7 +36,7 @@ class ConfigRouter extends ArrayRouter {
     public function __construct(IRequest $request, $configName) {
         $routes = Config::getInstance()->get($configName, false);
         if (!is_array($routes)) {
-            throw new RouterException('No route config found');
+            throw new RouterException('No route config found', RouterException::ERR_ROUTE_CONFIG);
         }
         parent::__construct($request, $routes);
     }

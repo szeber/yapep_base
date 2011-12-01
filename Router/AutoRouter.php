@@ -11,6 +11,7 @@
 
 
 namespace YapepBase\Router;
+use YapepBase\Request\IRequest;
 
 /**
  * AutoRouter class.
@@ -54,12 +55,12 @@ class AutoRouter implements IRouter {
         if (empty($controller)) {
             $controller = 'Index';
         } else {
-            $controller = $this->convertStringToName($controller);
+            $controller = $this->convertPathPartToName($controller);
         }
         if (empty($target)) {
             $action = 'Index';
         } else {
-            $action = $this->convertStringToName(array_shift($target));
+            $action = $this->convertPathPartToName(array_shift($target));
         }
         foreach ($target as $key => $value) {
             $this->request->setParam($key, $value);
@@ -69,18 +70,29 @@ class AutoRouter implements IRouter {
     }
 
     /**
-     * Converts a string to a controller or action name.
+     * Converts a path part to a controller or action name.
      *
      * @param string $string
      *
      * @return string
      */
-    protected function convertStringToName($string) {
+    protected function convertPathPartToName($string) {
         $parts = preg_split('/[-_ A-Z]/', preg_replace('/[^-_a-zA-Z0-9]/', '', $string));
         foreach($parts as $key => $value) {
             $parts[$key] = ucfirst($value);
         }
         return implode('', $parts);
+    }
+
+    /**
+     * Converts a controller or action name to a path part
+     *
+     * @param string $name
+     *
+     * @return string
+     */
+    protected function convertNameToPathPart($name) {
+        return strtolower(substr($name, 0, 1)) . substr($name, 1);
     }
 
     /**
@@ -95,12 +107,12 @@ class AutoRouter implements IRouter {
      * @throws RouterException   On errors. (Includig if the route is not found)
      */
     public function getTargetForControllerAction($controller, $action, $params = array()) {
-        if ('Index' == $action && 'Index' == $controller) {
+        if ('Index' == $action && 'Index' == $controller && empty($params)) {
             $path = '/';
-        } elseif ('Index' == $action) {
-            $path = '/' . $controller;
+        } elseif ('Index' == $action && empty($params)) {
+            $path = '/' . $this->convertNameToPathPart($controller);
         } else {
-            $path = '/' . $controller . '/' . $action;
+            $path = '/' . $this->convertNameToPathPart($controller) . '/' . $this->convertNameToPathPart($action);
         }
         if (!empty($params)) {
             $path .= '/' . implode('/', $params);

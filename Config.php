@@ -34,12 +34,16 @@ class Config {
 
     /**
      * Singleton constructor
+     *
+     * @codeCoverageIgnore
      */
     protected function __construct() {
     }
 
     /**
      * Singleton clone method
+     *
+     * @codeCoverageIgnore
      */
     protected function __clone() {
     }

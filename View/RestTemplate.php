@@ -11,6 +11,9 @@
 
 
 namespace YapepBase\View;
+use YapepBase\Exception\ViewException;
+use YapepBase\Response\HttpResponse;
+use YapepBase\Response\IResponse;
 
 /**
  * RestTemplate class
@@ -18,12 +21,6 @@ namespace YapepBase\View;
  * @package    YapepBase
  * @subpackage View
  */
-use YapepBase\Exception\ViewException;
-
-use YapepBase\Response\HttpResponse;
-
-use YapepBase\Response\IResponse;
-
 class RestTemplate extends ViewAbstract {
 
     /**
