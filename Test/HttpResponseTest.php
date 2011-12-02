@@ -14,16 +14,19 @@ class HttpResponseTest extends \PHPUnit_Framework_TestCase {
 	 * @var \YapepBase\Request\HttpResponse
 	 */
 	protected $response;
-        
+
+	/**
+	 * @see PHPUnit_Framework_TestCase::setUp()
+	 */
     protected function setUp() {
 
-    parent::setUp();
+        parent::setUp();
 
-            $this->response = new HttpResponse();
+        $this->response = new HttpResponse();
     }
 
     /**
-     * This function tests, that bodies are 
+     * This function tests, that bodies are correctly stored and rendered
      */
     public function testBodyStoringAndRendering() {
 
@@ -32,11 +35,11 @@ class HttpResponseTest extends \PHPUnit_Framework_TestCase {
 
         $this->response->setRenderedBody('test body 1');
         $this->assertEquals('test body 1', $this->response->getRenderedBody(), 'HttpResponse does not correctly store or render a plain text body.');
-        
+
         $view = new \YapepBase\Test\Mock\Response\ViewMock();
         $view->set('test body 2');
         $this->response->setBody($view);
         $this->assertEquals('test body 2', $this->response->getRenderedBody(), 'HttpResponse does not correctly store or render an IView body.');
-        
+
     }
 }
