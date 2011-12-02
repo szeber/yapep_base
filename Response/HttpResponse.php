@@ -139,11 +139,7 @@ class HttpResponse implements IResponse {
         }
         $obContents = ob_get_contents();
         ob_clean();
-        if ($this->body instanceof IView) {
-            $this->body->render($this->contentType, false);
-        } else {
-            echo $this->body;
-        }
+        echo $this->getRenderedBody();
         echo $obContents;
         ob_end_flush();
     }
@@ -183,6 +179,19 @@ class HttpResponse implements IResponse {
      */
     public function setRenderedBody($body) {
         $this->body = (string)$body;
+    }
+    
+    /**
+     * Renders and returns the HTTP response body.
+     * 
+     * @return string
+     */
+    public function getRenderedBody() {
+        if ($this->body instanceof IView) {
+            return $this->body->render($this->contentType, true);
+        } else {
+            return $this->body;
+        }
     }
 
     /**
