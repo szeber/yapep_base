@@ -47,7 +47,7 @@ class HttpResponse implements IResponse {
     const CONTENT_TYPE_JSON = 'application/json';
     /** XML content type */
     const CONTENT_TYPE_XML = 'application/xml';
-
+    
     /**
      * The response body.
      *
@@ -68,13 +68,20 @@ class HttpResponse implements IResponse {
      * @var array
      */
     protected $headers = array();
+    
+    /**
+     * Stores the status code 
+     * @var int
+     * @see http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
+     */
+    protected $statusCode = 200;
 
     /**
-     * Stores the status header
+     * Stores the status message
      *
      * @var string
      */
-    protected $statusHeader;
+    protected $statusMessage = 'OK';
 
     /**
      * Stores the content type. {@uses self::CONTENT_TYPE_*}
@@ -84,25 +91,81 @@ class HttpResponse implements IResponse {
     protected $contentType;
 
     /**
-     * Stores the content type header
-     *
-     * @var string
-     */
-    protected $contentTypeHeader;
-
-    /**
      * TRUE if the response has already been sent.
      *
      * @var bool
      */
     protected $isResponseSent = false;
+    
+    /**
+     * Stores the raw output handler.
+     * 
+     * @var IOutput
+     */
+    protected $output;
+    
+    /**
+     * Standard HTTP status codes
+     * 
+     * @var array
+     */
+    protected static $statusCodes = array(
+        100 => 'Continue',
+        101 => 'Switching Protocols',
+        200 => 'OK',
+        201 => 'Created',
+        202 => 'Accepted',
+        203 => 'Non-Authoritative Information',
+        204 => 'No Content',
+        205 => 'Reset Content',
+        206 => 'Partial Content',
+        300 => 'Multiple Choices',
+        301 => 'Moved Permanently',
+        302 => 'Found',
+        303 => 'See Other',
+        304 => 'Not Modified',
+        305 => 'Use Proxy',
+        307 => 'Temporary Redirect',
+        400 => 'Bad Request',
+        401 => 'Unauthorized',
+        402 => 'Payment Required',
+        403 => 'Forbidden',
+        404 => 'Not Found',
+        405 => 'Method Not Allowed',
+        406 => 'Not Acceptable',
+        407 => 'Proxy Authentication Required',
+        408 => 'Request Timeout',
+        409 => 'Conflict',
+        410 => 'Gone',
+        411 => 'Length Required',
+        412 => 'Precondition Failed',
+        413 => 'Request Entity Too Large',
+        414 => 'Request-URI Too Long',
+        415 => 'Unsupported Media Type',
+        416 => 'Requested Range Not Satisfiable',
+        417 => 'Expectation Failed',
+        500 => 'Internal Server Error',
+        501 => 'Not Implemented',
+        502 => 'Bad Gateway',
+        503 => 'Service Unavailable',
+        504 => 'Gateway Timeout',
+        505 => 'HTTP Version Not Supported',
+    );
 
     /**
      * Constructor.
+     * @param \YapepBase\Response\IOutput $output The output handler to use.
+     *                                            Uses PHPOutput if none given.
      */
-    public function __construct() {
+    public function __construct(IOutput $output = null) {
         $this->setContentType(self::CONTENT_TYPE_HTML);
         $this->startOutputBuffer();
+        // @codeCoverageIgnoreStart
+        if (!$output) {
+            $output = new PHPOutput();
+        }
+        // @codeCoverageIgnoreEnd
+        $this->output = $output;
     }
 
     /**
@@ -115,6 +178,69 @@ class HttpResponse implements IResponse {
             ob_start();
         }
     }
+    
+    /**
+     * Checks, if RFC2616 is adhered so browser incompatibilities are avoided.
+     * Only for use in the send() function.
+     */
+    protected function checkStandards($renderedBody) {
+        switch ($this->statusCode) {
+            case 204:
+                /**
+                 * If the response code is No Content, a response body must not be returned.
+                 */
+                if (strlen($renderedBody) > 0) {
+                    throw new \YapepBase\Exception\StandardsComplianceException('If a No Content (204) status code is returned, the response body must be empty. (Currently contains ' . strlen($this->body) . ' bytes)');
+                }
+                break;
+            case 206:
+                /**
+                 * In case of a partial-content the response must contain at least one of the following:
+                 * - A Content-Range header
+                 * - A Date header
+                 */
+                if (!$this->hasHeader('Content-Range') || !$this->hasHeader('Date')) {
+                    throw new \YapepBase\Exception\StandardsComplianceException('The Partial-Content (206) response requires a Content-Range and a Date header to be set.');
+                }
+                break;
+            case 301:
+            case 302:
+            case 303:
+            case 305:
+            case 307:
+                /**
+                 * A Location header field must be provided.
+                 */
+                if (!$this->hasHeader('Location')) {
+                    throw new \YapepBase\Exception\StandardsComplianceException('The ' . $this->statusCode . ' status code require a Location header to be set.');
+                }
+                break;
+            case 304:
+                /**
+                 * A Date header must be provided
+                 */
+                if (!$this->hasHeader('Date')) {
+                    throw new \YapepBase\Exception\StandardsComplianceException('The 304 status code requires a Date header to be set.');
+                }
+                break;
+            case 401:
+                /**
+                 * A WWW-Authenticate header must be provided, otherwise Opera will provide strange behaviour.
+                 */
+                if (!$this->hasHeader('WWW-Authenticate')) {
+                    throw new \YapepBase\Exception\StandardsComplianceException('The 401 status code requires a WWW-Authenticate header to be set.');
+                }
+                break;
+            case 405:
+                /**
+                 * An Allow header must be provided.
+                 */
+                if (!$this->hasHeader('Allow')) {
+                    throw new \YapepBase\Exception\StandardsComplianceException('The 405 status code requires an Allow header to be set.');
+                }
+                break;
+        }
+    }
 
     /**
      * Sends the response
@@ -123,25 +249,27 @@ class HttpResponse implements IResponse {
         if ($this->isResponseSent) {
             throw new Exception('Send called after the response has been sent');
         }
+        
+        $renderedBody = $this->getRenderedBody();
+
+        $this->checkStandards($renderedBody);
 
         $this->isResponseSent = true;
 
-        if (!empty($this->statusHeader)) {
-            header($this->statusHeader);
-        }
-        header($this->contentType);
-        foreach ($this->headers as $header) {
-            header($header);
+        $this->output->header('HTTP/1.1 ' . (int)$this->statusCode . ' '. $this->statusMessage);
+        foreach ($this->headers as $name => $header) {
+            foreach ($header as $value) {
+                $this->output->header($name . ': ' . $value);
+            }
         }
         foreach($this->cookies as $cookie) {
-            setcookie($cookie['name'], $cookie['value'], $cookie['expiration'], $cookie['path'], $cookie['domain'],
+            $this->output->setcookie($cookie['name'], $cookie['value'], $cookie['expiration'], $cookie['path'], $cookie['domain'],
                 $cookie['secure'], $cookie['httpOnly']);
         }
         $obContents = ob_get_contents();
         ob_clean();
-        echo $this->getRenderedBody();
-        echo $obContents;
-        ob_end_flush();
+        $this->output->out($renderedBody);
+        $this->output->out($obContents);
     }
 
     /**
@@ -159,8 +287,7 @@ class HttpResponse implements IResponse {
         $this->isResponseSent = true;
 
         $this->setStatusCode(500);
-        echo '<h1>Internal server error</h1>';
-        ob_end_flush();
+        $this->output->out('<h1>Internal server error</h1>');
     }
 
     /**
@@ -204,16 +331,122 @@ class HttpResponse implements IResponse {
      */
     public function setStatusCode($statusCode, $statusMessage = '') {
         // TODO default status messages
-        $this->statusHeader = 'HTTP/1.1 ' . (int)$statusCode . ' '. $statusMessage;
+        if (!$statusMessage) {
+            if (array_key_exists($statusCode, self::$statusCodes)) {
+                $statusMessage = self::$statusCodes[$statusCode];
+            } else {
+                $statusMessage = "Non-Standard Response";
+            }
+        }
+        $this->statusCode = $statusCode;
+        $this->statusMessage = $statusMessage;
+    }
+    
+    /**
+     * Returns the currently set status code.
+     * 
+     * @return int
+     */
+    public function getStatusCode() {
+        return $this->statusCode;
+    }
+    
+    /**
+     * Returns the currently set status message.
+     * 
+     * @return string
+     */
+    public function setStatusMessage() {
+        return $this->statusMessage;
     }
 
     /**
      * Sets an HTTP header.
      *
-     * @param string $header   The header to set.
+     * @param string|array $header The header to set. If it is an array, every
+     *                             part is used as a separate header.
+     * @param string $value        The header value to set. If empty, the
+     *                             $header will be exploded along a : sign.
+     * @throws \YapepBase\Exception\ParameterException if an invalid header
+     *         configuration occurs
      */
-    public function addHeader($header) {
-        $this->headers[] = $header;
+    public function addHeader($header, $value = '') {
+        if (is_array($header)) {
+            foreach ($header as $headername => $headervalue) {
+                if (is_string($headername)) {
+                    $this->addHeader($headervalue);
+                } else {
+                    $this->addHeader($headername, $headervalue);
+                }
+            }
+        } else {
+            if (!$value) {
+                $data = explode(':', $value);
+                if (!array_key_exists(1, $data)) {
+                    throw new \YapepBase\Exception\ParameterException('Invalid header line: ' . $value);
+                }
+                $header = trim($data[0]);
+                $value = trim($data[1]);
+            }
+            if (!$header){
+                throw new \YapepBase\Exception\ParameterException('Header name is empty.');
+            }
+            if (!$value){
+                throw new \YapepBase\Exception\ParameterException('Value for header is empty: ' . $header);
+            }
+            if (!array_key_exists($header, $this->headers)) {
+                $this->headers[$header] = array();
+            }
+            $this->headers[$header][] = $value;
+        }
+    }
+    
+    /**
+     * Removes a header.
+     * 
+     * @param string $header The header to remove.
+     */
+    public function removeHeader($header) {
+        if ($this->hasHeader($header)) {
+            unset($this->headers[$header]);
+        }
+    }
+    
+    /**
+     * This function removes all previous values of a header and sets the new
+     * values.
+     *
+     * @param string|array $header The header to set. If it is an array, every
+     *                             part is used as a separate header.
+     * @param string $value        The header value to set. If empty, the
+     *                             $header will be exploded along a : sign. 
+     */
+    public function setHeader($header, $value = '') {
+        $this->removeHeader($header);
+        $this->addHeader($header, $value);
+    }
+    
+    /**
+     * Return an array of values for a header, that has been set previously.
+     * 
+     * @param type $header 
+     * @return array of string
+     */
+    public function getHeader($header) {
+        if (!$this->hasHeader($header)) {
+            throw new \YapepBase\Exception\IndexOutOfBoundsException('The ' . $header . ' has not been set.');
+        }
+        return $this->headers[$header];
+    }
+    
+    /**
+     * Returns, if a header has been set.
+     * 
+     * @param  string $header A header name
+     * @return bool
+     */
+    public function hasHeader($header) {
+        return array_key_exists($header, $this->headers);
     }
 
     /**
@@ -226,7 +459,7 @@ class HttpResponse implements IResponse {
      */
     public function redirect($url, $statusCode = 303) {
         $this->setStatusCode($statusCode);
-        $this->addHeader('Location: ' . $url);
+        $this->addHeader('Location', $url);
         throw new RedirectException($url, RedirectException::TYPE_EXTERNAL);
     }
 
@@ -240,7 +473,7 @@ class HttpResponse implements IResponse {
      */
     public function setContentType($contentType, $charset = null) {
         $this->contentType = $contentType;
-        $this->contentTypeHeader = 'Content-type: ' . $contentType;
+        $contentTypeHeader = $contentType;
 
         if (self::CONTENT_TYPE_HTML == $contentType && empty($charset)) {
             // For HTML content set the default charset to the sytem default.
@@ -248,8 +481,9 @@ class HttpResponse implements IResponse {
         }
 
         if (!empty($charset)) {
-            $this->contentTypeHeader .= '; charset=' . $charset;
+            $contentTypeHeader .= '; charset=' . $charset;
         }
+        $this->setHeader('Content-Type', $contentTypeHeader);
     }
 
     /**
@@ -280,5 +514,13 @@ class HttpResponse implements IResponse {
             'httpOnly'   => $httpOnly,
         );
     }
-
+    
+    /**
+     * Checks, if a cookie has been set.
+     * @param string $name The cookie to check
+     * @return bool
+     */
+    public function hasCookie($name) { 
+        return array_key_exists($name, $this->headers);
+    }
 }

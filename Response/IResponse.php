@@ -19,6 +19,14 @@ use YapepBase\View\IView;
  * @subpackage Response
  */
 interface IResponse {
+    
+    /**
+     * Constructor to set the output. If no output is given, it should use
+     * whatever is default for the response.
+     * 
+     * @param \YapepBase\Response\IOutput $output The output handler to use.
+     */
+    public function __construct(IOutput $output = null);
 
     /**
      * Sets the response body.
