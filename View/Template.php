@@ -13,7 +13,13 @@
 namespace YapepBase\View;
 
 /**
- * Template class
+ * Template class. Any subclasses are direct templates with HTML code in them. Variables to the template must be
+ * defined as local variables. Reserved variables are:
+ * <ul>
+ *  <li>layout</li>
+ *  <li>variables</li>
+ *  <li>required</li>
+ * </ul>
  *
  * @package    YapepBase
  * @subpackage View
@@ -21,26 +27,96 @@ namespace YapepBase\View;
 abstract class Template extends ViewAbstract {
 
     /**
-     * Stores the raw (non-escaped) version of the params.
-     *
-     * @var array
-     */
-    private $rawParams = array();
-
-    /**
-     * Stores the escaped params.
-     *
-     * @var array
-     */
-    private $params = array();
-
-    /**
-     * Stores the layout object for the view
+     * Stores the layout object for the view.
      *
      * @var \YapepBase\View\Layout
      */
-    private $layout;
+    protected $layout;
+    
+    /**
+     * All template variables as keys (cached), set marks as values. If a variable has been set, it is set to true.
+     * @var array
+     */
+    protected $variables;
+    
+    /**
+     * Required local variables
+     * @var array
+     */
+    protected $required = array();
+    
+    protected $raw;
+    
+    /**
+     * Caches local variables.
+     */
+    private function cacheVariables() {
+        if (!is_array($this->variables)) {
+            $vars = get_object_vars($this);
+            unset($vars['layout']);
+            unset($vars['variables']);
+            unset($vars['required']);
+            foreach ($vars as &$var) {
+                $var = false;
+            }
+            $this->variables = $vars;
+        }
+    }
+    
+    public function hasVariable($var) {
+        $this->cacheVariables();
+        if (array_key_exists($var, $this->variables)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    protected function markSet($var) {
+        $this->cacheVariables();
+        if ($this->hasVariable($var)) {
+            $this->variables[$var] = true;
+        } else {
+            throw new \YapepBase\Exception\ParameterException("Template " . get_class($this) . " has no parameter " . $var);
+        }
+    }
 
+    public function isRequiredVariable($var) {
+        $this->cacheVariables();
+        if ($this->hasVariable($var)) {
+            if (array_search($var, $this->required)) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            throw new \YapepBase\Exception\ParameterException("Template " . get_class($this) . " has no parameter " . $var);
+        }
+    }
+
+    public function set($var, $value) {
+        $this->cacheVariables();
+        if ($this->hasVariable($var)) {
+            $this->$var = $value;
+            $this->raw[$var] = $value;
+        } else {
+            throw new \YapepBase\Exception\ParameterException("Template " . get_class($this) . " has no parameter " . $var);
+        }
+    }
+    
+    public function get($var, $raw = false) {
+        $this->cacheVariables();
+        if ($this->hasVariable($var)) {
+            if ($raw) {
+                return $this->raw[$var];
+            } else {
+                return $this->$var;
+            }
+        } else {
+            throw new \YapepBase\Exception\ParameterException("Template " . get_class($this) . " has no parameter " . $var);
+        }
+    }
+    
     /**
      * Renders the view and returns it.
      *
@@ -51,9 +127,17 @@ abstract class Template extends ViewAbstract {
      * @return string   The rendered view or NULL if not returned
      */
     public function render($contentType, $return = true) {
-        $this->contentType;
-        if (empty($this->params) && !empty($this->rawParams)) {
-            $this->params = $this->escape($this->rawParams);
+        $this->contentType = $contentType;
+        foreach ($this->required as $param) {
+            if ($this->variables[$param] == false) {
+                throw new \YapepBase\Exception\ParameterException($param . " is required in template " . get_class($this));
+            }
+        }
+        
+        foreach ($this->variables as $variable => $set) {
+            if ($set) {
+                $this->$variable = $this->escape($this->$variable);
+            }
         }
 
         if (empty($this->layout)) {
@@ -65,38 +149,6 @@ abstract class Template extends ViewAbstract {
         }
     }
 
-    /**
-     * Sets a parameter for the view
-     *
-     * @param string $name       The name of the parameter.
-     * @param mixed  $value      The value. It will be escaped according to the view used.
-     * @param mixed  $rawValue   If set, the value is considered to be already escaped.
-     */
-    public function set($name, $value) {
-        $this->rawParams[$name] = $value;
-    }
-
-    /**
-     * Returns the escaped version of a param.
-     *
-     * @param string $name
-     *
-     * @return mixed
-     */
-    protected function get($name) {
-        return $this->params[$name];
-    }
-
-    /**
-     * Returns the raw (non-escaped) version of a param.
-     *
-     * @param string $name
-     *
-     * @return mixed
-     */
-    protected function getRaw($name) {
-        return $this->rawParams[$name];
-    }
 
     /**
      * Sets the layout for the view.
