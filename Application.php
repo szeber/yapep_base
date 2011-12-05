@@ -107,6 +107,17 @@ class Application {
     }
 
     /**
+     * Sets the application instance.
+     *
+     * Be careful with this method, since it breaks the Singleton pattern.
+     *
+     * @param \YapepBase\Application $instance
+     */
+    public static function setInstance(Application $instance) {
+        static::$instance = $instance;
+    }
+
+    /**
      * Sets the router used by the application.
      *
      * @param \YapepBase\Router\IRouter $router
