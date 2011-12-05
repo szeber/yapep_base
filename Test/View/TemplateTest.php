@@ -75,9 +75,19 @@ class TemplateTest extends \PHPUnit_Framework_TestCase {
         } catch (\YapepBase\Exception\ParameterException $e) { }
         
         $o->set('var1', '&');
-        $o->render('text/html', true);
+        $this->assertEquals('test output', $o->render('text/html', true));
         $this->assertEquals('&amp;', $o->get('var1'));
         $this->assertEquals('&', $o->get('var1', true));
     }
-
+    
+    /**
+     * Tests the render function with a layout
+     */
+    public function testLayoutRender() {
+        $o = new TemplateMock();
+        $layout = new \YapepBase\Test\Mock\View\LayoutMock();
+        $o->setLayout($layout);
+        $o->set('var1', 'test');
+        $this->assertEquals('Layout: test output', $o->render('text/html'));
+    }
 }

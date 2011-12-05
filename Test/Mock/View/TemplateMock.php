@@ -10,6 +10,6 @@ class TemplateMock extends Template {
     protected $var2;
     
     protected function renderContent() {
-        return '';
+        echo 'test output';
     }
 }
