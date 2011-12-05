@@ -18,6 +18,8 @@ use YapepBase\Exception\ControllerException;
 use YapepBase\Request\HttpRequest;
 use YapepBase\Response\IResponse;
 use YapepBase\Request\IRequest;
+use YapepBase\Mime\MimeType;
+
 
 /**
  * HttpController class

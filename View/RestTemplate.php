@@ -12,8 +12,7 @@
 
 namespace YapepBase\View;
 use YapepBase\Exception\ViewException;
-use YapepBase\Response\HttpResponse;
-use YapepBase\Response\IResponse;
+use YapepBase\Mime\MimeType;
 
 /**
  * RestTemplate class
@@ -61,7 +60,7 @@ class RestTemplate extends ViewAbstract {
      * Renders the view and returns it.
      *
      * @param string $contentType   The content type of the response.
-     *                              {@uses \YapepBase\Response\HttpResponse::CONTENT_TYPE_*}
+     *                              {@uses \YapepBase\Mime\MimeType::*}
      * @param bool   $return        If TRUE, the method will return the output, otherwise it will print it.
      *
      * @return string   The rendered view or NULL if not returned
@@ -86,14 +85,14 @@ class RestTemplate extends ViewAbstract {
      */
     protected function renderContent() {
         switch ($this->contentType) {
-            case HttpResponse::CONTENT_TYPE_XML:
+            case MimeType::XML:
                 $content = $this->escape(array($this->rootNodeName => $this->content));
                 return $this->getXmlFromData($this->escape($this->content, true));
                 break;
 
-            case HttpResponse::CONTENT_TYPE_JAVASCRIPT:
-            case HttpResponse::CONTENT_TYPE_JSON:
-                return json_encode($this->content);
+            case MimeType::JAVASCRIPT:
+            case MimeType::JSON:
+                return \json_encode($this->content);
                 break;
 
             default:

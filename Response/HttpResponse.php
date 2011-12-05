@@ -19,6 +19,8 @@ use YapepBase\Exception\RedirectException;
 
 use YapepBase\Request\HttpRequest;
 
+use YapepBase\Mime\MimeType;
+
 use YapepBase\Config;
 
 /**
@@ -37,17 +39,6 @@ use YapepBase\Config;
  */
 class HttpResponse implements IResponse {
 
-    /** HTML content type */
-    const CONTENT_TYPE_HTML = 'text/html';
-    /** CSS content type */
-    const CONTENT_TYPE_CSS = 'text/css';
-    /** Javascript content type */
-    const CONTENT_TYPE_JAVASCRIPT = 'appliation/javascript';
-    /** JSON content type */
-    const CONTENT_TYPE_JSON = 'application/json';
-    /** XML content type */
-    const CONTENT_TYPE_XML = 'application/xml';
-    
     /**
      * The response body.
      *
@@ -84,7 +75,7 @@ class HttpResponse implements IResponse {
     protected $statusMessage = 'OK';
 
     /**
-     * Stores the content type. {@uses self::CONTENT_TYPE_*}
+     * Stores the content type. {@uses MimeType::*}
      *
      * @var string
      */
@@ -158,7 +149,7 @@ class HttpResponse implements IResponse {
      *                                            Uses PHPOutput if none given.
      */
     public function __construct(IOutput $output = null) {
-        $this->setContentType(self::CONTENT_TYPE_HTML);
+        $this->setContentType(MimeType::HTML);
         $this->startOutputBuffer();
         // @codeCoverageIgnoreStart
         if (!$output) {
@@ -472,7 +463,7 @@ class HttpResponse implements IResponse {
     /**
      * Sets the content type for the response
      *
-     * @param string $contentType   The content type for the response. {@uses self::CONTENT_TYPE} or any valid content
+     * @param string $contentType   The content type for the response. {@uses MimeType::*} or any valid content
      *                              type.
      * @param string $charset       The charset of the response. For HTML content this will be set to the system default
      *                              charset. See config option 'system.defaultCharset'.
@@ -481,7 +472,7 @@ class HttpResponse implements IResponse {
         $this->contentType = $contentType;
         $contentTypeHeader = $contentType;
 
-        if (self::CONTENT_TYPE_HTML == $contentType && empty($charset)) {
+        if (MimeType::HTML == $contentType && empty($charset)) {
             // For HTML content set the default charset to the sytem default.
             $charset = Config::getInstance()->get('system.defaultCharset', 'UTF-8');
         }

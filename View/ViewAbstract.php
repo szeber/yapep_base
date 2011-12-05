@@ -12,9 +12,8 @@
 
 namespace YapepBase\View;
 use YapepBase\Application;
-use YapepBase\Request\HttpRequest;
-use YapepBase\Response\HttpResponse;
 use YapepBase\Exception\ViewException;
+use YapepBase\Mime\MimeType;
 use YapepBase\Config;
 
 /**
@@ -56,7 +55,7 @@ abstract class ViewAbstract implements IView {
      * Renders the view and returns it.
      *
      * @param string $contentType   The content type of the response.
-     *                              {@uses \YapepBase\Response\HttpResponse::CONTENT_TYPE_*}
+     *                              {@uses \YapepBase\Mime\MimeType::*}
      * @param bool   $return        If TRUE, the method will return the output, otherwise it will print it.
      *
      * @return string   The rendered view or NULL if not returned
@@ -136,20 +135,19 @@ abstract class ViewAbstract implements IView {
             $contentType = $this->contentType;
         }
         switch ($contentType) {
-            case HttpResponse::CONTENT_TYPE_JAVASCRIPT:
-                // TODO make a more complete escaping here
-                return str_replace('\'', '\\\'', $value);
+            case MimeType::JAVASCRIPT:
+                return \json_encode($value);
                 break;
 
-            case HttpResponse::CONTENT_TYPE_JSON:
+            case MimeType::JSON:
                 // We don't escape JSON content, json_encode will take care of it.
-            case HttpResponse::CONTENT_TYPE_CSS:
+            case MimeType::CSS:
                 // We don't escape CSS content.
                 return $value;
                 break;
 
-            case HttpResponse::CONTENT_TYPE_HTML:
-            case HttpResponse::CONTENT_TYPE_XML:
+            case MimeType::HTML:
+            case MimeType::XML:
             default:
                 return htmlspecialchars($value, ENT_COMPAT, $this->charset);
                 break;
