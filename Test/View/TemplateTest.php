@@ -24,7 +24,7 @@ class TemplateTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @covers \YapepBase\View\Template::hasVariable
+     * Tests, if the hasVariable function works correctlz.
      */
     public function testHasVariable() {
         $this->assertEquals(true, $this->object->hasVariable('var1'));
@@ -33,7 +33,7 @@ class TemplateTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @covers \YapepBase\View\Template::isRequiredVariable
+     * Tests, if required variables are handled correctly.
      */
     public function testIsRequiredVariable() {
         $this->assertEquals(true, $this->object->isRequiredVariable('var1'));
@@ -65,7 +65,7 @@ class TemplateTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @covers \YapepBase\View\Template::render
+     * Tests, if variables are correctly handled and escaped.
      */
     public function testRender() {
         $o = new TemplateMock();
@@ -78,17 +78,6 @@ class TemplateTest extends \PHPUnit_Framework_TestCase {
         $o->render('text/html', true);
         $this->assertEquals('&amp;', $o->get('var1'));
         $this->assertEquals('&', $o->get('var1', true));
-    }
-
-    /**
-     * @covers {className}::{origMethodName}
-     * @todo Implement testSetLayout().
-     */
-    public function testSetLayout() {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
     }
 
 }
