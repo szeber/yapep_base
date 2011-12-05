@@ -172,11 +172,7 @@ class HttpResponse implements IResponse {
      * Starts the output buffer.
      */
     protected function startOutputBuffer() {
-        if (Config::getInstance()->get('system.response.gzip', false)) {
-            ob_start('ob_gzhandler');
-        } else {
-            ob_start();
-        }
+        ob_start();
     }
     
     /**
@@ -286,7 +282,7 @@ class HttpResponse implements IResponse {
 
         $this->isResponseSent = true;
 
-        $this->setStatusCode(500);
+        $this->output->header('HTTP/1.1 500 Internal Server Error');
         $this->output->out('<h1>Internal server error</h1>');
     }
 
@@ -330,7 +326,6 @@ class HttpResponse implements IResponse {
      * @return return_type
      */
     public function setStatusCode($statusCode, $statusMessage = '') {
-        // TODO default status messages
         if (!$statusMessage) {
             if (array_key_exists($statusCode, self::$statusCodes)) {
                 $statusMessage = self::$statusCodes[$statusCode];
@@ -356,7 +351,7 @@ class HttpResponse implements IResponse {
      * 
      * @return string
      */
-    public function setStatusMessage() {
+    public function getStatusMessage() {
         return $this->statusMessage;
     }
 
@@ -373,7 +368,7 @@ class HttpResponse implements IResponse {
     public function addHeader($header, $value = '') {
         if (is_array($header)) {
             foreach ($header as $headername => $headervalue) {
-                if (is_string($headername)) {
+                if (!is_string($headername)) {
                     $this->addHeader($headervalue);
                 } else {
                     $this->addHeader($headername, $headervalue);
@@ -381,7 +376,7 @@ class HttpResponse implements IResponse {
             }
         } else {
             if (!$value) {
-                $data = explode(':', $value);
+                $data = explode(':', $header, 2);
                 if (!array_key_exists(1, $data)) {
                     throw new \YapepBase\Exception\ParameterException('Invalid header line: ' . $value);
                 }
@@ -391,6 +386,10 @@ class HttpResponse implements IResponse {
             if (!$header){
                 throw new \YapepBase\Exception\ParameterException('Header name is empty.');
             }
+            /**
+             * Technically this is correct, but it's not nice. We don't allow it
+             * to avoid user agent bugs.
+             */
             if (!$value){
                 throw new \YapepBase\Exception\ParameterException('Value for header is empty: ' . $header);
             }
@@ -402,13 +401,20 @@ class HttpResponse implements IResponse {
     }
     
     /**
-     * Removes a header.
+     * Removes one or more headers.
      * 
-     * @param string $header The header to remove.
+     * @param string|array $header The header to remove.
      */
     public function removeHeader($header) {
-        if ($this->hasHeader($header)) {
-            unset($this->headers[$header]);
+        if (is_array($header)) {
+            foreach ($header as $h) {
+                $this->removeHeader($h);
+            }
+        } else {
+            $data = explode(':', $header, 2);
+            if ($this->hasHeader($data[0])) {
+                unset($this->headers[$data[0]]);
+            }
         }
     }
     
@@ -459,7 +465,7 @@ class HttpResponse implements IResponse {
      */
     public function redirect($url, $statusCode = 303) {
         $this->setStatusCode($statusCode);
-        $this->addHeader('Location', $url);
+        $this->setHeader('Location', $url);
         throw new RedirectException($url, RedirectException::TYPE_EXTERNAL);
     }
 
@@ -521,6 +527,6 @@ class HttpResponse implements IResponse {
      * @return bool
      */
     public function hasCookie($name) { 
-        return array_key_exists($name, $this->headers);
+        return array_key_exists($name, $this->cookies);
     }
 }

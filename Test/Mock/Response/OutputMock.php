@@ -36,7 +36,7 @@ class OutputMock implements IOutput {
             $this->responseCode = $matches['code'];
             $this->responseMessage = $matches['message'];
         } else {
-            list($name, $value) = explode(':', $string);
+            list($name, $value) = explode(':', $string, 2);
             $name = trim($name);
             $value = trim($value);
             if (!array_key_exists($string, $this->headers) || $replace) {

@@ -59,16 +59,20 @@ class HttpResponseTest extends \PHPUnit_Framework_TestCase {
     /**
      * Tests, if a response can be sent twice.
      */
-    public function testResponseSend() {
-        //$this->markTestIncomplete('This test is still buggy, because a headers already sent error is thrown.');
-        
-        ob_start();
+    public function testResponseSent() {
+        $this->createCleanResponse();
         $this->response->send();
         try {
             $this->response->send();
-            $this->fail('A response can be sent twice');
+            $this->fail('A response can be sent twice in HttpResponse::send');
         } catch (\YapepBase\Exception\Exception $e) { }
-        ob_end_clean();
+
+        $this->createCleanResponse();
+        $this->response->sendError();
+        try {
+            $this->response->sendError();
+            $this->fail('A response can be sent twice in HttpResponse::sendError');
+        } catch (\YapepBase\Exception\Exception $e) { }
     }
     
     /**
@@ -176,5 +180,106 @@ class HttpResponseTest extends \PHPUnit_Framework_TestCase {
         $this->response->setStatusCode(405);
         $this->response->setHeader('Allow', 'GET, HEAD, PUT');
         $this->response->send();
+    }
+    
+    public function testHeaders() {
+        $this->createCleanResponse();
+
+        $this->assertEquals(false, $this->response->hasHeader('X-Test-Header'));
+        $this->response->setHeader('X-Test-Header', 'Test Value');
+        $this->assertEquals(true, $this->response->hasHeader('X-Test-Header'));
+        $this->assertEquals(array('Test Value'), $this->response->getHeader('X-Test-Header'));
+        $this->response->addHeader('X-Test-Header', 'Test Value 2');
+        $this->assertEquals(array('Test Value', 'Test Value 2'), $this->response->getHeader('X-Test-Header'));
+        $this->response->setHeader('X-Test-Header', 'Test Value 3');
+        $this->assertEquals(array('Test Value 3'), $this->response->getHeader('X-Test-Header'));
+        $this->response->removeHeader('X-Test-Header');
+        $this->assertEquals(false, $this->response->hasHeader('X-Test-Header'));
+        
+        $this->createCleanResponse();
+        
+        $this->response->setHeader('X-Test-Header-2: Test : Value');
+        $this->assertEquals(array('Test : Value'), $this->response->getHeader('X-Test-Header-2'));
+
+        $this->createCleanResponse();
+        $this->response->setHeader(array('X-Test-Header-3: Test : Value', 'X-Test-Header-4: Test : Value'));
+        $this->assertEquals(array('Test : Value'), $this->response->getHeader('X-Test-Header-3'));
+        $this->assertEquals(array('Test : Value'), $this->response->getHeader('X-Test-Header-4'));
+
+        $this->createCleanResponse();
+        $this->response->setHeader(array('X-Test-Header-3' => 'Test : Value', 'X-Test-Header-4' => 'Test : Value'));
+        $this->assertEquals(array('Test : Value'), $this->response->getHeader('X-Test-Header-3'));
+        $this->assertEquals(array('Test : Value'), $this->response->getHeader('X-Test-Header-4'));        
+        
+        $this->createCleanResponse();
+        try {
+            $this->response->addHeader('This is an invalid header line');
+            $this->fail('Invalid header lines are not caught!');
+        } catch (\YapepBase\Exception\ParameterException $e) {}
+        
+        try {
+            $this->response->addHeader('');
+            $this->fail('Empty header lines are not caught!');
+        } catch (\YapepBase\Exception\ParameterException $e) {}
+
+        try {
+            $this->response->addHeader('X-Test-Header', '');
+            $this->fail('Empty header values are not caught!');
+        } catch (\YapepBase\Exception\ParameterException $e) {}
+        
+        try {
+            $this->response->getHeader('X-Non-Existent');
+            $this->fail('Fetching non-existent headers should throw an IndexOutOfBoundsException');
+        } catch (\YapepBase\Exception\IndexOutOfBoundsException $e) {}
+    }
+    
+    public function testCookies() {
+        $this->createCleanResponse();
+
+        $data = array('name' => 'testcookie', 'value' => 'testvalue', 'expire' => 3600, 'path' => '/test', 'domain' => 'www.example.com', 'secure' => true, 'httponly' => true);
+
+        $this->assertEquals(array(), $this->output->cookies, 'The cookies array is not empty in OutputMock. Possibly a bug in HttpResponseTest::createCleanResponse?');
+        $this->assertEquals(false, $this->response->hasCookie($data['name']));
+        $this->response->setCookie($data['name'], $data['value'], $data['expire'], $data['path'], $data['domain'], $data['secure'], $data['httponly']);
+        $this->assertEquals(true, $this->response->hasCookie($data['name']));
+        $this->response->send();
+        $this->assertEquals(array($data['name'] => $data), $this->output->cookies);
+        
+        $this->createCleanResponse();
+        $data = array('name' => 'testcookie', 'value' => 'testvalue', 'expire' => 3600, 'path' => '/test', 'domain' => 'www.example.org', 'secure' => true, 'httponly' => true);
+        Config::getInstance()->set('system.response.defaultCookieDomain', $data['domain']);
+        $this->response->setCookie($data['name'], $data['value'], $data['expire'], $data['path'], null, $data['secure'], $data['httponly']);
+        $this->response->send();
+        $this->assertEquals(array($data['name'] => $data), $this->output->cookies);
+    }
+    
+    public function testError() {
+        $this->createCleanResponse();
+
+        $this->response->sendError();
+        $this->assertEquals(500, $this->output->responseCode, 'HttpResponse::sendError should send a HTTP 500 status code.');
+    }
+    
+    public function testStatusCode() {
+        $this->createCleanResponse();
+        
+        $this->response->setStatusCode(201);
+        $this->assertEquals(201, $this->response->getStatusCode());
+        $this->assertNotEmpty($this->response->getStatusMessage());
+        
+        $this->response->setStatusCode(600);
+        $this->assertEquals(600, $this->response->getStatusCode());
+        $this->assertNotEmpty($this->response->getStatusMessage());
+    }
+    
+    public function testRedirect() {
+        $this->createCleanResponse();
+        try {
+            $this->response->redirect('http://www.example.com/', 301);
+            $this->fail('HttpResponse::redirect should throw a RedirectException');
+        } catch (\YapepBase\Exception\RedirectException $e) {}
+        $this->response->send();
+        $this->assertEquals(301, $this->output->responseCode);
+        $this->assertEquals(array('http://www.example.com/'), $this->output->headers['Location']);
     }
 }

@@ -87,5 +87,5 @@ class PHPOutput implements IOutput {
         foreach (func_get_args() as $string) {
             echo($string);
         }
-    } 
+    }
 }
