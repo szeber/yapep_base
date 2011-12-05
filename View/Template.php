@@ -63,6 +63,12 @@ abstract class Template extends ViewAbstract {
         }
     }
     
+    /**
+     * Checks, if a variable is valid for this template.
+     * @param  string $var
+     * @return bool
+     * @throws \YapepBase\Exception\ParameterException if the variable is invalid for this template.
+     */
     public function hasVariable($var) {
         $this->cacheVariables();
         if (array_key_exists($var, $this->variables)) {
@@ -72,19 +78,32 @@ abstract class Template extends ViewAbstract {
         }
     }
     
+    /**
+     * Marks a variable as set.
+     * @param  string $var 
+     * @throws \YapepBase\Exception\ParameterException if the variable is invalid for this template.
+     */
     protected function markSet($var) {
         $this->cacheVariables();
         if ($this->hasVariable($var)) {
             $this->variables[$var] = true;
         } else {
+            // @codeCoverageIgnoreStart
             throw new \YapepBase\Exception\ParameterException("Template " . get_class($this) . " has no parameter " . $var);
+            // @codeCoverageIgnoreEnd
         }
     }
 
+    /**
+     * Returns true, if the variable is required for this template.
+     * @param  string $var
+     * @return bool
+     * @throws \YapepBase\Exception\ParameterException if the variable is invalid for this template.
+     */
     public function isRequiredVariable($var) {
         $this->cacheVariables();
         if ($this->hasVariable($var)) {
-            if (array_search($var, $this->required)) {
+            if (array_search($var, $this->required) !== false) {
                 return true;
             } else {
                 return false;
@@ -94,11 +113,18 @@ abstract class Template extends ViewAbstract {
         }
     }
 
+    /**
+     * Sets a value for a variable.
+     * @param  string $var
+     * @param  mixed  $value 
+     * @throws \YapepBase\Exception\ParameterException if the variable is invalid for this template.
+     */
     public function set($var, $value) {
         $this->cacheVariables();
         if ($this->hasVariable($var)) {
             $this->$var = $value;
             $this->raw[$var] = $value;
+            $this->markSet($var);
         } else {
             throw new \YapepBase\Exception\ParameterException("Template " . get_class($this) . " has no parameter " . $var);
         }
