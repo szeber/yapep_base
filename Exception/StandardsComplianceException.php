@@ -17,7 +17,5 @@ namespace YapepBase\Exception;
  * will most likely lead to compatibility issues.
  */
 class StandardsComplianceException extends \Exception {
-    public function __construct($message) {
-        parent::__construct($message);
-    }
+
 }
