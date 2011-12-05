@@ -13,6 +13,7 @@ namespace YapepBase\Response;
 
 /**
  * This class uses standard PHP functions to return content to the browser.
+ * @codeCoverageIgnore
  */
 class PHPOutput implements IOutput {
     /**
