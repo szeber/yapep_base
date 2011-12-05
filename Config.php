@@ -54,9 +54,11 @@ class Config {
      * @return Config
      */
     public static function getInstance() {
+        // @codeCoverageIgnoreStart
         if (!isset(static::$instance)) {
             static::$instance = new static();
         }
+        // @codeCoverageIgnoreEnd
         return static::$instance;
     }
 
