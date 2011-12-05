@@ -365,7 +365,7 @@ class HttpResponse implements IResponse {
      * @throws \YapepBase\Exception\ParameterException if an invalid header
      *         configuration occurs
      */
-    public function addHeader($header, $value = '') {
+    public function addHeader($header, $value = null) {
         if (is_array($header)) {
             foreach ($header as $headername => $headervalue) {
                 if (!is_string($headername)) {
@@ -375,16 +375,16 @@ class HttpResponse implements IResponse {
                 }
             }
         } else {
-            if (!$value) {
+            if (!$header){
+                throw new \YapepBase\Exception\ParameterException('Header name is empty.');
+            }
+            if (is_null($value)) {
                 $data = explode(':', $header, 2);
                 if (!array_key_exists(1, $data)) {
                     throw new \YapepBase\Exception\ParameterException('Invalid header line: ' . $value);
                 }
                 $header = trim($data[0]);
                 $value = trim($data[1]);
-            }
-            if (!$header){
-                throw new \YapepBase\Exception\ParameterException('Header name is empty.');
             }
             /**
              * Technically this is correct, but it's not nice. We don't allow it
@@ -427,7 +427,7 @@ class HttpResponse implements IResponse {
      * @param string $value        The header value to set. If empty, the
      *                             $header will be exploded along a : sign. 
      */
-    public function setHeader($header, $value = '') {
+    public function setHeader($header, $value = null) {
         $this->removeHeader($header);
         $this->addHeader($header, $value);
     }
