@@ -18,7 +18,7 @@ namespace YapepBase\View;
  * @package    YapepBase
  * @subpackage View
  */
-class Layout extends ViewAbstract {
+abstract class Layout extends ViewAbstract {
 
     /**
      * Stores the template output

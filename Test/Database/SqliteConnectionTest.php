@@ -5,8 +5,6 @@ use YapepBase\Exception\DatabaseException;
 
 use YapepBase\Database\SqliteConnection;
 
-require_once dirname(__FILE__) . '/../../bootstrap.php';
-
 /**
  * SqliteConnection test case.
  */

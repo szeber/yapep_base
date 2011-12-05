@@ -106,7 +106,8 @@ class MemcachedStorage extends StorageAbstract {
         $this->hashKey = (isset($config['hashKey']) ? (bool)$config['hashKey'] : false);
 
         $this->memcache = new \Memcached($this->persistentId);
-        if (!$this->persistentId || empty($this->memcached->getServerList())) {
+        $serverList = $this->memcached->getServerList();
+        if (!$this->persistentId || empty($serverList)) {
             $this->memcache->addServer($this->host, $this->port);
         }
     }

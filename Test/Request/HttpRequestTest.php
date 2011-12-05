@@ -13,8 +13,6 @@
 namespace YapepBase\Test\Request;
 use YapepBase\Request\HttpRequest;
 
-require_once dirname(__FILE__) . '/../../bootstrap.php';
-
 /**
  * HttpRequestTest class
  *

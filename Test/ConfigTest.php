@@ -3,8 +3,6 @@
 namespace YapepBase\Test;
 use YapepBase\Config;
 
-require_once dirname(__FILE__) . '/../bootstrap.php';
-
 /**
  * Config test case.
  */

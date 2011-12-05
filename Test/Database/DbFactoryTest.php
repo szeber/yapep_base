@@ -4,8 +4,6 @@ namespace YapepBase\Test\Database;
 use YapepBase\Config;
 use YapepBase\Database\DbFactory;
 
-require_once dirname(__FILE__) . '/../../bootstrap.php';
-
 /**
  * DbFactory test case.
  */

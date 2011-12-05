@@ -17,7 +17,5 @@ namespace YapepBase\Exception;
  * element doesn't exist.
  */
 class IndexOutOfBoundsException extends \Exception {
-    public function __construct($message) {
-        parent::__construct($message);
-    }
+
 }

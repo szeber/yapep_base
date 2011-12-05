@@ -5,8 +5,6 @@ namespace YapepBase\Test\Response;
 use YapepBase\Response\HttpResponse;
 use YapepBase\Config;
 
-require_once dirname(__FILE__) . '/../../bootstrap.php';
-
 class HttpResponseTest extends \PHPUnit_Framework_TestCase {
     /**
      * @var \YapepBase\Test\Mock\Response\OutputMock

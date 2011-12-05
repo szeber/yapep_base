@@ -15,9 +15,6 @@ use YapepBase\Request\IRequest;
 use YapepBase\Test\Mock\Request\RequestMock;
 use YapepBase\Router\AutoRouter;
 
-
-require_once dirname(__FILE__) . '/../../bootstrap.php';
-
 /**
  * AutoRouterTest class
  *

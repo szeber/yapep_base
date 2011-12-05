@@ -16,8 +16,6 @@ use YapepBase\Test\Mock\Request\RequestMock;
 use YapepBase\Router\ArrayRouter;
 use YapepBase\Request\IRequest;
 
-require_once dirname(__FILE__) . '/../../bootstrap.php';
-
 /**
  * ArrayRouterTest class
  *
