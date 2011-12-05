@@ -182,6 +182,9 @@ class HttpResponseTest extends \PHPUnit_Framework_TestCase {
         $this->response->send();
     }
     
+    /**
+     * Tests the correct handing of headers.
+     */
     public function testHeaders() {
         $this->createCleanResponse();
 
@@ -233,6 +236,9 @@ class HttpResponseTest extends \PHPUnit_Framework_TestCase {
         } catch (\YapepBase\Exception\IndexOutOfBoundsException $e) {}
     }
     
+    /**
+     * Tests the correct handling of cookies.
+     */
     public function testCookies() {
         $this->createCleanResponse();
 
@@ -253,6 +259,9 @@ class HttpResponseTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals(array($data['name'] => $data), $this->output->cookies);
     }
     
+    /**
+     * Tests, that the sendError method sends a HTTP 500 error
+     */
     public function testError() {
         $this->createCleanResponse();
 
@@ -260,6 +269,9 @@ class HttpResponseTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals(500, $this->output->responseCode, 'HttpResponse::sendError should send a HTTP 500 status code.');
     }
     
+    /**
+     * Tests the correct handling of status codes.
+     */
     public function testStatusCode() {
         $this->createCleanResponse();
         
@@ -272,6 +284,10 @@ class HttpResponseTest extends \PHPUnit_Framework_TestCase {
         $this->assertNotEmpty($this->response->getStatusMessage());
     }
     
+    /**
+     * Tests, that the redirect function throws an exception and correctly
+     * passes the parameters.
+     */
     public function testRedirect() {
         $this->createCleanResponse();
         try {
