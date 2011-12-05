@@ -166,7 +166,7 @@ class Application {
 	/**
 	 * Returns the response object used by the application.
 	 *
-     * @return \YapepBase\Response\
+     * @return \YapepBase\Response\IResponse $response
      */
     public function getResponse() {
         return $this->response;
