@@ -17,6 +17,40 @@ class SyslogConnectionTest extends \PHPUnit_Framework_TestCase {
         $this->object = new SyslogConnection;
     }
 
+    public function testPath() {
+        $this->object->setPath('/test');
+        $this->assertEquals('/test', $this->object->getPath());
+    }
+    
+    public function testIdent() {
+        $this->object->setIdent('identtest');
+        $this->assertEquals('identtest', $this->object->getIdent());
+    }
+    
+    public function testOptions() {
+        $this->object->setOptions(SyslogConnection::LOG_PID);
+        $this->assertEquals(SyslogConnection::LOG_PID, $this->object->getOptions());
+    }
+    
+    public function testFacility() {
+        $this->object->setFacility(SyslogConnection::LOG_AUTH);
+        $this->assertEquals(SyslogConnection::LOG_AUTH, $this->object->getFacility());
+        
+        try {
+            $this->object->setFacility(192);
+            $this->fail('Setting an invalid facility should result in a ParameterException');
+        } catch (\YapepBase\Exception\ParameterException $e) { }
+        
+        try {
+            $this->object->setFacility(-1);
+            $this->fail('Setting an invalid facility should result in a ParameterException');
+        } catch (\YapepBase\Exception\ParameterException $e) { }
+
+        try {
+            $this->object->setFacility(7);
+            $this->fail('Setting an invalid facility should result in a ParameterException');
+        } catch (\YapepBase\Exception\ParameterException $e) { }
+    }
 
     public function testLogging() {
         $logpath = \dirname(__DIR__) . '/Temp/Syslog/log';
