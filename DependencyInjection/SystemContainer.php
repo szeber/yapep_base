@@ -95,5 +95,4 @@ class SystemContainer extends Pimple {
         $fullClassName = '\YapepBase\View\Block\\' . $blockName . 'Block';
         return new $fullClassName();
     }
-
 }
