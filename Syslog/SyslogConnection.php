@@ -169,7 +169,9 @@ class SyslogConnection {
      */
     protected function handleError() {
         if (socket_last_error($this->sock)) {
-            throw new SyslogException(socket_strerror(socket_last_error($this->sock)), socket_last_error($this->sock));
+            $e = new SyslogException(socket_strerror(socket_last_error($this->sock)), socket_last_error($this->sock));
+            socket_clear_error($this->sock);
+            throw $e;
         }
     }
     
@@ -210,10 +212,24 @@ class SyslogConnection {
      * @return SyslogConnection 
      */
     public function open() {
-        $this->sock = socket_create(AF_UNIX, SOCK_STREAM, 0);
-        $this->handleError();
-        socket_connect($this->sock, $this->path);
-        $this->handleError();
+        try {
+            $this->sock = socket_create(AF_UNIX, SOCK_STREAM, 0);
+            $this->handleError();
+            @socket_connect($this->sock, $this->path);
+            $this->handleError();
+        } catch (\YapepBase\Syslog\SyslogException $e) {
+            /**
+             * If we have a EPROTOTYPE error, the log socket doesn't support stream sockets, only dgram sockets.
+             */
+            if ($e->getCode() == 91) {
+                $this->sock = socket_create(AF_UNIX, SOCK_DGRAM, 0);
+                $this->handleError();
+                @socket_connect($this->sock, $this->path);
+                $this->handleError();
+            } else {
+                throw $e;
+            }
+        }
         return $this;
     }
     
@@ -241,6 +257,9 @@ class SyslogConnection {
         if (!$this->sock) {
             $this->open();
         }
+        if (!is_int($priority) || $priority < 0 || $priority > 191) {
+            throw new SyslogException('Invalid priority value ' . $priority);
+        }
         if ($priority < 8) {
             $priority += $this->facility;
         }
@@ -249,6 +268,8 @@ class SyslogConnection {
         }
         if (!is_string($ident)) {
             $ident = $this->ident;
+        } else if (preg_match('/[\s]/', $ident)) {
+            throw new SyslogException('The syslog tag/ident cannot contain whitespace. Value: "' . $ident . '"');
         }
         $buf = '<' . $priority . '>' . date('M', $date) . ' ' . str_pad(date('j', $date), 2, ' ', STR_PAD_LEFT) . ' ' .
             date('H:i:s', $date) . ' ' . $ident
@@ -283,6 +304,9 @@ class SyslogConnection {
      * @return SyslogConnection 
      */
     public function setIdent($ident) {
+        if (preg_match('/[\s]/', $ident)) {
+            throw new SyslogException('The syslog tag/ident cannot contain whitespace. Value: "' . $ident . '"');
+        }
         $this->ident = (string)$ident;
         return $this;
     }
