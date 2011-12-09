@@ -9,40 +9,82 @@ use YapepBase\Config;
  */
 class SyslogTest extends \PHPUnit_Framework_TestCase {
     public function testLog() {
-        $this->markTestIncomplete();
         Config::getInstance()->set('syslog', array(
             'applicationIdent' => 'testApp',
-            'facility' => LOG_USER,
+            'facility' => \YapepBase\Syslog\Syslog::LOG_USER,
             ));
-        $o = new Syslog('syslog');
+        $mock = new \YapepBase\Test\Mock\Syslog\SyslogConnectionMock();
+        $this->assertFalse($mock->isOpen);
+        $o = new Syslog('syslog', $mock);
+        $this->assertTrue($mock->isOpen);
+        
         $msg = new Message\ErrorMessage();
-        $msg->set('Test message', 'test', 'test', \LOG_NOTICE);
-        if (!file_exists(__dir__ . '/../Temp/Log/dev/')) {
-            mkdir(__dir__ . '/../Temp/Log/dev/');
-        }
-        if (!\chroot(__dir__ . '/../Temp/Log/')) {
-            $this->markTestSkipped('Failed to chroot, skipping test.');
-            return;
-        }
-        $sock = socket_create(AF_UNIX, SOCK_DGRAM, 0);
-        socket_set_option($sock, SOL_SOCKET, SO_REUSEADDR, 1);
-        socket_bind($sock, '/dev/log');
-        socket_listen($sock);
-        $pid = pcntl_fork();
-        if ($pid < 0) {
-            $this->markTestSkipped('Failed to fork, skipping test.');
-            return;
-        } elseif ($pid == 0) {
-            $o->log($msg);
-            exit;
-        } else {
-            $client = socket_accept($sock);
-            if ($client !== false) {
-                $data = socket_read($sock, 1024);
-                var_dump($data);
-            }
-            socket_close($client);
-            socket_close($sock);
-        }
+        $msg->set('Test message', 'test', 'test', \YapepBase\Syslog\Syslog::LOG_NOTICE);
+        $o->log($msg);
+        
+        $this->assertEquals(array(
+            array(
+                'priority' => \YapepBase\Syslog\Syslog::LOG_NOTICE + \YapepBase\Syslog\Syslog::LOG_USER,
+                'message' => '[phpErrorLog]|test|test|Test message',
+                'ident' => 'testApp',
+                'date' => null
+            )
+        ), $mock->messages);
+        
+    }
+    
+    public function testLogWithPidAndSapi() {
+        Config::getInstance()->set('syslog', array(
+            'applicationIdent' => 'testApp',
+            'facility' => \YapepBase\Syslog\Syslog::LOG_USER,
+            'includeSapiName' => true,
+            'addPid' => true,
+            ));
+        $mock = new \YapepBase\Test\Mock\Syslog\SyslogConnectionMock();
+        $o = new Syslog('syslog', $mock);
+        $msg = new Message\ErrorMessage();
+        $msg->set('Test message', 'test', 'test', \YapepBase\Syslog\Syslog::LOG_NOTICE);
+        $o->log($msg);
+        
+        $this->assertEquals(array(
+            array(
+                'priority' => \YapepBase\Syslog\Syslog::LOG_NOTICE + \YapepBase\Syslog\Syslog::LOG_USER,
+                'message' => '[phpErrorLog]|test|test|Test message',
+                'ident' => 'testApp-' . PHP_SAPI . '[pid]',
+                'date' => null
+            )
+        ), $mock->messages);
+    }
+    
+    public function testInvalidConfiguration() {
+        $mock = new \YapepBase\Test\Mock\Syslog\SyslogConnectionMock();
+
+        Config::getInstance()->set('syslog', array(
+            'facility' => \YapepBase\Syslog\Syslog::LOG_USER,
+            ));
+        try {
+            $o = new Syslog('syslog', $mock);
+            $this->fail('Calling syslog class without applicationIdent config should result in a ConfigException');
+        } catch (\YapepBase\Exception\ConfigException $e) { }
+        
+        Config::getInstance()->set('syslog', array(
+            'applicationIdent' => 'testApp',
+            ));
+        try {
+            $o = new Syslog('syslog', $mock);
+            $this->fail('Calling syslog class without facility config should result in a ConfigException');
+        } catch (\YapepBase\Exception\ConfigException $e) { }
+
+        Config::getInstance()->set('syslog', array(
+            ));
+        try {
+            $o = new Syslog('syslog', $mock);
+            $this->fail('Calling syslog class without facility and applicationIdent config should result in a ConfigException');
+        } catch (\YapepBase\Exception\ConfigException $e) { }
+
+        try {
+            $o = new Syslog('nonexistent', $mock);
+            $this->fail('Calling syslog class without config should result in a ConfigException');
+        } catch (\YapepBase\Exception\ConfigException $e) { }
     }
 }

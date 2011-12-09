@@ -43,12 +43,17 @@ class Syslog extends LoggerAbstract {
      * Creates a syslog connection.
      * @todo  2011-12-09  Janoszen  Move platform testing to a separate class.
      */
-    public function __construct() {
-        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+    public function __construct($configName, \YapepBase\Syslog\ISyslogConnection $connection = null) {
+        parent::__construct($configName);
+        if ($connection) {
+            $this->connection = $connection;
+        //@codeCoverageIgnoreStart
+        } elseif (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
             $this->connection = new \YapepBase\Syslog\LegacySyslogConnection();
         } else {
             $this->connection = new \YapepBase\Syslog\NativeSyslogConnection();
         }
+        //@codeCoverageIgnoreEnd
         $ident = $this->configOptions['applicationIdent'];
         if (isset($this->configOptions['includeSapiName']) && $this->configOptions['includeSapiName']) {
             $ident .= '-' . PHP_SAPI;

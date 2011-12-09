@@ -27,6 +27,15 @@ class SyslogConnectionMock extends \YapepBase\Syslog\SyslogConnection {
         if ($this->throwExceptions) {
             throw new \YapepBase\Syslog\SyslogException('Mock exception');
         }
+        if (!$ident) {
+            $ident = $this->ident;
+        }
+        if ($priority < 8) {
+            $priority += $this->facility;
+        }
+        if ($this->options == self::LOG_PID) {
+            $ident .= '[pid]';
+        }
         $this->messages[] = array(
             'priority' => $priority,
             'message' => $message,
