@@ -221,7 +221,7 @@ class SyslogConnection {
             /**
              * If we have a EPROTOTYPE error, the log socket doesn't support stream sockets, only dgram sockets.
              */
-            if ($e->getCode() == 91) {
+            if ($e->getCode() == SOCKET_EPROTOTYPE) {
                 $this->sock = socket_create(AF_UNIX, SOCK_DGRAM, 0);
                 $this->handleError();
                 @socket_connect($this->sock, $this->path);

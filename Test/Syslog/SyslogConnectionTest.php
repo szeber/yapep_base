@@ -13,7 +13,9 @@ class SyslogConnectionTest extends \PHPUnit_Framework_TestCase {
      */
     protected $object;
     
+    protected $logpath;
     protected $sock;
+    protected $dgram;
     
     protected function initSyslogServer($logpath, $dgram = false) {
         if (\file_exists($logpath)) {
@@ -26,22 +28,34 @@ class SyslogConnectionTest extends \PHPUnit_Framework_TestCase {
         }
         \socket_set_option($this->sock, SOL_SOCKET, SO_REUSEADDR, 1);
         \socket_bind($this->sock, $logpath);
-        \socket_listen($this->sock);
+        if (!$dgram) {
+            \socket_listen($this->sock);
+        }
+        $this->logpath = $logpath;
+        $this->dgram = $dgram;
     }
     
     protected function getSyslogMessage() {
-        $client = \socket_accept($this->sock);
-        if ($client !== false) {
-            $msg = \socket_read($client, 1024);
-            \socket_close($client);
-            return $msg;
+        if (!$this->dgram) {
+            $client = \socket_accept($this->sock);
+            if ($client !== false) {
+                $msg = \socket_read($client, 1024);
+                \socket_close($client);
+                return $msg;
+            }
         } else {
-            return false;
+            if (($msg = \socket_read($this->sock, 1024))) {
+                return $msg;
+            }
         }
+        return false;
     }
     
     protected function closeSyslogServer() {
         \socket_close($this->sock);        
+        if (\file_exists($this->logpath)) {
+            \unlink($this->logpath);
+        }
     }
 
     protected function setUp() {
@@ -106,11 +120,44 @@ class SyslogConnectionTest extends \PHPUnit_Framework_TestCase {
             exit;
         } else {
             $this->assertEquals('<13>Dec  6 15:45:19 test: test', $this->getSyslogMessage());
-            $this->closeSyslogServer();
             \pcntl_waitpid($pid, $status);
-            if (\file_exists($logpath)) {
-                \unlink($logpath);
-            }
+            $this->closeSyslogServer();
         }
+    }
+    
+    public function testHandleError() {
+        try {
+            $this->object->setPath('/nonexistent');
+            $this->object->open();
+            $this->fail('Connecting to a non-existent socket should result in a SyslogException');
+        } catch (\YapepBase\Syslog\SyslogException $e) { }
+    }
+    
+    public function testDgramSockets() {
+        if (!\function_exists('pcntl_fork')) {
+            $this->markTestSkipped('Skipping syslog test, pcntl_fork is not available');
+            return;
+        }
+        
+        $logpath = \dirname(__DIR__) . '/Temp/Syslog/log';
+        $this->object->setFacility(SyslogConnection::LOG_USER);
+        $this->object->setPath($logpath);
+        $this->object->setIdent('test');
+
+        $this->initSyslogServer($logpath, true);
+        
+        $pid = \pcntl_fork();
+        if ($pid < 0) {
+            $this->markTestSkipped('Failed to fork, skipping test.');
+            return;
+        } elseif ($pid == 0) {
+            $this->object->log(SyslogConnection::LOG_NOTICE, 'test', 'test', mktime(15, 45, 19, 12, 6, 2011));
+            $this->closeSyslogServer();
+            exit;
+        } else {
+            $this->assertEquals('<13>Dec  6 15:45:19 test: test', $this->getSyslogMessage());
+            \pcntl_waitpid($pid, $status);
+            $this->closeSyslogServer();
+        }        
     }
 }
