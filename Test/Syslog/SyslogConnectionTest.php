@@ -72,7 +72,7 @@ class SyslogConnectionTest extends \PHPUnit_Framework_TestCase {
             $this->markTestSkipped('Failed to fork, skipping test.');
             return;
         } elseif ($pid == 0) {
-            $this->object->log(SyslogConnection::LOG_NOTICE, 'test', 'test', 1323182719);
+            $this->object->log(SyslogConnection::LOG_NOTICE, 'test', 'test', mktime(15, 45, 19, 12, 6, 2011));
             exit;
         } else {
             $client = \socket_accept($sock);

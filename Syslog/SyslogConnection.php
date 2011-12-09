@@ -14,44 +14,153 @@ namespace YapepBase\Syslog;
 /**
  * This class is a replacement for the native syslog(), openlog() and closelog() calls to make it independent and
  * testable.
+ * 
+ * Warning: do NOT exchange the numeric values to the PHP native syslog constanst!
  */
 class SyslogConnection {
+    /**
+     * Security/authorization messages
+     */
     const LOG_AUTH = 40;
+    /**
+     * Security/authorization messages (private)
+     */
     const LOG_AUTHPRIV = 80;
+    /**
+     * Cron daemon
+     */
     const LOG_CRON = 72;
+    /**
+     * Other daemons
+     */
     const LOG_DAEMON = 24;
+    /**
+     * FTP server
+     */
     const LOG_FTP = 88;
+    /**
+     * Kernel log (do not use)
+     */
     const LOG_KERN = 0;
+    /**
+     * Local use (ask sysadmin about it)
+     */
     const LOG_LOCAL0 = 128;
+    /**
+     * Local use (ask sysadmin about it)
+     */
     const LOG_LOCAL1 = 136;
+    /**
+     * Local use (ask sysadmin about it)
+     */
     const LOG_LOCAL2 = 144;
+    /**
+     * Local use (ask sysadmin about it)
+     */
     const LOG_LOCAL3 = 152;
+    /**
+     * Local use (ask sysadmin about it)
+     */
     const LOG_LOCAL4 = 160;
+    /**
+     * Local use (ask sysadmin about it)
+     */
     const LOG_LOCAL5 = 168;
+    /**
+     * Local use (ask sysadmin about it)
+     */
     const LOG_LOCAL6 = 176;
+    /**
+     * Local use (ask sysadmin about it)
+     */
     const LOG_LOCAL7 = 184;
+    /**
+     * Printer facility
+     */
     const LOG_LPR = 48;
+    /**
+     * Mail server
+     */
     const LOG_MAIL = 16;
+    /**
+     * News server
+     */
     const LOG_NEWS = 72;
+    /**
+     * Syslog internal messages (do not use)
+     */
     const LOG_SYSLOG = 48;
+    /**
+     * Generic user-level messages
+     */
     const LOG_USER = 8;
+    /**
+     * UUCP subsystem
+     */
     const LOG_UUCP = 64;
 
+    /**
+     * System is unusable
+     */
     const LOG_EMERG = 0;
+    /**
+     * Action must be taken immediately
+     */
     const LOG_ALERT = 1;
+    /**
+     * Critical conditions
+     */
     const LOG_CRIT = 2;
+    /**
+     * Error conditions
+     */
     const LOG_ERR = 3;
+    /**
+     * Warning conditions
+     */
     const LOG_WARNING = 4;
+    /**
+     * Normal, but significant condition
+     */
     const LOG_NOTICE = 5;
+    /**
+     * Informational message
+     */
     const LOG_INFO = 6;
+    /**
+     * Debug-level message
+     */
     const LOG_DEBUG = 7;
     
+    /**
+     * Log application PID in syslog ident
+     */
     const LOG_PID = 1;
     
+    /**
+     * Program identification string (tag)
+     * @var string
+     */
     protected $ident = 'php';
+    /**
+     * Options for logging (currently only LOG_PID is supported)
+     * @var int
+     */
     protected $options = 0;
+    /**
+     * Syslog facility. Must be dividable by 8 by RFC
+     * @var int
+     */
     protected $facility = 8;
+    /**
+     * Path of the log socket to use/
+     * @var string
+     */
     protected $path = '/dev/log';
+    /**
+     * Open log socket storage
+     * @var resource
+     */
     protected $sock;
     
     /**
@@ -114,7 +223,7 @@ class SyslogConnection {
      */
     public function close() {
         if ($this->sock) {
-            socket_close($sock);
+            socket_close($$this->sock);
             $this->handleError();
         }
         return $this;
@@ -156,7 +265,7 @@ class SyslogConnection {
      * @return SyslogConnection 
      */
     public function setPath($path = '/dev/log') {
-        $this->path = $path;
+        $this->path = (string)$path;
         return $this;
     }
     
@@ -196,6 +305,10 @@ class SyslogConnection {
         return $this;
     }
     
+    /**
+     * Return the options set for logging.
+     * @return  int
+     */
     public function getOptions() {
         return $this->options;
     }
