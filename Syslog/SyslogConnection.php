@@ -252,6 +252,7 @@ class SyslogConnection {
      * @param  string  $ident     Defaults to the ident set via setIdent()
      * @param  int     $date      Timestamp for log message. Defaults to now.
      * @return SyslogConnection 
+     * @todo   Reconnect, if the connection is lost.
      */
     public function log($priority, $message, $ident = null, $date = null) {
         if (!$this->sock) {
