@@ -20,7 +20,7 @@ use YapepBase\Exception\ConfigException;
  * Configuration:
  *     <ul>
  *         <li>applicationIdent: The name of the application as it will appear in the logs.</li>
- *         <li>facility: The facility to use for logging {@uses LOG_*}</li>
+ *         <li>facility: The facility to use for logging {@uses \YapepBase\Syslog\Syslog::LOG_*}</li>
  *         <li>includeSapiName: If TRUE, the SAPI's name will be appended to the applicationIdent. Optional.</li>
  *         <li>addPid: If TRUE, the current PID will be logged too. Optional.</li>
  *         <li>printError: If TRUE, the log message will also be printed to STDERR. Optional.</li>
@@ -32,6 +32,44 @@ use YapepBase\Exception\ConfigException;
  * @subpackage Log
  */
 class Syslog extends LoggerAbstract {
+    
+    /**
+     * The syslog connection
+     * @var \YapepBase\Syslog\NativeSyslogConnection
+     */
+    protected $connection;
+    
+    /**
+     * Creates a syslog connection.
+     * @todo  2011-12-09  Janoszen  Move platform testing to a separate class.
+     */
+    public function __construct() {
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            $this->connection = new \YapepBase\Syslog\LegacySyslogConnection();
+        } else {
+            $this->connection = new \YapepBase\Syslog\NativeSyslogConnection();
+        }
+        $ident = $this->configOptions['applicationIdent'];
+        if (isset($this->configOptions['includeSapiName']) && $this->configOptions['includeSapiName']) {
+            $ident .= '-' . PHP_SAPI;
+        }
+        $this->connection->setIdent($ident);
+        $this->connection->setFacility($this->configOptions['facility']);
+
+        $options = 0;
+        if (isset($this->configOptions['addPid']) && $this->configOptions['addPid']) {
+            $options += \YapepBase\Syslog\ISyslogConnection::LOG_PID;
+        }
+        $this->connection->setOptions($options);
+        $this->connection->open();
+    }
+    
+    /**
+     * Closes the syslog connection.
+     */
+    public function __destruct() {
+        $this->connection->close();
+    }
 
     /**
      * Logs the message
@@ -39,28 +77,7 @@ class Syslog extends LoggerAbstract {
      * @param IMessage $message
      */
     public function log(IMessage $message) {
-        $ident = $this->configOptions['applicationIdent'];
-        if (isset($this->configOptions['includeSapiName']) && $this->configOptions['includeSapiName']) {
-            $ident .= '-' . PHP_SAPI;
-        }
-
-        // Set the options
-        $options = 0;
-        if (isset($this->configOptions['addPid']) && $this->configOptions['addPid']) {
-            $options = $options | LOG_PID;
-        }
-        if (isset($this->configOptions['printError']) && $this->configOptions['printError']) {
-            $options = $options | LOG_PERROR;
-        }
-        if (isset($this->configOptions['console']) && $this->configOptions['console']) {
-            $options = $options | LOG_CONS;
-        }
-
-        $logMessage = $this->getLogMessage($message);
-
-        openlog($ident, $options, $this->configOptions['facility']);
-        syslog($message->getPriority(), $logMessage);
-        closelog();
+        $this->connection->log($message->getPriority(), $this->getLogMessage($message));
     }
 
     /**
@@ -98,9 +115,5 @@ class Syslog extends LoggerAbstract {
             throw new ConfigException('Configuration invalid for syslog: ' . $configName);
         }
     }
-
-
-
-
-
+    
 }
