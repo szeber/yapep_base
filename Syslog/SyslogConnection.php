@@ -168,7 +168,7 @@ class SyslogConnection {
      * @throws SyslogException if a socket error occured.
      */
     protected function handleError() {
-        if (socket_last_error($this->sock)) {
+        if (\is_resource($this->sock) && socket_last_error($this->sock)) {
             $e = new SyslogException(socket_strerror(socket_last_error($this->sock)), socket_last_error($this->sock));
             socket_clear_error($this->sock);
             throw $e;
@@ -184,7 +184,7 @@ class SyslogConnection {
      */
     public function openlog($ident, $option, $facility) {
         $this->setIdent($ident);
-        $this->setOption($option);
+        $this->setOptions($option);
         $this->setFacility($facility);
         return $this->open();
     }
@@ -213,7 +213,7 @@ class SyslogConnection {
      */
     public function open() {
         try {
-            $this->sock = socket_create(AF_UNIX, SOCK_STREAM, 0);
+            $this->sock = @socket_create(AF_UNIX, SOCK_STREAM, 0);
             $this->handleError();
             @socket_connect($this->sock, $this->path);
             $this->handleError();
@@ -222,7 +222,7 @@ class SyslogConnection {
              * If we have a EPROTOTYPE error, the log socket doesn't support stream sockets, only dgram sockets.
              */
             if ($e->getCode() == SOCKET_EPROTOTYPE) {
-                $this->sock = socket_create(AF_UNIX, SOCK_DGRAM, 0);
+                $this->sock = @socket_create(AF_UNIX, SOCK_DGRAM, 0);
                 $this->handleError();
                 @socket_connect($this->sock, $this->path);
                 $this->handleError();
@@ -239,7 +239,7 @@ class SyslogConnection {
      */
     public function close() {
         if ($this->sock) {
-            socket_close($$this->sock);
+            @socket_close($this->sock);
             $this->handleError();
         }
         return $this;
@@ -255,9 +255,6 @@ class SyslogConnection {
      * @todo   Reconnect, if the connection is lost.
      */
     public function log($priority, $message, $ident = null, $date = null) {
-        if (!$this->sock) {
-            $this->open();
-        }
         if (!is_int($priority) || $priority < 0 || $priority > 191) {
             throw new SyslogException('Invalid priority value ' . $priority);
         }
@@ -276,7 +273,10 @@ class SyslogConnection {
             date('H:i:s', $date) . ' ' . $ident
             . ($this->options&self::LOG_PID && function_exists('posix_getpid')?'[' . posix_getpid() . ']':'') . ': '
             . $message;
-        socket_write($this->sock, $buf, 1024);
+        if (!$this->sock) {
+            $this->open();
+        }
+        @socket_write($this->sock, $buf, 1024);
         $this->handleError();
         return $this;
     }

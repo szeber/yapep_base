@@ -98,31 +98,31 @@ class SyslogConnectionTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testLogging() {
-        if (!\function_exists('pcntl_fork')) {
-            $this->markTestSkipped('Skipping syslog test, pcntl_fork is not available');
-            return;
-        }
-        
         $logpath = \dirname(__DIR__) . '/Temp/Syslog/log';
         $this->object->setFacility(SyslogConnection::LOG_USER);
         $this->object->setPath($logpath);
         $this->object->setIdent('test');
 
         $this->initSyslogServer($logpath);
+        $this->object->open();
         
-        $pid = \pcntl_fork();
-        if ($pid < 0) {
-            $this->markTestSkipped('Failed to fork, skipping test.');
-            return;
-        } elseif ($pid == 0) {
-            $this->object->log(SyslogConnection::LOG_NOTICE, 'test', 'test', mktime(15, 45, 19, 12, 6, 2011));
-            $this->closeSyslogServer();
-            exit;
-        } else {
-            $this->assertEquals('<13>Dec  6 15:45:19 test: test', $this->getSyslogMessage());
-            \pcntl_waitpid($pid, $status);
-            $this->closeSyslogServer();
-        }
+        $this->object->log(SyslogConnection::LOG_NOTICE, 'test', 'test', mktime(15, 45, 19, 12, 6, 2011));
+        $this->assertEquals('<13>Dec  6 15:45:19 test: test', $this->getSyslogMessage());
+        $this->object->close();
+        $this->closeSyslogServer();
+    }
+    
+    public function testLoggingWithNoParams() {
+        $logpath = \dirname(__DIR__) . '/Temp/Syslog/log';
+
+        $this->initSyslogServer($logpath);
+        $this->object->setPath($logpath);
+        $this->object->open();
+        
+        $this->object->log(SyslogConnection::LOG_NOTICE, 'test');
+        $this->assertRegExp('/^<13>(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) ( |1|2|3)([0-9]) ([0-9]{2}):([0-9]{2}):([0-9]{2}) php: test$/', $this->getSyslogMessage());
+        $this->object->close();        
+        $this->closeSyslogServer();
     }
     
     public function testHandleError() {
@@ -133,12 +133,30 @@ class SyslogConnectionTest extends \PHPUnit_Framework_TestCase {
         } catch (\YapepBase\Syslog\SyslogException $e) { }
     }
     
+    public function testInvalidParams() {
+        try {
+            $this->object->setIdent('Test Ident');
+            $this->fail('setIdent with whitespace should result in a SyslogException');
+        } catch (\YapepBase\Syslog\SyslogException $e) { }
+        try {
+            $this->object->log(SyslogConnection::LOG_NOTICE, 'test', 'Test Ident');
+            $this->fail('log with ident with whitespace should result in a SyslogException');
+        } catch (\YapepBase\Syslog\SyslogException $e) { }
+        try {
+            $this->object->log(-1, 'test');
+            $this->fail('Negative priority should result in a SyslogException');
+        } catch (\YapepBase\Syslog\SyslogException $e) { }
+        try {
+            $this->object->log(192, 'test');
+            $this->fail('Priority higher than 192 should result in a SyslogException');
+        } catch (\YapepBase\Syslog\SyslogException $e) { }
+        try {
+            $this->object->log(0.1, 'test');
+            $this->fail('Float priority should result in a SyslogException');
+        } catch (\YapepBase\Syslog\SyslogException $e) { }
+    }
+    
     public function testDgramSockets() {
-        if (!\function_exists('pcntl_fork')) {
-            $this->markTestSkipped('Skipping syslog test, pcntl_fork is not available');
-            return;
-        }
-        
         $logpath = \dirname(__DIR__) . '/Temp/Syslog/log';
         $this->object->setFacility(SyslogConnection::LOG_USER);
         $this->object->setPath($logpath);
@@ -146,18 +164,22 @@ class SyslogConnectionTest extends \PHPUnit_Framework_TestCase {
 
         $this->initSyslogServer($logpath, true);
         
-        $pid = \pcntl_fork();
-        if ($pid < 0) {
-            $this->markTestSkipped('Failed to fork, skipping test.');
-            return;
-        } elseif ($pid == 0) {
-            $this->object->log(SyslogConnection::LOG_NOTICE, 'test', 'test', mktime(15, 45, 19, 12, 6, 2011));
-            $this->closeSyslogServer();
-            exit;
-        } else {
-            $this->assertEquals('<13>Dec  6 15:45:19 test: test', $this->getSyslogMessage());
-            \pcntl_waitpid($pid, $status);
-            $this->closeSyslogServer();
-        }        
+        $this->object->log(SyslogConnection::LOG_NOTICE, 'test', 'test', mktime(15, 45, 19, 12, 6, 2011));
+        $this->assertEquals('<13>Dec  6 15:45:19 test: test', $this->getSyslogMessage());
+        $this->object->close();        
+        $this->closeSyslogServer();
+    }
+    
+    public function testLegacyCalls() {
+        $logpath = \dirname(__DIR__) . '/Temp/Syslog/log';
+        $this->object->setPath($logpath);
+
+        $this->initSyslogServer($logpath, true);
+        $this->object->openlog('test', 0, SyslogConnection::LOG_LOCAL0);
+        
+        $this->object->syslog(SyslogConnection::LOG_NOTICE, 'test');
+        $this->assertRegExp('/^<133>(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) ( |1|2|3)([0-9]) ([0-9]{2}):([0-9]{2}):([0-9]{2}) test: test$/', $this->getSyslogMessage());
+        $this->object->closelog();        
+        $this->closeSyslogServer();
     }
 }
