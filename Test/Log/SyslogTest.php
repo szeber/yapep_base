@@ -8,20 +8,26 @@ use YapepBase\Config;
  * Test class for Syslog.
  */
 class SyslogTest extends \PHPUnit_Framework_TestCase {
+
+    public function setUp() {
+        parent::setUp();
+        Config::getInstance()->clear();
+    }
+
     public function testLog() {
         Config::getInstance()->set('syslog', array(
             'applicationIdent' => 'testApp',
             'facility' => \YapepBase\Syslog\Syslog::LOG_USER,
-            ));
+        ));
         $mock = new \YapepBase\Test\Mock\Syslog\SyslogConnectionMock();
         $this->assertFalse($mock->isOpen);
         $o = new Syslog('syslog', $mock);
         $this->assertTrue($mock->isOpen);
-        
+
         $msg = new Message\ErrorMessage();
         $msg->set('Test message', 'test', 'test', \YapepBase\Syslog\Syslog::LOG_NOTICE);
         $o->log($msg);
-        
+
         $this->assertEquals(array(
             array(
                 'priority' => \YapepBase\Syslog\Syslog::LOG_NOTICE + \YapepBase\Syslog\Syslog::LOG_USER,
@@ -30,9 +36,27 @@ class SyslogTest extends \PHPUnit_Framework_TestCase {
                 'date' => null
             )
         ), $mock->messages);
-        
     }
-    
+
+    public function testLogInstantiationWithArray() {
+        Config::getInstance()->set('syslog', array(
+            'applicationIdent' => 'testApp',
+            'facility' => \YapepBase\Syslog\Syslog::LOG_USER,
+        ));
+        $mock = new \YapepBase\Test\Mock\Syslog\SyslogConnectionMock();
+        $o = new Syslog('syslog', $mock);
+    }
+
+    public function testLogInstantiationWithHierarchicalConfig() {
+        Config::getInstance()->set(array(
+            'syslog.applicationIdent' => 'testApp',
+            'syslog.facility' => \YapepBase\Syslog\Syslog::LOG_USER,
+        ));
+        $mock = new \YapepBase\Test\Mock\Syslog\SyslogConnectionMock();
+        $o = new Syslog('syslog.*', $mock);
+
+    }
+
     public function testLogWithPidAndSapi() {
         Config::getInstance()->set('syslog', array(
             'applicationIdent' => 'testApp',
@@ -45,7 +69,7 @@ class SyslogTest extends \PHPUnit_Framework_TestCase {
         $msg = new Message\ErrorMessage();
         $msg->set('Test message', 'test', 'test', \YapepBase\Syslog\Syslog::LOG_NOTICE);
         $o->log($msg);
-        
+
         $this->assertEquals(array(
             array(
                 'priority' => \YapepBase\Syslog\Syslog::LOG_NOTICE + \YapepBase\Syslog\Syslog::LOG_USER,
@@ -55,7 +79,7 @@ class SyslogTest extends \PHPUnit_Framework_TestCase {
             )
         ), $mock->messages);
     }
-    
+
     public function testInvalidConfiguration() {
         $mock = new \YapepBase\Test\Mock\Syslog\SyslogConnectionMock();
 
@@ -66,7 +90,7 @@ class SyslogTest extends \PHPUnit_Framework_TestCase {
             $o = new Syslog('syslog', $mock);
             $this->fail('Calling syslog class without applicationIdent config should result in a ConfigException');
         } catch (\YapepBase\Exception\ConfigException $e) { }
-        
+
         Config::getInstance()->set('syslog', array(
             'applicationIdent' => 'testApp',
             ));
@@ -85,6 +109,15 @@ class SyslogTest extends \PHPUnit_Framework_TestCase {
         try {
             $o = new Syslog('nonexistent', $mock);
             $this->fail('Calling syslog class without config should result in a ConfigException');
+        } catch (\YapepBase\Exception\ConfigException $e) { }
+    }
+
+    public function testMissingConfiguration() {
+        $mock = new \YapepBase\Test\Mock\Syslog\SyslogConnectionMock();
+
+        try {
+            $o = new Syslog('syslogNonExistent', $mock);
+            $this->fail('Calling syslog class with nonexistent config name should resilt in a ConfigException');
         } catch (\YapepBase\Exception\ConfigException $e) { }
     }
 }

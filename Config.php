@@ -8,11 +8,14 @@
  * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
-
 namespace YapepBase;
 
 /**
- * Config singleton class
+ * Config singleton class.
+ *
+ * Configuration data can be stored in a hierarchycal way, the parents separated from their children by '.' characters.
+ * For example 'system.database.paramPrefix'. All child nodes of a parent can be retrieved by adding '.*' to the name
+ * of the parent.
  *
  * @package    YapepBase
  */
