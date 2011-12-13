@@ -22,7 +22,14 @@ class SimpleAutoloaderTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testLoad() {
-
+        $this->object->addClassPath(BASE_DIR);
+        $this->assertTrue($this->object->load('\\YapepBase\\Test\\Mock\\Autoloader\\ClassMock'));
+        $this->assertTrue($this->object->load('\\YapepBase\\Test\\Mock\\Autoloader\\InterfaceMock'));
+        $this->assertFalse($this->object->load('\\YapepBase\\Test\\Mock\\Autoloader\\NonexistentClassMock'));
+        try {
+            $this->assertFalse($this->object->load('\\YapepBase\\Test\\Mock\\Autoloader\\EmptyMock'));
+            $this->fail('Loading an empty file should result in a warning.');
+        } catch (\PHPUnit_Framework_Error_Warning $e) { }
     }
 
     protected function loadDirectory($path, $root) {
