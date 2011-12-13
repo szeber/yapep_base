@@ -47,7 +47,6 @@ class SystemContainer extends Pimple {
         $this[self::KEY_ERROR_HANDLER_CONTAINER] = function($container) {
             return new ErrorHandlerContainer();
         };
-        parent::__construct();
     }
 
     /**
