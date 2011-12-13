@@ -9,23 +9,3 @@
  */
 
 include_once(__DIR__ . '/../bootstrap.php');
-
-/**
- * Load all classes, so we have real code coverage.
- */
-function loadDirectory($path) {
-    if (($dh = opendir($path)) !== false) {
-        while (($entry = readdir($dh)) !== false) {
-            if (!preg_match('/(^Test$|Test\.php$|^\.$|^\.\.$)/', $entry)) {
-                $newpath = $path . '/' . $entry;
-                if (is_dir($newpath)) {
-                    loadDirectory($newpath);
-                } else if (is_file($newpath) && preg_match('/\.php/', $newpath)) {
-                    include_once($newpath);
-                }
-            }
-        }
-    }
-}
-
-loadDirectory(__DIR__ . '/../');

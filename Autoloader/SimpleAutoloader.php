@@ -11,8 +11,6 @@
 
 namespace YapepBase\Autoloader;
 
-require_once BASE_DIR . '/YapepBase/Autoloader/AutoloaderBase.php';
-
 /**
  * SimpleAutoloader class
  *
@@ -20,51 +18,51 @@ require_once BASE_DIR . '/YapepBase/Autoloader/AutoloaderBase.php';
  * @subpackage Autoloader
  */
 class SimpleAutoloader extends AutoloaderBase {
+    /**
+     * Gets possible file names for all directories to autoload.
+     * @param   string $className
+     * @return  array of string
+     */
+    protected function getFileNames($className) {
+        $namespacePath = explode('\\', $className);
+        $classnamePath = explode('_', array_pop($namespacePath));
+        $files = array();
+        $fileName = implode(DIRECTORY_SEPARATOR, array_merge($namespacePath, $classnamePath)) . '.php';
+        foreach ($this->classpath as &$path) {
+            $files[] = $path . DIRECTORY_SEPARATOR . $fileName;
+        }
+        return $files;
+    }
 
     /**
-     * The autoloader instance
-     *
-     * @var SimpleAutoloader
+     * Load a file which should contain a class.
+     * @param   string  $fileName
+     * @param   string  $className
+     * @return  bool    TRUE if loading was successful.
      */
-    protected static $instance;
-
-    /**
-     * Loads the specified class if it can be found by name.
-     *
-     * @param string $className
-     *
-     * @return bool   TRUE if the class was loaded, FALSE if it can't be loaded.
-     */
-    public function load($className) {
-        $namespacePath = $this->sanitizeClassPath(explode('\\', $className));
-        if (empty($namespacePath)) {
-            return false;
-        }
-        $classnamePath = $this->sanitizeClassPath(explode('_', array_pop($namespacePath)));
-        if (empty($classnamePath)) {
-            return false;
-        }
-        $fileName = BASE_DIR . implode(DIRECTORY_SEPARATOR, array_merge($namespacePath, $classnamePath)) . '.php';
-        if (is_file($fileName) || is_readable($fileName)) {
-            require $fileName;
+    protected function loadFile($fileName, $className) {
+        if (\is_file($fileName) && \is_readable($fileName) && include($fileName)) {
+            if (!\class_exists($className, false) && !interface_exists($className, false)) {
+                trigger_error($fileName . ' loaded, but did not find ' . $className, E_USER_WARNING);
+            }
             return true;
         }
         return false;
     }
 
     /**
-     * Removes potentialy dangerous parts from the array
+     * Loads the specified class if it can be found by name.
      *
-     * @param array $classPath
+     * @param  string $className
      *
-     * @return array   The cleaned path array
+     * @return bool   TRUE if the class was loaded, FALSE if it can't be loaded.
      */
-    protected function sanitizeClassPath(array $classPath) {
-        foreach ($classPath as $index => $path) {
-            if (strstr($path, '.') || strstr($path, '/')) {
-                unset($classPath[$index]);
+    public function load($className) {
+        foreach ($this->getFileNames($className) as $fileName) {
+            if ($this->loadFile($fileName, $className)) {
+                return true;
             }
         }
-        return $classPath;
+        return false;
     }
 }

@@ -127,7 +127,6 @@ class MemcacheStorage extends StorageAbstract {
      */
     public function set($key, $data, $ttl = 0) {
         $this->memcache->set($this->makeKey($key), $data, 0, $ttl);
-
     }
 
     /**
@@ -141,7 +140,6 @@ class MemcacheStorage extends StorageAbstract {
      */
     public function get($key) {
         return $this->memcache->get($this->makeKey($key));
-
     }
 
     /**
@@ -153,7 +151,6 @@ class MemcacheStorage extends StorageAbstract {
      */
     public function delete($key) {
         $this->memcache->delete($this->makeKey($key));
-
     }
 
     /**

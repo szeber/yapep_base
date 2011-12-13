@@ -20,13 +20,34 @@ use YapepBase\Exception\Exception;
  * @subpackage Autoloader
  */
 abstract class AutoloaderBase {
+    protected $classpath = array();
 
     /**
-     * The autoloader instance
-     *
-     * @var AutoloaderBase
+     * Set an array of directories to be tried on class loading.
+     * @param  array  $classpath
+     * @return AutoloaderBase
      */
-    protected static $instance;
+    public function setClassPath(array $classpath) {
+        $this->classpath = $classpath;
+        return $this;
+    }
+
+    /**
+     * Add a single directory to the list of dirctories to be tried on class loading.
+     * @param  string $directory
+     * @return AutoloaderBase
+     */
+    public function addClassPath($directory) {
+        $this->classpath[] = $directory;
+    }
+
+    /**
+     * Returns all paths in the classpath
+     * @return array of string
+     */
+    public function getClassPath() {
+        return $this->classpath;
+    }
 
     /**
      * Loads the specified class if it can be found by name.
@@ -38,29 +59,18 @@ abstract class AutoloaderBase {
     abstract public function load($className);
 
     /**
-     * Registers the autoloader
-     *
-     * @throws YapepBase\Exception\YapepException   If the autoloader is already registered
+     * Registers the autoloader with AutoloaderRegistry. This is an alias for
+     * \YapepBase\Autoloader\AutoloaderRegistry::getInstance()->register($autoloader);
      */
-    public static function register() {
-        if (!empty(static::$instance)) {
-            throw new Exception('Trying to register an already registered autoloader');
-        }
-        static::$instance = new static();
-        spl_autoload_register(array(static::$instance, 'load'), true, true);
+    public function register() {
+        AutoloaderContainer::getInstance()->register($this);
     }
 
     /**
-     * Unregisters the autoloader
-     *
-     * @throws YapepBase\Exception\YapepException   If the autoloader is not registered
+     * Unregisters the autoloader with AutoloaderRegistry. This is an alias for
+     * \YapepBase\Autoloader\AutoloaderRegistry::getInstance()->unregister($autoloader);
      */
-    public static function unregister() {
-        if (is_null(static::$instance)) {
-            throw new Exception('Trying to unregister autoloader, but it is not registered');
-        }
-        spl_autoload_unregister(array(static::$instance, 'load'));
-        static::$instance = null;
+    public function unregister() {
+        AutoloaderContainer::getInstance()->unregister($this);
     }
-
 }

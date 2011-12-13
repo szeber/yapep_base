@@ -11,8 +11,14 @@
 namespace YapepBase;
 
 /** The base directory */
-define('BASE_DIR', realpath(dirname(dirname(__FILE__))) . '/');
+if (!\defined('BASE_DIR')) {
+    \define('BASE_DIR', realpath(dirname(dirname(__FILE__))));
+}
 
 /** Require the simple autoloader */
-require_once BASE_DIR . 'YapepBase/Autoloader/SimpleAutoloader.php';
-\YapepBase\Autoloader\SimpleAutoloader::register();
+require_once BASE_DIR . '/YapepBase/Autoloader/AutoloaderBase.php';
+require_once BASE_DIR . '/YapepBase/Autoloader/SimpleAutoloader.php';
+require_once BASE_DIR . '/YapepBase/Autoloader/AutoloaderContainer.php';
+$autoloader = new \YapepBase\Autoloader\SimpleAutoloader();
+$autoloader->setClassPath(array(BASE_DIR));
+$autoloader->register();
