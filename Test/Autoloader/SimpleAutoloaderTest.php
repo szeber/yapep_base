@@ -35,7 +35,7 @@ class SimpleAutoloaderTest extends \PHPUnit_Framework_TestCase {
     protected function loadDirectory($path, $root) {
         if (($dh = opendir($path)) !== false) {
             while (($entry = readdir($dh)) !== false) {
-                if (!preg_match('/([a-z]+\.php|^Test$|Test\.php$|^\.$|^\.\.$)/', $entry)) {
+                if (!preg_match('/(^[a-z]+\.php$|^Test$|Test\.php$|^\.$|^\.\.$)/', $entry)) {
                     $newpath = $path . '/' . $entry;
                     if (is_dir($newpath)) {
                         $this->loadDirectory($newpath, $root);
@@ -43,8 +43,7 @@ class SimpleAutoloaderTest extends \PHPUnit_Framework_TestCase {
                         $name = trim(str_replace('.php', '', str_replace($root, '', $newpath)), DIRECTORY_SEPARATOR);
                         $namespacedclass = strtr($name, DIRECTORY_SEPARATOR, '\\');
                         $legacyclass = strtr($name, DIRECTORY_SEPARATOR, '_');
-                        $this->object->load($namespacedclass);
-                        $this->object->load($legacyclass);
+                        $this->assertTrue($this->object->load($namespacedclass) || $this->object->load($legacyclass));
                     }
                 }
             }
@@ -56,7 +55,8 @@ class SimpleAutoloaderTest extends \PHPUnit_Framework_TestCase {
      * @depends testLoad
      */
     public function testLoadEverything() {
+        $classroot = BASE_DIR . DIRECTORY_SEPARATOR . 'YapepBase';
         $this->object->setClassPath(array(BASE_DIR));
-        $this->loadDirectory(BASE_DIR, BASE_DIR);
+        $this->loadDirectory($classroot, BASE_DIR);
     }
 }

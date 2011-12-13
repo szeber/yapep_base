@@ -27,7 +27,7 @@ class SimpleAutoloader extends AutoloaderBase {
         $namespacePath = \explode('\\', $className);
         $classnamePath = \explode('_', \array_pop($namespacePath));
         $files = array();
-        $fileName = \implode(\DIRECTORY_SEPARATOR, array_merge($namespacePath, $classnamePath)) . '.php';
+        $fileName = \implode(\DIRECTORY_SEPARATOR, \array_merge($namespacePath, $classnamePath)) . '.php';
         foreach ($this->classpath as &$path) {
             $files[] = $path . \DIRECTORY_SEPARATOR . $fileName;
         }
@@ -41,8 +41,8 @@ class SimpleAutoloader extends AutoloaderBase {
      * @return  bool    TRUE if loading was successful.
      */
     protected function loadFile($fileName, $className) {
-        if (\is_file($fileName) && \is_readable($fileName) && include($fileName)) {
-            if (!\class_exists($className, false) && !interface_exists($className, false)) {
+        if (\is_file($fileName) && \is_readable($fileName) && include_once($fileName)) {
+            if (!\class_exists($className, false) && !\interface_exists($className, false)) {
                 \trigger_error($fileName . ' loaded, but did not find ' . $className, \E_USER_WARNING);
             }
             return true;

@@ -12,7 +12,7 @@ namespace YapepBase;
 
 /** The base directory */
 if (!\defined('BASE_DIR')) {
-    \define('BASE_DIR', realpath(dirname(dirname(__FILE__))));
+    \define('BASE_DIR', realpath(dirname(dirname((__FILE__)))));
 }
 
 /** Require the simple autoloader */
