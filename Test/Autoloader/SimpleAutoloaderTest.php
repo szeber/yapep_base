@@ -29,7 +29,9 @@ class SimpleAutoloaderTest extends \PHPUnit_Framework_TestCase {
         try {
             $this->assertFalse($this->object->load('\\YapepBase\\Test\\Mock\\Autoloader\\EmptyMock'));
             $this->fail('Loading an empty file should result in a warning.');
-        } catch (\PHPUnit_Framework_Error_Warning $e) { }
+        } catch (\ErrorException $e) {
+            $this->assertEquals(\E_USER_WARNING, $e->getSeverity());
+        }
     }
 
     protected function loadDirectory($path, $root) {
@@ -45,12 +47,14 @@ class SimpleAutoloaderTest extends \PHPUnit_Framework_TestCase {
                         $legacyclass = strtr($name, DIRECTORY_SEPARATOR, '_');
                         try {
                             $namespacedres = $this->object->load($namespacedclass);
-                        } catch (\PHPUnit_Framework_Error_Warning $e) {
+                        } catch (\ErrorException $e) {
+                            $this->assertEquals(\E_USER_WARNING, $e->getSeverity());
                             $namespacedres = false;
                         }
                         try {
                             $legacyres = $this->object->load($legacyclass);
-                        } catch (\PHPUnit_Framework_Error_Warning $e) {
+                        } catch (\ErrorException $e) {
+                            $this->assertEquals(\E_USER_WARNING, $e->getSeverity());
                             $legacyres = false;
                         }
                         $this->assertTrue($namespacedres || $legacyres, 'Neither ' . $namespacedclass . ' nor '
