@@ -44,8 +44,9 @@ class SimpleAutoloader extends AutoloaderBase {
         if (\is_file($fileName) && \is_readable($fileName) && include_once($fileName)) {
             if (!\class_exists($className, false) && !\interface_exists($className, false)) {
                 \trigger_error($fileName . ' loaded, but did not find ' . $className, \E_USER_WARNING);
+            } else {
+                return true;
             }
-            return true;
         }
         return false;
     }
