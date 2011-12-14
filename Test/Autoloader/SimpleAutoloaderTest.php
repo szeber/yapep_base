@@ -45,10 +45,14 @@ class SimpleAutoloaderTest extends \PHPUnit_Framework_TestCase {
                         $legacyclass = strtr($name, DIRECTORY_SEPARATOR, '_');
                         try {
                             $namespacedres = $this->object->load($namespacedclass);
-                        } catch (\PHPUnit_Framework_Error_Warning $e) { }
+                        } catch (\PHPUnit_Framework_Error_Warning $e) {
+                            $namespacedres = false;
+                        }
                         try {
                             $legacyres = $this->object->load($legacyclass);
-                        } catch (\PHPUnit_Framework_Error_Warning $e) { }
+                        } catch (\PHPUnit_Framework_Error_Warning $e) {
+                            $legacyres = false;
+                        }
                         $this->assertTrue($namespacedres || $legacyres, 'Neither ' . $namespacedclass . ' nor '
                             . $namespacedclass . ' were found in ' . $newpath);
                     }
