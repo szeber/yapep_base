@@ -48,7 +48,7 @@ class SystemContainer extends Pimple {
         $this[self::KEY_ERROR_HANDLER_CONTAINER] = function($container) {
             return new ErrorHandlerContainer();
         };
-        $this[self::KEY_EVENT_HANDLER_CONTAINER] = $this->share(function($container) {
+        $this[self::KEY_EVENT_HANDLER_REGISTRY] = $this->share(function($container) {
             return new EventHandlerRegistry();
         });
     }
