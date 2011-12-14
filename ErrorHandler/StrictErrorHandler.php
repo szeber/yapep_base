@@ -31,7 +31,7 @@ class StrictErrorHandler implements IErrorHandler {
             case E_WARNING:
             case E_NOTICE:
             case E_RECOVERABLE_ERROR:
-            throw new \ErrorException($message, 0, $errorLevel, $file, $line);
+                throw new \ErrorException($message, 0, $errorLevel, $file, $line);
         }
     }
 
