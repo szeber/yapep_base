@@ -11,10 +11,9 @@
 
 
 namespace YapepBase\DependencyInjection;
+use YapepBase\Event\EventHandlerRegistry;
 use YapepBase\Response\IResponse;
-
 use YapepBase\Request\IRequest;
-
 use YapepBase\ErrorHandler\ErrorHandlerContainer;
 use YapepBase\Lib\Pimple\Pimple;
 use YapepBase\Log\Message\ErrorMessage;
@@ -34,6 +33,8 @@ class SystemContainer extends Pimple {
     const KEY_ERROR_LOG_MESSAGE = 'errorLogMessage';
     /** Error handler container key. */
     const KEY_ERROR_HANDLER_CONTAINER = 'errorHandlerContainer';
+    /** Event handler container key. */
+    const KEY_EVENT_HANDLER_REGISTRY = 'eventHandlerRegistry';
 
     /**
      * Constructor. Sets up the system DI objects.
@@ -47,6 +48,9 @@ class SystemContainer extends Pimple {
         $this[self::KEY_ERROR_HANDLER_CONTAINER] = function($container) {
             return new ErrorHandlerContainer();
         };
+        $this[self::KEY_EVENT_HANDLER_CONTAINER] = $this->share(function($container) {
+            return new EventHandlerRegistry();
+        });
     }
 
     /**
@@ -65,6 +69,15 @@ class SystemContainer extends Pimple {
      */
     public function getErrorHandlerContainer() {
         return $this[self::KEY_ERROR_HANDLER_CONTAINER];
+    }
+
+    /**
+     * Returns an event handler registry instance
+     *
+     * @return \YapepBase\Event\EventHandlerRegistry
+     */
+    public function getEventHandlerRegistry() {
+        return $this[self::KEY_EVENT_HANDLER_REGISTRY];
     }
 
     /**

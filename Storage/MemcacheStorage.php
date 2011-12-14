@@ -31,6 +31,7 @@ use YapepBase\Exception\ConfigException;
  *
  * @package    YapepBase
  * @subpackage Storage
+ * @todo locking
  */
 class MemcacheStorage extends StorageAbstract {
 

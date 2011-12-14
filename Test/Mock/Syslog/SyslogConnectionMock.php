@@ -11,21 +11,21 @@ class SyslogConnectionMock extends \YapepBase\Syslog\SyslogConnection {
     }
     public function open() {
         if ($this->throwExceptions) {
-            throw new \YapepBase\Syslog\SyslogException('Mock exception');
+            throw new \YapepBase\Exception\SyslogException('Mock exception');
         }
         $this->isOpen = true;
         return $this;
     }
     public function close() {
         if ($this->throwExceptions) {
-            throw new \YapepBase\Syslog\SyslogException('Mock exception');
+            throw new \YapepBase\Exception\SyslogException('Mock exception');
         }
         $this->isOpen = false;
         return $this;
     }
     public function log($priority, $message, $ident = null, $date = null) {
         if ($this->throwExceptions) {
-            throw new \YapepBase\Syslog\SyslogException('Mock exception');
+            throw new \YapepBase\Exception\SyslogException('Mock exception');
         }
         if (!$ident) {
             $ident = $this->ident;

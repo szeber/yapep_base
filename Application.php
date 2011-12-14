@@ -10,6 +10,8 @@
 
 
 namespace YapepBase;
+use YapepBase\Event\Event;
+
 use YapepBase\Response\IResponse;
 
 use YapepBase\Request\IRequest;
@@ -206,11 +208,14 @@ class Application {
      */
     public function run() {
         try {
+            $eventHandlerRegistry = $this->diContainer->getEventHandlerRegistry();
+            $eventHandlerRegistry->raise(new Event(Event::TYPE_APPSTART));
             $controllerName = null;
             $action = null;
             $this->router->getRoute($controllerName, $action);
             $controller = $this->getDiContainer()->getController($controllerName, $this->request, $this->response);
             $controller->run($action);
+            $eventHandlerRegistry->raise(new Event(Event::TYPE_APPFINISH));
         } catch (\Exception $exception) {
             // FIXME refine exception handling
             $this->outputError();

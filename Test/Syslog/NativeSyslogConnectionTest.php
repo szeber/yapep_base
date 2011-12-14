@@ -134,30 +134,30 @@ class NativeSyslogConnectionTest extends \PHPUnit_Framework_TestCase {
             $this->object->setPath('/nonexistent');
             $this->object->open();
             $this->fail('Connecting to a non-existent socket should result in a SyslogException');
-        } catch (\YapepBase\Syslog\SyslogException $e) { }
+        } catch (\YapepBase\Exception\SyslogException $e) { }
     }
 
     public function testInvalidParams() {
         try {
             $this->object->setIdent('Test Ident');
             $this->fail('setIdent with whitespace should result in a SyslogException');
-        } catch (\YapepBase\Syslog\SyslogException $e) { }
+        } catch (\YapepBase\Exception\SyslogException $e) { }
         try {
             $this->object->log(Syslog::LOG_NOTICE, 'test', 'Test Ident');
             $this->fail('log with ident with whitespace should result in a SyslogException');
-        } catch (\YapepBase\Syslog\SyslogException $e) { }
+        } catch (\YapepBase\Exception\SyslogException $e) { }
         try {
             $this->object->log(-1, 'test');
             $this->fail('Negative priority should result in a SyslogException');
-        } catch (\YapepBase\Syslog\SyslogException $e) { }
+        } catch (\YapepBase\Exception\SyslogException $e) { }
         try {
             $this->object->log(192, 'test');
             $this->fail('Priority higher than 192 should result in a SyslogException');
-        } catch (\YapepBase\Syslog\SyslogException $e) { }
+        } catch (\YapepBase\Exception\SyslogException $e) { }
         try {
             $this->object->log(0.1, 'test');
             $this->fail('Float priority should result in a SyslogException');
-        } catch (\YapepBase\Syslog\SyslogException $e) { }
+        } catch (\YapepBase\Exception\SyslogException $e) { }
     }
 
     public function testDgramSockets() {
