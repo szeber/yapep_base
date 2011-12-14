@@ -67,17 +67,32 @@ class EventHandlerRegistry {
     }
 
     /**
+     * Clears all event handlers for an event type
+     *
+     * @param string $eventType
+     */
+    public function clear($eventType) {
+        $this->eventHandlers[$eventType] = array();
+    }
+
+    /**
+     * Clears all event handlers for all event types
+     */
+    public function clearAll() {
+        $this->eventHandlers = array();
+    }
+
+    /**
      * Raises an event
      *
      * @param Event $event
      */
     public function raise(Event $event) {
         $type = $event->getType();
-        if (empty($this->eventHandlers[$type])) {
-            return;
-        }
-        foreach($this->eventHandlers[$type] as $handler) {
-            $handler->handleEvent($event);
+        if (!empty($this->eventHandlers[$type])) {
+            foreach($this->eventHandlers[$type] as $handler) {
+                $handler->handleEvent($event);
+            }
         }
     }
 }
