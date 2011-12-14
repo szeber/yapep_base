@@ -22,6 +22,7 @@ class AutoloaderRegistry {
     /**
      * Singleton instance getter.
      * @return \YapepBase\Autoloader\AutoloaderRegistry
+     * @codeCoverageIgnore
      */
     public static function getInstance() {
         if (!self::$instance) {
@@ -47,6 +48,7 @@ class AutoloaderRegistry {
 
     /**
      * Registers this registry with SPL.
+     * @codeCoverageIgnore
      */
     public function registerWithSpl() {
         \spl_autoload_register(array($this, 'load'));
@@ -54,6 +56,7 @@ class AutoloaderRegistry {
 
     /**
      * Unregisters this registry with SPL
+     * @codeCoverageIgnore
      */
     public function unregisterFromSpl() {
         \spl_autoload_unregister(array($this, 'load'));
@@ -101,9 +104,10 @@ class AutoloaderRegistry {
      * @param bool   $autounregister  default null  Automatically unregister from SPL if no more autoloaders are left.
      */
     public function unregisterByClass($autoloaderClass, $autounregister = null) {
+        $autoloaderClass = ltrim($autoloaderClass, '\\');
         foreach ($this->registry as $autoloader) {
             if (\get_class($autoloader) == $autoloaderClass) {
-                $this->detach($autoloader, $autounregister);
+                $this->unregister($autoloader, $autounregister);
             }
         }
     }
