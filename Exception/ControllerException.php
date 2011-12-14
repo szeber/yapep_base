@@ -28,5 +28,9 @@ class ControllerException extends Exception {
 
     // Action related errors
     /** The return value received from the action is invalid. */
-    const ERR_INVALID_ACTION_RETURN_VALUE = 201;
+    const ERR_INVALID_ACTION_RESULT = 201;
+    /** The action is not present in the controller. */
+    const ERR_ACTION_NOT_FOUND = 202;
+    /** The controller is not found in the system. */
+    const ERR_CONTROLLER_NOT_FOUND = 203;
 }

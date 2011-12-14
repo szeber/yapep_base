@@ -23,8 +23,6 @@ use YapepBase\Log\Message\ErrorMessage;
  *
  * @package    YapepBase
  * @subpackage DependencyInjection
- *
- * @todo Fix getController() and getBlock() implementation to use the namespace set in the config
  */
 class SystemContainer extends Pimple {
 
@@ -35,6 +33,9 @@ class SystemContainer extends Pimple {
     const KEY_ERROR_HANDLER_CONTAINER = 'errorHandlerContainer';
     /** Event handler container key. */
     const KEY_EVENT_HANDLER_REGISTRY = 'eventHandlerRegistry';
+
+    protected $controllerSearchNamespaces = array('\YapepBase\Controller');
+    protected $blockSearchNamespaces = array('\YapepBase\View\Block');
 
     /**
      * Constructor. Sets up the system DI objects.
@@ -81,9 +82,42 @@ class SystemContainer extends Pimple {
     }
 
     /**
+     * Set a list of namespace roots to search for controllers in.
+     * @param array $namespaces a list of namespace roots to search for the controller in.
+     */
+    public function setControllerSearchNamespaces($namespaces = array()) {
+        $this->controllerSearchNamespaces = $namespaces;
+    }
+
+    /**
+     * Adds a namespace to the namespace roots to search for controllers in.
+     * @param string $namespace a single namespace to add to the search list
+     */
+    public function addControllerSearchNamespace($namespace) {
+        $this->controllerSearchNamespaces[] = $namespace;
+    }
+
+    /**
+     * Searches for the controller in all the controller search namespaces
+     * @param  string $controllerName
+     * @return string controller name
+     * @throws \YapepBase\Exception\ControllerException if the controller was not found
+     */
+    protected function searchForController($controllerName) {
+        foreach ($this->controllerSearchNamespaces as $nsroot) {
+            $className = $nsroot . '\\' . $controllerName . 'Controller';
+            if (class_exists($className, true)) {
+                return $className;
+            }
+        }
+        throw new \YapepBase\Exception\ControllerException('Controller ' . $controllerName . ' not found in '
+            . implode('; ', $this->controllerSearchNamespace), \YapepBase\Exception\ControllerException::ERR_CONTROLLER_NOT_FOUND);
+    }
+
+    /**
      * Returns a controller by it's name.
      *
-     * @param stirng    $controllerName   The name of the controller class to return.
+     * @param string    $controllerName   The name of the controller class to return.
      *                                    (Without the namespace and Controller suffix)
      * @param IRequest  $request          The request object for the controller.
      * @param IResponse $response         The response object for the controller.
@@ -91,7 +125,7 @@ class SystemContainer extends Pimple {
      * @return \YapepBase\Controller\IController
      */
     public function getController($controllerName, IRequest $request, IResponse $response) {
-        $fullClassName = '\YapepBase\Controller\\' . $controllerName . 'Controller';
+        $fullClassName = $this->searchForController($controllerName);
         return new $fullClassName($request, $response);
     }
 
