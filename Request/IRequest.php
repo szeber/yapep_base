@@ -36,7 +36,7 @@ interface IRequest {
     const METHOD_HTTP_DELETE = 'DELETE';
 
     /**
-     * Returns the target of the request.
+     * Returns the target of the request. (eg the URI for HTTP requests)
      *
      * @return string   The target of the request.
      */

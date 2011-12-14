@@ -193,7 +193,7 @@ class HttpRequest implements IRequest {
     }
 
     /**
-     * Returns the target of the request.
+     * Returns the target of the request.  (eg the URI for HTTP requests)
      *
      * @return string   The target of the request.
      */
