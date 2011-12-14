@@ -198,7 +198,8 @@ class ErrorHandlerContainer {
         // Shutdown because of a fatal error
         if (empty($this->errorHandlers)) {
             // We have no error handlers defined, send the fatal error to the SAPI's logger.
-            error_log('No errorhandlers are defined and a fatal error occured: ' . $error['message'], 4);
+            error_log('No errorhandlers are defined and a fatal error occured: ' . $error['message']
+                . '. File: ' . $error['file'] . ', line: ' . $error['line'] . '. Type: ' . $error['type'], 4);
             return;
         }
 
