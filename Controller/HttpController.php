@@ -94,11 +94,7 @@ abstract class HttpController extends BaseController {
         $url = Application::getInstance()->getRouter()->getTargetForControllerAction($controller, $action,
             $routeParams);
         if (!empty($getParams)) {
-            $transformedGetParams = array();
-            foreach($getParams as $key => $value) {
-                $transformedGetParams[] = urlencode($key) . '=' . urlencode($value);
-            }
-            $url .= '?' . implode('&', $transformedGetParams);
+            $url .= '?' . \http_build_query($getParams, null, '&', \PHP_QUERY_RFC1738);
         }
         if (!empty($anchor)) {
             $url .= '#' . $anchor;
