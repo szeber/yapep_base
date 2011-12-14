@@ -138,15 +138,15 @@ abstract class BaseController implements IController {
      * @param string $controller   The name of the controller.
      * @param string $action
      *
-     * @throws \YapepBase\Exception\RedirectException   To stop execution of the controller.
+     * @throws \YapepBase\Exception\RedirectException     To stop execution of the controller.
      * @throws \YapepBase\Exception\ControllerException   On controller specific error. (eg. action not found)
      * @throws \YapepBase\Exception\Exception             On framework related errors.
      * @throws \Exception                                 On non-framework related errors.
      */
-    protected function internalRedirect($controller, $action) {
-        $controller = Application::getInstance()->getDiContainer()->getController($controller, $this->request,
+    protected function internalRedirect($controllerName, $action) {
+        $controller = Application::getInstance()->getDiContainer()->getController($controllerName, $this->request,
             $this->response);
         $controller->run($action);
-        throw new RedirectException($controller . '/' . $action, RedirectException::TYPE_INTERNAL);
+        throw new RedirectException($controllerName . '/' . $action, RedirectException::TYPE_INTERNAL);
     }
 }
