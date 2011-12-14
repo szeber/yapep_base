@@ -38,6 +38,7 @@ use YapepBase\Config;
  *
  * @package    YapepBase
  * @subpackage Storage
+ * @todo locking
  */
 class FileStorage extends StorageAbstract {
 
