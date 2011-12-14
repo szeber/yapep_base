@@ -43,7 +43,14 @@ class SimpleAutoloaderTest extends \PHPUnit_Framework_TestCase {
                         $name = trim(str_replace('.php', '', str_replace($root, '', $newpath)), DIRECTORY_SEPARATOR);
                         $namespacedclass = strtr($name, DIRECTORY_SEPARATOR, '\\');
                         $legacyclass = strtr($name, DIRECTORY_SEPARATOR, '_');
-                        $this->assertTrue($this->object->load($namespacedclass) || $this->object->load($legacyclass));
+                        try {
+                            $namespacedres = $this->object->load($namespacedclass);
+                        } catch (\PHPUnit_Framework_Error_Warning $e) { }
+                        try {
+                            $legacyres = $this->object->load($legacyclass);
+                        } catch (\PHPUnit_Framework_Error_Warning $e) { }
+                        $this->assertTrue($namespacedres || $legacyres, 'Neither ' . $namespacedclass . ' nor '
+                            . $namespacedclass . ' were found in ' . $newpath);
                     }
                 }
             }
