@@ -10,11 +10,12 @@
  */
 
 namespace YapepBase\Syslog;
+use YapepBase\Exception\SyslogException;
 
 /**
  * This class is a replacement for the native syslog(), openlog() and closelog() calls to make it independent and
  * testable.
- * 
+ *
  * Warning: do NOT exchange the numeric values to the PHP native syslog constanst!
  */
 class NativeSyslogConnection extends SyslogConnection {
@@ -43,7 +44,7 @@ class NativeSyslogConnection extends SyslogConnection {
      * @var resource
      */
     protected $sock;
-    
+
     /**
      * Handle socket errors.
      * @throws SyslogException if a socket error occured.
@@ -55,11 +56,11 @@ class NativeSyslogConnection extends SyslogConnection {
             throw $e;
         }
     }
-        
+
     /**
      * Opens the log socket.
      * @return \YapepBase\Syslog\NativeSyslogConnection
-     * @throws \YapepBase\Syslog\SyslogException on error 
+     * @throws \YapepBase\Exception\SyslogException on error
      */
     public function open() {
         try {
@@ -67,7 +68,7 @@ class NativeSyslogConnection extends SyslogConnection {
             $this->handleError();
             @socket_connect($this->sock, $this->path);
             $this->handleError();
-        } catch (\YapepBase\Syslog\SyslogException $e) {
+        } catch (SyslogException $e) {
             /**
              * If we have a EPROTOTYPE error, the log socket doesn't support stream sockets, only dgram sockets.
              */
@@ -82,11 +83,11 @@ class NativeSyslogConnection extends SyslogConnection {
         }
         return $this;
     }
-    
+
     /**
      * Closes the log socket.
-     * @return \YapepBase\Syslog\NativeSyslogConnection 
-     * @throws \YapepBase\Syslog\SyslogException on error
+     * @return \YapepBase\Syslog\NativeSyslogConnection
+     * @throws \YapepBase\Exception\SyslogException on error
      */
     public function close() {
         if ($this->sock) {
@@ -95,15 +96,15 @@ class NativeSyslogConnection extends SyslogConnection {
         }
         return $this;
     }
-    
+
     /**
      * Write a log message to the log socket.
      * @param  int     $priority
      * @param  string  $message
      * @param  string  $ident     Defaults to the ident set via setIdent()
      * @param  int     $date      Timestamp for log message. Defaults to now.
-     * @return \YapepBase\Syslog\NativeSyslogConnection 
-     * @throws \YapepBase\Syslog\SyslogException on error
+     * @return \YapepBase\Syslog\NativeSyslogConnection
+     * @throws \YapepBase\Exception\SyslogException on error
      * @todo   Reconnect, if the connection is lost.
      */
     public function log($priority, $message, $ident = null, $date = null) {
@@ -128,5 +129,5 @@ class NativeSyslogConnection extends SyslogConnection {
         @socket_write($this->sock, $buf, 1024);
         $this->handleError();
         return $this;
-    }    
+    }
 }

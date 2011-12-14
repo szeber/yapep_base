@@ -49,7 +49,7 @@ interface ISyslogConnection {
     /**
      * Closes the log socket.
      * @return \YapepBase\Syslog\NativeSyslogConnection
-     * @throws \YapepBase\Syslog\SyslogException on error
+     * @throws \YapepBase\Exception\SyslogException on error
      */
     public function close();
     /**
@@ -59,7 +59,7 @@ interface ISyslogConnection {
      * @param  string  $ident     Defaults to the ident set via setIdent()
      * @param  int     $date      Timestamp for log message. Some implementations MAY not respect this.
      * @return \YapepBase\Syslog\ISyslogConnection 
-     * @throws \YapepBase\Syslog\SyslogException on error
+     * @throws \YapepBase\Exception\SyslogException on error
      * @throws \YapepBase\Exception\NotImplementedException if the date is set, but not supported by the implementation.
      */
     public function log($priority, $message, $ident = null, $date = null);
@@ -67,14 +67,14 @@ interface ISyslogConnection {
      * Set the path of the log socket. Some implementations MAY not respect this setting.
      * @param  string  $path  Defaults to /dev/log
      * @return \YapepBase\Syslog\ISyslogConnection 
-     * @throws \YapepBase\Syslog\SyslogException on error
+     * @throws \YapepBase\Exception\SyslogException on error
      * @throws \YapepBase\Exception\NotImplementedException if this call is not supported by the implementation.
      */
     public function setPath($path = '/dev/log');
     /**
      * Returns the log socket path.
      * @return string  The log socket path.
-     * @throws \YapepBase\Syslog\SyslogException on error
+     * @throws \YapepBase\Exception\SyslogException on error
      */
     public function getPath();
     /**
@@ -103,7 +103,7 @@ interface ISyslogConnection {
      * Set the default facility.
      * @param  int  $facility
      * @return \YapepBase\Syslog\ISyslogConnection 
-     * @throws \YapepBase\Syslog\SyslogException on error
+     * @throws \YapepBase\Exception\SyslogException on error
      */
     public function setFacility($facility);
     /**

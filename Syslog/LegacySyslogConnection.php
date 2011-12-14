@@ -10,6 +10,7 @@
  */
 
 namespace YapepBase\Syslog;
+use YapepBase\Exception\SyslogException;
 
 /**
  * This class uses the native PHP syslog calls.
@@ -29,14 +30,14 @@ class LegacySyslogConnection extends SyslogConnection {
     /**
      * Opens the log socket. This implementation does nothing.
      * @return \YapepBase\Syslog\LegacySyslogConnection
-     * @throws \YapepBase\Syslog\SyslogException on error 
+     * @throws \YapepBase\Exception\SyslogException on error
      */
     public function open() {
         return $this;
     }
     /**
      * Closes the log socket.  This implementation does nothing.
-     * @return \YapepBase\Syslog\LegacySyslogConnection 
+     * @return \YapepBase\Syslog\LegacySyslogConnection
      */
     public function close() {
         return $this;
@@ -47,8 +48,8 @@ class LegacySyslogConnection extends SyslogConnection {
      * @param  string  $message
      * @param  string  $ident     Defaults to the ident set via setIdent()
      * @param  int     $date      Timestamp for log message. Defaults to now.
-     * @return \YapepBase\Syslog\LegacySyslogConnection 
-     * @throws \YapepBase\Syslog\SyslogException on error
+     * @return \YapepBase\Syslog\LegacySyslogConnection
+     * @throws \YapepBase\Exception\SyslogException on error
      * @throws \YapepBase\Exception\NotImplementedException if the date is set, because this implementation
      *                                                      doesn't support it.
      */
