@@ -18,7 +18,7 @@ if (!\defined('BASE_DIR')) {
 /** Require the simple autoloader */
 require_once BASE_DIR . '/YapepBase/Autoloader/AutoloaderBase.php';
 require_once BASE_DIR . '/YapepBase/Autoloader/SimpleAutoloader.php';
-require_once BASE_DIR . '/YapepBase/Autoloader/AutoloaderContainer.php';
+require_once BASE_DIR . '/YapepBase/Autoloader/AutoloaderRegistry.php';
 $autoloader = new \YapepBase\Autoloader\SimpleAutoloader();
 $autoloader->setClassPath(array(BASE_DIR));
 $autoloader->register();

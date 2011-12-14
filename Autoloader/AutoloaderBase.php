@@ -63,7 +63,7 @@ abstract class AutoloaderBase {
      * \YapepBase\Autoloader\AutoloaderRegistry::getInstance()->register($autoloader);
      */
     public function register() {
-        AutoloaderContainer::getInstance()->register($this);
+        AutoloaderRegistry::getInstance()->register($this);
     }
 
     /**
@@ -71,6 +71,6 @@ abstract class AutoloaderBase {
      * \YapepBase\Autoloader\AutoloaderRegistry::getInstance()->unregister($autoloader);
      */
     public function unregister() {
-        AutoloaderContainer::getInstance()->unregister($this);
+        AutoloaderRegistry::getInstance()->unregister($this);
     }
 }
