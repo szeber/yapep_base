@@ -186,7 +186,7 @@ class ErrorHandlerContainer {
      */
     public function handleShutdown() {
         $error = error_get_last();
-        if (!$error || !$this->isRegistered) {
+        if (!$error || !$this->isRegistered || !$this->isErrorFatal($error['type'])) {
             // Normal shutdown or we are not the system handler
             return;
         }

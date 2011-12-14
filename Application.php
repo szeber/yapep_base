@@ -93,6 +93,7 @@ class Application {
 
     /**
      * Singleton __clone() method
+     * @codeCoverageIgnore
      */
     protected function __clone() {}
 
@@ -100,6 +101,7 @@ class Application {
      * Singleton getter
      *
      * @return \YapepBase\Application
+     * @codeCoverageIgnore
      */
     public static function getInstance() {
         if (is_null(static::$instance)) {
