@@ -12,7 +12,7 @@
 namespace YapepBase\ErrorHandler;
 
 /**
- * This error handler converts all warnings, notices and fatal errors to ErrorException.
+ * This error handler converts all warnings, notices and recoverable fatal errors to ErrorException.
  */
 class StrictErrorHandler implements IErrorHandler {
     /**
@@ -29,9 +29,7 @@ class StrictErrorHandler implements IErrorHandler {
     public function handleError($errorLevel, $message, $file, $line, $context, $errorId, array $backTrace = array()) {
         switch ($errorLevel) {
             case E_WARNING:
-            case E_STRICT:
             case E_NOTICE:
-            case E_DEPRECATED:
             case E_RECOVERABLE_ERROR:
             throw new \ErrorException($message, 0, $errorLevel, $file, $line);
         }
