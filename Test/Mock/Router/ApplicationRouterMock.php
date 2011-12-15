@@ -2,6 +2,9 @@
 
 namespace YapepBase\Test\Mock\Router;
 
+/**
+ * @codeCoverageIgnore
+ */
 class ApplicationRouterMock implements \YapepBase\Router\IRouter {
     public function getRoute(&$controller = null, &$action = null) {
         $controller = 'ApplicationMock';
