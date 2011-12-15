@@ -114,7 +114,7 @@ class RestTemplate extends ViewAbstract {
         if (is_array($data) || (($data instanceof \Iterator) && ($data instanceof \ArrayAccess))) {
             $xml = '';
             foreach($data as $key => $value) {
-                $xml .= '<' . $key . '>' . $this->getXmlFromData($data) . '</' . $key . '>';
+                $xml .= '<' . $key . '>' . $this->getXmlFromData($value) . '</' . $key . '>';
             }
             return $xml;
         } else {
