@@ -18,6 +18,7 @@ use YapepBase\UtilityFunctions;
  *
  * @package    YapepBase
  * @subpackage Request
+ * @todo $_FILES handling
  */
 class HttpRequest implements IRequest {
 
@@ -43,6 +44,27 @@ class HttpRequest implements IRequest {
     protected $cookies;
 
     /**
+     * The information of the files uploaded with the request.
+     *
+     * @var array
+     */
+    protected $files;
+
+    /**
+     * The server array.
+     *
+     * @var array
+     */
+    protected $server;
+
+    /**
+     * The environment array.
+     *
+     * @var array
+     */
+    protected $env;
+
+    /**
      * The target URI
      *
      * @var string
@@ -58,18 +80,36 @@ class HttpRequest implements IRequest {
 
     /**
      * Constructor.
+     *
+     * @param array $get                  The $_GET array
+     * @param array $post                 The $_POST array
+     * @param array $cookie               The $_COOKIE array
+     * @param array $server               The $_SERVER array
+     * @param array $env                  The $_ENV array
+     * @param array $files                The $_FILES array
+     * @param bool  $magicQuotesEnabled   If TRUE, the get, post, cookie arrays will be recursively stripped of slashes.
      */
-    public function __construct() {
-        if (get_magic_quotes_gpc()) {
-            $this->getParams = UtilityFunctions::recursiveStripSlashes($_GET);
-            $this->postParams = UtilityFunctions::recursiveStripSlashes($_POST);
-            $this->cookies = UtilityFunctions::recursiveStripSlashes($_COOKIE);
-        } else {
-            $this->getParams = $_GET;
-            $this->postParams = $_POST;
-            $this->cookies = $_COOKIE;
+    public function __construct(
+        array $get, array $post, array $cookie, array $server, array $env, array $files, $magicQuotesEnabled = null
+    ) {
+        if (is_null($magicQuotesEnabled)) {
+            $magicQuotesEnabled = \get_magic_quotes_gpc();
         }
-        list($this->targetUri) = explode('?', $_SERVER['REQUEST_URI'], 2);
+
+        if ($magicQuotesEnabled) {
+            $get = UtilityFunctions::recursiveStripSlashes($get);
+            $post = UtilityFunctions::recursiveStripSlashes($post);
+            $cookie = UtilityFunctions::recursiveStripSlashes($cookie);
+        }
+
+        $this->getParams = $get;
+        $this->postParams = $post;
+        $this->cookies = $cookie;
+        $this->server = $server;
+        $this->env = $env;
+        $this->files = $files;
+
+        list($this->targetUri) = explode('?', $this->server['REQUEST_URI'], 2);
     }
 
     /**
@@ -133,7 +173,7 @@ class HttpRequest implements IRequest {
     }
 
     /**
-     * Returns a value from the PHP server array. {@uses $_SERVER}
+     * Returns a value from the PHP server array.
      *
      * @param string $name      The key of the value to return.
      * @param mixed  $default   The default value, if the key is not set.
@@ -141,14 +181,14 @@ class HttpRequest implements IRequest {
      * @return mixed   The value, or the provided default, if the key is not found.
      */
     public function getServer($name, $default = null) {
-        if (isset($_SERVER[$name])) {
-            return $_SERVER[$name];
+        if (isset($this->server[$name])) {
+            return $this->server[$name];
         }
         return $default;
     }
 
     /**
-     * Returns a value from the running environment. {@uses $_ENV}
+     * Returns a value from the running environment.
      *
      * @param string $name      The key of the value to return.
      * @param mixed  $default   The default value, if the key is not set.
@@ -156,8 +196,8 @@ class HttpRequest implements IRequest {
      * @return mixed   The value, or the provided default, if the key is not found.
      */
     public function getEnv($name, $default = null) {
-        if (isset($_ENV[$name])) {
-            return $_ENV[$name];
+        if (isset($this->env[$name])) {
+            return $this->env[$name];
         }
         return $default;
     }
@@ -207,7 +247,7 @@ class HttpRequest implements IRequest {
      * @return string   {@uses self::METHOD_*}
      */
     public function getMethod() {
-        return $_SERVER['REQUEST_METHOD'];
+        return $this->server['REQUEST_METHOD'];
     }
 
     /**
@@ -226,7 +266,7 @@ class HttpRequest implements IRequest {
      * @return bool
      */
     public function isAjaxRequest() {
-        return (!empty($_SERVER['HTTP_X_REQUESTED_WITH'])
-            && 'xmlhttprequest' == strtolower($_SERVER['HTTP_X_REQUESTED_WITH']));
+        return (!empty($this->server['HTTP_X_REQUESTED_WITH'])
+            && 'xmlhttprequest' == strtolower($this->server['HTTP_X_REQUESTED_WITH']));
     }
 }

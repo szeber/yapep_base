@@ -35,19 +35,7 @@ class HttpRequestTest extends \PHPUnit_Framework_TestCase {
 
 		parent::setUp();
 
-		$_SERVER['REQUEST_URI'] = '/target';
-
-		$_GET = array(
-			'param' 	=> 'get_param',
-			'username' 	=> 'username_value',
-			'password' 	=> 'password_value'
-		);
-		$_POST['param'] = 'post_param';
-		$_COOKIE['param'] = 'cookie_param';
-
-		$this->request = new HttpRequest();
-
-
+		$this->request = $this->getRequest();
 	}
 
     /**
@@ -59,6 +47,34 @@ class HttpRequestTest extends \PHPUnit_Framework_TestCase {
 		$_GET = array();
 		$_COOKIE = array();
 		parent::tearDown();
+	}
+
+	/**
+	 * Returns a request instance
+	 *
+	 * @param array $additionalServerFields   Any additional fields for the server array
+	 *
+	 * @return \YapepBase\Request\HttpRequest
+	 */
+	protected function getRequest(array $additionalServerFields = array()) {
+		$server = array_merge(array(
+			'REQUEST_URI'    => '/target',
+            'REQUEST_METHOD' => 'post',
+		), $additionalServerFields);
+
+		$get = array(
+			'param' 	=> 'get_param',
+			'username' 	=> 'username_value',
+			'password' 	=> 'password_value',
+		);
+	    $post = array(
+			'param' => 'post_param',
+		);
+		$cookie = array(
+			'param' => 'cookie_param',
+	    );
+
+		return new HttpRequest($get, $post, $cookie, $server, array(), array(), true);
 	}
 
 	/**
@@ -123,7 +139,6 @@ class HttpRequestTest extends \PHPUnit_Framework_TestCase {
 	 * Test if the getMethod responses the right value
 	 */
 	public function testServerMethod() {
-		$_SERVER['REQUEST_METHOD'] = 'post';
 		$this->assertSame($this->request->getMethod(), 'post');
 	}
 
@@ -139,8 +154,8 @@ class HttpRequestTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testIsAjaxRequest() {
 		$this->assertFalse($this->request->isAjaxRequest());
-		$_SERVER['HTTP_X_REQUESTED_WITH'] = 'xmlhttprequest';
-		$this->assertTrue($this->request->isAjaxRequest());
+		$request = $this->getRequest(array('HTTP_X_REQUESTED_WITH' => 'xmlhttprequest'));
+		$this->assertTrue($request->isAjaxRequest());
 	}
 
 	/**
