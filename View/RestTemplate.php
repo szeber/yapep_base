@@ -87,7 +87,7 @@ class RestTemplate extends ViewAbstract {
         switch ($this->contentType) {
             case MimeType::XML:
                 $content = $this->escape(array($this->rootNodeName => $this->content));
-                return $this->getXmlFromData($this->escape($this->content, true));
+                return $this->getXmlFromData($this->content, true);
                 break;
 
             case MimeType::JAVASCRIPT:
@@ -118,7 +118,7 @@ class RestTemplate extends ViewAbstract {
             }
             return $xml;
         } else {
-            return (string)$data;
+            return $this->escapeSimpleValue((string)$data);
         }
     }
 
