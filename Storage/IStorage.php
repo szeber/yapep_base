@@ -35,11 +35,11 @@ interface IStorage {
     public function set($key, $data, $ttl = 0);
 
     /**
-     * Retrieves data from the cache identified by the specified key
+     * Retrieves data from the cache identified by the specified key. Returns FALSE if the key does not exist.
      *
      * @param string $key
      *
-     * @return mixed
+     * @return mixed   The data or FALSE if the specified key does not exist.
      *
      * @throws \YapepBase\Exception\StorageException      On error.
      */
