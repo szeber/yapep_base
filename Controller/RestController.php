@@ -47,7 +47,7 @@ abstract class RestController extends HttpController {
         $result = $this->$methodName();
         if (is_array($result)) {
             $view = new RestTemplate();
-            $view->setRootNode(Config::getInstance()->get('application.rest.xmlRootNode', 'xml'));
+            $view->setRootNode(Config::getInstance()->get('application.rest.xmlRootNode', 'rest'));
             $view->setContent($result);
             return $view;
         } elseif (!is_string($result) && !($result instanceof RestTemplate)) {

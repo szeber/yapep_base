@@ -86,8 +86,7 @@ class RestTemplate extends ViewAbstract {
     protected function renderContent() {
         switch ($this->contentType) {
             case MimeType::XML:
-                $content = $this->escape(array($this->rootNodeName => $this->content));
-                return $this->getXmlFromData($this->content, true);
+                return $this->getXmlFromData(array($this->rootNodeName => $this->content), true);
                 break;
 
             case MimeType::JAVASCRIPT:

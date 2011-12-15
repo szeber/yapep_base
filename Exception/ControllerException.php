@@ -25,6 +25,8 @@ class ControllerException extends Exception {
     const ERR_INCOMPATIBLE_REQUEST = 101;
     /** The received response object is not compatible with the controller. */
     const ERR_INCOMPATIBLE_RESPONSE = 102;
+    /** The value returned by the action is of a non-supported type. */
+    const ERR_INVALID_ACTION_RETURN_VALUE = 103;
 
     // Action related errors
     /** The return value received from the action is invalid. */
