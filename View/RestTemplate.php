@@ -86,8 +86,7 @@ class RestTemplate extends ViewAbstract {
     protected function renderContent() {
         switch ($this->contentType) {
             case MimeType::XML:
-                $content = $this->escape(array($this->rootNodeName => $this->content));
-                return $this->getXmlFromData($this->escape($this->content, true));
+                return $this->getXmlFromData(array($this->rootNodeName => $this->content), true);
                 break;
 
             case MimeType::JAVASCRIPT:
@@ -114,11 +113,11 @@ class RestTemplate extends ViewAbstract {
         if (is_array($data) || (($data instanceof \Iterator) && ($data instanceof \ArrayAccess))) {
             $xml = '';
             foreach($data as $key => $value) {
-                $xml .= '<' . $key . '>' . $this->getXmlFromData($data) . '</' . $key . '>';
+                $xml .= '<' . $key . '>' . $this->getXmlFromData($value) . '</' . $key . '>';
             }
             return $xml;
         } else {
-            return (string)$data;
+            return $this->escapeSimpleValue((string)$data);
         }
     }
 

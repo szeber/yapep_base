@@ -26,4 +26,6 @@ class MimeType {
     const JSON = 'application/json';
     /** XML content type */
     const XML = 'application/xml';
+    /** Plain text content type */
+    const PLAINTEXT = 'text/plain';
 }

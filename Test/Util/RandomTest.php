@@ -29,7 +29,7 @@ class RandomTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testPseudoNumberMT() {
 		if (!\function_exists('\mt_rand')) {
-			$this->skipTest('\mt_rand() is not available');
+			$this->markTestSkipped('\mt_rand() is not available');
 		}
 		$number = Random::pseudoNumber(0, 1, Random::NUMBER_METHOD_MTRAND);
 		$this->assertEquals('double', \gettype($number));
@@ -62,7 +62,7 @@ class RandomTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testPseudoStringOpenSSL() {
 		if (!\function_exists('\openssl_random_pseudo_bytes')) {
-			$this->skipTest('\openssl_random_pseudo_bytes() is not available');
+			$this->markTestSkipped('\openssl_random_pseudo_bytes() is not available');
 		}
 		$string = Random::pseudoString(61, Random::STRING_METHOD_OPENSSL);
 		$this->assertEquals(61, \strlen($string));
