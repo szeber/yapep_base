@@ -2,6 +2,9 @@
 
 namespace YapepBase\Test\Mock\Response;
 
+/**
+ * @codeCoverageIgnore
+ */
 class ResponseMock implements \YapepBase\Response\IResponse {
     public function __construct(\YapepBase\Response\IOutput $output = null) {
 

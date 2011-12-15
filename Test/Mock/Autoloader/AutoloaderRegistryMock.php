@@ -2,6 +2,9 @@
 
 namespace YapepBase\Test\Mock\Autoloader;
 
+/**
+ * @codeCoverageIgnore
+ */
 class AutoloaderRegistryMock extends \YapepBase\Autoloader\AutoloaderRegistry {
     public $spl = false;
 

@@ -2,6 +2,9 @@
 
 namespace YapepBase\Test\Mock\Autoloader;
 
+/**
+ * @codeCoverageIgnore
+ */
 class AutoloaderMock extends \YapepBase\Autoloader\AutoloaderBase {
     public $loaded = array();
     public $fail = false;

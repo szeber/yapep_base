@@ -18,6 +18,7 @@ use YapepBase\Event\IEventHandler;
  *
  * @package    YapepBase
  * @subpackage Test\Mock\Event
+ * @codeCoverageIgnore
  */
 class EventHandlerMock implements IEventHandler{
 

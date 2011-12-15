@@ -2,6 +2,9 @@
 
 namespace YapepBase\Test\Mock\Syslog;
 
+/**
+ * @codeCoverageIgnore
+ */
 class SyslogConnectionMock extends \YapepBase\Syslog\SyslogConnection {
     public $isOpen = false;
     public $messages = array();

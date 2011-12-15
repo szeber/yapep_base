@@ -3,13 +3,16 @@
 namespace YapepBase\Test\Mock\Response;
 use \YapepBase\Response\IOutput;
 
+/**
+ * @codeCoverageIgnore
+ */
 class OutputMock implements IOutput {
     public $responseCode    = 200;
     public $responseMessage = "OK";
     public $headers         = array();
     public $cookies         = array();
     public $out             = "";
-    
+
     /**
      * Cleans all previously set output.
      */
@@ -18,17 +21,17 @@ class OutputMock implements IOutput {
         $this->responseMessage = "OK";
         $this->headers         = array();
         $this->cookies         = array();
-        $this->out             = "";       
+        $this->out             = "";
     }
-    
+
     /**
-     * header() is used to send a raw HTTP header. See the » HTTP/1.1 specification for more information on HTTP headers. 
-     * 
+     * header() is used to send a raw HTTP header. See the » HTTP/1.1 specification for more information on HTTP headers.
+     *
      * @param string $string       The header string to set.
      * @param bool   $replace      If this is set, current headers are replaced.
      *                             Defaults to true.
      * @param int    $responsecode The response code to set.
-     * 
+     *
      */
     public function header($string, $replace = true, $responsecode = null){
         if (preg_match('/HTTP\/1.1 (?P<code>[0-9]+) (?P<message>.*)/', $string,
@@ -45,10 +48,10 @@ class OutputMock implements IOutput {
             $this->headers[$name][] = $value;
         }
     }
-    
+
     /**
      * Send a cookie to the browser.
-     * @param string $name     The name of the cookie. 
+     * @param string $name     The name of the cookie.
      * @param string $value    The value of the cookie.
      * @param int    $expire   The time the cookie expires. This is a Unix
      *                         timestamp so is in number of seconds since the
@@ -102,10 +105,10 @@ class OutputMock implements IOutput {
         );
         return true;
     }
-    
+
     /**
      * Outputs all parameters.
-     * 
+     *
      * @param string $string1 First string to output
      * @param string $string2 Second string to output
      * @param string $stringn n-th string to output
@@ -114,5 +117,5 @@ class OutputMock implements IOutput {
         foreach (func_get_args() as $string) {
             $this->out .= $string;
         }
-    } 
+    }
 }

@@ -2,6 +2,9 @@
 
 namespace YapepBase\Test\Mock\Controller;
 
+/**
+ * @codeCoverageIgnore
+ */
 class MockController extends \YapepBase\Controller\BaseController {
     public $ran = false;
     public function doTest() {

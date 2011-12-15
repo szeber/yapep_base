@@ -73,7 +73,9 @@ abstract class HttpController extends BaseController {
      */
     protected function redirectToUrl($url, $statusCode = 303) {
         $this->response->redirect($url, $statusCode);
+    // @codeCoverageIgnoreStart
     }
+    // @codeCoverageIgnoreEnd
 
     /**
      * Redirects the client to the URL specified by the controller and action.
@@ -100,5 +102,7 @@ abstract class HttpController extends BaseController {
             $url .= '#' . $anchor;
         }
         $this->redirectToUrl($url, $statusCode);
+    // @codeCoverageIgnoreStart
     }
+    // @codeCoverageIgnoreEnd
 }

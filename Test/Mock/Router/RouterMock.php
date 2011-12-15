@@ -2,6 +2,9 @@
 
 namespace YapepBase\Test\Mock\Router;
 
+/**
+ * @codeCoverageIgnore
+ */
 class RouterMock implements \YapepBase\Router\IRouter {
     /**
      * Returns a controller and an action for the request's target.
