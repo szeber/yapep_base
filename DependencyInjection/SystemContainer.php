@@ -34,8 +34,16 @@ class SystemContainer extends Pimple {
     /** Event handler container key. */
     const KEY_EVENT_HANDLER_REGISTRY = 'eventHandlerRegistry';
 
-    protected $controllerSearchNamespaces = array('\YapepBase\Controller');
-    protected $blockSearchNamespaces = array('\YapepBase\View\Block');
+    /**
+     * List of namespaces to search for controllers in.
+     * @var array
+     */
+    protected $controllerSearchNamespaces = array('\\YapepBase\\Controller');
+    /**
+     * List of namespaces to search for blocks in.
+     * @var array
+     */
+    protected $blockSearchNamespaces = array('\\YapepBase\\View\\Block');
 
     /**
      * Constructor. Sets up the system DI objects.
@@ -106,12 +114,45 @@ class SystemContainer extends Pimple {
     protected function searchForController($controllerName) {
         foreach ($this->controllerSearchNamespaces as $nsroot) {
             $className = $nsroot . '\\' . $controllerName . 'Controller';
-            if (class_exists($className, true)) {
+            if (\class_exists($className, true)) {
                 return $className;
             }
         }
         throw new \YapepBase\Exception\ControllerException('Controller ' . $controllerName . ' not found in '
-            . implode('; ', $this->controllerSearchNamespace), \YapepBase\Exception\ControllerException::ERR_CONTROLLER_NOT_FOUND);
+            . \implode('; ', $this->controllerSearchNamespaces), \YapepBase\Exception\ControllerException::ERR_CONTROLLER_NOT_FOUND);
+    }
+
+    /**
+     * Set a list of namespace roots to search for controllers in.
+     * @param array $namespaces a list of namespace roots to search for the controller in.
+     */
+    public function setBlockSearchNamespaces($namespaces = array()) {
+        $this->controllerSearchNamespaces = $namespaces;
+    }
+
+    /**
+     * Adds a namespace to the namespace roots to search for blocks in.
+     * @param string $namespace a single namespace to add to the search list
+     */
+    public function addBlockSearchNamespace($namespace) {
+        $this->blockSearchNamespaces[] = $namespace;
+    }
+
+    /**
+     * Searches for the controller in all the controller search namespaces
+     * @param  string $controllerName
+     * @return string controller name
+     * @throws \YapepBase\Exception\ViewException if the controller was not found
+     */
+    protected function searchForBlock($blockName) {
+        foreach ($this->blockSearchNamespaces as $nsroot) {
+            $className = $nsroot . '\\' . $blockName . 'Block';
+            if (\class_exists($className, true)) {
+                return $className;
+            }
+        }
+        throw new \YapepBase\Exception\ViewException('Block ' . $blockName . ' not found in '
+            . \implode('; ', $this->blockSearchNamespaces), \YapepBase\Exception\ViewException::ERR_BLOCK_NOT_FOUND);
     }
 
     /**
@@ -138,7 +179,7 @@ class SystemContainer extends Pimple {
      * @return \YapepBase\View\Block
      */
     public function getBlock($blockName) {
-        $fullClassName = '\YapepBase\View\Block\\' . $blockName . 'Block';
+        $fullClassName = $this->searchForBlock($blockName);
         return new $fullClassName();
     }
 }

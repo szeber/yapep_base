@@ -19,5 +19,8 @@ namespace YapepBase\Exception;
  * @subpackage Exception
  */
 class ViewException extends Exception {
-
+    /**
+     * Indicates, that a block was not found.
+     */
+    const ERR_BLOCK_NOT_FOUND = 101;
 }
