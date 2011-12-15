@@ -13,7 +13,6 @@ namespace YapepBase\Session;
 use YapepBase\Util\Random;
 use YapepBase\Request\IRequest;
 use YapepBase\Response\IResponse;
-use YapepBase\Event\IEventHandler;
 use YapepBase\Application;
 use YapepBase\Event\Event;
 use YapepBase\Exception\ConfigException;
@@ -25,7 +24,7 @@ use YapepBase\Config;
  * @package    YapepBase
  * @subpackage Session
  */
-abstract class SessionAbstract implements IEventHandler, \ArrayAccess {
+abstract class SessionAbstract implements ISession {
 
     /** The default session lifetime, if one is not provided in the config. */
     const DEFAULT_LIFETIME = 1800;
@@ -209,6 +208,9 @@ abstract class SessionAbstract implements IEventHandler, \ArrayAccess {
      * Creates a new session.
      */
     public function create() {
+        if (!empty($this->id)) {
+            $this->destroy();
+        }
         $this->id = $this->generateId();
         $this->data = array();
         $this->isLoaded = true;
@@ -218,7 +220,7 @@ abstract class SessionAbstract implements IEventHandler, \ArrayAccess {
     /**
      * Generates a session ID.
      */
-    public function generateId() {
+    protected function generateId() {
         return Random::pseudoString(32);
     }
 
@@ -251,6 +253,11 @@ abstract class SessionAbstract implements IEventHandler, \ArrayAccess {
         }
     }
 
+    /**
+     * Returns the session's namespace
+     *
+     * @return string
+     */
     public function getNamespace() {
         return $this->namespace;
     }

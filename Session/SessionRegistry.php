@@ -49,7 +49,7 @@ class SessionRegistry {
      *
      * @param SessionAbstract $session   The session object
      */
-    public function register(SessionAbstract $session) {
+    public function register(ISession $session) {
         $this->namespaces[$session->getNamespace()] = $session;
     }
 }
