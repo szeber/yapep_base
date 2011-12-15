@@ -35,4 +35,39 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase {
         $this->object->setRouter($r);
         $this->assertEquals($r, $this->object->getRouter());
     }
+
+    public function testSetDiContainer() {
+        $c = new \YapepBase\DependencyInjection\SystemContainer();
+        $this->object->setDiContainer($c);
+        $this->assertEquals($c, $this->object->getDiContainer());
+    }
+
+    public function testSetRequest() {
+        $r = new Mock\Request\RequestMock('');
+        $this->object->setRequest($r);
+        $this->assertEquals($r, $this->object->getRequest());
+    }
+
+    public function testSetResponse() {
+        $r = new Mock\Response\ResponseMock();
+        $this->object->setResponse($r);
+        $this->assertEquals($r, $this->object->getResponse());
+    }
+
+    public function testGetErrorHandlerContainer() {
+        $this->assertInstanceOf('\YapepBase\ErrorHandler\ErrorHandlerContainer', $this->object->getErrorHandlerContainer());
+    }
+
+    public function testRun() {
+        $out = new Mock\Response\OutputMock();
+        $request = new Mock\Request\RequestMock('/');
+        $response = new Mock\Response\ResponseMock($out);
+        $router = new Mock\Router\ApplicationRouterMock();
+        $this->object->getDiContainer()->setControllerSearchNamespaces(array('\YapepBase\Test\Mock\Controller'));
+        $this->object->setRequest($request);
+        $this->object->setResponse($response);
+        $this->object->setRouter($router);
+        $this->object->run();
+        $response->send();
+    }
 }
