@@ -47,4 +47,23 @@ class HttpControllerTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals(301, $out->responseCode);
         $this->assertEquals(array('http://www.example.com/'), $out->headers['Location']);
     }
+
+    function testRedirectToRoute() {
+        $_SERVER['REQUEST_URI'] = '/';
+        $router = new \YapepBase\Test\Mock\Router\RouterMock();
+        \YapepBase\Application::getInstance()->setRouter($router);
+        $request = new \YapepBase\Request\HttpRequest();
+        $out = new \YapepBase\Test\Mock\Response\OutputMock();
+        $response = new \YapepBase\Response\HttpResponse($out);
+        $o = new \YapepBase\Test\Mock\Controller\HttpMockController($request, $response);
+        try {
+            $o->testRedirectToRoute();
+            $this->fail('RedirectToRoute test should result in a RedirectException');
+        } catch (\YapepBase\Exception\RedirectException $e) {
+            $this->assertEquals(\YapepBase\Exception\RedirectException::TYPE_EXTERNAL, $e->getCode());
+        }
+        $response->send();
+        $this->assertEquals(303, $out->responseCode);
+        $this->assertEquals(array('/?test=test&test2%5B0%5D=test1&test2%5B1%5D=test2#test'), $out->headers['Location']);
+    }
 }
