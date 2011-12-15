@@ -10,6 +10,8 @@
  */
 
 namespace YapepBase\Session;
+use YapepBase\Exception\Exception;
+use YapepBase\Storage\IStorage;
 use YapepBase\Util\Random;
 use YapepBase\Request\IRequest;
 use YapepBase\Response\IResponse;
@@ -94,11 +96,20 @@ abstract class SessionAbstract implements ISession {
      * @param \YapepBase\Response\IResponse $response
      * @param bool                          $autoregister
      *
-     * @throws \YapepBase\Exception\ConfigException
+     * @throws \YapepBase\Exception\ConfigException   On configuration problems
+     * @throws \YapepBase\Exception\Exception         On other problems
      */
     public function __construct(
         $configName, IStorage $storage, IRequest $request, IResponse $response, $autoregister = true
     ) {
+        if (!$storage->isTtlSupported()) {
+            throw new Exception('Storage without TTL support passed to session handler.');
+        }
+
+        $this->storage  = $storage;
+        $this->request  = $request;
+        $this->response = $response;
+
         $config = Config::getInstance()->get($configName);
         if (empty($config)) {
             throw new ConfigException('Configuration not found for session handler');
@@ -112,7 +123,7 @@ abstract class SessionAbstract implements ISession {
         $this->namespace = $config['namespace'];
         $this->lifetime = (isset($config['lifetime']) ? (int)$config['lifetime'] : self::DEFAULT_LIFETIME);
 
-        $this->validateConfig();
+        $this->validateConfig($config);
 
         if ($autoregister) {
             $this->registerEventHandler();
@@ -146,6 +157,15 @@ abstract class SessionAbstract implements ISession {
     }
 
     /**
+     * This method is called if a request with a non-existing session ID is received.
+     *
+     * It can be used for example to log the request. The method should not return anything, and not stop execution.
+     */
+    protected function nonExistentSessionId() {
+        // Empty default implementation. Should be implemented by descendant classes if needed
+    }
+
+    /**
      * Registers the instance as an event handler
      */
     public function registerEventHandler() {
@@ -161,6 +181,15 @@ abstract class SessionAbstract implements ISession {
         $registry = Application::getInstance()->getDiContainer()->getEventHandlerRegistry();
         $registry->removeEventHandler(Event::TYPE_APPSTART, $this);
         $registry->removeEventHandler(Event::TYPE_APPFINISH, $this);
+    }
+
+    /**
+     * Returns the session ID
+     *
+     * @return string
+     */
+    public function getId() {
+        return $this->id;
     }
 
     /**
@@ -187,19 +216,23 @@ abstract class SessionAbstract implements ISession {
         }
         $result = $this->storage->get($this->getStorageKey());
         if (false === $result) {
+            $this->nonExistentSessionId();
             $this->create();
             return;
         }
         $this->data = $result;
         $this->isLoaded = true;
+        $this->sessionInitialized();
     }
 
     /**
      * Saves the session. If it has not been loaded yet, it loads it first.
+     *
+     * @throws \YapepBase\Exception\Exception   If trying to save a not loaded session
      */
     protected function saveSession() {
         if (!$this->isLoaded) {
-            $this->loadSession();
+            throw new Exception('Saving a session that has not been loaded yet');
         }
         $this->storage->set($this->getStorageKey(), $this->data, $this->lifetime);
     }
@@ -214,7 +247,7 @@ abstract class SessionAbstract implements ISession {
         $this->id = $this->generateId();
         $this->data = array();
         $this->isLoaded = true;
-
+        $this->sessionInitialized();
     }
 
     /**
@@ -242,7 +275,7 @@ abstract class SessionAbstract implements ISession {
      * @see YapepBase\Event.IEventHandler::handleEvent()
      */
     public function handleEvent(Event $event) {
-        switch ($event) {
+        switch ($event->getType()) {
             case Event::TYPE_APPSTART:
                 $this->loadSession();
                 break;

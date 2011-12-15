@@ -11,7 +11,6 @@
 
 namespace YapepBase\Session;
 use YapepBase\Request\HttpRequest;
-
 use YapepBase\Exception\Exception;
 use YapepBase\Application;
 use YapepBase\Event\Event;
@@ -141,7 +140,6 @@ class HttpSession extends SessionAbstract {
     public function destroy() {
         parent::destroy();
 
-        $this->response->setCookie($this->cookieName, '', 1, $this->cookiePath, $this->cookieDomain,
-            $this->cookieSecure, $this->cookieHttpOnly);
+        $this->response->setCookie($this->cookieName, '', 1, $this->cookiePath, $this->cookieDomain);
     }
 }
