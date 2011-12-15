@@ -82,13 +82,16 @@ class Random {
             case self::STRING_METHOD_AUTO :
             case self::STRING_METHOD_OPENSSL :
                 if (\function_exists('\openssl_random_pseudo_bytes')) {
-                    $string =\openssl_random_pseudo_bytes($length, $strong);
+                    while (\strlen($string) < $length) {
+                        $string .= \sha1(\openssl_random_pseudo_bytes(20, $strong));
+                    }
+                    $string =\substr($string, 0, $length);
                     break;
                 }
 
             case self::STRING_METHOD_UNIQID :
                 while (\strlen($string) < $length) {
-                    $string .=\uniqid('', true);
+                    $string .= \str_replace('.', '', \uniqid('', true));
                 }
                 $string =\substr($string, 0, $length);
                 break;

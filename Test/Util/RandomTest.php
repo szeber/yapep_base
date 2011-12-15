@@ -65,7 +65,7 @@ class RandomTest extends \PHPUnit_Framework_TestCase {
 			$this->markTestSkipped('\openssl_random_pseudo_bytes() is not available');
 		}
 		$string = Random::pseudoString(61, Random::STRING_METHOD_OPENSSL);
-		$this->assertEquals(61, \strlen($string));
+		$this->assertRegExp('/^[-_a-zA-Z0-9]{61}$/', $string);
 	}
 
 	/**
@@ -73,7 +73,7 @@ class RandomTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testPseudoStringUniqid() {
 		$string = Random::pseudoString(61, Random::STRING_METHOD_UNIQID);
-		$this->assertEquals(61, \strlen($string));
+		$this->assertRegExp('/^[-_a-zA-Z0-9]{61}$/', $string);
 	}
 
 	/**
@@ -81,7 +81,7 @@ class RandomTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testPseudoStringTime() {
 		$string = Random::pseudoString(61, Random::STRING_METHOD_TIME);
-		$this->assertEquals(61, \strlen($string));
+		$this->assertRegExp('/^[-_a-zA-Z0-9]{61}$/', $string);
 	}
 
 	/**
@@ -93,5 +93,4 @@ class RandomTest extends \PHPUnit_Framework_TestCase {
             $this->fail('The method check fails');
 	    } catch (Exception $exception) {}
 	}
-
 }
