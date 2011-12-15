@@ -67,8 +67,8 @@ class NativeSyslogConnection extends SyslogConnection {
             $this->sock = @socket_create(AF_UNIX, SOCK_STREAM, 0);
             $this->handleError();
             try {
-                socket_connect($this->sock, $this->path);
-            } catch (\ErrorException $e) { }
+                @socket_connect($this->sock, $this->path);
+            } catch (\Exception $e) {}
             $this->handleError();
         } catch (SyslogException $e) {
             /**
@@ -78,8 +78,8 @@ class NativeSyslogConnection extends SyslogConnection {
                 $this->sock = @socket_create(AF_UNIX, SOCK_DGRAM, 0);
                 $this->handleError();
                 try {
-                    socket_connect($this->sock, $this->path);
-                } catch (\ErrorException $e) { }
+                    @socket_connect($this->sock, $this->path);
+                } catch (\Exception $e) {}
                 $this->handleError();
             } else {
                 throw $e;
@@ -96,8 +96,8 @@ class NativeSyslogConnection extends SyslogConnection {
     public function close() {
         if ($this->sock) {
             try {
-                socket_close($this->sock);
-            } catch (\ErrorException $e) { }
+                @socket_close($this->sock);
+            } catch (\Exception $e) {}
             $this->handleError();
         }
         return $this;
@@ -133,8 +133,8 @@ class NativeSyslogConnection extends SyslogConnection {
             $this->open();
         }
         try {
-            socket_write($this->sock, $buf, 1024);
-        } catch (\ErrorException $e) { }
+            @socket_write($this->sock, $buf, 1024);
+        } catch (\Exception $e) {}
         $this->handleError();
         return $this;
     }

@@ -41,13 +41,13 @@ class SimpleAutoloader extends AutoloaderBase {
      * @return  bool    TRUE if loading was successful.
      */
     protected function loadFile($fileName, $className) {
-        if (\is_file($fileName) && \is_readable($fileName) && include_once($fileName)) {
-            if (!\class_exists($className, false) && !\interface_exists($className, false)) {
-                \trigger_error($fileName . ' loaded, but did not find ' . $className, \E_USER_WARNING);
-            } else {
-                return true;
+        try {
+            if (\is_file($fileName) && \is_readable($fileName) && include_once($fileName)) {
+                if (\class_exists($className, false) || \interface_exists($className, false)) {
+                    return true;
+                }
             }
-        }
+        } catch (\ErrorException $e) { }
         return false;
     }
 

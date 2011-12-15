@@ -1,6 +1,6 @@
 <?php
 
-namespace YapepBase\Autoloader;
+namespace YapepBase\Test\Autoloader;
 
 /**
  * Test class for SimpleAutoloader.
@@ -18,15 +18,19 @@ class SimpleAutoloaderTest extends \PHPUnit_Framework_TestCase {
      * This method is called before a test is executed.
      */
     protected function setUp() {
-        $this->object = new SimpleAutoloader;
+        $this->object = new \YapepBase\Autoloader\SimpleAutoloader();
     }
 
     public function testLoad() {
         $this->object->addClassPath(BASE_DIR);
         $this->assertTrue($this->object->load('\\YapepBase\\Test\\Mock\\Autoloader\\ClassMock'));
         $this->assertTrue($this->object->load('\\YapepBase\\Test\\Mock\\Autoloader\\InterfaceMock'));
-        $this->assertFalse($this->object->load('\\YapepBase\\Test\\Mock\\Autoloader\\NonexistentClassMock'));
-        $this->assertFalse($this->object->load('\\YapepBase\\Test\\Mock\\Autoloader\\EmptyMock'));
+        try {
+            $this->assertFalse($this->object->load('\\YapepBase\\Test\\Mock\\Autoloader\\NonexistentClassMock'));
+        } catch (\PHPUnit_Framework_Error_Warning $e) {}
+        try {
+            $this->assertFalse($this->object->load('\\YapepBase\\Test\\Mock\\Autoloader\\EmptyMock'));
+        } catch (\PHPUnit_Framework_Error_Warning $e) {}
     }
 
     protected function loadDirectory($path, $root) {
@@ -42,14 +46,12 @@ class SimpleAutoloaderTest extends \PHPUnit_Framework_TestCase {
                         $legacyclass = strtr($name, DIRECTORY_SEPARATOR, '_');
                         try {
                             $namespacedres = $this->object->load($namespacedclass);
-                        } catch (\ErrorException $e) {
-                            $this->assertEquals(\E_USER_WARNING, $e->getSeverity());
+                        } catch (\PHPUnit_Framework_Error_Warning $e) {
                             $namespacedres = false;
                         }
                         try {
                             $legacyres = $this->object->load($legacyclass);
-                        } catch (\ErrorException $e) {
-                            $this->assertEquals(\E_USER_WARNING, $e->getSeverity());
+                        } catch (\PHPUnit_Framework_Error_Warning $e) {
                             $legacyres = false;
                         }
                         $this->assertTrue($namespacedres || $legacyres, 'Neither ' . $namespacedclass . ' nor '
