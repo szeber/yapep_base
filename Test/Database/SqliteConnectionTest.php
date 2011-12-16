@@ -22,6 +22,9 @@ class SqliteConnectionTest extends \PHPUnit_Framework_TestCase {
      */
     protected function setUp() {
         parent::setUp();
+        if (!\class_exists('\SqliteConnection')) {
+            $this->markTestSkipped('SqliteConnection is not available');
+        }
         $this->subject = new SqliteConnection(array('path' => ':memory:'), 'test', '_');
     }
 

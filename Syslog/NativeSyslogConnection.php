@@ -75,7 +75,9 @@ class NativeSyslogConnection extends SyslogConnection {
              * If we have a EPROTOTYPE error, the log socket doesn't support stream sockets, only dgram sockets.
              */
             if ($e->getCode() == SOCKET_EPROTOTYPE) {
-                $this->sock = @socket_create(AF_UNIX, SOCK_DGRAM, 0);
+                try {
+                    $this->sock = @socket_create(AF_UNIX, SOCK_DGRAM, 0);
+                } catch (\Exception $e) {}
                 $this->handleError();
                 try {
                     @socket_connect($this->sock, $this->path);

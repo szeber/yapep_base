@@ -26,6 +26,11 @@ class NativeSyslogConnectionTest extends \PHPUnit_Framework_TestCase {
             if (\file_exists($logpath)) {
                 \unlink($logpath);
             }
+            if (!file_exists(dirname($logpath))) {
+                if (!@mkdir($logpath)) {
+                    $this->markTestSkipped('Unable to create logpath directory: ' . dirname($logpath));
+                }
+            }
             if ($dgram) {
                 $this->sock = \socket_create(AF_UNIX, SOCK_DGRAM, 0);
             } else {
@@ -38,8 +43,8 @@ class NativeSyslogConnectionTest extends \PHPUnit_Framework_TestCase {
             }
             $this->logpath = $logpath;
             $this->dgram = $dgram;
-        } catch (\PHPUnit_Framework_Error_Warning $e) {
-            $this->markTestSkipped('Unable to create log socket');
+        } catch (\Exception $e) {
+            $this->markTestSkipped('Unable to create log socket at ' . $logpath);
         }
     }
 

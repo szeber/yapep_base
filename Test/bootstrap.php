@@ -9,4 +9,4 @@
  */
 
 include_once(__DIR__ . '/../bootstrap.php');
-//\YapepBase\Application::getInstance()->getErrorHandlerContainer()->addErrorHandler(new \YapepBase\ErrorHandler\StrictErrorHandler());
+\YapepBase\Application::getInstance()->getErrorHandlerContainer()->addErrorHandler(new \YapepBase\ErrorHandler\StrictErrorHandler());
