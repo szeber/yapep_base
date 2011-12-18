@@ -36,7 +36,7 @@ class SimpleAutoloaderTest extends \PHPUnit_Framework_TestCase {
     protected function loadDirectory($path, $root) {
         if (($dh = opendir($path)) !== false) {
             while (($entry = readdir($dh)) !== false) {
-                if (!preg_match('/(^[a-z]+\.php$|^Test$|Test\.php$|^\.$|^\.\.$)/', $entry)) {
+                if (!preg_match('/(^[a-z]+\.php$|^Test$|Test\.php$|^\.$|^\.)/', $entry)) {
                     $newpath = $path . '/' . $entry;
                     if (is_dir($newpath)) {
                         $this->loadDirectory($newpath, $root);
