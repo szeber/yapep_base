@@ -54,96 +54,70 @@ class HttpSessionTest extends \PHPUnit_Framework_TestCase {
         return new StorageMock($ttlSupport, false, $data);
     }
 
-    public function testFunctionality() {
-        $storage = $this->getStorageMock();
-        $request = new HttpRequest(array(), array(), array(), array('REQUEST_URI' => '/'), array(), array());
+    /**
+     * Instatiates a HttpSession
+     *
+     * @param string                                      $sessionId
+     * @param array                                       $sessionData
+     * @param \YapepBase\Test\Mock\Response\OuptputMock   $output
+     * @param \YapepBase\Response\HttpResponse            $response
+     * @param \YapepBase\Test\Mock\Storage\StorageMock    $storage
+     *
+     * @return \YapepBase\Session\HttpSession
+     */
+    protected function getSession($sessionId = null, $sessionData = array(), &$output = null, &$response = null, &$storage = null) {
+        $storage = new StorageMock(true, false, $sessionData);
+        $cookie = ($sessionId ? array('testSession' => $sessionId) : array());
+        $request = new HttpRequest(array(), array(), $cookie, array('REQUEST_URI' => '/'), array(), array());
         $output = new OutputMock();
         $response = new HttpResponse($output);
-		$session = new HttpSession('test.session.*', $storage, $request, $response, false);
+        return new HttpSession('test.session.*', $storage, $request, $response, false);
+    }
 
-        $session->handleEvent(new Event(Event::TYPE_APPSTART));
-
-        $sessionId = $session->getId();
-
-        $this->assertSame('test', $session->getNamespace(), 'The session namespace does not match');
-
+    public function testArrayAccess() {
+        $session = $this->getSession();
+        $this->assertFalse(isset($session['test']), 'Test key is set for new empty session');
+        $this->assertNull($session['test'], 'Not set key is not null');
         $session['test'] = 'testValue';
-        $this->assertTrue(isset($session['test']), 'isset() for existing key fails');
-        $this->assertFalse(isset($session['test2']), 'isset() for non-existing key fails');
-        $this->assertSame('testValue', $session['test'], 'Readback from session does not match');
-        $this->assertNull($session['test2'], 'Get for non-existing key does not return NULL');
-
-        $session->handleEvent(new Event(Event::TYPE_APPSTART));
-        $this->assertSame('testValue', $session['test'], 'Second start event call overwrites the session data');
-
-        $session->handleEvent(new Event(Event::TYPE_APPFINISH));
-
-        $storedData = $storage->getData();
-        $this->assertEquals(1, count($storedData), 'The store should have 1 item');
-        $this->assertTrue(isset($storedData['session.test.' . $sessionId]), 'Stored session ID does not match');
-        $this->assertSame(array('test' => 'testValue'), $storedData['session.test.' . $sessionId],
-        	'Stored session data does not match');
-
-        $existingRequest = new HttpRequest(array(), array(), array('testSession' => $sessionId),
-            array('REQUEST_URI' => '/'), array(), array());
-
-        $response->send();
-
-        $this->assertTrue(isset($output->cookies['testSession']), 'Session cookie is not set');
-        $this->assertEquals($sessionId, $output->cookies['testSession']['value'],
-        	'Session cookie is not set to the correct value');
-
-        $this->assertTrue(
-            isset($output->headers['Expires'])
-                && isset($output->headers['Cache-Control'])
-                && isset($output->headers['Pragma']),
-            'Cache limiters are not sent'
-        );
-
-        $output = new OutputMock();
-        $response = new HttpResponse($output);
-
-        $session = new HttpSession('test.session.*', $storage, $existingRequest, $response);
-
-        $session->handleEvent(new Event(Event::TYPE_APPSTART));
-
-        $this->assertSame($sessionId, $session->getId(), 'Session ID does not match for existing session');
-
-        $this->assertSame('testValue', $session['test'], 'Readback fails for existing session');
-
+        $this->assertTrue(isset($session['test']), 'Test key is not set');
+        $this->assertSame('testValue', $session['test'], 'Test key is not correctly set');
         unset($session['test']);
+        $this->assertFalse(isset($session['test']), 'Test key is set after deleting');
+        $this->assertNull($session['test'], 'Deleted key is not null');
+    }
 
-        $this->assertNull($session['test'], 'Key deletion failed');
+    public function testGetNamespace() {
+        $session = $this->getSession();
+        $this->assertSame('test', $session->getNamespace(), 'Namespace does not match');
+    }
 
-        $session->handleEvent(new Event(Event::TYPE_APPFINISH));
-
-        $storedData = $storage->getData();
-        $this->assertEquals(1, count($storedData), 'The store should have 1 item');
-        $this->assertTrue(isset($storedData['session.test.' . $sessionId]), 'Stored session ID does not match');
-        $this->assertTrue(empty($storedData['session.test.' . $sessionId]), 'Stored data was not emptied');
-
-        $output = new OutputMock();
-        $response = new HttpResponse($output);
-
-        $session = new HttpSession('test.session.*', $storage, $existingRequest, $response);
-
+    public function testStorage() {
+        $output = $response =  $storage = null;
+        $session = $this->getSession(null, array(), $output, $response, $storage);
         $session->handleEvent(new Event(Event::TYPE_APPSTART));
-
-        $session->create();
-        $newSessionId = $session->getId();
-
-        $this->assertNotEquals($sessionId, $newSessionId, 'Creating a new session did not change the sessionId');
-
+        $session['test'] = 'testValue';
         $session->handleEvent(new Event(Event::TYPE_APPFINISH));
-
         $response->send();
-
         $storedData = $storage->getData();
-        $this->assertEquals(1, count($storedData), 'The store should have 1 item');
-        $this->assertFalse(isset($storedData['session.test.' . $sessionId]),
-        	'The destroyed session data was not deleted');
-        $this->assertTrue(isset($storedData['session.test.' . $newSessionId]),
-        	'The newly created session data was not saved');
+        $this->assertSame(
+            array('session.test.' . $output->cookies['testSession']['value'] => array('test' => 'testValue')),
+            $storedData, 'Stored data is incorrect');
+    }
+
+    public function testLoading() {
+        $sessionData = array('session.test.test' => array('test' => 'testValue'));
+        $output = $response =  $storage = null;
+        $session = $this->getSession('test', $sessionData);
+        $session->handleEvent(new Event(Event::TYPE_APPSTART));
+        $this->assertSame('testValue', $session['test'], 'Loaded value is invalid');
+    }
+
+    public function testInvalidEventHandling() {
+        $session = $this->getSession();
+        $session->handleEvent(new Event(Event::TYPE_APPSTART));
+        $session['test'] = 'testValue';
+        $session->handleEvent(new Event(Event::TYPE_APPSTART));
+        $this->assertSame('testValue', $session['test'], 'Loading the session twice overwrites data');
     }
 
     public function testInvalidSessionHandling() {
@@ -153,42 +127,42 @@ class HttpSessionTest extends \PHPUnit_Framework_TestCase {
         $output = new OutputMock();
         $response = new HttpResponse($output);
 
-		$session = new HttpSession('test.session.*', $storage, $request, $response, false);
+        $session = new HttpSession('test.session.*', $storage, $request, $response, false);
 
-		$session->handleEvent(new Event(Event::TYPE_APPSTART));
+        $session->handleEvent(new Event(Event::TYPE_APPSTART));
 
-		$this->assertNotEquals('nonexistent', $session->getId(), 'The session ID was not changed');
+        $this->assertNotEquals('nonexistent', $session->getId(), 'The session ID was not changed');
     }
 
-    public function testEventHandling() {
+    public function testEventHandlerRegistration() {
         $output = new OutputMock();
         $storage = $this->getStorageMock();
         $request = new HttpRequest(array(), array(), array(), array('REQUEST_URI' => '/'), array(), array());
-		$response = new HttpResponse($output);
+        $response = new HttpResponse($output);
         $eventHandlerRegistry = Application::getInstance()->getDiContainer()->getEventHandlerRegistry();
-		$session = new HttpSession('test.session.*', $storage, $request, $response, true);
+        $session = new HttpSession('test.session.*', $storage, $request, $response, true);
 
-		$this->assertTrue(in_array($session, $eventHandlerRegistry->getEventHandlers(Event::TYPE_APPSTART), true),
-			'Autoregistration failed for APPSTART event');
+        $this->assertTrue(in_array($session, $eventHandlerRegistry->getEventHandlers(Event::TYPE_APPSTART), true),
+            'Autoregistration failed for APPSTART event');
 
-		$this->assertTrue(in_array($session, $eventHandlerRegistry->getEventHandlers(Event::TYPE_APPFINISH), true),
-			'Autoegistration failed for APPFINISH event');
+        $this->assertTrue(in_array($session, $eventHandlerRegistry->getEventHandlers(Event::TYPE_APPFINISH), true),
+            'Autoegistration failed for APPFINISH event');
 
-		$session->removeEventHandler();
+        $session->removeEventHandler();
 
-		$this->assertFalse(in_array($session, $eventHandlerRegistry->getEventHandlers(Event::TYPE_APPSTART), true),
-			'Unregistration failed for APPSTART event');
+        $this->assertFalse(in_array($session, $eventHandlerRegistry->getEventHandlers(Event::TYPE_APPSTART), true),
+            'Unregistration failed for APPSTART event');
 
-		$this->assertFalse(in_array($session, $eventHandlerRegistry->getEventHandlers(Event::TYPE_APPFINISH), true),
-			'Unregistration failed for APPFINISH event');
+        $this->assertFalse(in_array($session, $eventHandlerRegistry->getEventHandlers(Event::TYPE_APPFINISH), true),
+            'Unregistration failed for APPFINISH event');
 
-		$session->registerEventHandler();
+        $session->registerEventHandler();
 
-		$this->assertTrue(in_array($session, $eventHandlerRegistry->getEventHandlers(Event::TYPE_APPSTART), true),
-			'Manual registration failed for APPSTART event');
+        $this->assertTrue(in_array($session, $eventHandlerRegistry->getEventHandlers(Event::TYPE_APPSTART), true),
+            'Manual registration failed for APPSTART event');
 
-		$this->assertTrue(in_array($session, $eventHandlerRegistry->getEventHandlers(Event::TYPE_APPFINISH), true),
-			'Manual registration failed for APPFINISH event');
+        $this->assertTrue(in_array($session, $eventHandlerRegistry->getEventHandlers(Event::TYPE_APPFINISH), true),
+            'Manual registration failed for APPFINISH event');
     }
 
     public function testErrorHandling() {
@@ -196,24 +170,24 @@ class HttpSessionTest extends \PHPUnit_Framework_TestCase {
         $storage = $this->getStorageMock();
         $nonTtlStorage = $this->getStorageMock(false);
         $request = new HttpRequest(array(), array(), array(), array('REQUEST_URI' => '/'), array(), array());
-		$response = new HttpResponse($output);
-		$requestMock = new RequestMock('test');
-		$responseMock = new ResponseMock();
+        $response = new HttpResponse($output);
+        $requestMock = new RequestMock('test');
+        $responseMock = new ResponseMock();
 
-		try {
-		    new HttpSession('test.session.*', $nonTtlStorage, $request, $response);
+        try {
+            new HttpSession('test.session.*', $nonTtlStorage, $request, $response);
             $this->fail('Non TTL supporting storage does not cause an exception');
-		} catch(Exception $e) {}
+        } catch(Exception $e) {}
 
-		try {
-		    new HttpSession('test.nonexistingSession', $storage, $request, $response);
-		    $this->fail('Non existing config does not cause an exception');
-		} catch (ConfigException $exception) {}
+        try {
+            new HttpSession('test.nonexistingSession', $storage, $request, $response);
+            $this->fail('Non existing config does not cause an exception');
+        } catch (ConfigException $exception) {}
 
-		try {
-	        new HttpSession('test.session.namespace', $storage, $request, $response);
-	        $this->fail('Non array config option does not cause an exception');
-		} catch (ConfigException $exception) {}
+        try {
+            new HttpSession('test.session.namespace', $storage, $request, $response);
+            $this->fail('Non array config option does not cause an exception');
+        } catch (ConfigException $exception) {}
 
         Config::getInstance()->set(array(
             'test.session2.namespace' => 'test',
@@ -242,11 +216,11 @@ class HttpSessionTest extends \PHPUnit_Framework_TestCase {
             $this->fail('No exception thrown for non HttpResponse response instance');
         } catch (Exception $exception) {}
 
-		try {
-		    $session = new HttpSession('test.session.*', $storage, $request, $response);
-		    $session->handleEvent(new Event(Event::TYPE_APPFINISH));
+        try {
+            $session = new HttpSession('test.session.*', $storage, $request, $response);
+            $session->handleEvent(new Event(Event::TYPE_APPFINISH));
             $this->fail('No exception thrown when trying to save a not yet loaded session');
-		} catch(Exception $e) {}
+        } catch(Exception $e) {}
 
     }
 
