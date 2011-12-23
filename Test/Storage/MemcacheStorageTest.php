@@ -1,6 +1,6 @@
 <?php
 
-namespace YapepBase\Storage;
+namespace YapepBase\Test\Storage;
 
 use YapepBase\Storage\MemcacheStorage;
 use YapepBase\Application;
@@ -9,8 +9,6 @@ use YapepBase\Test\Mock\Storage\MemcacheMock;
 use YapepBase\DependencyInjection\SystemContainer;
 use YapepBase\Exception\ConfigException;
 use YapepBase\Exception\StorageException;
-
-require_once dirname(__FILE__) . '/../../Storage/MemcacheStorage.php';
 
 /**
  * Test class for MemcacheStorage.
@@ -85,7 +83,6 @@ class MemcacheStorageTest extends \PHPUnit_Framework_TestCase {
         $storage = new MemcacheStorage('test2.*');
         $storage->set('test', 'testValue');
         $this->assertTrue(isset($this->memcacheMock->data['test.test.test']), 'Prefixed storage fails');
-
     }
 
     public function testHashedStorage() {

@@ -31,7 +31,7 @@ use YapepBase\Config;
  *         <li>fileSuffix:     The files will be suffixed with this string.
  *                             No checking is done on the string. Optional, defaults to empty string.</li>
  *         <li>fileMode:       The mode of the files in unix octal notation. If path does not exists,
- *                             and will be created, this mode will be set for it. Optional, defaults to 0755.</li>
+ *                             and will be created, this mode will be set for it. Optional, defaults to 0644.</li>
  *         <li>hashKey:        If TRUE, the key will be hashed before being used for the filename.
  *                             Optional, defaults to FALSE.</li>
  *     </ul>
@@ -105,14 +105,14 @@ class FileStorage extends StorageAbstract {
         $this->storePlainText = (isset($config['storePlainText']) && $config['storePlainText']);
         $this->filePrefix = (isset($config['filePrefix']) ? $config['filePrefix'] : '');
         $this->fileSuffix = (isset($config['fileSuffix']) ? $config['fileSuffix'] : '');
-        $this->fileMode = (empty($config['fileMode']) ? 0755 : $config['fileMode']);
+        $this->fileMode = (empty($config['fileMode']) ? 0644 : $config['fileMode']);
         $this->hashKey = (isset($config['hashKey']) ? (bool)$config['hashKey'] : false);
 
         if (!file_exists($this->path)) {
             if (!mkdir($this->path, $this->fileMode, true)) {
                 throw new StorageException('Can not create directory for FileStorage');
             }
-        } elseif (!is_dir($this->path)) {
+        } elseif (!is_dir(rtrim($this->path, '/'))) {
             throw new StorageException('Path is not a directory for FileStorage');
         }
 
@@ -153,10 +153,12 @@ class FileStorage extends StorageAbstract {
      */
     public function set($key, $data, $ttl = 0) {
         $fileName = $this->makeFullPath($key);
-        if (false === file_put_contents($fileName, $this->prepareData($key, $data, $ttl))) {
+        // save error handled via exception
+        if (false === @file_put_contents($fileName, $this->prepareData($key, $data, $ttl))) {
             throw new StorageException('Unable to write data to FileStorage');
         }
-        chmod($fileName, $this->fileMode);
+        // Disable potential warnings if unit testing with vfsStream
+        @\chmod($fileName, $this->fileMode);
     }
 
     /**
@@ -194,7 +196,8 @@ class FileStorage extends StorageAbstract {
         if ($this->storePlainText) {
             return $data;
         }
-        $data = unserialize($data);
+        // Unserialization errors handled via exception
+        $data = @unserialize($data);
         if (!is_array($data) || !isset($data['expiresAt']) || !isset($data['data'])) {
             throw new StorageException('Unable to unserialize stored data');
         }

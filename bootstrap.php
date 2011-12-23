@@ -22,3 +22,5 @@ require_once BASE_DIR . '/YapepBase/Autoloader/AutoloaderRegistry.php';
 $autoloader = new \YapepBase\Autoloader\SimpleAutoloader();
 $autoloader->setClassPath(array(BASE_DIR));
 $autoloader->register();
+
+unset($autoloader);
