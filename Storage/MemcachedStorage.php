@@ -44,7 +44,7 @@ class MemcachedStorage extends StorageAbstract {
      *
      * @var \Memcached
      */
-    protected $memcached;
+    protected $memcache;
 
     /**
      * The memcache host
@@ -98,7 +98,7 @@ class MemcachedStorage extends StorageAbstract {
      */
     protected function setupConfig(array $config) {
         if (empty($config['host'])) {
-            throw new ConfigException('Host is not set for MemcacheStorage');
+            throw new ConfigException('Host is not set for MemcachedStorage');
         }
         $this->host = $config['host'];
         $this->port = (isset($config['port']) ? (int)$config['port'] : 11211);
@@ -108,7 +108,7 @@ class MemcachedStorage extends StorageAbstract {
         $this->hashKey = (isset($config['hashKey']) ? (bool)$config['hashKey'] : false);
 
         $this->memcache = new \Memcached($this->persistentId);
-        $serverList = $this->memcached->getServerList();
+        $serverList = $this->memcache->getServerList();
         if (!$this->persistentId || empty($serverList)) {
             $this->memcache->addServer($this->host, $this->port);
         }

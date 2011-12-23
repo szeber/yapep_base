@@ -10,8 +10,10 @@
  */
 
 namespace YapepBase\Storage;
+use YapepBase\Application;
 use YapepBase\Exception\StorageException;
 use YapepBase\Exception\ConfigException;
+use YapepBase\DependencyInjection\SystemContainer;
 
 /**
  * MemcacheStorage class
@@ -96,7 +98,7 @@ class MemcacheStorage extends StorageAbstract {
         $this->keySuffix = (isset($config['keySuffix']) ? $config['keySuffix'] : '');
         $this->hashKey = (isset($config['hashKey']) ? (bool)$config['hashKey'] : false);
 
-        $this->memcache = new \Memcache();
+        $this->memcache = Application::getInstance()->getDiContainer()->getMemcache();
         if (!$this->memcache->connect($this->host, $this->port)) {
             throw new StorageException('MemcacheStorage is unable to connect to server');
         }

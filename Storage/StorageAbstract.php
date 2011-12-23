@@ -33,11 +33,7 @@ abstract class StorageAbstract implements IStorage {
     public function __construct($configName) {
         $config = Config::getInstance()->get($configName, false);
         if (false === $config) {
-            // Try with wildcard option
-            $config = Config::getInstance()->get($configName . '.*', false);
-            if (false === $config) {
-                throw new ConfigException('Configuration not found: ' . $configName);
-            }
+            throw new ConfigException('Configuration not found: ' . $configName);
         }
         $this->setupConfig($config);
     }

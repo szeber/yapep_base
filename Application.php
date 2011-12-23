@@ -145,7 +145,7 @@ class Application {
      * @param \YapepBase\DependencyInjection\SystemContainer $diContainer
      */
     public function setDiContainer(SystemContainer $diContainer) {
-        $this->diContainer;
+        $this->diContainer = $diContainer;
     }
 
     /**
