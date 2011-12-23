@@ -35,6 +35,7 @@ use YapepBase\Exception\ConfigException;
  * @package    YapepBase
  * @subpackage Storage
  * @todo locking
+ * @todo refactor for unittesting - move memcached instantiation to DI container
  */
 class MemcachedStorage extends StorageAbstract {
 
