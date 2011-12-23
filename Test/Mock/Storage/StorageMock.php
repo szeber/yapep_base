@@ -19,6 +19,7 @@ use YapepBase\Storage\IStorage;
  *
  * @package    YapepBase
  * @subpackage Test\Mock\Storage
+ * @codeCoverageIgnore
  */
 class StorageMock implements IStorage {
 

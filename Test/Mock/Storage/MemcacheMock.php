@@ -16,6 +16,7 @@ namespace YapepBase\Test\Mock\Storage;
  *
  * @package    YapepBase
  * @subpackage Test\Mock\Storage
+ * @codeCoverageIgnore
  */
 class MemcacheMock {
 

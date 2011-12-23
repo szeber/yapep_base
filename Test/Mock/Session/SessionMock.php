@@ -18,6 +18,7 @@ use YapepBase\Session\ISession;
  *
  * @package    YapepBase
  * @subpackage Test\Mock\Session
+ * @codeCoverageIgnore
  */
 class SessionMock implements ISession {
 

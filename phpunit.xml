@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit bootstrap="Test/bootstrap.php">
-
+    <filter>
+        <blacklist>
+            <directory>/usr/share/php</directory> <!-- FIXME Find a better way to exclude the vfsStream libs -->
+        </blacklist>
+    </filter>
 </phpunit>
