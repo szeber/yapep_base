@@ -38,17 +38,6 @@ class HttpRequestTest extends \PHPUnit_Framework_TestCase {
 		$this->request = $this->getRequest();
 	}
 
-    /**
-     * Cleans up the environment after running a test.
-     */
-	protected function tearDown() {
-		unset($_SERVER['REQUEST_URI']);
-		$_GET = array();
-		$_GET = array();
-		$_COOKIE = array();
-		parent::tearDown();
-	}
-
 	/**
 	 * Returns a request instance
 	 *
@@ -73,8 +62,11 @@ class HttpRequestTest extends \PHPUnit_Framework_TestCase {
 		$cookie = array(
 			'param' => 'cookie_param',
 	    );
+        $env = array(
+            'envParam' => 'env_value',
+        );
 
-		return new HttpRequest($get, $post, $cookie, $server, array(), array(), true);
+		return new HttpRequest($get, $post, $cookie, $server, $env, array(), true);
 	}
 
 	/**
@@ -162,6 +154,19 @@ class HttpRequestTest extends \PHPUnit_Framework_TestCase {
 	 * Test the parameter sequence
 	 */
 	public function testParamSequence() {
-		$this->assertSame($this->request->get('param', null, 'G'), 'get_param');
+		$this->assertSame($this->request->get('param', null, 'G'), 'get_param', 'Generic getter fails for GET');
+		$this->assertSame($this->request->get('param', null, 'P'), 'post_param', 'Generic getter fails for POST');
+		$this->assertSame($this->request->get('param', null, 'C'), 'cookie_param', 'Generic getter fails for COOKIE');
+		$this->assertNull($this->request->get('nonexistent'), 'Generic getter fails for nonexistent value');
 	}
+
+    public function testGetServer() {
+        $this->assertSame('/target', $this->request->getServer('REQUEST_URI'), 'Get from server fails');
+        $this->assertNull($this->request->getServer('nonexistent'), 'Get nonexistent key from server fails');
+    }
+
+    public function testGetEnv() {
+        $this->assertSame('env_value', $this->request->getEnv('envParam'), 'Get from env fails');
+        $this->assertNull($this->request->getEnv('nonexistent'), 'Get nonexistent key from env fails');
+    }
 }
