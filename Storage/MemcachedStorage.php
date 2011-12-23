@@ -12,6 +12,7 @@
 namespace YapepBase\Storage;
 use YapepBase\Exception\StorageException;
 use YapepBase\Exception\ConfigException;
+use YapepBase\Application;
 
 /**
  * MemcachedStorage class
@@ -23,10 +24,6 @@ use YapepBase\Exception\ConfigException;
  *     <ul>
  *         <li>host:           The memcache server's hostname or IP.</li>
  *         <li>port:           The port of the memcache server. Optional, defaults to 11211</li>
- *         <li>persistentId:   The persistent ID to use for the connection. Connections with the same persistent ID
- *                             are shared between requests. Optional, defaults to NULL, which means the connection will
- *                             not be shared. See the comments in the PHP manual for the risks involved in using
- *                             persistent connections. {@link php.net/manual/en/memcached.construct.php}</li>
  *         <li>keyPrefix:      The keys will be prefixed with this string. Optional, defaults to empty string.</li>
  *         <li>keySuffix:      The keys will be suffixed with this string. Optional, defaults to empty string.</li>
  *         <li>hashKey:        If TRUE, the key will be hashed before being stored. Optional, defaults to FALSE.</li>
@@ -35,7 +32,6 @@ use YapepBase\Exception\ConfigException;
  * @package    YapepBase
  * @subpackage Storage
  * @todo locking
- * @todo refactor for unittesting - move memcached instantiation to DI container
  */
 class MemcachedStorage extends StorageAbstract {
 
@@ -59,13 +55,6 @@ class MemcachedStorage extends StorageAbstract {
      * @var int
      */
     protected $port;
-
-    /**
-     * The persistent ID for the connection.
-     *
-     * @var string
-     */
-    protected $persistentId;
 
     /**
      * The string to prefix the keys with
@@ -102,14 +91,13 @@ class MemcachedStorage extends StorageAbstract {
         }
         $this->host = $config['host'];
         $this->port = (isset($config['port']) ? (int)$config['port'] : 11211);
-        $this->persistentId = (isset($config['persistentId']) ? $config['persistentId'] : null);
         $this->keyPrefix = (isset($config['keyPrefix']) ? $config['keyPrefix'] : '');
         $this->keySuffix = (isset($config['keySuffix']) ? $config['keySuffix'] : '');
         $this->hashKey = (isset($config['hashKey']) ? (bool)$config['hashKey'] : false);
 
-        $this->memcache = new \Memcached($this->persistentId);
+        $this->memcache = Application::getInstance()->getDiContainer()->getMemcached();
         $serverList = $this->memcache->getServerList();
-        if (!$this->persistentId || empty($serverList)) {
+        if (empty($serverList)) {
             $this->memcache->addServer($this->host, $this->port);
         }
     }

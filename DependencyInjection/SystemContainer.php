@@ -35,6 +35,8 @@ class SystemContainer extends Pimple {
     const KEY_EVENT_HANDLER_REGISTRY = 'eventHandlerRegistry';
     /** Memcache key. */
     const KEY_MEMCACHE = 'memcache';
+    /** Memcache key. */
+    const KEY_MEMCACHED = 'memcached';
 
     /**
      * List of namespaces to search for controllers in.
@@ -64,6 +66,9 @@ class SystemContainer extends Pimple {
         });
         $this[self::KEY_MEMCACHE] = function($container) {
             return new \Memcache();
+        };
+        $this[self::KEY_MEMCACHED] = function($container) {
+            return new \Memcached();
         };
     }
 
@@ -101,6 +106,15 @@ class SystemContainer extends Pimple {
      */
     public function getMemcache() {
         return $this[self::KEY_MEMCACHE];
+    }
+
+    /**
+     * Returns a memcache instance
+     *
+     * @return \Memcached
+     */
+    public function getMemcached() {
+        return $this[self::KEY_MEMCACHED];
     }
 
     /**
