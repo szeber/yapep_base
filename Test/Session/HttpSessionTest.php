@@ -29,8 +29,6 @@ use YapepBase\Session\HttpSession;
  *
  * @package    YapepBase
  * @subpackage Test\Session
- *
- * @todo refactor the huge testFunctionality method
  */
 class HttpSessionTest extends \PHPUnit_Framework_TestCase {
 
