@@ -95,8 +95,6 @@ abstract class DbConnection {
      * @return \PDOStatement   The result of the query.
      *
      * @throws \YapepBase\Exception\DatabaseException   On execution errors.
-     *
-     * @todo   Replace PDOStatement with generic DbResult
      */
     public function query($query, array $params = array()) {
         try {
@@ -105,7 +103,7 @@ abstract class DbConnection {
                 $statement->bindValue(':' . $this->paramPrefix . $key, $value, $this->getParamType($value));
             }
             $statement->execute();
-            return $statement;
+            return new DbResult($statement);
         }
         catch (PDOException $exception) {
             $this->transactionFailed = true;

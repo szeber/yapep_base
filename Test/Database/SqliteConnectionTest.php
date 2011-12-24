@@ -2,7 +2,6 @@
 
 namespace YapepBase\Test\Database;
 use YapepBase\Exception\DatabaseException;
-
 use YapepBase\Database\SqliteConnection;
 
 /**
@@ -92,7 +91,7 @@ class SqliteConnectionTest extends \PHPUnit_Framework_TestCase {
 
         $result = $this->subject->query($sql);
 
-        $this->assertInstanceOf('\PDOStatement', $result, 'Result is of wrong type');
+        $this->assertInstanceOf('\YapepBase\Database\DbResult', $result, 'Result is of wrong type');
         $this->assertEquals('test', $result->fetchColumn(0), 'Invalid result');
     }
 
@@ -138,7 +137,7 @@ class SqliteConnectionTest extends \PHPUnit_Framework_TestCase {
 
         $result = $this->subject->query($sql, $params);
 
-        $this->assertInstanceOf('\PDOStatement', $result, 'Result is of wrong type');
+        $this->assertInstanceOf('\YapepBase\Database\DbResult', $result, 'Result is of wrong type');
         $this->assertEquals('test', $result->fetchColumn(0), 'Invalid result');
     }
 
@@ -180,15 +179,15 @@ class SqliteConnectionTest extends \PHPUnit_Framework_TestCase {
 
         $result = $this->subject->query($sql);
 
-        $row = $result->fetch(\PDO::FETCH_ASSOC);
+        $row = $result->fetch();
         $this->assertEquals(1, $row['id'], 'Invalid first ID');
         $this->assertEquals('test', $row['test'], 'Invalid first ID');
 
-        $row = $result->fetch(\PDO::FETCH_ASSOC);
+        $row = $result->fetch();
         $this->assertEquals(2, $row['id'], 'Invalid second ID');
         $this->assertEquals('test2', $row['test'], 'Invalid second ID');
 
-        $this->assertFalse($result->fetch(\PDO::FETCH_ASSOC));
+        $this->assertFalse($result->fetch());
     }
 
     /**
@@ -230,7 +229,7 @@ class SqliteConnectionTest extends \PHPUnit_Framework_TestCase {
 
         $result = $this->subject->query($sql);
 
-        $this->assertFalse($result->fetch(\PDO::FETCH_ASSOC));
+        $this->assertFalse($result->fetch());
     }
 
     /**
@@ -288,7 +287,7 @@ class SqliteConnectionTest extends \PHPUnit_Framework_TestCase {
 
         $result = $this->subject->query($sql);
 
-        $this->assertFalse($result->fetch(\PDO::FETCH_ASSOC));
+        $this->assertFalse($result->fetch());
     }
 
     /**
