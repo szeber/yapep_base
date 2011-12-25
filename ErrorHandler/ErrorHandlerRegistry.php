@@ -224,11 +224,10 @@ class ErrorHandlerRegistry {
      * @return string
      */
     protected function generateErrorId($message, $file, $line) {
-        $uname = posix_uname();
         $idTimeout = Config::getInstance()->get('system.errorHandling.defaultIdTimeout',
             self::ERROR_HANDLING_DEFAULT_ID_TIMEOUT);
 
-        return md5($message . $file . (string)$line . $uname['nodename'] . floor(time() / $idTimeout));
+        return md5($message . $file . (string)$line . php_uname('n') . floor(time() / $idTimeout));
     }
 
     /**
