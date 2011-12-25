@@ -5,7 +5,7 @@ namespace YapepBase\Test\DependencyInjection;
 class SystemContainerTest extends \PHPUnit_Framework_TestCase {
     public function testConstructor() {
         $sc = new \YapepBase\DependencyInjection\SystemContainer();
-        $this->assertInstanceOf('\YapepBase\ErrorHandler\ErrorHandlerContainer', $sc->getErrorHandlerContainer());
+        $this->assertInstanceOf('\YapepBase\ErrorHandler\ErrorHandlerRegistry', $sc->getErrorHandlerRegistry());
         $this->assertInstanceOf('\YapepBase\Log\Message\ErrorMessage', $sc->getErrorLogMessage());
         $this->assertInstanceOf('\YapepBase\Event\EventHandlerRegistry', $sc->getEventHandlerRegistry());
         $this->assertInstanceOf('\Memcache', $sc->getMemcache());

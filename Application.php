@@ -21,7 +21,7 @@ use YapepBase\Router\IRouter;
 use YapepBase\DependencyInjection\SystemContainer;
 use YapepBase\Debugger\IDebugger;
 use YapepBase\Exception\Exception;
-use YapepBase\ErrorHandler\ErrorHandlerContainer;
+use YapepBase\ErrorHandler\ErrorHandlerRegistry;
 
 /**
  * Application singleton class
@@ -70,9 +70,9 @@ class Application {
     /**
      * The error handler container instance
      *
-     * @var \YapepBase\ErrorHandler\ErrorHandlerContainer
+     * @var \YapepBase\ErrorHandler\ErrorHandlerRegistry
      */
-    protected $errorHandlerContainer;
+    protected $errorHandlerRegistry;
 
     /**
      * Stores the system DI container
@@ -87,8 +87,8 @@ class Application {
     protected function __construct() {
         $this->config = Config::getInstance();
         // Set up error handling
-        $this->errorHandlerContainer = $this->getDiContainer()->getErrorHandlerContainer();
-        $this->errorHandlerContainer->register();
+        $this->errorHandlerRegistry = $this->getDiContainer()->getErrorHandlerRegistry();
+        $this->errorHandlerRegistry->register();
     }
 
     /**
@@ -199,10 +199,10 @@ class Application {
     /**
      * Returns the errorhandler container instance
      *
-     * @return \YapepBase\ErrorHandler\ErrorHandlerContainer
+     * @return \YapepBase\ErrorHandler\ErrorHandlerRegistry
      */
-    public function getErrorHandlerContainer() {
-        return $this->errorHandlerContainer;
+    public function getErrorHandlerRegistry() {
+        return $this->errorHandlerRegistry;
     }
 
     /**

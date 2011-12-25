@@ -15,12 +15,12 @@ use YapepBase\Application;
 use YapepBase\Config;
 
 /**
- * ErrorHandlerContainer class
+ * ErrorHandlerRegistry class
  *
  * @package    YapepBase
  * @subpackage ErrorHandler
  */
-class ErrorHandlerContainer {
+class ErrorHandlerRegistry {
 
     /** The default timeout for the error ID in seconds. */
     const ERROR_HANDLING_DEFAULT_ID_TIMEOUT = 600;   // 10 minutes

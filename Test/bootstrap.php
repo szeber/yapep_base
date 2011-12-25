@@ -9,7 +9,7 @@
  */
 
 include_once(__DIR__ . '/../bootstrap.php');
-\YapepBase\Application::getInstance()->getErrorHandlerContainer()->addErrorHandler(new \YapepBase\ErrorHandler\StrictErrorHandler());
+\YapepBase\Application::getInstance()->getErrorHandlerRegistry()->addErrorHandler(new \YapepBase\ErrorHandler\StrictErrorHandler());
 
 // Find vfsStream, and register autoloading for it, if available
 foreach(explode(\PATH_SEPARATOR, get_include_path()) as $path) {
