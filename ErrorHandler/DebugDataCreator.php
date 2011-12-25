@@ -29,12 +29,21 @@ class DebugDataCreator implements IErrorHandler  {
     protected $storage;
 
     /**
+     * If TRUE, exception traces are not going to be dumped.
+     *
+     * @var bool
+     */
+    protected $isTestMode = false;
+
+    /**
      * Constructor.
      *
-     * @param IStorage $storage   The storage backend to use for the debug data.
+     * @param \YapepBase\Storage\IStorage $storage      The storage backend to use for the debug data.
+     * @param bool                        $isTestMode   If TRUE, exception traces are not going to be dumped.
      */
-    public function __construct(IStorage $storage) {
+    public function __construct(IStorage $storage, $isTestMode = false) {
         $this->storage = $storage;
+        $this->isTestMode = $isTestMode;
     }
 
     /**
@@ -79,7 +88,8 @@ class DebugDataCreator implements IErrorHandler  {
             . $exception->getMessage() . '(' . $exception->getCode() .') on line ' . $exception->getLine() . ' in '
             . $exception->getFile();
 
-        $this->storage->set($errorId, $this->getDebugData($errorId, $errorMessage, $exception->getTrace()));
+        $this->storage->set($errorId, $this->getDebugData($errorId, $errorMessage,
+            ($this->isTestMode ? array() : $exception->getTrace())));
     }
 
     /**

@@ -26,6 +26,7 @@ class ErrorHandlerHelper {
      * @param int $errorLevel
      *
      * @return string
+     * @codeCoverageIgnore
      */
     public function getPhpErrorLevelDescription($errorLevel) {
         switch($errorLevel) {
@@ -104,6 +105,7 @@ class ErrorHandlerHelper {
      * @param int $errorLevel
      *
      * @return int
+     * @codeCoverageIgnore
      */
     public function getLogPriorityForErrorLevel($errorLevel) {
         switch($errorLevel) {
