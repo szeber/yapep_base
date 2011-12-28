@@ -218,7 +218,8 @@ class Application {
             $controller = $this->getDiContainer()->getController($controllerName, $this->request, $this->response);
             $controller->run($action);
             $eventHandlerRegistry->raise(new Event(Event::TYPE_APPFINISH));
-        // @codeCoverageIgnoreStart
+            $this->response->send();
+            // @codeCoverageIgnoreStart
         } catch (\Exception $exception) {
             // FIXME refine exception handling
             var_dump($exception);
