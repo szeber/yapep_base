@@ -45,10 +45,19 @@ abstract class ViewAbstract implements IView {
      *
      * @return string
      */
-    public function __construct() {
+    public function __construct($charset = null) {
+        $this->charset = $charset;
         if (empty($this->charset)) {
             $this->charset = Config::getInstance()->get('system.defaultCharset');
         }
+        $this->init();
+    }
+
+    /**
+     * Called at class construction
+     */
+    protected function init() {
+        // Implemented in descendant classes if neccessary
     }
 
     /**
