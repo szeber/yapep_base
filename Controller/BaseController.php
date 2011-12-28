@@ -109,6 +109,7 @@ abstract class BaseController implements IController {
                 }
             }
             $this->after();
+            $this->response->send();
         } catch (RedirectException $exception) {
             // This is a redirect, we don't have to do anything with it.
         }
