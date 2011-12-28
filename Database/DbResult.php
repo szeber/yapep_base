@@ -12,6 +12,7 @@
 
 namespace YapepBase\Database;
 use \PDOStatement;
+use \PDO;
 use \Iterator;
 
 /**
@@ -82,7 +83,7 @@ class DbResult implements Iterator {
      * @return array|bool
      */
     public function next() {
-        $this->row = $this->statement->fetch(\PDO::FETCH_ASSOC);
+        $this->row = $this->statement->fetch(PDO::FETCH_ASSOC);
         if (false !== $this->row) {
             $this->rowIndex++;
         }
