@@ -8,6 +8,7 @@ class SystemContainerTest extends \PHPUnit_Framework_TestCase {
         $this->assertInstanceOf('\YapepBase\ErrorHandler\ErrorHandlerRegistry', $sc->getErrorHandlerRegistry());
         $this->assertInstanceOf('\YapepBase\Log\Message\ErrorMessage', $sc->getErrorLogMessage());
         $this->assertInstanceOf('\YapepBase\Event\EventHandlerRegistry', $sc->getEventHandlerRegistry());
+        $this->assertInstanceOf('\YapepBase\Session\SessionRegistry', $sc->getSessionRegistry());
         $this->assertInstanceOf('\Memcache', $sc->getMemcache());
         $this->assertInstanceOf('\Memcached', $sc->getMemcached());
     }

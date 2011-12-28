@@ -11,6 +11,8 @@
 
 
 namespace YapepBase\DependencyInjection;
+use YapepBase\Session\SessionRegistry;
+
 use YapepBase\Event\EventHandlerRegistry;
 use YapepBase\Response\IResponse;
 use YapepBase\Request\IRequest;
@@ -29,10 +31,12 @@ class SystemContainer extends Pimple {
     // Container keys
     /** Error log message key. */
     const KEY_ERROR_LOG_MESSAGE = 'errorLogMessage';
-    /** Error handler container key. */
+    /** Error handler registry key. */
     const KEY_ERROR_HANDLER_REGISTRY = 'errorHandlerRegistry';
     /** Event handler container key. */
     const KEY_EVENT_HANDLER_REGISTRY = 'eventHandlerRegistry';
+    /** Session registry key. */
+    const KEY_SESSION_REGISTRY = 'sessionRegistry';
     /** Memcache key. */
     const KEY_MEMCACHE = 'memcache';
     /** Memcache key. */
@@ -63,6 +67,9 @@ class SystemContainer extends Pimple {
         };
         $this[self::KEY_EVENT_HANDLER_REGISTRY] = $this->share(function($container) {
             return new EventHandlerRegistry();
+        });
+        $this[self::KEY_SESSION_REGISTRY] = $this->share(function($container) {
+            return new SessionRegistry();
         });
         $this[self::KEY_MEMCACHE] = function($container) {
             return new \Memcache();
@@ -97,6 +104,15 @@ class SystemContainer extends Pimple {
      */
     public function getEventHandlerRegistry() {
         return $this[self::KEY_EVENT_HANDLER_REGISTRY];
+    }
+
+    /**
+     * Returns a session registry instance
+     *
+     * @return \YapepBase\Session\SessionRegistry
+     */
+    public function getSessionRegistry() {
+        return $this[self::KEY_SESSION_REGISTRY];
     }
 
     /**
