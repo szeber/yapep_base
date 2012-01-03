@@ -11,6 +11,8 @@
 
 
 namespace YapepBase\DependencyInjection;
+use YapepBase\Exception\Exception;
+
 use YapepBase\Session\SessionRegistry;
 
 use YapepBase\Event\EventHandlerRegistry;
@@ -71,12 +73,16 @@ class SystemContainer extends Pimple {
         $this[self::KEY_SESSION_REGISTRY] = $this->share(function($container) {
             return new SessionRegistry();
         });
-        $this[self::KEY_MEMCACHE] = function($container) {
-            return new \Memcache();
-        };
-        $this[self::KEY_MEMCACHED] = function($container) {
-            return new \Memcached();
-        };
+        if (class_exists('\Memcache')) {
+            $this[self::KEY_MEMCACHE] = function($container) {
+                return new \Memcache();
+            };
+        }
+        if (class_exists('\Memcached')) {
+            $this[self::KEY_MEMCACHED] = function($container) {
+                return new \Memcached();
+            };
+        }
     }
 
     /**
@@ -119,8 +125,15 @@ class SystemContainer extends Pimple {
      * Returns a memcache instance
      *
      * @return \Memcache
+     *
+     * @throws \YapepBase\Exception\Exception   If there is no Memcache support in PHP.
      */
     public function getMemcache() {
+        // @codeCoverageIgnoreStart
+        if (!isset($this[self::KEY_MEMCACHE])) {
+            throw new Exception('No memcache support in PHP');
+        }
+        // @codeCoverageIgnoreEnd
         return $this[self::KEY_MEMCACHE];
     }
 
@@ -128,8 +141,15 @@ class SystemContainer extends Pimple {
      * Returns a memcache instance
      *
      * @return \Memcached
+     *
+     * @throws \YapepBase\Exception\Exception   If there is no Memcached support in PHP.
      */
     public function getMemcached() {
+        // @codeCoverageIgnoreStart
+        if (!isset($this[self::KEY_MEMCACHED])) {
+            throw new Exception('No memcached support in PHP');
+        }
+        // @codeCoverageIgnoreEnd
         return $this[self::KEY_MEMCACHED];
     }
 

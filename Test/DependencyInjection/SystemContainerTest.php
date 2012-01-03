@@ -9,9 +9,24 @@ class SystemContainerTest extends \PHPUnit_Framework_TestCase {
         $this->assertInstanceOf('\YapepBase\Log\Message\ErrorMessage', $sc->getErrorLogMessage());
         $this->assertInstanceOf('\YapepBase\Event\EventHandlerRegistry', $sc->getEventHandlerRegistry());
         $this->assertInstanceOf('\YapepBase\Session\SessionRegistry', $sc->getSessionRegistry());
+    }
+
+    public function testGetMemcache() {
+        if (!class_exists('\Memcache')) {
+            $this->markTestSkipped('No memcache support');
+        }
+        $sc = new \YapepBase\DependencyInjection\SystemContainer();
         $this->assertInstanceOf('\Memcache', $sc->getMemcache());
+    }
+
+    public function testGetMemcached() {
+        if (!class_exists('\Memcached')) {
+            $this->markTestSkipped('No memcached support');
+        }
+        $sc = new \YapepBase\DependencyInjection\SystemContainer();
         $this->assertInstanceOf('\Memcached', $sc->getMemcached());
     }
+
     public function testGetController() {
         $sc = new \YapepBase\DependencyInjection\SystemContainer();
         $sc->setControllerSearchNamespaces(array());
