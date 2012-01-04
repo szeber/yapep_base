@@ -32,21 +32,21 @@ abstract class Template extends ViewAbstract {
      * @var \YapepBase\View\Layout
      */
     protected $layout;
-    
+
     /**
      * All template variables as keys (cached), set marks as values. If a variable has been set, it is set to true.
      * @var array
      */
     protected $variables;
-    
+
     /**
      * Required local variables
      * @var array
      */
     protected $required = array();
-    
+
     protected $raw;
-    
+
     /**
      * Caches local variables.
      */
@@ -62,7 +62,7 @@ abstract class Template extends ViewAbstract {
             $this->variables = $vars;
         }
     }
-    
+
     /**
      * Checks, if a variable is valid for this template.
      * @param  string $var
@@ -77,10 +77,10 @@ abstract class Template extends ViewAbstract {
             return false;
         }
     }
-    
+
     /**
      * Marks a variable as set.
-     * @param  string $var 
+     * @param  string $var
      * @throws \YapepBase\Exception\ParameterException if the variable is invalid for this template.
      */
     protected function markSet($var) {
@@ -116,7 +116,7 @@ abstract class Template extends ViewAbstract {
     /**
      * Sets a value for a variable.
      * @param  string $var
-     * @param  mixed  $value 
+     * @param  mixed  $value
      * @throws \YapepBase\Exception\ParameterException if the variable is invalid for this template.
      */
     public function set($var, $value) {
@@ -129,7 +129,7 @@ abstract class Template extends ViewAbstract {
             throw new \YapepBase\Exception\ParameterException("Template " . get_class($this) . " has no parameter " . $var);
         }
     }
-    
+
     public function get($var, $raw = false) {
         $this->cacheVariables();
         if ($this->hasVariable($var)) {
@@ -142,7 +142,7 @@ abstract class Template extends ViewAbstract {
             throw new \YapepBase\Exception\ParameterException("Template " . get_class($this) . " has no parameter " . $var);
         }
     }
-    
+
     /**
      * Renders the view and returns it.
      *
@@ -153,13 +153,14 @@ abstract class Template extends ViewAbstract {
      * @return string   The rendered view or NULL if not returned
      */
     public function render($contentType, $return = true) {
+        $this->cacheVariables();
         $this->contentType = $contentType;
         foreach ($this->required as $param) {
             if ($this->variables[$param] == false) {
                 throw new \YapepBase\Exception\ParameterException($param . " is required in template " . get_class($this));
             }
         }
-        
+
         foreach ($this->variables as $variable => $set) {
             if ($set) {
                 $this->$variable = $this->escape($this->$variable);
