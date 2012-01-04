@@ -8,7 +8,7 @@ use \YapepBase\View\Layout;
  * Mock for a Layout.
  * @codeCoverageIgnore
  */
-class LayoutMock extends Layout {
+class MockLayout extends Layout {
     /**
      * Render the fake content
      */

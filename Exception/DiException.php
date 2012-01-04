@@ -19,4 +19,6 @@ namespace YapepBase\Exception;
  */
 class DiException extends Exception {
 
+    const ERR_NAMESPACE_SEARCH_CLASS_NOT_FOUND = 101;
+
 }

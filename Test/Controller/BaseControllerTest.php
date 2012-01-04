@@ -2,6 +2,8 @@
 
 namespace YapepBase\Controller;
 
+use YapepBase\DependencyInjection\SystemContainer;
+
 class BaseControllerTest extends \PHPUnit_Framework_TestCase {
 
     /**
@@ -38,7 +40,8 @@ class BaseControllerTest extends \PHPUnit_Framework_TestCase {
         $this->object->run('returnView');
         $this->assertEquals('view test string', $response->getRenderedBody());
 
-        \YapepBase\Application::getInstance()->getDiContainer()->addControllerSearchNamespace('\YapepBase\Test\Mock\Controller');
+        \YapepBase\Application::getInstance()->getDiContainer()->addSearchNamespace(
+            SystemContainer::NAMESPACE_SEARCH_CONTROLLER, '\YapepBase\Test\Mock\Controller');
         $this->object->run('redirect');
         $this->assertEquals('redirect test', $response->getRenderedBody());
     }

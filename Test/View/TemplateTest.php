@@ -2,7 +2,7 @@
 
 namespace YapepBase\Test\View;
 use \YapepBase\View\Template;
-use \YapepBase\Test\Mock\View\TemplateMock;
+use \YapepBase\Test\Mock\View\MockTemplate;
 
 /**
  * Test class for Template.
@@ -11,7 +11,7 @@ use \YapepBase\Test\Mock\View\TemplateMock;
 class TemplateTest extends \PHPUnit_Framework_TestCase {
 
     /**
-     * @var \YapepBase\Test\Mock\View\TemplateMock
+     * @var \YapepBase\Test\Mock\View\MockTemplate
      */
     protected $object;
 
@@ -20,7 +20,7 @@ class TemplateTest extends \PHPUnit_Framework_TestCase {
      * This method is called before a test is executed.
      */
     protected function setUp() {
-        $this->object = new TemplateMock;
+        $this->object = new MockTemplate;
     }
 
     /**
@@ -68,24 +68,24 @@ class TemplateTest extends \PHPUnit_Framework_TestCase {
      * Tests, if variables are correctly handled and escaped.
      */
     public function testRender() {
-        $o = new TemplateMock();
+        $o = new MockTemplate();
         try {
             $o->render('text/html', true);
             $this->fail('Calling render on a Template with missing required variables should raise ParameterException');
         } catch (\YapepBase\Exception\ParameterException $e) { }
-        
+
         $o->set('var1', '&');
         $this->assertEquals('test output', $o->render('text/html', true));
         $this->assertEquals('&amp;', $o->get('var1'));
         $this->assertEquals('&', $o->get('var1', true));
     }
-    
+
     /**
      * Tests the render function with a layout
      */
     public function testLayoutRender() {
-        $o = new TemplateMock();
-        $layout = new \YapepBase\Test\Mock\View\LayoutMock();
+        $o = new MockTemplate();
+        $layout = new \YapepBase\Test\Mock\View\MockLayout();
         $o->setLayout($layout);
         $o->set('var1', 'test');
         $this->assertEquals('Layout: test output', $o->render('text/html'));

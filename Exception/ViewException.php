@@ -19,8 +19,10 @@ namespace YapepBase\Exception;
  * @subpackage Exception
  */
 class ViewException extends Exception {
-    /**
-     * Indicates, that a block was not found.
-     */
+    /** Indicates, that a block was not found. */
     const ERR_BLOCK_NOT_FOUND = 101;
+    /** Indicates, that a template was not found. */
+    const ERR_TEMPLATE_NOT_FOUND = 102;
+    /** Indicates, that a layout was not found. */
+    const ERR_LAYOUT_NOT_FOUND = 103;
 }

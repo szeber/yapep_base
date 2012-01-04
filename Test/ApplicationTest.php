@@ -2,6 +2,8 @@
 
 namespace YapepBase\Test;
 
+use YapepBase\DependencyInjection\SystemContainer;
+
 require_once dirname(__FILE__) . '/../Application.php';
 
 /**
@@ -63,7 +65,8 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase {
         $request = new Mock\Request\RequestMock('/');
         $response = new Mock\Response\ResponseMock($out);
         $router = new Mock\Router\ApplicationRouterMock();
-        $this->object->getDiContainer()->setControllerSearchNamespaces(array('\YapepBase\Test\Mock\Controller'));
+        $this->object->getDiContainer()->setSearchNamespaces(SystemContainer::NAMESPACE_SEARCH_CONTROLLER,
+            array('\YapepBase\Test\Mock\Controller'));
         $this->object->setRequest($request);
         $this->object->setResponse($response);
         $this->object->setRouter($router);
