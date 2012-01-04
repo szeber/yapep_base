@@ -33,7 +33,7 @@ class SessionRegistry {
      *
      * @param string $namespace
      *
-     * @return SessionAbstract   The session object.
+     * @return \YapepBase\Session\SessionAbstract   The session object.
      *
      * @throws \YapepBase\Exception\Exception   If no session is registered with the specified namespace.
      */
