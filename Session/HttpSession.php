@@ -92,7 +92,7 @@ class HttpSession extends SessionAbstract {
         }
 
         $this->cookieName = $config['cookieName'];
-        $this->cookieDomain = (empty($config['cookieDomain']) ? '/' : $config['cookieDomain']);
+        $this->cookieDomain = (empty($config['cookieDomain']) ? null : $config['cookieDomain']);
         $this->cookiePath = (empty($config['cookiePath']) ? '/' : $config['cookiePath']);
         $this->cacheLimitersEnabled = (empty($config['cacheLimitersEnabled']) ? true : $config['cacheLimitersEnabled']);
     }
