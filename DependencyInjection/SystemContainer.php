@@ -191,7 +191,7 @@ class SystemContainer extends Pimple {
      * @param array $namespaces a list of namespace roots to search for the controller in.
      */
     public function setBlockSearchNamespaces($namespaces = array()) {
-        $this->controllerSearchNamespaces = $namespaces;
+        $this->blockSearchNamespaces = $namespaces;
     }
 
     /**
