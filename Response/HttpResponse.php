@@ -59,9 +59,9 @@ class HttpResponse implements IResponse {
      * @var array
      */
     protected $headers = array();
-    
+
     /**
-     * Stores the status code 
+     * Stores the status code
      * @var int
      * @see http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
      */
@@ -87,17 +87,17 @@ class HttpResponse implements IResponse {
      * @var bool
      */
     protected $isResponseSent = false;
-    
+
     /**
      * Stores the raw output handler.
-     * 
+     *
      * @var IOutput
      */
     protected $output;
-    
+
     /**
      * Standard HTTP status codes
-     * 
+     *
      * @var array
      */
     protected static $statusCodes = array(
@@ -165,7 +165,7 @@ class HttpResponse implements IResponse {
     protected function startOutputBuffer() {
         ob_start();
     }
-    
+
     /**
      * Checks, if RFC2616 is adhered so browser incompatibilities are avoided.
      * Only for use in the send() function.
@@ -236,7 +236,7 @@ class HttpResponse implements IResponse {
         if ($this->isResponseSent) {
             throw new Exception('Send called after the response has been sent');
         }
-        
+
         $renderedBody = $this->getRenderedBody();
 
         $this->checkStandards($renderedBody);
@@ -294,10 +294,10 @@ class HttpResponse implements IResponse {
     public function setRenderedBody($body) {
         $this->body = (string)$body;
     }
-    
+
     /**
      * Renders and returns the HTTP response body.
-     * 
+     *
      * @return string
      */
     public function getRenderedBody() {
@@ -327,19 +327,19 @@ class HttpResponse implements IResponse {
         $this->statusCode = $statusCode;
         $this->statusMessage = $statusMessage;
     }
-    
+
     /**
      * Returns the currently set status code.
-     * 
+     *
      * @return int
      */
     public function getStatusCode() {
         return $this->statusCode;
     }
-    
+
     /**
      * Returns the currently set status message.
-     * 
+     *
      * @return string
      */
     public function getStatusMessage() {
@@ -390,10 +390,10 @@ class HttpResponse implements IResponse {
             $this->headers[$header][] = $value;
         }
     }
-    
+
     /**
      * Removes one or more headers.
-     * 
+     *
      * @param string|array $header The header to remove.
      */
     public function removeHeader($header) {
@@ -408,7 +408,7 @@ class HttpResponse implements IResponse {
             }
         }
     }
-    
+
     /**
      * This function removes all previous values of a header and sets the new
      * values.
@@ -416,17 +416,17 @@ class HttpResponse implements IResponse {
      * @param string|array $header The header to set. If it is an array, every
      *                             part is used as a separate header.
      * @param string $value        The header value to set. If empty, the
-     *                             $header will be exploded along a : sign. 
+     *                             $header will be exploded along a : sign.
      */
     public function setHeader($header, $value = null) {
         $this->removeHeader($header);
         $this->addHeader($header, $value);
     }
-    
+
     /**
      * Return an array of values for a header, that has been set previously.
-     * 
-     * @param type $header 
+     *
+     * @param type $header
      * @return array of string
      */
     public function getHeader($header) {
@@ -435,10 +435,10 @@ class HttpResponse implements IResponse {
         }
         return $this->headers[$header];
     }
-    
+
     /**
      * Returns, if a header has been set.
-     * 
+     *
      * @param  string $header A header name
      * @return bool
      */
@@ -472,8 +472,8 @@ class HttpResponse implements IResponse {
         $this->contentType = $contentType;
         $contentTypeHeader = $contentType;
 
-        if (MimeType::HTML == $contentType && empty($charset)) {
-            // For HTML content set the default charset to the sytem default.
+        if ((MimeType::HTML == $contentType || MimeType::XHTML == $contentType) && empty($charset)) {
+            // For (X)HTML content set the default charset to the sytem default.
             $charset = Config::getInstance()->get('system.defaultCharset', 'UTF-8');
         }
 
@@ -511,13 +511,13 @@ class HttpResponse implements IResponse {
             'httpOnly'   => $httpOnly,
         );
     }
-    
+
     /**
      * Checks, if a cookie has been set.
      * @param string $name The cookie to check
      * @return bool
      */
-    public function hasCookie($name) { 
+    public function hasCookie($name) {
         return array_key_exists($name, $this->cookies);
     }
 }

@@ -18,6 +18,8 @@ namespace YapepBase\Mime;
 class MimeType {
     /** HTML content type */
     const HTML = 'text/html';
+    /** XHTML content type */
+    const XHTML = 'application/xhtml+xml';
     /** CSS content type */
     const CSS = 'text/css';
     /** Javascript content type */
