@@ -10,6 +10,8 @@
 
 
 namespace YapepBase;
+use YapepBase\Exception\RedirectException;
+
 use YapepBase\Event\Event;
 
 use YapepBase\Response\IResponse;
@@ -220,6 +222,9 @@ class Application {
             $eventHandlerRegistry->raise(new Event(Event::TYPE_APPFINISH));
             $this->response->send();
             // @codeCoverageIgnoreStart
+        } catch (RedirectException $exception) {
+            $eventHandlerRegistry->raise(new Event(Event::TYPE_APPFINISH));
+            $this->response->send();
         } catch (\Exception $exception) {
             // FIXME refine exception handling
             var_dump($exception);

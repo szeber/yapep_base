@@ -2,6 +2,8 @@
 
 namespace YapepBase\Controller;
 
+use YapepBase\Exception\RedirectException;
+
 use YapepBase\DependencyInjection\SystemContainer;
 
 class BaseControllerTest extends \PHPUnit_Framework_TestCase {
@@ -42,7 +44,10 @@ class BaseControllerTest extends \PHPUnit_Framework_TestCase {
 
         \YapepBase\Application::getInstance()->getDiContainer()->addSearchNamespace(
             SystemContainer::NAMESPACE_SEARCH_CONTROLLER, '\YapepBase\Test\Mock\Controller');
-        $this->object->run('redirect');
+        try {
+            $this->object->run('redirect');
+            $this->fail('No redirectException is thrown');
+        } catch (RedirectException $exception) {}
         $this->assertEquals('redirect test', $response->getRenderedBody());
     }
 }

@@ -65,6 +65,24 @@ class ArrayRouter implements IRouter {
     }
 
     /**
+     * Returns the target of the request.
+     *
+     * @return string
+     */
+    protected function getTarget() {
+        return $this->request->getTarget();
+    }
+
+    /**
+     * Returns the method of the request.
+     *
+     * @return string
+     */
+    protected function getMethod() {
+        return $this->request->getMethod();
+    }
+
+    /**
      * Returns a controller and an action for the request's target.
      *
      * @param string $controller   $he controller class name. (Outgoing parameter)
@@ -75,8 +93,8 @@ class ArrayRouter implements IRouter {
      * @throws RouterException   On errors. (Includig if the route is not found)
      */
     public function getRoute (&$controller = null, &$action = null) {
-        $target = $this->request->getTarget();
-        $method = $this->request->getMethod();
+        $target = $this->getTarget();
+        $method = $this->getMethod();
 
         // If the target doesn't start with a '/', add one
         if ('/' != substr($target, 0, 1)) {

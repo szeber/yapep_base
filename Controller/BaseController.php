@@ -86,6 +86,7 @@ abstract class BaseController implements IController {
      *
      * @throws \YapepBase\Exception\ControllerException   On controller specific error. (eg. action not found)
      * @throws \YapepBase\Exception\Exception             On framework related errors.
+     * @throws \YapepBase\Exception\RedirectException     On redirections.
      * @throws \Exception                                 On non-framework related errors.
      */
     public function run($action) {
@@ -94,24 +95,20 @@ abstract class BaseController implements IController {
             throw new ControllerException('Action ' . $methodName . ' does not exist',
                 ControllerException::ERR_ACTION_NOT_FOUND);
         }
-        try {
-            $this->before();
-            $result = $this->runAction($methodName);
-            if (!empty($result) && !is_string($result) && !($result instanceof IView)) {
-                throw new ControllerException('Result of the action is not an instance of IView or string',
-                    ControllerException::ERR_INVALID_ACTION_RESULT);
-            }
-            if (!empty($result)) {
-                if (is_string($result)) {
-                    $this->response->setRenderedBody($result);
-                } else {
-                    $this->response->setBody($result);
-                }
-            }
-            $this->after();
-        } catch (RedirectException $exception) {
-            // This is a redirect, we don't have to do anything with it.
+        $this->before();
+        $result = $this->runAction($methodName);
+        if (!empty($result) && !is_string($result) && !($result instanceof IView)) {
+            throw new ControllerException('Result of the action is not an instance of IView or string',
+                ControllerException::ERR_INVALID_ACTION_RESULT);
         }
+        if (!empty($result)) {
+            if (is_string($result)) {
+                $this->response->setRenderedBody($result);
+            } else {
+                $this->response->setBody($result);
+            }
+        }
+        $this->after();
     }
 
     /**
