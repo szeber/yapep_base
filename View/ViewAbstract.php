@@ -100,7 +100,7 @@ abstract class ViewAbstract implements IView {
             if (!array_key_exists($name, $rawParams)) {
                 throw new ViewException('The keys in the params do not match the keys in the raw params');
             }
-            $block->set($name, $value);
+            $block->set($name, $value, $rawParams[$name]);
         }
 
         // Render the block, and output it's contents
