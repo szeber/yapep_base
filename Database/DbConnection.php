@@ -92,7 +92,7 @@ abstract class DbConnection {
      * @param string $query    The query to execute.
      * @param array  $params   The parameters for the query.
      *
-     * @return \PDOStatement   The result of the query.
+     * @return \YapepBase\Database\DbResult   The result of the query.
      *
      * @throws \YapepBase\Exception\DatabaseException   On execution errors.
      */
