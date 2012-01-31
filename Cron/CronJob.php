@@ -9,7 +9,7 @@
  * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
-declare(ticks = 1);
+declare(ticks = 1) ;
 
 namespace YapepBase\Cron;
 
@@ -37,75 +37,96 @@ namespace YapepBase\Cron;
  * @abstract
  */
 abstract class CronJob {
+
     /**
      * Stores the file name of the PID file
+     *
      * @var string
      */
-    private $_pidFile = '';
+    private $pidFile = '';
+
     /**
      * Stores the path of the PID file
+     *
      * @var string
      */
-    private $_pidPath = '/var/run';
+    private $pidPath = '/var/run';
+
     /**
      * Stores the lock file descriptor
+     *
      * @var resource
      */
-    private $_lockFd;
+    private $lockFd;
+
     /**
      * Handle signals in the signal handler.
+     *
      * @var bool
      */
-    private $_handleSignals = false;
+    private $handleSignals = false;
+
     /**
      * PHP 5 constructor
      */
     public function __construct() {
-        $this->_pidFile = get_class($this) . '.pid';
+        $this->pidFile = get_class($this) . '.pid';
         if (function_exists('pcntl_signal')) {
             pcntl_signal(SIGTERM, array(&$this, "handleSignal"), true);
             pcntl_signal(SIGHUP, array(&$this, "handleSignal"), true);
             pcntl_signal(SIGINT, array(&$this, "handleSignal"), true);
         }
     }
+
     /**
      * Sets the PID file name (file name only). Normally this is not needed, the class name is used.
+     *
      * @param string $pidFile
      */
     public function setPidFile($pidFile) {
-        $this->_pidFile = $pidFile;
+        $this->pidFile = $pidFile;
     }
+
     /**
      * Get the PID file name.
+     *
      * @return string
      */
     public function getPidFile() {
-        return $this->_pidFile;
+        return $this->pidFile;
     }
+
     /**
      * Set the PID file path. This MUST be on a filesystem, that supports locking.
      * DO NOT USE NFS FOR IT! You have been warned.
+     *
      * @param string $pidPath
      */
     public function setPidPath($pidPath) {
-        $this->_pidPath = $pidPath;
+        $this->pidPath = $pidPath;
     }
+
     /**
      * Get the PID file path
+     *
      * @return string
      */
     public function getPidPath() {
-        return $this->_pidPath;
+        return $this->pidPath;
     }
+
     /**
      * Returns the full path of the PID file
+     *
      * @return string
      */
     public function getFullPidFile() {
-        return $this->_pidPath . DIRECTORY_SEPARATOR . $this->_pidFile;
+        return $this->pidPath . DIRECTORY_SEPARATOR . $this->pidFile;
     }
+
     /**
      * Acquires the lock on the PID file and inserts the PID.
+     *
      * @return boolean
      */
     private function acquireLock() {
@@ -124,21 +145,23 @@ abstract class CronJob {
         if (function_exists('posix_getpid')) {
             fwrite($fp, posix_getpid() . PHP_EOL);
         }
-        $this->_lockFd = $fp;
+        $this->lockFd = $fp;
         return true;
     }
+
     /**
      * Truncates and releases the lock on the PID file.
      */
     private function releaseLock() {
-        if ($this->_lockFd) {
-            $fp = $this->_lockFd;
-            $this->_lockFd = null;
+        if ($this->lockFd) {
+            $fp           = $this->lockFd;
+            $this->lockFd = null;
             ftruncate($fp, 0);
             flock($fp, LOCK_UN);
             fclose($fp);
         }
     }
+
     /**
      * Acquires the lock, runs the cronjob and then releases it.
      */
@@ -150,23 +173,26 @@ abstract class CronJob {
             $this->releaseLock();
         }
     }
+
     /**
      * Sets the signal handlers
      */
     private function setSignalHandler() {
-        $this->_handleSignals = true;
+        $this->handleSignals = true;
     }
+
     /**
      * Removes the signal handlers
      */
     private function removeSignalHandler() {
-        $this->_handleSignals = false;
+        $this->handleSignals = false;
     }
+
     /**
      * Signal handler
      */
     final protected function handleSignal($signo) {
-        if ($this->_handleSignals) {
+        if ($this->handleSignals) {
             switch ($signo) {
                 case SIGTERM:
                 case SIGHUP:
@@ -178,6 +204,7 @@ abstract class CronJob {
             }
         }
     }
+
     /**
      * This function is called, if the process receives an interrupt, term signal, etc. It can be used to clean up
      * stuff. Note, that this function is not guaranteed to run or it may run after execution.
@@ -185,6 +212,7 @@ abstract class CronJob {
     protected function abort() {
 
     }
+
     /**
      * Function to do the actual work.
      */
