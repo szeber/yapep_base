@@ -433,7 +433,7 @@ class HttpResponse implements IResponse {
      */
     public function getHeader($header) {
         if (!$this->hasHeader($header)) {
-            throw new \YapepBase\Exception\IndexOutOfBoundsException('The ' . $header . ' has not been set.');
+            throw new \YapepBase\Exception\IndexOutOfBoundsException($header);
         }
         return $this->headers[$header];
     }

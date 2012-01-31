@@ -92,7 +92,7 @@ abstract class DbConnection {
      * @param string $query    The query to execute.
      * @param array  $params   The parameters for the query.
      *
-     * @return \PDOStatement   The result of the query.
+     * @return \YapepBase\Database\DbResult   The result of the query.
      *
      * @throws \YapepBase\Exception\DatabaseException   On execution errors.
      */
@@ -188,5 +188,24 @@ abstract class DbConnection {
      */
     public function quote($value) {
         return $this->connection->quote($value, $this->getParamType($value));
+    }
+
+    /**
+     * Returns the last insert id for the connection.
+     *
+     * @param string $name   Name of the sequence object from which the ID should be returned.
+     *
+     * @return string
+     *
+     * @throws DatabaseException   If the driver does not support the capability.
+     *
+     * @see PDO::lastInsertId()
+     */
+    public function lastInsertId($name = null) {
+        try {
+            return $this->connection->lastInsertId($name);
+        } catch (PDOException $exception) {
+            throw new DatabaseException($exception->getMessage(), 0, $exception);
+        }
     }
 }
