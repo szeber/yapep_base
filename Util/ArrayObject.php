@@ -49,7 +49,6 @@ abstract class ArrayObject implements \Iterator, \ArrayAccess, \Countable, \Seri
 	 * @param type $data
 	 */
 	public function __construct($data = null) {
-		parent::__construct();
 		if (\is_array($data)) {
 			foreach ($data as $key => $value) {
 				$this->offsetSet($key, $value);
