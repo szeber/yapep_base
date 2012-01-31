@@ -231,6 +231,8 @@ class HttpResponse implements IResponse {
 
     /**
      * Sends the response
+     *
+     * @todo make sending non-rendered output configurable (defaults to not sending it)
      */
     public function send() {
         if ($this->isResponseSent) {

@@ -135,6 +135,17 @@ class HttpRequest implements IRequest {
     }
 
     /**
+     * Returns TRUE if there is a GET parameter set in the request with the specified name.
+     *
+     * @param string $name
+     *
+     * @return bool
+     */
+    public function hasGet($name) {
+        return $this->has($name, 'G');
+    }
+
+    /**
      * Returns the POST parameter specified, or the default value, if it's not set.
      *
      * @param string $name      The name of the parameter.
@@ -150,6 +161,17 @@ class HttpRequest implements IRequest {
     }
 
     /**
+     * Returns TRUE if there is a POST parameter set in the request with the specified name.
+     *
+     * @param string $name
+     *
+     * @return bool
+     */
+    public function hasPost($name) {
+        return $this->has($name, 'P');
+    }
+
+    /**
      * Returns the specified cookie, or the default value, if it's not set.
      *
      * @param string $name      The name of the cookie.
@@ -162,6 +184,17 @@ class HttpRequest implements IRequest {
             return $this->cookies[$name];
         }
         return $default;
+    }
+
+    /**
+     * Returns TRUE if there is a cookie set in the request with the specified name.
+     *
+     * @param string $name
+     *
+     * @return bool
+     */
+    public function hasCookie($name) {
+        return $this->has($name, 'C');
     }
 
     /**
@@ -237,6 +270,27 @@ class HttpRequest implements IRequest {
         }
 
         return $result;
+    }
+
+    /**
+     * Returns TRUE if the specified request parameter from the specified source is set.
+     *
+     * @param string $name     The name of the param.
+     * @param string $source   The sources of the parameter. 'G' for GET, 'P' for POST, 'C' for Cookie.
+     *
+     * @return bool
+     */
+    public function has($name, $source = 'GP') {
+        $source = strtoupper($source);
+
+        if (
+            (strstr($source, 'G') && isset($this->getParams[$name]))
+            || (strstr($source, 'P') && isset($this->postParams[$name]))
+            || (strstr($source, 'C') && isset($this->cookies[$name]))
+        ) {
+            return true;
+        }
+        return false;
     }
 
     /**
