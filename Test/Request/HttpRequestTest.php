@@ -58,9 +58,11 @@ class HttpRequestTest extends \PHPUnit_Framework_TestCase {
 		);
 	    $post = array(
 			'param' => 'post_param',
+	        'post_param' => 1,
 		);
 		$cookie = array(
 			'param' => 'cookie_param',
+		    'cookie' => 1,
 	    );
         $env = array(
             'envParam' => 'env_value',
@@ -329,5 +331,19 @@ class HttpRequestTest extends \PHPUnit_Framework_TestCase {
 	    	'text/html; level=2 fails');
 	    $this->assertTrue($request->checkIfContentTypeIsPreferred('text/html; level=3'),
 	    	'text/html; level=3 fails');
+    }
+
+    public function testHas() {
+        $this->assertFalse($this->request->has('username', 'PC'));
+        $this->assertTrue($this->request->has('username', 'G'));
+
+        $this->assertTrue($this->request->hasGet('username'));
+        $this->assertFalse($this->request->hasGet('post_param'));
+
+        $this->assertTrue($this->request->hasPost('post_param'));
+        $this->assertFalse($this->request->hasPost('cookie'));
+
+        $this->assertTrue($this->request->hasCookie('cookie'));
+        $this->assertFalse($this->request->hasCookie('post_param'));
     }
 }

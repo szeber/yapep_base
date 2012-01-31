@@ -9,7 +9,6 @@
  * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
-
 namespace YapepBase\View;
 use YapepBase\Exception\ViewException;
 use YapepBase\Mime\MimeType;

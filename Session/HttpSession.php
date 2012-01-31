@@ -110,6 +110,8 @@ class HttpSession extends SessionAbstract {
      * This method is called when the session has been initialized (loaded or created).
      *
      * @see YapepBase\Session.SessionAbstract::sessionInitialized()
+     *
+     * @todo move cache limiter to response&controller
      */
     protected function sessionInitialized() {
         parent::sessionInitialized();
