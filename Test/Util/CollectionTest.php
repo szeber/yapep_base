@@ -172,8 +172,8 @@ class CollectionTest extends \PHPUnit_Framework_TestCase {
         $collection3->add($o1);
         $collection3->add($o3);
         $collection2->retainAll($collection3);
-        $this->assertEquals(false, $collection2->contains($o1));
         $this->assertEquals(true, $collection2->contains($o1));
-        $this->assertEquals(true, $collection2->contains($o1));
+        $this->assertEquals(false, $collection2->contains($o2));
+        $this->assertEquals(true, $collection2->contains($o3));
     }
 }
