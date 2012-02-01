@@ -2,6 +2,11 @@
 
 namespace YapepBase\Test\Mock\Database;
 
+/**
+ * Mock class for PDOStatement
+ *
+ * @codeCoverageIgnore
+ */
 class PDOStatementMock extends \PDOStatement {
     protected $data;
     public function __construct($data) {
