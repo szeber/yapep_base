@@ -39,6 +39,8 @@ abstract class ArrayObject implements \Iterator, \ArrayAccess, \Countable, \Seri
 	 *
 	 * @throws \YapepBase\Exception\TypeException if the Collection cannot contain this element
 	 * 	type.
+     *
+     * @codeCoverageIgnore
 	 */
 	protected function typeCheck($element) {
 

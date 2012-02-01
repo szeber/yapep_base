@@ -211,6 +211,8 @@ abstract class CronJob {
     /**
      * This function is called, if the process receives an interrupt, term signal, etc. It can be used to clean up
      * stuff. Note, that this function is not guaranteed to run or it may run after execution.
+     *
+     * @codeCoverageIgnore
      */
     protected function abort() {
 

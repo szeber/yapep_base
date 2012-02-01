@@ -237,7 +237,9 @@ class ErrorHandlerRegistry {
         if (0 == $idTimeout) {
             return md5($message . $file . (string)$line . php_uname('n'));
         } else {
+            // @codeCoverageIgnoreStart
             return md5($message . $file . (string)$line . php_uname('n') . floor(time() / $idTimeout));
+            // @codeCoverageIgnoreEnd
         }
     }
 
