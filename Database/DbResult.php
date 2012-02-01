@@ -86,6 +86,8 @@ class DbResult implements Iterator {
         $this->row = $this->statement->fetch(PDO::FETCH_ASSOC);
         if (false !== $this->row) {
             $this->rowIndex++;
+        } else {
+            $this->rowIndex = null;
         }
         return $this->row;
     }
