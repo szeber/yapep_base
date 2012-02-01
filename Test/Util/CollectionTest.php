@@ -42,4 +42,52 @@ class CollectionTest extends \PHPUnit_Framework_TestCase {
             $this->fail('offsetUnset on a non existent element in a Collection should result in an IndexOutOfBoundsException');
         } catch (\YapepBase\Exception\IndexOutOfBoundsException $e) { }
     }
+
+    public function testKeyCheck() {
+        $this->setExpectedException('\YapepBase\Exception\ValueException');
+        $collection = new \YapepBase\Test\Mock\Util\CollectionMock();
+        $o = new \YapepBase\Test\Mock\Util\CollectionElementMock();
+        $collection->offsetSet('test', $o);
+        $this->fail('Collection::keyCheck should throw a ValueException, if a string offset is passed');
+    }
+
+    public function testIterator() {
+        $collection = new \YapepBase\Test\Mock\Util\CollectionMock();
+        $this->assertEquals(false, $collection->rewind());
+        $o1 = new \YapepBase\Test\Mock\Util\CollectionElementMock();
+        $o2 = new \YapepBase\Test\Mock\Util\CollectionElementMock();
+        $o3 = new \YapepBase\Test\Mock\Util\CollectionElementMock();
+        $collection[] = $o1;
+        $collection[] = $o2;
+        $collection[] = $o3;
+        $this->assertEquals($o1, $collection->current());
+        $this->assertEquals(0, $collection->key());
+        $this->assertEquals(true, $collection->valid());
+        $this->assertEquals($o1, $collection->next());
+
+        $this->assertEquals($o2, $collection->current());
+        $this->assertEquals(1, $collection->key());
+        $this->assertEquals(true, $collection->valid());
+        $this->assertEquals($o2, $collection->next());
+
+        $this->assertEquals($o3, $collection->current());
+        $this->assertEquals(2, $collection->key());
+        $this->assertEquals(true, $collection->valid());
+        $this->assertEquals($o3, $collection->next());
+
+        $this->assertEquals(false, $collection->valid());
+        try {
+            $collection->current();
+            $this->fail('Calling Collection::current() at the end of the collection should result in an IndexOutOfBoundsException');
+        } catch (\YapepBase\Exception\IndexOutOfBoundsException $e) { }
+        try {
+            $collection->next();
+            $this->fail('Calling Collection::next() at the end of the collection should result in an IndexOutOfBoundsException');
+        } catch (\YapepBase\Exception\IndexOutOfBoundsException $e) { }
+
+        $this->assertEquals(true, $collection->rewind());
+        $this->assertEquals($o1, $collection->current());
+        $this->assertEquals(0, $collection->key());
+        $this->assertEquals(true, $collection->valid());
+    }
 }

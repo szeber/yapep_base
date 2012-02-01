@@ -176,6 +176,7 @@ abstract class ArrayObject implements \Iterator, \ArrayAccess, \Countable, \Seri
 	 */
 	public function next() {
 		$current = each($this->data);
+        var_dump($current);
 		if ($current === false) {
 			throw new \YapepBase\Exception\IndexOutOfBoundsException();
 		} else {
