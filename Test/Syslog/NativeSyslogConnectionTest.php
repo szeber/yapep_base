@@ -48,6 +48,14 @@ class NativeSyslogConnectionTest extends \PHPUnit_Framework_TestCase {
         }
     }
 
+    protected function getLogpath() {
+        $logpath = getenv('YAPEPBASE_TEST_LOGPATH');
+        if (empty ($logpath)) {
+            $logpath = \dirname(__DIR__) . '/Temp/Syslog/log';
+        }
+        return $logpath;
+    }
+
     protected function getSyslogMessage() {
         if (!$this->dgram) {
             $client = \socket_accept($this->sock);
@@ -107,7 +115,8 @@ class NativeSyslogConnectionTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testLogging() {
-        $logpath = \dirname(__DIR__) . '/Temp/Syslog/log';
+        $logpath = $this->getLogpath();
+
         $this->object->setFacility(Syslog::LOG_USER);
         $this->object->setPath($logpath);
         $this->object->setIdent('test');
@@ -122,7 +131,7 @@ class NativeSyslogConnectionTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testLoggingWithNoParams() {
-        $logpath = \dirname(__DIR__) . '/Temp/Syslog/log';
+        $logpath = $this->getLogpath();
 
         $this->initSyslogServer($logpath);
         $this->object->setPath($logpath);
@@ -166,7 +175,7 @@ class NativeSyslogConnectionTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testDgramSockets() {
-        $logpath = \dirname(__DIR__) . '/Temp/Syslog/log';
+        $logpath = $this->getLogpath();
         $this->object->setFacility(Syslog::LOG_USER);
         $this->object->setPath($logpath);
         $this->object->setIdent('test');
@@ -180,7 +189,7 @@ class NativeSyslogConnectionTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testLegacyCalls() {
-        $logpath = \dirname(__DIR__) . '/Temp/Syslog/log';
+        $logpath = $this->getLogpath();
         $this->object->setPath($logpath);
 
         $this->initSyslogServer($logpath, true);

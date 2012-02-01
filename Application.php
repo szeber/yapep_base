@@ -165,7 +165,7 @@ class Application {
 	/**
 	 * Returns the request object used by the application.
 	 *
-     * @return \YapepBase\Request\
+     * @return \YapepBase\Request\IRequest
      */
     public function getRequest() {
         return $this->request;
