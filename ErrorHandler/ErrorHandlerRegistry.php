@@ -63,7 +63,9 @@ class ErrorHandlerRegistry {
     }
 
     /**
-     * Unregisters as the system errror handler container.
+     * Unregisters as the system error handler container.
+     *
+     * @codeCoverageIgnore
      */
     public function unregister() {
         if ($this->isRegistered) {
@@ -142,13 +144,14 @@ class ErrorHandlerRegistry {
             $errorHandler->handleError($errorLevel, $message, $file, $line, $context, $errorId, $backTrace);
         }
 
+        // @codeCoverageIgnoreStart
         if ($this->isErrorFatal($errorLevel)) {
             // We encountered a fatal error, so we output an error and exit
-            restore_error_handler();
-            restore_exception_handler();
+            $this->unregister();
             Application::getInstance()->outputError();
             exit;
         }
+        // @codeCoverageIgnoreEnd
 
         return true;
     }
@@ -158,9 +161,10 @@ class ErrorHandlerRegistry {
      *
      *
      * Should not be called manually, only by PHP.
-     * @param Exception $exception
+     * @param \Exception $exception
      */
     public function handleException($exception) {
+        // @codeCoverageIgnoreStart
         if (!($exception instanceof \Exception)) {
             // The error handlers can only handle exceptions that are descendants of the Exception built in class
             trigger_error('Unable to handle exception of type: ' . get_class($exception), E_USER_ERROR);
@@ -169,10 +173,11 @@ class ErrorHandlerRegistry {
 
         if (empty($this->errorHandlers)) {
             // We have no error handlers, trigger an error and let the default error handler handle it
-            restore_error_handler();
+            $this->unregister();
             trigger_error('Unhandled exception: ' . $exception->getMessage(), E_USER_ERROR);
             return;
         }
+        // @codeCoverageIgnoreEnd
 
         $errorId = $this->generateErrorId($exception->getMessage(), $exception->getFile(), $exception->getLine());
 
@@ -183,6 +188,8 @@ class ErrorHandlerRegistry {
 
     /**
      * Handles script shutdown.
+     *
+     * @codeCoverageIgnore
      */
     public function handleShutdown() {
         $error = error_get_last();
@@ -193,7 +200,7 @@ class ErrorHandlerRegistry {
 
         // We are shutting down because of a fatal error, if any more errors occur, they should be handled by
         // the default error handler.
-        restore_error_handler();
+        $this->unregister();
 
         // Shutdown because of a fatal error
         if (empty($this->errorHandlers)) {
@@ -227,7 +234,11 @@ class ErrorHandlerRegistry {
         $idTimeout = Config::getInstance()->get('system.errorHandling.defaultIdTimeout',
             self::ERROR_HANDLING_DEFAULT_ID_TIMEOUT);
 
-        return md5($message . $file . (string)$line . php_uname('n') . floor(time() / $idTimeout));
+        if (0 == $idTimeout) {
+            return md5($message . $file . (string)$line . php_uname('n'));
+        } else {
+            return md5($message . $file . (string)$line . php_uname('n') . floor(time() / $idTimeout));
+        }
     }
 
     /**
@@ -236,6 +247,8 @@ class ErrorHandlerRegistry {
      * @param int $errorLevel
      *
      * @return bool
+     *
+     * @codeCoverageIgnore
      */
     protected function isErrorFatal($errorLevel) {
         switch($errorLevel) {
