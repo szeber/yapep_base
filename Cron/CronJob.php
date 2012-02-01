@@ -43,34 +43,34 @@ abstract class CronJob {
      *
      * @var string
      */
-    private $pidFile = '';
+    protected $pidFile = '';
 
     /**
      * Stores the path of the PID file
      *
      * @var string
      */
-    private $pidPath = '/var/run';
+    protected $pidPath = '/var/run';
 
     /**
      * Stores the lock file descriptor
      *
      * @var resource
      */
-    private $lockFd;
+    protected $lockFd;
 
     /**
      * Handle signals in the signal handler.
      *
      * @var bool
      */
-    private $handleSignals = false;
+    protected $handleSignals = false;
 
     /**
      * PHP 5 constructor
      */
     public function __construct() {
-        $this->pidFile = get_class($this) . '.pid';
+        $this->pidFile = trim(strtr(get_class($this), '\\', '_'), '_') . '.pid';
         if (function_exists('pcntl_signal')) {
             pcntl_signal(SIGTERM, array(&$this, "handleSignal"), true);
             pcntl_signal(SIGHUP, array(&$this, "handleSignal"), true);
@@ -129,12 +129,14 @@ abstract class CronJob {
      *
      * @return boolean
      */
-    private function acquireLock() {
+    protected function acquireLock() {
         $pidFile = $this->getFullPidFile();
         if (!$fp = fopen($pidFile, 'a+')) {
             //We can't open the PID file
+            //@codeCoverageIgnoreStart
             trigger_error('Can\'t open PID file: ' . $pidFile, E_USER_WARNING);
             return false;
+            //@codeCoverageIgnoreEnd
         }
         if (!flock($fp, LOCK_EX | LOCK_NB)) {
             //File is locked by an other instance, skip this run.
@@ -152,7 +154,7 @@ abstract class CronJob {
     /**
      * Truncates and releases the lock on the PID file.
      */
-    private function releaseLock() {
+    protected function releaseLock() {
         if ($this->lockFd) {
             $fp           = $this->lockFd;
             $this->lockFd = null;
@@ -177,19 +179,20 @@ abstract class CronJob {
     /**
      * Sets the signal handlers
      */
-    private function setSignalHandler() {
+    protected function setSignalHandler() {
         $this->handleSignals = true;
     }
 
     /**
      * Removes the signal handlers
      */
-    private function removeSignalHandler() {
+    protected function removeSignalHandler() {
         $this->handleSignals = false;
     }
 
     /**
      * Signal handler
+     * @codeCoverageIgnore
      */
     final protected function handleSignal($signo) {
         if ($this->handleSignals) {
