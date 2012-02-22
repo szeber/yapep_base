@@ -128,7 +128,13 @@ class MemcachedStorage extends StorageAbstract {
      * @throws \YapepBase\Exception\ParameterException    If TTL is set and not supported by the backend.
      */
     public function set($key, $data, $ttl = 0) {
-        $this->memcache->set($this->makeKey($key), $data, $ttl);
+        if (!$this->memcache->set($this->makeKey($key), $data, $ttl)) {
+            $code = $this->memcache->getResultCode();
+            if (\Memcached::RES_NOTSTORED !== $code) {
+                throw new StorageException('Unable to store value in memcache. Error: '
+                    . $this->memcache->getResultMessage(), $this->memcache->getResultCode());
+            }
+        }
 
     }
 
@@ -142,8 +148,15 @@ class MemcachedStorage extends StorageAbstract {
      * @throws \YapepBase\Exception\StorageException      On error.
      */
     public function get($key) {
-        return $this->memcache->get($this->makeKey($key));
-
+        $result = $this->memcache->get($this->makeKey($key));
+        if (false === $result) {
+            $code = $this->memcache->getResultCode();
+            if (\Memcached::RES_NOTFOUND !== $code) {
+                throw new StorageException('Unable to get value in memcache. Error: '
+                    . $this->memcache->getResultMessage(), $this->memcache->getResultCode());
+            }
+        }
+        return $result;
     }
 
     /**

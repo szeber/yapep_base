@@ -11,13 +11,9 @@
 
 namespace YapepBase;
 use YapepBase\Exception\RedirectException;
-
 use YapepBase\Event\Event;
-
 use YapepBase\Response\IResponse;
-
 use YapepBase\Request\IRequest;
-
 use YapepBase\ErrorHandler\IErrorHandler;
 use YapepBase\Router\IRouter;
 use YapepBase\DependencyInjection\SystemContainer;
