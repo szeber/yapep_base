@@ -189,9 +189,9 @@ class SystemContainer extends Pimple {
      * Searches for the class in all the search namespaces for the given type
      *
      * @param string $type             The type of class to search for. {@uses self::NAMESPACE_SEARCH_*}
-     * @param string $controllerName
+     * @param string $className
      *
-     * @return string controller name
+     * @return string class name
      *
      * @throws \YapepBase\Exception\DiException           If the class is not found
      */
@@ -334,7 +334,7 @@ class SystemContainer extends Pimple {
     /**
      * Returns a layout by it's name
      *
-     * @param string $templateName   The name of the template class to return.
+     * @param string $layoutName   The name of the template class to return.
      *                               (Without the namespace and Template suffix)
      *
      * @return \YapepBase\View\Layout
