@@ -164,6 +164,21 @@ abstract class ViewAbstract implements IView {
     }
 
     /**
+     * Helper method to access the target of the route specified by controller and action.
+     *
+     * @see \YapepBase\Router\IRouter::getTargetForControllerAction()
+     *
+     * @param string $controller   The name of the controller.
+     * @param string $action       The name of the action in the controller.
+     * @param array $params        The parameters for the route.
+     *
+     * @return string   The route target.
+     */
+    protected function getRouteTarget($controller, $action, array $params = array()) {
+        return Application::getInstance()->getRouter()->getTargetForControllerAction($controller, $action, $params);
+    }
+
+    /**
      * Does the actual rendering of the view
      */
     abstract protected function renderContent();
