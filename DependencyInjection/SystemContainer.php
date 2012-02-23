@@ -12,15 +12,11 @@
 
 namespace YapepBase\DependencyInjection;
 use YapepBase\Exception\ViewException;
-
 use YapepBase\Exception\ControllerException;
-
 use YapepBase\Exception\DiException;
-
 use YapepBase\Exception\Exception;
-
 use YapepBase\Session\SessionRegistry;
-
+use YapepBase\Log\LoggerRegistry;
 use YapepBase\Event\EventHandlerRegistry;
 use YapepBase\Response\IResponse;
 use YapepBase\Request\IRequest;
@@ -45,6 +41,8 @@ class SystemContainer extends Pimple {
     const KEY_EVENT_HANDLER_REGISTRY = 'eventHandlerRegistry';
     /** Session registry key. */
     const KEY_SESSION_REGISTRY = 'sessionRegistry';
+    /** Logger registry key. */
+    const KEY_LOGGER_REGISTRY = 'loggerRegistry';
     /** Memcache key. */
     const KEY_MEMCACHE = 'memcache';
     /** Memcache key. */
@@ -84,6 +82,9 @@ class SystemContainer extends Pimple {
         });
         $this[self::KEY_SESSION_REGISTRY] = $this->share(function($container) {
             return new SessionRegistry();
+        });
+        $this[self::KEY_LOGGER_REGISTRY] = $this->share(function($container) {
+            return new LoggerRegistry();
         });
         if (class_exists('\Memcache')) {
             $this[self::KEY_MEMCACHE] = function($container) {
@@ -131,6 +132,13 @@ class SystemContainer extends Pimple {
      */
     public function getSessionRegistry() {
         return $this[self::KEY_SESSION_REGISTRY];
+    }
+
+    /**
+     * @return \YapepBase\Log\LoggerRegistry
+     */
+    public function getLoggerRegistry() {
+        return $this[self::KEY_LOGGER_REGISTRY];
     }
 
     /**
@@ -401,6 +409,4 @@ class SystemContainer extends Pimple {
         trigger_error(__METHOD__ . ' called, use ' . __CLASS__ . '::addSearchNamespace instead', E_USER_DEPRECATED);
         $this->addSearchNamespace(self::NAMESPACE_SEARCH_BLOCK, $namespace);
     }
-
-
 }
