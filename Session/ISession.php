@@ -46,4 +46,11 @@ interface ISession extends \ArrayAccess, IEventHandler {
      */
     public function getNamespace();
 
+    /**
+     * Returns the session ID
+     *
+     * @return string
+     */
+    public function getId();
+
 }
