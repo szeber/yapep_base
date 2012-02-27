@@ -19,7 +19,7 @@ class IndexOutOfBoundsException extends \Exception {
     /**
      * Exception constructor
      *
-     * @param integer|string|false $offset the offset in question
+     * @param integer|string|bool $offset the offset in question
      */
     function __construct($offset = false) {
         if ($offset !== false) {

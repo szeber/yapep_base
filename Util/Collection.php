@@ -17,16 +17,16 @@ namespace YapepBase\Util;
  * array.
  */
 class Collection extends ArrayObject {
-	/**
-	 * Throws a \YapepBase\Exception\ValueException, if $offset is not an integer
-	 *
-	 * @param int $offset
-	 *
-	 * @throws \YapepBase\Exception\ValueException if $offset is not an integer.
-	 */
-	final protected function keyCheck($offset) {
-		if (!\is_int($offset)) {
-			throw new \YapepBase\Exception\ValueException($offset, "integer");
-		}
-	}
+    /**
+     * Throws a \YapepBase\Exception\ValueException, if $offset is not an integer
+     *
+     * @param int $offset
+     *
+     * @throws \YapepBase\Exception\ValueException if $offset is not an integer.
+     */
+    final protected function keyCheck($offset) {
+        if (!\is_int($offset)) {
+            throw new \YapepBase\Exception\ValueException($offset, "integer");
+        }
+    }
 }
