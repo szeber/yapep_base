@@ -109,7 +109,7 @@ class FileStorage extends StorageAbstract {
         $this->hashKey = (isset($config['hashKey']) ? (bool)$config['hashKey'] : false);
 
         if (!file_exists($this->path)) {
-            if (!mkdir($this->path, $this->fileMode, true)) {
+            if (!mkdir($this->path, ($this->fileMode | 0111), true)) {
                 throw new StorageException('Can not create directory for FileStorage');
             }
         } elseif (!is_dir(rtrim($this->path, '/'))) {
