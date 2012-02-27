@@ -170,9 +170,14 @@ abstract class CronJob {
     final public function run() {
         if ($this->acquireLock()) {
             $this->setSignalHandler();
-            $this->work();
+            try {
+                $this->work();
+            } catch (\Exception $e) { }
             $this->removeSignalHandler();
             $this->releaseLock();
+            if (isset($e)) {
+                throw $e;
+            }
         }
     }
 
