@@ -19,7 +19,12 @@ use YapepBase\Router\IRouter;
 use YapepBase\DependencyInjection\SystemContainer;
 use YapepBase\Debugger\IDebugger;
 use YapepBase\Exception\Exception;
+use YapepBase\Exception\HttpException;
 use YapepBase\ErrorHandler\ErrorHandlerRegistry;
+use YapepBase\Request\HttpRequest;
+use YapepBase\Exception\ControllerException;
+use YapepBase\Event\EventHandlerRegistry;
+use YapepBase\Exception\RouterException;
 
 /**
  * Application singleton class
@@ -207,8 +212,8 @@ class Application {
      * Runs the request on the application
      */
     public function run() {
+        $eventHandlerRegistry = $this->diContainer->getEventHandlerRegistry();
         try {
-            $eventHandlerRegistry = $this->diContainer->getEventHandlerRegistry();
             $eventHandlerRegistry->raise(new Event(Event::TYPE_APPSTART));
             $controllerName = null;
             $action = null;
@@ -218,15 +223,58 @@ class Application {
             $eventHandlerRegistry->raise(new Event(Event::TYPE_APPFINISH));
             $this->response->send();
             // @codeCoverageIgnoreStart
+        } catch (RouterException $exception) {
+            if ($exception->getCode() == RouterException::ERR_NO_ROUTE_FOUND) {
+                $this->runErrorAction(404);
+            } else {
+                $this->handleFatalException($exception);
+            }
+        } catch (HttpException $exception) {
+            $this->runErrorAction($exception->getCode());
         } catch (RedirectException $exception) {
             $eventHandlerRegistry->raise(new Event(Event::TYPE_APPFINISH));
             $this->response->send();
         } catch (\Exception $exception) {
-            // FIXME refine exception handling
-            var_dump($exception);
-            $this->outputError();
+            $this->handleFatalException($exception);
         }
         // @codeCoverageIgnoreEnd
+    }
+
+    /**
+     * Handles a fatal exception.
+     *
+     * @param \Exception $exception
+     */
+    protected function handleFatalException(\Exception $exception) {
+        if ($this->request instanceof \YapepBase\Request\HttpRequest) {
+            trigger_error('Unhandled exception of type: ' . get_class($exception), E_USER_ERROR);
+            // We have an HTTP request, try to run
+            try {
+                $this->runErrorAction(500);
+            } catch (\Exception $exception) {
+                $this->outputError();
+            }
+        } else {
+            // Not an HTTP request, just use default error output
+            $this->outputError();
+        }
+    }
+
+    /**
+     * Runs the error controller action for the specified HTTP error code.
+     *
+     * @param int $errorCode
+     */
+    protected function runErrorAction($errorCode) {
+        $controllerName = Config::getInstance()->get('system.errorController', 'Error');
+        try {
+            $controller = $this->diContainer->getController($controllerName, $this->request, $this->response);
+        } catch (ControllerException $exception) {
+            // No such controller, fall back to built in default
+            $controller = $this->diContainer->getDefaultErrorController($this->request, $this->response);
+        }
+        $controller->run($errorCode);
+        $this->response->send();
     }
 
     /**

@@ -47,6 +47,8 @@ class SystemContainer extends Pimple {
     const KEY_MEMCACHE = 'memcache';
     /** Memcache key. */
     const KEY_MEMCACHED = 'memcached';
+    /** Key containing the default error controller class' name. */
+    const KEY_DEFAULT_ERROR_CONTROLLER_NAME = 'defaultErrorControllerName';
 
     const NAMESPACE_SEARCH_BLOCK = 'block';
     const NAMESPACE_SEARCH_TEMPLATE = 'template';
@@ -96,6 +98,7 @@ class SystemContainer extends Pimple {
                 return new \Memcached();
             };
         }
+        $this[self::KEY_DEFAULT_ERROR_CONTROLLER_NAME] = '\\YapepBase\\Controller\\DefaultErrorController';
     }
 
     /**
@@ -171,6 +174,18 @@ class SystemContainer extends Pimple {
         }
         // @codeCoverageIgnoreEnd
         return $this[self::KEY_MEMCACHED];
+    }
+
+    /**
+     * Returns an instance of the default error controller.
+     *
+     * @param \YapepBase\Request\IRequest   $request    The request object.
+     * @param \YapepBase\Response\IResponse $response   The response object.
+     *
+     * @return \YapepBase\Controller\DefaultErrorController
+     */
+    public function getDefaultErrorController(IRequest $request, IResponse $response) {
+        return new $this[self::KEY_DEFAULT_ERROR_CONTROLLER_NAME]($request, $response);
     }
 
     /**
@@ -295,10 +310,10 @@ class SystemContainer extends Pimple {
     /**
      * Returns a controller by it's name.
      *
-     * @param string    $controllerName   The name of the controller class to return.
-     *                                    (Without the namespace and Controller suffix)
-     * @param IRequest  $request          The request object for the controller.
-     * @param IResponse $response         The response object for the controller.
+     * @param string                        $controllerName   The name of the controller class to return.
+     *                                                        (Without the namespace and Controller suffix)
+     * @param \YapepBase\Request\IRequest   $request          The request object for the controller.
+     * @param \YapepBase\Response\IResponse $response         The response object for the controller.
      *
      * @return \YapepBase\Controller\IController
      *
