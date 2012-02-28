@@ -35,7 +35,7 @@ class ErrorHandlerRegistry {
     /**
      * Set to TRUE if we are registered as the system error handler.
      *
-     * @var unknown_type
+     * @var bool
      */
     protected $isRegistered = false;
 
@@ -141,6 +141,7 @@ class ErrorHandlerRegistry {
         array_shift($backTrace);
 
         foreach($this->errorHandlers as $errorHandler) {
+            /** @var IErrorHandler $errorHandler */
             $errorHandler->handleError($errorLevel, $message, $file, $line, $context, $errorId, $backTrace);
         }
 
@@ -182,6 +183,7 @@ class ErrorHandlerRegistry {
         $errorId = $this->generateErrorId($exception->getMessage(), $exception->getFile(), $exception->getLine());
 
         foreach($this->errorHandlers as $errorHandler) {
+            /** @var IErrorHandler $errorHandler */
             $errorHandler->handleException($exception, $errorId);
         }
     }
@@ -213,6 +215,7 @@ class ErrorHandlerRegistry {
         $errorId = $this->generateErrorId($error['message'], $error['file'], $error['line']);
 
         foreach($this->errorHandlers as $errorHandler) {
+            /** @var IErrorHandler $errorHandler */
             $errorHandler->handleShutdown($error['type'], $error['message'], $error['file'], $error['line'], $errorId);
         }
     }
@@ -244,7 +247,7 @@ class ErrorHandlerRegistry {
     }
 
     /**
-     * Returns if the error should be considered fatal by the error level
+     * Returns if the error should be considered fatal by the error level.
      *
      * @param int $errorLevel
      *
@@ -258,7 +261,6 @@ class ErrorHandlerRegistry {
             case E_PARSE:
             case E_CORE_ERROR:
             case E_COMPILE_ERROR:
-            case E_USER_ERROR:
             case E_RECOVERABLE_ERROR:
                 return true;
                 break;
