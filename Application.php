@@ -27,7 +27,13 @@ use YapepBase\Event\EventHandlerRegistry;
 use YapepBase\Exception\RouterException;
 
 /**
- * Application singleton class
+ * Application singleton class.
+ *
+ * Global config options affecting this class:
+ * <ul>
+ *  <li>system.errorController: The name of the error controller for the application without the Controller suffix.
+ *                              If not defined, defaults to Error.</li>
+ * </ul>
  *
  * @package    YapepBase
  *
@@ -266,7 +272,7 @@ class Application {
      * @param int $errorCode
      */
     protected function runErrorAction($errorCode) {
-        $controllerName = Config::getInstance()->get('system.errorController', 'Error');
+        $controllerName = $this->config->get('system.errorController', 'Error');
         try {
             $controller = $this->diContainer->getController($controllerName, $this->request, $this->response);
         } catch (ControllerException $exception) {
