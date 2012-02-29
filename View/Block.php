@@ -60,7 +60,7 @@ abstract class Block extends ViewAbstract {
      * @param mixed  $rawValue   If set, the value is considered to be already escaped.
      */
     public function set($name, $value, $rawValue) {
-        $this->params[$name] = $value;
+        $this->$name = $value;
         $this->rawParams[$name] = $rawValue;
     }
 
