@@ -28,76 +28,82 @@ class SessionMock implements ISession {
         $this->namespace = $namespace;
     }
 
-	/**
-	 * (non-PHPdoc)
+    /**
+     * (non-PHPdoc)
      * @see YapepBase\Session.ISession::create()
      */
     public function create() {
     }
 
-	/**
-	 * (non-PHPdoc)
+    /**
+     * (non-PHPdoc)
      * @see YapepBase\Session.ISession::destroy()
      */
     public function destroy() {
     }
 
-	/**
-	 * (non-PHPdoc)
+    /**
+     * (non-PHPdoc)
      * @see YapepBase\Session.ISession::getNamespace()
      */
     public function getNamespace() {
         return $this->namespace;
     }
 
-	/**
-	 * (non-PHPdoc)
+    /**
+     * (non-PHPdoc)
      * @see YapepBase\Session.ISession::registerEventHandler()
      */
     public function registerEventHandler() {
     }
 
-	/**
-	 * (non-PHPdoc)
+    /**
+     * (non-PHPdoc)
      * @see YapepBase\Session.ISession::removeEventHandler()
      */
     public function removeEventHandler() {
     }
 
-	/**
-	 * (non-PHPdoc)
+    /**
+     * (non-PHPdoc)
      * @see YapepBase\Event.IEventHandler::handleEvent()
      */
     public function handleEvent(Event $event) {
     }
 
-	/**
-	 * (non-PHPdoc)
+    /**
+     * (non-PHPdoc)
      * @see ArrayAccess::offsetExists()
      */
     public function offsetExists($offset) {
     }
 
-	/**
-	 * (non-PHPdoc)
+    /**
+     * (non-PHPdoc)
      * @see ArrayAccess::offsetGet()
      */
     public function offsetGet($offset) {
     }
 
-	/**
-	 * (non-PHPdoc)
+    /**
+     * (non-PHPdoc)
      * @see ArrayAccess::offsetSet()
      */
     public function offsetSet($offset, $value) {
     }
 
-	/**
-	 * (non-PHPdoc)
+    /**
+     * (non-PHPdoc)
      * @see ArrayAccess::offsetUnset()
      */
     public function offsetUnset($offset) {
     }
 
+    /**
+     * (non-PHPdoc)
+     * @see ArrayAccess::offsetUnset()
+     */
+    public function getId() {
+    }
 
 }
