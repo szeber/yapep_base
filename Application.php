@@ -253,7 +253,8 @@ class Application {
      */
     protected function handleFatalException(\Exception $exception) {
         if ($this->request instanceof \YapepBase\Request\HttpRequest) {
-            trigger_error('Unhandled exception of type: ' . get_class($exception), E_USER_ERROR);
+            trigger_error('Unhandled exception of type: ' . get_class($exception) .'. Message: '
+                . $exception->getMessage(), E_USER_ERROR);
             // We have an HTTP request, try to run
             try {
                 $this->runErrorAction(500);
