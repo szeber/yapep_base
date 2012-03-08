@@ -74,7 +74,14 @@ abstract class ViewAbstract implements IView {
             ob_start();
         }
         $this->contentType = $contentType;
-        $this->renderContent();
+        try {
+            $this->renderContent();
+        } catch (\Exception $e) {
+            if ($return) {
+                ob_clean();
+            }
+            throw $e;
+        }
         if ($return) {
             return ob_get_clean();
         } else {
