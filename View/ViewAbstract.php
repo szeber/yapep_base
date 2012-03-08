@@ -143,6 +143,9 @@ abstract class ViewAbstract implements IView {
         if (empty($contentType)) {
             $contentType = $this->contentType;
         }
+        if (is_null($value)) {
+            return null;
+        }
         switch ($contentType) {
             case MimeType::JAVASCRIPT:
                 return \json_encode($value);
