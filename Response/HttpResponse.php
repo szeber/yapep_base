@@ -146,14 +146,14 @@ class HttpResponse implements IResponse {
     /**
      * Constructor.
      * @param \YapepBase\Response\IOutput $output The output handler to use.
-     *                                            Uses PHPOutput if none given.
+     *                                            Uses PhpOutput if none given.
      */
     public function __construct(IOutput $output = null) {
         $this->setContentType(MimeType::HTML);
         $this->startOutputBuffer();
         // @codeCoverageIgnoreStart
         if (!$output) {
-            $output = new PHPOutput();
+            $output = new PhpOutput();
         }
         // @codeCoverageIgnoreEnd
         $this->output = $output;
