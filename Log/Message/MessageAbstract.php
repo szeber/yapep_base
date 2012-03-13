@@ -70,4 +70,13 @@ abstract class MessageAbstract implements IMessage {
     public function getPriority() {
         return $this->priority;
     }
+
+    /**
+     * Checks the object is empty or not.
+     *
+     * @return bool
+     */
+    public function checkIsEmpty() {
+        return empty($this->message) && empty($this->fields);
+    }
 }

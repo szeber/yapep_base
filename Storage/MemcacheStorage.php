@@ -14,6 +14,7 @@ use YapepBase\Application;
 use YapepBase\Exception\StorageException;
 use YapepBase\Exception\ConfigException;
 use YapepBase\DependencyInjection\SystemContainer;
+use YapepBase\Debugger\IDebugger;
 
 /**
  * MemcacheStorage class
@@ -129,7 +130,20 @@ class MemcacheStorage extends StorageAbstract {
      * @throws \YapepBase\Exception\ParameterException    If TTL is set and not supported by the backend.
      */
     public function set($key, $data, $ttl = 0) {
+        $debugger = Application::getInstance()->getDiContainer()->getDebugger();
+
+        // If we have a debugger, we have to log the query
+        if ($debugger !== false) {
+            $queryId = $debugger->logQuery(IDebugger::QUERY_TYPE_CACHE, 'set ' . $key . ' for ' . $ttl, $data);
+            $startTime = microtime(true);
+        }
+
         $this->memcache->set($this->makeKey($key), $data, 0, $ttl);
+
+        // If we have a debugger, we have to log the execution time
+        if ($debugger !== false) {
+            $debugger->logQueryExecutionTime(IDebugger::QUERY_TYPE_CACHE, $queryId, microtime(true) - $startTime);
+        }
     }
 
     /**
@@ -142,7 +156,22 @@ class MemcacheStorage extends StorageAbstract {
      * @throws \YapepBase\Exception\StorageException      On error.
      */
     public function get($key) {
-        return $this->memcache->get($this->makeKey($key));
+        $debugger = Application::getInstance()->getDiContainer()->getDebugger();
+
+        // If we have a debugger, we have to log the query
+        if ($debugger !== false) {
+            $queryId = $debugger->logQuery(IDebugger::QUERY_TYPE_CACHE, 'get ' . $key);
+            $startTime = microtime(true);
+        }
+
+        $value = $this->memcache->get($this->makeKey($key));
+
+        // If we have a debugger, we have to log the execution time
+        if ($debugger !== false) {
+            $debugger->logQueryExecutionTime(IDebugger::QUERY_TYPE_CACHE, $queryId, microtime(true) - $startTime, $value);
+        }
+
+        return $value;
     }
 
     /**
@@ -153,7 +182,20 @@ class MemcacheStorage extends StorageAbstract {
      * @throws \YapepBase\Exception\StorageException      On error.
      */
     public function delete($key) {
+        $debugger = Application::getInstance()->getDiContainer()->getDebugger();
+
+        // If we have a debugger, we have to log the query
+        if ($debugger !== false) {
+            $queryId = $debugger->logQuery(IDebugger::QUERY_TYPE_CACHE, 'delete ' . $key);
+            $startTime = microtime(true);
+        }
+
         $this->memcache->delete($this->makeKey($key));
+
+        // If we have a debugger, we have to log the execution time
+        if ($debugger !== false) {
+            $debugger->logQueryExecutionTime(IDebugger::QUERY_TYPE_CACHE, $queryId, microtime(true) - $startTime);
+        }
     }
 
     /**

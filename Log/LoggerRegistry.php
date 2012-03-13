@@ -68,8 +68,9 @@ class LoggerRegistry implements ILogger {
      */
     public function log(IMessage $message) {
         foreach ($this->loggers as $logger) {
-            $logger->log($message);
+            if (!$logger->checkIsEmpty()) {
+                $logger->log($message);
+            }
         }
     }
-
 }

@@ -13,6 +13,7 @@
 namespace YapepBase\Log;
 use YapepBase\Exception\ConfigException;
 use YapepBase\Config;
+use YapepBase\Log\Message\IMessage;
 
 /**
  * LoggerAbstract class
@@ -47,6 +48,13 @@ abstract class LoggerAbstract implements ILogger {
     }
 
     /**
+     * It really logs the message.
+     *
+     * @param Message\IMessage $message   The message that should be logged.
+     */
+    abstract protected function logMessage(IMessage $message);
+
+    /**
      * Verifies the configuration. If there is an error with the config, it throws an exception.
      *
      * @param string $configName   The name of the configuration to validate.
@@ -55,5 +63,16 @@ abstract class LoggerAbstract implements ILogger {
      */
     protected function verifyConfig($configName) {
         // Default implementation does nothing, override in descendant classes to validate the configuration
+    }
+
+    /**
+     * Logs the message
+     *
+     * @param IMessage $message
+     */
+    public function log(IMessage $message) {
+        if (!$message->checkIsEmpty()) {
+            $this->logMessage($message);
+        }
     }
 }

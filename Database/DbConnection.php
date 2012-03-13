@@ -15,6 +15,8 @@ use YapepBase\Exception\DatabaseException;
 use \PDO;
 use \PDOException;
 use \PDOStatement;
+use YapepBase\Application;
+use YapepBase\Debugger\IDebugger;
 
 /**
  * DbConnection class
@@ -98,11 +100,25 @@ abstract class DbConnection {
      */
     public function query($query, array $params = array()) {
         try {
+            $debugger = Application::getInstance()->getDiContainer()->getDebugger();
+
+            // If we have a debugger, we have to log the query
+            if ($debugger !== false) {
+                $queryId = $debugger->logQuery(IDebugger::QUERY_TYPE_DB, $query, $params);
+                $startTime = microtime(true);
+            }
+
             $statement = $this->connection->prepare($query);
             foreach ($params as $key=>$value) {
                 $statement->bindValue(':' . $this->paramPrefix . $key, $value, $this->getParamType($value));
             }
             $statement->execute();
+
+            // If we have a debugger, we have to log the execution time
+            if ($debugger !== false) {
+                $debugger->logQueryExecutionTime(IDebugger::QUERY_TYPE_DB, $queryId, microtime(true) - $startTime);
+            }
+
             return new DbResult($statement);
         }
         catch (PDOException $exception) {

@@ -198,6 +198,33 @@ class HttpRequest implements IRequest {
     }
 
     /**
+     * Returns all of the parameters received through GET.
+     *
+     * @return array
+     */
+    public function getAllGet() {
+        return $this->getParams;
+    }
+
+    /**
+     * Returns all of the parameters received through POST.
+     *
+     * @return array
+     */
+    public function getAllPost() {
+        return $this->postParams;
+    }
+
+    /**
+     * Returns all of the parameters received through COOKIE.
+     *
+     * @return array
+     */
+    public function getAllCookie() {
+        return $this->cookies;
+    }
+
+    /**
      * Retruns the specified route param, or the default value if it's not set.
      *
      * @param string $name      The name of the cookie.

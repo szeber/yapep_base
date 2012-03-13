@@ -20,6 +20,45 @@ namespace YapepBase\ErrorHandler;
  */
 class ErrorHandlerHelper {
 
+    /** Code of the error represents an exception. (2^30) */
+    const E_EXCEPTION = 1073741824;
+
+    // Error descriptions
+    /** PHP Error description */
+    const E_ERROR_DESCRIPTION             = 'Error';
+    /** PHP Warning description */
+    const E_WARNING_DESCRIPTION           = 'Warning';
+    /** Parse error description */
+    const E_PARSE_DESCRIPTION             = 'Parse error';
+    /** PHP Notice description */
+    const E_NOTICE_DESCRIPTION            = 'Notice';
+    /** Core error description */
+    const E_CORE_ERROR_DESCRIPTION        = 'Core error';
+    /** Core warning description */
+    const E_CORE_WARNING_DESCRIPTION      = 'Core warning';
+    /** Compile error description */
+    const E_COMPILE_ERROR_DESCRIPTION     = 'Compile error';
+    /** Compile warning desription */
+    const E_COMPILE_WARNING_DESCRIPTION   = 'Compile warning';
+    /** User error description */
+    const E_USER_ERROR_DESCRIPTION        = 'User error';
+    /** User warning description */
+    const E_USER_WARNING_DESCRIPTION      = 'User warning';
+    /** User notice description */
+    const E_USER_NOTICE_DESCRIPTION       = 'User notice';
+    /** Strict error description */
+    const E_STRICT_DESCRIPTION            = 'Strict error';
+    /** Catchable fatal error description */
+    const E_RECOVERABLE_ERROR_DESCRIPTION = 'Catchable fatal error';
+    /** Deprecated description */
+    const E_DEPRECATED_DESCRIPTION        = 'Deprecated';
+    /** User deprecated description */
+    const E_USER_DEPRECATED_DESCRIPTION   = 'User deprecated';
+    /** Exception description */
+    const E_EXCEPTION_DESCRIPTION           = 'Exception';
+    /** Unknown error level description */
+    const UNKNOWN_DESCRIPTION             = 'Unknown';
+
     /**
      * Returns the description for the provided error level
      *
@@ -31,68 +70,72 @@ class ErrorHandlerHelper {
     public function getPhpErrorLevelDescription($errorLevel) {
         switch($errorLevel) {
             case E_ERROR:
-                $description = IErrorHandler::E_ERROR_DESCRIPTION;
+                $description = self::E_ERROR_DESCRIPTION;
                 break;
 
             case E_PARSE:
-                $description = IErrorHandler::E_PARSE_DESCRIPTION;
+                $description = self::E_PARSE_DESCRIPTION;
                 break;
 
             case E_WARNING:
-                $description = IErrorHandler::E_WARNING_DESCRIPTION;
+                $description = self::E_WARNING_DESCRIPTION;
                 break;
 
             case E_NOTICE:
-                $description = IErrorHandler::E_NOTICE_DESCRIPTION;
+                $description = self::E_NOTICE_DESCRIPTION;
                 break;
 
             case E_CORE_ERROR:
-                $description = IErrorHandler::E_CORE_ERROR_DESCRIPTION;
+                $description = self::E_CORE_ERROR_DESCRIPTION;
                 break;
 
             case E_CORE_WARNING:
-                $description = IErrorHandler::E_CORE_WARNING_DESCRIPTION;
+                $description = self::E_CORE_WARNING_DESCRIPTION;
                 break;
 
             case E_COMPILE_ERROR:
-                $description = IErrorHandler::E_COMPILE_ERROR_DESCRIPTION;
+                $description = self::E_COMPILE_ERROR_DESCRIPTION;
                 break;
 
             case E_COMPILE_WARNING:
-                $description = IErrorHandler::E_COMPILE_WARNING_DESCRIPTION;
+                $description = self::E_COMPILE_WARNING_DESCRIPTION;
                 break;
 
             case E_STRICT:
-                $description = IErrorHandler::E_STRICT_DESCRIPTION;
+                $description = self::E_STRICT_DESCRIPTION;
                 break;
 
             case E_RECOVERABLE_ERROR:
-                $description = IErrorHandler::E_RECOVERABLE_ERROR_DESCRIPTION;
+                $description = self::E_RECOVERABLE_ERROR_DESCRIPTION;
                 break;
 
             case E_DEPRECATED:
-                $description = IErrorHandler::E_DEPRECATED_DESCRIPTION;
+                $description = self::E_DEPRECATED_DESCRIPTION;
                 break;
 
             case E_USER_ERROR:
-                $description = IErrorHandler::E_USER_ERROR_DESCRIPTION;
+                $description = self::E_USER_ERROR_DESCRIPTION;
                 $isFatal = true;
                 break;
 
             case E_USER_WARNING:
-                $description = IErrorHandler::E_USER_WARNING_DESCRIPTION;
+                $description = self::E_USER_WARNING_DESCRIPTION;
                 break;
 
             case E_USER_NOTICE:
-                $description = IErrorHandler::E_USER_NOTICE_DESCRIPTION;
+                $description = self::E_USER_NOTICE_DESCRIPTION;
                 break;
 
             case E_USER_DEPRECATED:
-                $description = IErrorHandler::E_USER_DEPRECATED_DESCRIPTION;
+                $description = self::E_USER_DEPRECATED_DESCRIPTION;
+                break;
+
+            case self::E_EXCEPTION:
+                $description = self::E_EXCEPTION_DESCRIPTION;
                 break;
 
             default:
-                $description = IErrorHandler::UNKNOWN_DESCRIPTION;
+                $description = self::UNKNOWN_DESCRIPTION;
                 break;
         }
 

@@ -23,6 +23,7 @@ use YapepBase\Request\IRequest;
 use YapepBase\ErrorHandler\ErrorHandlerRegistry;
 use YapepBase\Lib\Pimple\Pimple;
 use YapepBase\Log\Message\ErrorMessage;
+use YapepBase\Debugger\IDebugger;
 
 /**
  * SystemContainer class
@@ -50,14 +51,25 @@ class SystemContainer extends Pimple {
     /** Key containing the default error controller class' name. */
     const KEY_DEFAULT_ERROR_CONTROLLER_NAME = 'defaultErrorControllerName';
 
+    /** Name of the namespace which holds the blocks. */
     const NAMESPACE_SEARCH_BLOCK = 'block';
+    /** Name of the namespace which holds the templates. */
     const NAMESPACE_SEARCH_TEMPLATE = 'template';
+    /** Name of the namespace which holds the layouts. */
     const NAMESPACE_SEARCH_LAYOUT = 'layout';
+    /** Name of the namespace which holds the controllers. */
     const NAMESPACE_SEARCH_CONTROLLER = 'controller';
 
+    /**
+     * DebugConsole object.
+     *
+     * @var \YapepBase\Debugger\IDebugger
+     */
+    protected $debugger;
 
     /**
      * List of namespaces to search in for each namespace search.
+     *
      * @var array
      */
     protected $searchNamespaces = array(
@@ -423,5 +435,28 @@ class SystemContainer extends Pimple {
     public function addBlockSearchNamespace($namespace) {
         trigger_error(__METHOD__ . ' called, use ' . __CLASS__ . '::addSearchNamespace instead', E_USER_DEPRECATED);
         $this->addSearchNamespace(self::NAMESPACE_SEARCH_BLOCK, $namespace);
+    }
+
+    /**
+     * Stores the given debugger.
+     *
+     * @param \YapepBase\Debugger\IDebugger $debugger   The debugger object.
+     *
+     * @return void
+     */
+    public function setDebugger(IDebugger $debugger) {
+        $this->debugger = $debugger;
+    }
+
+    /**
+     * Retursn the Debugger.
+     *
+     * @return bool|\YapepBase\Debugger\IDebugger   The debugger object, or false if its not set.
+     */
+    public function getDebugger() {
+        if (empty($this->debugger)) {
+            return false;
+        }
+        return $this->debugger;
     }
 }

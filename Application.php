@@ -226,7 +226,6 @@ class Application {
             $this->router->getRoute($controllerName, $action);
             $controller = $this->getDiContainer()->getController($controllerName, $this->request, $this->response);
             $controller->run($action);
-            $eventHandlerRegistry->raise(new Event(Event::TYPE_APPFINISH));
             $this->response->send();
             // @codeCoverageIgnoreStart
         } catch (RouterException $exception) {
@@ -238,11 +237,11 @@ class Application {
         } catch (HttpException $exception) {
             $this->runErrorAction($exception->getCode());
         } catch (RedirectException $exception) {
-            $eventHandlerRegistry->raise(new Event(Event::TYPE_APPFINISH));
             $this->response->send();
         } catch (\Exception $exception) {
             $this->handleFatalException($exception);
         }
+        $eventHandlerRegistry->raise(new Event(Event::TYPE_APPFINISH));
         // @codeCoverageIgnoreEnd
     }
 

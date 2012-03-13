@@ -47,4 +47,11 @@ interface IMessage {
      * @return string
      */
     public function getMessage();
+
+    /**
+     * Checks the object is empty or not.
+     *
+     * @return bool
+     */
+    public function checkIsEmpty();
 }

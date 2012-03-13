@@ -32,13 +32,13 @@ use YapepBase\Exception\ConfigException;
  * @subpackage Log
  */
 class Syslog extends LoggerAbstract {
-    
+
     /**
      * The syslog connection
      * @var \YapepBase\Syslog\NativeSyslogConnection
      */
     protected $connection;
-    
+
     /**
      * Creates a syslog connection.
      * @todo  2011-12-09  Janoszen  Move platform testing to a separate class.
@@ -68,7 +68,7 @@ class Syslog extends LoggerAbstract {
         $this->connection->setOptions($options);
         $this->connection->open();
     }
-    
+
     /**
      * Closes the syslog connection.
      */
@@ -81,7 +81,7 @@ class Syslog extends LoggerAbstract {
      *
      * @param IMessage $message
      */
-    public function log(IMessage $message) {
+    protected function logMessage(IMessage $message) {
         $this->connection->log($message->getPriority(), $this->getLogMessage($message));
     }
 
@@ -120,5 +120,5 @@ class Syslog extends LoggerAbstract {
             throw new ConfigException('Configuration invalid for syslog: ' . $configName);
         }
     }
-    
+
 }

@@ -19,41 +19,6 @@ namespace YapepBase\ErrorHandler;
  * @subpackage ErrorHandler
  */
 interface IErrorHandler {
-    // Error descriptions
-    /** PHP Error description */
-    const E_ERROR_DESCRIPTION             = 'Error';
-    /** PHP Warning description */
-    const E_WARNING_DESCRIPTION           = 'Warning';
-    /** Parse error description */
-    const E_PARSE_DESCRIPTION             = 'Parse error';
-    /** PHP Notice description */
-    const E_NOTICE_DESCRIPTION            = 'Notice';
-    /** Core error description */
-    const E_CORE_ERROR_DESCRIPTION        = 'Core error';
-    /** Core warning description */
-    const E_CORE_WARNING_DESCRIPTION      = 'Core warning';
-    /** Compile error description */
-    const E_COMPILE_ERROR_DESCRIPTION     = 'Compile error';
-    /** Compile warning desription */
-    const E_COMPILE_WARNING_DESCRIPTION   = 'Compile warning';
-    /** User error description */
-    const E_USER_ERROR_DESCRIPTION        = 'User error';
-    /** User warning description */
-    const E_USER_WARNING_DESCRIPTION      = 'User warning';
-    /** User notice description */
-    const E_USER_NOTICE_DESCRIPTION       = 'User notice';
-    /** Strict error description */
-    const E_STRICT_DESCRIPTION            = 'Strict error';
-    /** Catchable fatal error description */
-    const E_RECOVERABLE_ERROR_DESCRIPTION = 'Catchable fatal error';
-    /** Deprecated description */
-    const E_DEPRECATED_DESCRIPTION        = 'Deprecated';
-    /** User deprecated description */
-    const E_USER_DEPRECATED_DESCRIPTION   = 'User deprecated';
-    /** Exception description */
-    const EXCEPTION_DESCRIPTION           = 'Exception';
-    /** Unknown error level description */
-    const UNKNOWN_DESCRIPTION             = 'Unknown';
 
     /**
      * Handles a PHP error
