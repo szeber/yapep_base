@@ -67,8 +67,9 @@ class LoggerRegistry implements ILogger {
      * @param \YapepBase\Log\Message\IMessage $message
      */
     public function log(IMessage $message) {
-        foreach ($this->loggers as $logger) {
-            if (!$logger->checkIsEmpty()) {
+        if (!$message->checkIsEmpty()) {
+            foreach ($this->loggers as $logger) {
+                /** @var ILogger $logger */
                 $logger->log($message);
             }
         }

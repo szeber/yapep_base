@@ -12,6 +12,7 @@
 
 namespace YapepBase\ErrorHandler;
 use YapepBase\Storage\IStorage;
+use YapepBase\ErrorHandler\ErrorHandlerHelper;
 
 /**
  * DebugDataCreator class
@@ -75,7 +76,7 @@ class DebugDataCreator implements IErrorHandler  {
     /**
      * Handles an uncaught exception. The exception must extend the \Exception class to be handled.
      *
-     * @param Exception $exception   The exception to handle.
+     * @param \Exception $exception   The exception to handle.
      * @param string $errorId        The internal ID of the error.
      */
     public function handleException(\Exception $exception, $errorId) {
@@ -84,7 +85,7 @@ class DebugDataCreator implements IErrorHandler  {
             return;
         }
 
-        $errorMessage = '[' . self::EXCEPTION_DESCRIPTION . ']: Unhandled ' . get_class($exception) .': '
+        $errorMessage = '[' . ErrorHandlerHelper::E_EXCEPTION_DESCRIPTION . ']: Unhandled ' . get_class($exception) .': '
             . $exception->getMessage() . '(' . $exception->getCode() .') on line ' . $exception->getLine() . ' in '
             . $exception->getFile();
 
