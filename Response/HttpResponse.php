@@ -251,7 +251,7 @@ class HttpResponse implements IResponse {
                 $this->output->header($name . ': ' . $value);
             }
         }
-        foreach($this->cookies as $cookie) {
+        foreach ($this->cookies as $cookie) {
             $this->output->setcookie($cookie['name'], $cookie['value'], $cookie['expiration'], $cookie['path'], $cookie['domain'],
                 $cookie['secure'], $cookie['httpOnly']);
         }
@@ -483,6 +483,15 @@ class HttpResponse implements IResponse {
             $contentTypeHeader .= '; charset=' . $charset;
         }
         $this->setHeader('Content-Type', $contentTypeHeader);
+    }
+
+    /**
+     * Returns the contentType of the current response.
+     *
+     * @return string   The content type for the response. {@uses MimeType::*}
+     */
+    public function getContentType() {
+       return $this->contentType;
     }
 
     /**

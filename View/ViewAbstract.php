@@ -4,7 +4,6 @@
  *
  * @package      YapepBase
  * @subpackage   View
- * @author       Zsolt Szeberenyi <szeber@yapep.org>
  * @copyright    2011 The YAPEP Project All rights reserved.
  * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
  */
@@ -17,7 +16,7 @@ use YapepBase\Mime\MimeType;
 use YapepBase\Config;
 
 /**
- * ViewAbstract class
+ * ViewAbstract class what should be extended by every View class.
  *
  * @package    YapepBase
  * @subpackage View
@@ -37,6 +36,24 @@ abstract class ViewAbstract implements IView {
      * @var string
      */
     protected $contentType;
+
+    /**
+     * Does the actual rendering.
+     */
+    abstract protected function renderContent();
+
+    /**
+     * Returns the rendered content.
+     *
+     * It returns the same as the {@link render()} prints.
+     *
+     * @return string
+     */
+    public function __toString() {
+        ob_start();
+        $this->render();
+        return ob_get_clean();
+    }
 
     /**
      * Constructor.
@@ -61,135 +78,57 @@ abstract class ViewAbstract implements IView {
     }
 
     /**
-     * Renders the view and returns it.
+     * Renders the view and prints it.
      *
-     * @param string $contentType   The content type of the response.
-     *                              {@uses \YapepBase\Mime\MimeType::*}
-     * @param bool   $return        If TRUE, the method will return the output, otherwise it will print it.
-     *
-     * @return string   The rendered view or NULL if not returned
+     * @return void
      */
-    public function render($contentType, $return = true) {
-        if ($return) {
-            ob_start();
-        }
-        $this->contentType = $contentType;
-        try {
-            $this->renderContent();
-        } catch (\Exception $e) {
-            if ($return) {
-                ob_clean();
-            }
-            throw $e;
-        }
-        if ($return) {
-            return ob_get_clean();
-        } else {
-            return null;
-        }
+    public function render() {
+        $this->renderContent();
     }
 
     /**
-     * Renders and outputs a block.
+     * Displays th given block
      *
-     * @param string $blockName   The name of the block.
-     * @param array  $params      The parameters for the block.
-     * @param array  $rawParams   The raw parameters for the block.
+     * @param \YapepBase\View\BlockAbstract $block   The block.
      *
-     * @return string   The rendered output of the block.
+     * @return void
      */
-    protected function renderBlock($blockName, array $params = array(), array $rawParams = array()) {
-        $block = Application::getInstance()->getDiContainer()->getBlock($blockName);
-        if (count($rawParams) != count($params)) {
-            throw new ViewException('The number of params does not match the number of raw params');
-        }
-        foreach($params as $name => $value) {
-            if (!array_key_exists($name, $rawParams)) {
-                throw new ViewException('The keys in the params do not match the keys in the raw params');
-            }
-            $block->set($name, $value, $rawParams[$name]);
-        }
-
-        // Render the block, and output it's contents
-        $block->render($this->contentType, false);
+    protected function renderBlock(BlockAbstract $block) {
+        $block->render();
     }
 
     /**
-     * Recursively escapes the data.
+     * Returns the the value registered to the given key.
      *
-     * @param mixed $data         The data to escape.
-     * @param bool  $escapeKeys   If TRUE then the keys will be escaped too.
+     * @param string $key   The name of the key.
+     * @param bool   $raw   if TRUE it will return the raw (unescaped) data.
      *
-     * @return mixed   The escaped data.
+     * @return mixed   The data stored with the given key.
      */
-    protected function escape($data, $escapeKeys = false) {
-        if (is_array($data) || (($data instanceof \Iterator) && ($data instanceof \ArrayAccess))) {
-            foreach($data as $key => $value) {
-                if ($escapeKeys) {
-                    unset($data[$key]);
-                    $data[$this->escapeSimpleValue($key)] = $this->escape($value);
-                } else {
-                    $data[$key] = $this->escape($value);
-                }
-            }
-            return $data;
-        } else {
-            return $this->escapeSimpleValue($data);
-        }
+    public function get($key, $raw = false) {
+        return Application::getInstance()->getDiContainer()->getViewDo()->get($key, $raw);
     }
 
     /**
-     * Escapes a simple value
+     * Checks the given key if it has a value.
      *
-     * @param mixed  $value
-     * @param string $contentType   The content type to use for escaping.
+     * @param string $key          The name of the key.
+     * @param bool   $checkIsSet   If TRUE it checks the existense of the key.
      *
-     * @return mixed
+     * @return bool   FALSE if it has a value/exist, TRUE if not.
      */
-    protected function escapeSimpleValue($value, $contentType = null) {
-        if (empty($contentType)) {
-            $contentType = $this->contentType;
-        }
-        if (is_null($value)) {
-            return null;
-        }
-        switch ($contentType) {
-            case MimeType::JAVASCRIPT:
-                return \json_encode($value);
-                break;
-
-            case MimeType::JSON:
-                // We don't escape JSON content, json_encode will take care of it.
-            case MimeType::CSS:
-                // We don't escape CSS content.
-                return $value;
-                break;
-
-            case MimeType::HTML:
-            case MimeType::XML:
-            default:
-                return htmlspecialchars($value, ENT_COMPAT, $this->charset);
-                break;
-        }
+    public function checkIsEmpty($key, $checkIsSet = false) {
+        return Application::getInstance()->getDiContainer()->getViewDo()->checkIsEmpty($key, $checkIsSet);
     }
 
     /**
-     * Helper method to access the target of the route specified by controller and action.
+     * Checks if the value is an array.
      *
-     * @see \YapepBase\Router\IRouter::getTargetForControllerAction()
+     * @param string $key   The name of the key.
      *
-     * @param string $controller   The name of the controller.
-     * @param string $action       The name of the action in the controller.
-     * @param array $params        The parameters for the route.
-     *
-     * @return string   The route target.
+     * @return bool   TRUE if its an array, FALSE if not.
      */
-    protected function getRouteTarget($controller, $action, array $params = array()) {
-        return Application::getInstance()->getRouter()->getTargetForControllerAction($controller, $action, $params);
+    public function checkIsArray($key) {
+        return Application::getInstance()->getDiContainer()->getViewDo()->checkIsArray($key);
     }
-
-    /**
-     * Does the actual rendering of the view
-     */
-    abstract protected function renderContent();
 }

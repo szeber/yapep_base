@@ -4,7 +4,6 @@
  *
  * @package      YapepBase
  * @subpackage   View
- * @author       Zsolt Szeberenyi <szeber@yapep.org>
  * @copyright    2011 The YAPEP Project All rights reserved.
  * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
  */
@@ -13,7 +12,7 @@
 namespace YapepBase\View;
 
 /**
- * View interface
+ * Interface what should be implemented by every View
  *
  * @package    YapepBase
  * @subpackage View
@@ -21,13 +20,9 @@ namespace YapepBase\View;
 interface IView {
 
     /**
-     * Renders the view and returns it.
+     * Renders the view and prints it.
      *
-     * @param string $contentType   The content type of the response.
-     *                              {@uses \YapepBase\Mime\MimeType::*}
-     * @param bool   $return        If TRUE, the method will return the output, otherwise it will print it.
-     *
-     * @return string   The rendered view or NULL if not returned
+     * @return void
      */
-    public function render($contentType, $return = true);
+    public function render();
 }

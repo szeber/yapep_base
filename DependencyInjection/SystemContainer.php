@@ -24,6 +24,9 @@ use YapepBase\ErrorHandler\ErrorHandlerRegistry;
 use YapepBase\Lib\Pimple\Pimple;
 use YapepBase\Log\Message\ErrorMessage;
 use YapepBase\Debugger\IDebugger;
+use YapepBase\View\ViewDo;
+use YapepBase\Mime\MimeType;
+
 
 /**
  * SystemContainer class
@@ -50,6 +53,8 @@ class SystemContainer extends Pimple {
     const KEY_MEMCACHED = 'memcached';
     /** Key containing the default error controller class' name. */
     const KEY_DEFAULT_ERROR_CONTROLLER_NAME = 'defaultErrorControllerName';
+    /** Key containing the ViewDo. */
+    const KEY_VIEW_DO = 'viewDo';
 
     /** Name of the namespace which holds the blocks. */
     const NAMESPACE_SEARCH_BLOCK = 'block';
@@ -111,6 +116,10 @@ class SystemContainer extends Pimple {
             };
         }
         $this[self::KEY_DEFAULT_ERROR_CONTROLLER_NAME] = '\\YapepBase\\Controller\\DefaultErrorController';
+
+        $this[self::KEY_VIEW_DO] = $this->share(function($container) {
+            return new ViewDo(MimeType::HTML);
+        });
     }
 
     /**
@@ -198,6 +207,15 @@ class SystemContainer extends Pimple {
      */
     public function getDefaultErrorController(IRequest $request, IResponse $response) {
         return new $this[self::KEY_DEFAULT_ERROR_CONTROLLER_NAME]($request, $response);
+    }
+
+    /**
+     * Returns the ViewDo.
+     *
+     * @return \YapepBase\View\ViewDo
+     */
+    public function getViewDo() {
+        return $this[self::KEY_VIEW_DO]();
     }
 
     /**

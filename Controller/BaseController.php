@@ -146,4 +146,18 @@ abstract class BaseController implements IController {
         $controller->run($action);
         throw new RedirectException($controllerName . '/' . $action, RedirectException::TYPE_INTERNAL);
     }
+
+    /**
+     * Stores one ore more value(s).
+     *
+     * @param string $nameOrData   The name of the key, or the storable data in an associative array.
+     * @param mixed  $value        The value.
+     *
+     * @throws Exception   If the key already exist.
+     *
+     * @return void
+     */
+    public function set($nameOrData, $value = null) {
+        Application::getInstance()->getDiContainer()->getViewDo()->set($nameOrData, $value);
+    }
 }
