@@ -25,39 +25,39 @@ class ErrorHandlerHelper {
 
     // Error descriptions
     /** PHP Error description */
-    const E_ERROR_DESCRIPTION             = 'Error';
+    const E_ERROR_DESCRIPTION             = 'E_ERROR';
     /** PHP Warning description */
-    const E_WARNING_DESCRIPTION           = 'Warning';
+    const E_WARNING_DESCRIPTION           = 'E_WARNING';
     /** Parse error description */
-    const E_PARSE_DESCRIPTION             = 'Parse error';
+    const E_PARSE_DESCRIPTION             = 'E_PARSE';
     /** PHP Notice description */
-    const E_NOTICE_DESCRIPTION            = 'Notice';
+    const E_NOTICE_DESCRIPTION            = 'E_NOTICE';
     /** Core error description */
-    const E_CORE_ERROR_DESCRIPTION        = 'Core error';
+    const E_CORE_ERROR_DESCRIPTION        = 'E_CORE_ERROR';
     /** Core warning description */
-    const E_CORE_WARNING_DESCRIPTION      = 'Core warning';
+    const E_CORE_WARNING_DESCRIPTION      = 'E_CORE_WARNING';
     /** Compile error description */
-    const E_COMPILE_ERROR_DESCRIPTION     = 'Compile error';
+    const E_COMPILE_ERROR_DESCRIPTION     = 'E_COMPILE_ERROR';
     /** Compile warning desription */
-    const E_COMPILE_WARNING_DESCRIPTION   = 'Compile warning';
+    const E_COMPILE_WARNING_DESCRIPTION   = 'E_COMPILE_WARNINING';
     /** User error description */
-    const E_USER_ERROR_DESCRIPTION        = 'User error';
+    const E_USER_ERROR_DESCRIPTION        = 'E_USER_ERROR';
     /** User warning description */
-    const E_USER_WARNING_DESCRIPTION      = 'User warning';
+    const E_USER_WARNING_DESCRIPTION      = 'E_USER_WARNING';
     /** User notice description */
-    const E_USER_NOTICE_DESCRIPTION       = 'User notice';
+    const E_USER_NOTICE_DESCRIPTION       = 'E_USER_NOTICE';
     /** Strict error description */
-    const E_STRICT_DESCRIPTION            = 'Strict error';
+    const E_STRICT_DESCRIPTION            = 'E_STRICT';
     /** Catchable fatal error description */
-    const E_RECOVERABLE_ERROR_DESCRIPTION = 'Catchable fatal error';
+    const E_RECOVERABLE_ERROR_DESCRIPTION = 'E_RECOVERABLE_ERROR';
     /** Deprecated description */
-    const E_DEPRECATED_DESCRIPTION        = 'Deprecated';
+    const E_DEPRECATED_DESCRIPTION        = 'E_DEPRECATED';
     /** User deprecated description */
-    const E_USER_DEPRECATED_DESCRIPTION   = 'User deprecated';
+    const E_USER_DEPRECATED_DESCRIPTION   = 'E_USER_DEPRECATED';
     /** Exception description */
-    const E_EXCEPTION_DESCRIPTION           = 'Exception';
+    const E_EXCEPTION_DESCRIPTION           = 'E_EXCEPTION';
     /** Unknown error level description */
-    const UNKNOWN_DESCRIPTION             = 'Unknown';
+    const UNKNOWN_DESCRIPTION             = 'UNKOWN';
 
     /**
      * Returns the description for the provided error level

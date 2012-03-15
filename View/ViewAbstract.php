@@ -23,14 +23,6 @@ use YapepBase\Config;
  * @subpackage View
  */
 abstract class ViewAbstract implements IView {
-
-    /**
-     * Stores the charset
-     *
-     * @var string
-     */
-    protected $charset;
-
     /**
      * Stores the content type
      *
@@ -42,28 +34,6 @@ abstract class ViewAbstract implements IView {
      * Does the actual rendering.
      */
     abstract protected function renderContent();
-
-    /**
-     * Constructor.
-     *
-     * @param string $charset   The charset for the view.
-     *
-     * @return string
-     */
-    public function __construct($charset = null) {
-        $this->charset = $charset;
-        if (empty($this->charset)) {
-            $this->charset = Config::getInstance()->get('system.defaultCharset');
-        }
-        $this->init();
-    }
-
-    /**
-     * Called at class construction
-     */
-    protected function init() {
-        // Implemented in descendant classes if neccessary
-    }
 
     /**
      * Renders the view and prints it.
