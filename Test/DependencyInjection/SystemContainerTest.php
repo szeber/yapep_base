@@ -44,19 +44,6 @@ class SystemContainerTest extends \PHPUnit_Framework_TestCase {
         $this->assertInstanceOf('\YapepBase\Controller\BaseController', $sc->getController('Mock', $request, $response));
     }
 
-    public function testGetBlock() {
-        $sc = new SystemContainer();
-        $sc->setSearchNamespaces(SystemContainer::NAMESPACE_SEARCH_BLOCK, array());
-        try {
-            $sc->getBlock('Mock');
-            $this->fail('Getting a block with an empty search array should result in a ViewException');
-        } catch (\YapepBase\Exception\ViewException $e) {
-            $this->assertEquals(\YapepBase\Exception\ViewException::ERR_BLOCK_NOT_FOUND, $e->getCode());
-        }
-        $sc->addSearchNamespace(SystemContainer::NAMESPACE_SEARCH_BLOCK, '\YapepBase\Test\Mock\View');
-        $this->assertInstanceOf('\YapepBase\View\Block', $sc->getBlock('Mock'));
-    }
-
     public function testGetTemplate() {
         $sc = new SystemContainer();
         $sc->setSearchNamespaces(SystemContainer::NAMESPACE_SEARCH_TEMPLATE, array());
@@ -67,19 +54,6 @@ class SystemContainerTest extends \PHPUnit_Framework_TestCase {
             $this->assertEquals(\YapepBase\Exception\ViewException::ERR_TEMPLATE_NOT_FOUND, $e->getCode());
         }
         $sc->addSearchNamespace(SystemContainer::NAMESPACE_SEARCH_TEMPLATE, '\YapepBase\Test\Mock\View');
-        $this->assertInstanceOf('\YapepBase\View\Template', $sc->getTemplate('Mock'));
-    }
-
-    public function testGetLayout() {
-        $sc = new SystemContainer();
-        $sc->setSearchNamespaces(SystemContainer::NAMESPACE_SEARCH_LAYOUT, array());
-        try {
-            $sc->getLayout('Mock');
-            $this->fail('Getting a layout with an empty search array should result in a ViewException');
-        } catch (\YapepBase\Exception\ViewException $e) {
-            $this->assertEquals(\YapepBase\Exception\ViewException::ERR_LAYOUT_NOT_FOUND, $e->getCode());
-        }
-        $sc->addSearchNamespace(SystemContainer::NAMESPACE_SEARCH_LAYOUT, '\YapepBase\Test\Mock\View');
-        $this->assertInstanceOf('\YapepBase\View\Layout', $sc->getLayout('Mock'));
+        $this->assertInstanceOf('\YapepBase\View\TemplateAbstract', $sc->getTemplate('Mock'));
     }
 }

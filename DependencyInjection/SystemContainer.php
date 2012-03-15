@@ -56,12 +56,8 @@ class SystemContainer extends Pimple {
     /** Key containing the ViewDo. */
     const KEY_VIEW_DO = 'viewDo';
 
-    /** Name of the namespace which holds the blocks. */
-    const NAMESPACE_SEARCH_BLOCK = 'block';
     /** Name of the namespace which holds the templates. */
     const NAMESPACE_SEARCH_TEMPLATE = 'template';
-    /** Name of the namespace which holds the layouts. */
-    const NAMESPACE_SEARCH_LAYOUT = 'layout';
     /** Name of the namespace which holds the controllers. */
     const NAMESPACE_SEARCH_CONTROLLER = 'controller';
 
@@ -78,9 +74,7 @@ class SystemContainer extends Pimple {
      * @var array
      */
     protected $searchNamespaces = array(
-        self::NAMESPACE_SEARCH_BLOCK => array(),
         self::NAMESPACE_SEARCH_TEMPLATE => array(),
-        self::NAMESPACE_SEARCH_LAYOUT => array(),
         self::NAMESPACE_SEARCH_CONTROLLER => array(),
     );
 
@@ -281,25 +275,6 @@ class SystemContainer extends Pimple {
     }
 
     /**
-     * Searches for the block in all the block search namespaces
-     *
-     * @param string $blockName
-     *
-     * @return string block name
-     *
-     * @throws \YapepBase\Exception\ViewException If the block was not found
-     */
-    protected function searchForBlock($blockName) {
-        try {
-            return $this->searchForClass(self::NAMESPACE_SEARCH_BLOCK, $blockName . 'Block');
-        } catch (DiException $e) {
-            throw new ViewException('Block ' . $blockName . ' not found in '
-                . \implode('; ', $this->searchNamespaces[self::NAMESPACE_SEARCH_BLOCK]),
-                ViewException::ERR_BLOCK_NOT_FOUND);
-        }
-    }
-
-    /**
      * Searches for the template in all the template search namespaces
      *
      * @param string $templateName
@@ -315,25 +290,6 @@ class SystemContainer extends Pimple {
             throw new ViewException('Template ' . $templateName . ' not found in '
                 . \implode('; ', $this->searchNamespaces[self::NAMESPACE_SEARCH_TEMPLATE]),
                 ViewException::ERR_TEMPLATE_NOT_FOUND);
-        }
-    }
-
-    /**
-     * Searches for the layout in all the layout search namespaces
-     *
-     * @param string $layoutName
-     *
-     * @return string layout name
-     *
-     * @throws \YapepBase\Exception\ViewException If the template was not found
-     */
-    protected function searchForLayout($layoutName) {
-        try {
-            return $this->searchForClass(self::NAMESPACE_SEARCH_LAYOUT, $layoutName . 'Layout');
-        } catch (DiException $e) {
-            throw new ViewException('Layout ' . $layoutName . ' not found in '
-                . \implode('; ', $this->searchNamespaces[self::NAMESPACE_SEARCH_LAYOUT]),
-                ViewException::ERR_LAYOUT_NOT_FOUND);
         }
     }
 
@@ -355,47 +311,17 @@ class SystemContainer extends Pimple {
     }
 
     /**
-     * Returns a block by it's name
-     *
-     * @param string $blockName   The name of the block class to return.
-     *                            (Without the namespace and Block suffix)
-     *
-     * @return \YapepBase\View\Block
-     *
-     * @throws \YapepBase\Exception\ViewException If the block was not found
-     */
-    public function getBlock($blockName) {
-        $fullClassName = $this->searchForBlock($blockName);
-        return new $fullClassName();
-    }
-
-    /**
      * Returns a template by it's name
      *
      * @param string $templateName   The name of the template class to return.
      *                               (Without the namespace and Template suffix)
      *
-     * @return \YapepBase\View\Template
+     * @return \YapepBase\View\TemplateAbstract
      *
      * @throws \YapepBase\Exception\ViewException If the block was not found
      */
     public function getTemplate($templateName) {
         $fullClassName = $this->searchForTemplate($templateName);
-        return new $fullClassName();
-    }
-
-    /**
-     * Returns a layout by it's name
-     *
-     * @param string $layoutName   The name of the template class to return.
-     *                               (Without the namespace and Template suffix)
-     *
-     * @return \YapepBase\View\Layout
-     *
-     * @throws \YapepBase\Exception\ViewException If the layout was not found
-     */
-    public function getLayout($layoutName) {
-        $fullClassName = $this->searchForLayout($layoutName);
         return new $fullClassName();
     }
 
@@ -425,34 +351,6 @@ class SystemContainer extends Pimple {
     public function addControllerSearchNamespace($namespace) {
         trigger_error(__METHOD__ . ' called, use ' . __CLASS__ . '::addSearchNamespace instead', E_USER_DEPRECATED);
         $this->addSearchNamespace(self::NAMESPACE_SEARCH_CONTROLLER, $namespace);
-    }
-
-    /**
-     * Set a list of namespace roots to search for controllers in.
-     *
-     * @param array $namespaces a list of namespace roots to search for the controller in.
-     *
-     * @deprecated   Use setSearchNamespaces() instead
-     *
-     * @codeCoverageIgnore
-     */
-    public function setBlockSearchNamespaces($namespaces = array()) {
-        trigger_error(__METHOD__ . ' called, use ' . __CLASS__ . '::setSearchNamespaces instead', E_USER_DEPRECATED);
-        $this->setSearchNamespaces(self::NAMESPACE_SEARCH_BLOCK, $namespaces);
-    }
-
-    /**
-     * Adds a namespace to the namespace roots to search for blocks in.
-     *
-     * @param string $namespace a single namespace to add to the search list
-     *
-     * @deprecated   Use addSearchNamespace() instead
-     *
-     * @codeCoverageIgnore
-     */
-    public function addBlockSearchNamespace($namespace) {
-        trigger_error(__METHOD__ . ' called, use ' . __CLASS__ . '::addSearchNamespace instead', E_USER_DEPRECATED);
-        $this->addSearchNamespace(self::NAMESPACE_SEARCH_BLOCK, $namespace);
     }
 
     /**
