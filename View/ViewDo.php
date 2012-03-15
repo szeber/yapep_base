@@ -62,7 +62,7 @@ class ViewDo {
 	 */
 	final public function get($key, $raw = false) {
 		if (empty($key)) {
-			trigger_error('Ures kulcs', E_USER_NOTICE);
+			trigger_error('Empty key', E_USER_NOTICE);
 			return;
 		}
 
