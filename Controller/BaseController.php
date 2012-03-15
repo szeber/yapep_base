@@ -157,7 +157,7 @@ abstract class BaseController implements IController {
      *
      * @return void
      */
-    public function set($nameOrData, $value = null) {
+    public function setToView($nameOrData, $value = null) {
         Application::getInstance()->getDiContainer()->getViewDo()->set($nameOrData, $value);
     }
 }

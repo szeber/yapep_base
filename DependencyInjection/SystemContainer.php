@@ -215,7 +215,7 @@ class SystemContainer extends Pimple {
      * @return \YapepBase\View\ViewDo
      */
     public function getViewDo() {
-        return $this[self::KEY_VIEW_DO]();
+        return $this[self::KEY_VIEW_DO];
     }
 
     /**

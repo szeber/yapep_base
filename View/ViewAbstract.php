@@ -10,6 +10,7 @@
 
 
 namespace YapepBase\View;
+
 use YapepBase\Application;
 use YapepBase\Exception\ViewException;
 use YapepBase\Mime\MimeType;
@@ -43,19 +44,6 @@ abstract class ViewAbstract implements IView {
     abstract protected function renderContent();
 
     /**
-     * Returns the rendered content.
-     *
-     * It returns the same as the {@link render()} prints.
-     *
-     * @return string
-     */
-    public function __toString() {
-        ob_start();
-        $this->render();
-        return ob_get_clean();
-    }
-
-    /**
      * Constructor.
      *
      * @param string $charset   The charset for the view.
@@ -84,6 +72,30 @@ abstract class ViewAbstract implements IView {
      */
     public function render() {
         $this->renderContent();
+    }
+
+    /**
+     * Returns the rendered content.
+     *
+     * It returns the same as the {@link render()} prints.
+     *
+     * @return string
+     */
+    public function __toString() {
+        ob_start();
+        $this->render();
+        return ob_get_clean();
+    }
+
+    /**
+     * Sets the contentType of the View.
+     *
+     * @param string $contentType   {@uses \YapepBase\Mime\MimeType::*}
+     *
+     * @return void
+     */
+    public function setContentType($contentType) {
+        $this->contentType = $contentType;
     }
 
     /**

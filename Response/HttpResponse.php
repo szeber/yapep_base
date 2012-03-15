@@ -303,11 +303,7 @@ class HttpResponse implements IResponse {
      * @return string
      */
     public function getRenderedBody() {
-        if ($this->body instanceof IView) {
-            return $this->body->render($this->contentType, true);
-        } else {
-            return $this->body;
-        }
+        return (string)$this->body;
     }
 
     /**

@@ -25,4 +25,13 @@ interface IView {
      * @return void
      */
     public function render();
+
+    /**
+     * Returns the rendered content.
+     *
+     * It returns the same as the {@link render()} prints.
+     *
+     * @return string
+     */
+    public function __toString();
 }

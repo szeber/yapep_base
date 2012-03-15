@@ -104,6 +104,4 @@ class LoggingErrorHandler implements IErrorHandler {
                 $helper->getLogPriorityForErrorLevel($errorLevel));
         $this->logger->log($message);
     }
-
-
 }

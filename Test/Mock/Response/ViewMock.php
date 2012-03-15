@@ -13,11 +13,11 @@ class ViewMock implements IView {
         $this->content = $content;
     }
 
-    public function render($contentType, $return = true) {
-        if ($return) {
-            return $this->content;
-        } else {
-            echo $this->content;
-        }
+    public function render() {
+        echo $this->content;
+    }
+
+    function __toString() {
+        return $this->content;
     }
 }

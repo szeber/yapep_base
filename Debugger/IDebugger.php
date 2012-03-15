@@ -88,5 +88,12 @@ interface IDebugger {
      *
      * @return void
      */
-    public function logQueryExecutionTime($type, $queryId, $executionTime, $params = null) ;
+    public function logQueryExecutionTime($type, $queryId, $executionTime, $params = null);
+
+    /**
+     * Displays the interface of the Debugger (if it has one).
+     *
+     * @return void
+     */
+    public function display();
 }

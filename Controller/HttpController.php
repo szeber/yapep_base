@@ -9,7 +9,6 @@
  * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
-
 namespace YapepBase\Controller;
 use YapepBase\Application;
 
@@ -19,7 +18,6 @@ use YapepBase\Request\HttpRequest;
 use YapepBase\Response\IResponse;
 use YapepBase\Request\IRequest;
 use YapepBase\Mime\MimeType;
-
 
 /**
  * HttpController class
