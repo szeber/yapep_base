@@ -15,6 +15,7 @@ use YapepBase\Application;
 use YapepBase\Config;
 use YapepBase\Log\Message\ErrorMessage;
 use YapepBase\Log\ILogger;
+use YapepBase\ErrorHandler\ErrorHandlerHelper;
 
 /**
  * Logging error handler class
@@ -70,16 +71,16 @@ class LoggingErrorHandler implements IErrorHandler {
     /**
      * Handles an uncaught exception. The exception must extend the \Exception class to be handled.
      *
-     * @param Exception $exception   The exception to handle.
+     * @param \Exception $exception   The exception to handle.
      * @param string $errorId        The internal ID of the error.
      */
     public function handleException(\Exception $exception, $errorId) {
-        $errorMessage = '[' . self::EXCEPTION_DESCRIPTION . ']: Unhandled ' . get_class($exception) .': '
+        $errorMessage = '[' . ErrorHandlerHelper::E_EXCEPTION_DESCRIPTION . ']: Unhandled ' . get_class($exception) .': '
             . $exception->getMessage() . '(' . $exception->getCode() .') on line ' . $exception->getLine() . ' in '
             . $exception->getFile();
 
         $message = Application::getInstance()->getDiContainer()->getErrorLogMessage();
-        $message->set($errorMessage, self::EXCEPTION_DESCRIPTION, $errorId, LOG_ERR);
+        $message->set($errorMessage, ErrorHandlerHelper::E_EXCEPTION_DESCRIPTION, $errorId, LOG_ERR);
 
         $this->logger->log($message);
     }
