@@ -137,6 +137,41 @@ abstract class DbConnection {
     }
 
     /**
+     * Runs a paginated query, and returns the result.
+     *
+     * You can't use LIMIT or OFFSET clause in your query, becouse then it will be duplicated in the method.
+     *
+     * @param string $query          Th query to execute.
+     * @param array  $params         The parameters for the query.
+     * @param int    $pageNumber     The number of the requested page.
+     * @param int    $itemsPerPage   How many items should be listed in the page.
+     * @param int    &$itemCount     The count of all items in the result without the pagination.
+     *                               If it is set to FALSE then it wont be populated. (outgoing parameter)
+     *
+     * @return \YapepBase\Database\DbResult   The result of the query.
+     *
+     * @throws \YapepBase\Exception\DatabaseException   On execution errors.
+     */
+    public function queryPaged($query, array $params, $pageNumber, $itemsPerPage, &$itemCount = false) {
+        if ($itemCount !== false) {
+            $query = preg_replace('/SELECT/i', '$0 SQL_CALC_FOUND_ROWS', $query, 1);
+        }
+
+        $query .= '
+			LIMIT
+				' . (int)$itemsPerPage . '
+			OFFSET
+				' . (int)(($pageNumber - 1) * $itemsPerPage);
+
+        $result = $this->query($query, $params);
+
+        if ($itemCount !== false) {
+            $itemCount = (int)$this->query('SELECT FOUND_ROWS()')->fetchColumn();
+        }
+        return $result;
+    }
+
+    /**
      * Returns the PDO data type for the specified value.
      *
      * Also casts the specified value if it's necessary.
