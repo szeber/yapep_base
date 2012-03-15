@@ -89,6 +89,15 @@ abstract class DbConnection {
     abstract protected function connect(array $configuration);
 
     /**
+     * Returns the prefix which is for prefixing parameters in the query.
+     *
+     * @return string
+     */
+    public function getParamPrefix() {
+        return $this->paramPrefix;
+    }
+
+    /**
      * Runs a query and returns the result object.
      *
      * @param string $query    The query to execute.
