@@ -325,13 +325,18 @@ abstract class LayoutAbstract extends ViewAbstract {
     /**
      * Adds a javascript variable declaration to the footer.
      *
-     * Neither the name nor the value is escaped, they should be passed as already escaped variables.
+     * Neither the name nor the value is escaped, they should be passed as already escaped variables. If using the
+     * treat as string option, the value should be escaped for single quotes.
      *
-     * @param string $name    The name of the variable.
-     * @param string $value   The value of the variable. Must be a string that is the valid javascript representation
-     * of the value.
+     * @param string $name            The name of the variable.
+     * @param string $value           The value of the variable. Must be a string that is the valid javascript
+     *                                representation of the value.
+     * @param bool   $treatAsString   If TRUE, the value will be treated as a string and placed within single quotes.
      */
-    public function addJavaScriptVariable($name, $value) {
+    public function addJavaScriptVariable($name, $value, $treatAsString) {
+        if ($treatAsString) {
+            $value = '\'' . $value . '\'';
+        }
         $this->footerJavaScriptvariables[$name] = $value;
     }
 
