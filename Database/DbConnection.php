@@ -76,7 +76,7 @@ abstract class DbConnection {
         try {
             $this->connect($configuration);
         } catch (PDOException $exception) {
-            throw new DatabaseException($exception->getMessage(),0, $exception);
+            throw new DatabaseException($exception->getMessage(), (int)$exception->getCode(), $exception);
         }
         $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
