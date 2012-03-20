@@ -37,9 +37,11 @@ class MysqlConnection extends DbConnection {
         $options = ((!empty($configuration['options']) && is_array($options)) ? $configuration['options'] : array());
         $options[PDO::MYSQL_ATTR_INIT_COMMAND]
             = 'SET NAMES ' . (empty($configuration['charset']) ? 'utf8' : $configuration['charset']);
-
+        
         $this->connection = new PDO($dsn, $configuration['user'], $configuration['password'], $options);
+        
+        if (isset($configuration['timezone'])) {
+            $this->query('SET time_zone=:_tz', array('tz' => $configuration['timezone']));
+        }
     }
-
-
 }
