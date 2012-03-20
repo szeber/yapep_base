@@ -129,7 +129,7 @@ class NativeSyslogConnection extends SyslogConnection {
         }
         $buf = '<' . $priority . '>' . date('M', $date) . ' ' . str_pad(date('j', $date), 2, ' ', STR_PAD_LEFT) . ' ' .
             date('H:i:s', $date) . ' ' . $ident
-            . ($this->options&self::LOG_PID && function_exists('posix_getpid')?'[' . posix_getpid() . ']':'') . ': '
+            . ($this->options & self::LOG_PID && function_exists('posix_getpid')?'[' . posix_getpid() . ']':'') . ': '
             . $message;
         if (!$this->sock) {
             $this->open();

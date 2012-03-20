@@ -100,7 +100,10 @@ class Syslog extends LoggerAbstract {
             $logMessage .= implode('|', $fields) . '|';
         }
 
-        return $logMessage . $message->getMessage();
+        // We have to remove the line breaks, because syslog will create new log entry after every linebreak.
+        $message = str_replace(PHP_EOL, '', $logMessage . $message->getMessage());
+
+        return $message;
 
     }
 
