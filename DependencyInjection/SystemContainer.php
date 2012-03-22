@@ -80,8 +80,6 @@ class SystemContainer extends Pimple {
 
     /**
      * Constructor. Sets up the system DI objects.
-     *
-     * @return \YapepBase\Log\Message\ErrorMessage
      */
     public function __construct() {
         $this[self::KEY_ERROR_LOG_MESSAGE] = function($container) {

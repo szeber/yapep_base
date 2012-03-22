@@ -15,12 +15,12 @@ use YapepBase\Log\Message\IMessage;
 use YapepBase\Exception\ConfigException;
 
 /**
- * Syslog logger class
+ * SyslogLogger class
  *
  * Configuration:
  *     <ul>
  *         <li>applicationIdent: The name of the application as it will appear in the logs.</li>
- *         <li>facility: The facility to use for logging {@uses \YapepBase\Syslog\Syslog::LOG_*}</li>
+ *         <li>facility: The facility to use for logging {@uses \YapepBase\SyslogLogger\SyslogLogger::LOG_*}</li>
  *         <li>includeSapiName: If TRUE, the SAPI's name will be appended to the applicationIdent. Optional.</li>
  *         <li>addPid: If TRUE, the current PID will be logged too. Optional.</li>
  *         <li>printError: If TRUE, the log message will also be printed to STDERR. Optional.</li>
@@ -31,7 +31,7 @@ use YapepBase\Exception\ConfigException;
  * @package    YapepBase
  * @subpackage Log
  */
-class Syslog extends LoggerAbstract {
+class SyslogLogger extends LoggerAbstract {
 
     /**
      * The syslog connection
@@ -59,6 +59,7 @@ class Syslog extends LoggerAbstract {
             $ident .= '-' . PHP_SAPI;
         }
         $this->connection->setIdent($ident);
+
         $this->connection->setFacility($this->configOptions['facility']);
 
         $options = 0;

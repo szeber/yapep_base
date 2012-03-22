@@ -35,7 +35,7 @@ class ErrorMessage extends MessageAbstract {
      * Sets the message data.
      *
      * @param string $errorMessage   The message of the error.
-     * @param string $errorType      The textual representation of the error type. {@uses IErrorHandler::E_*}
+     * @param string $errorType      The textual representation of the error type. {@uses ErrorHandlerHelper::E_*}
      * @param string $errorId        The ID of the error.
      * @param int    $priority       The severity of the error {@uses LOG_*}
      */
