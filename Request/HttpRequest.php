@@ -272,17 +272,21 @@ class HttpRequest implements IRequest {
     /**
      * Returns the specified request parameter from the specified source, or the default value.
      *
-     * Search order is GPC, so a POST value will overwrite a GET value with the same name.
+     * Search order is UGPC, so a POST value will overwrite a GET value with the same name.
      *
      * @param string $name      The name of the param.
      * @param mixed  $default   The default value, if the parameter is not set.
-     * @param string $source    The sources of the parameter. 'G' for GET, 'P' for POST, 'C' for Cookie.
+     * @param string $source    The sources of the parameter. 'U' for URI, 'G' for GET, 'P' for POST, 'C' for Cookie.
      *
      * @return mixed
      */
-    public function get($name, $default = null, $source = 'GP') {
+    public function get($name, $default = null, $source = 'UGP') {
         $source = strtoupper($source);
         $result = $default;
+
+        if (strstr($source, 'U') && isset($this->routeParams[$name])) {
+            $result = $this->routeParams[$name];
+        }
 
         if (strstr($source, 'G') && isset($this->getParams[$name])) {
             $result = $this->getParams[$name];
@@ -303,15 +307,16 @@ class HttpRequest implements IRequest {
      * Returns TRUE if the specified request parameter from the specified source is set.
      *
      * @param string $name     The name of the param.
-     * @param string $source   The sources of the parameter. 'G' for GET, 'P' for POST, 'C' for Cookie.
+     * @param string $source   The sources of the parameter. 'U' for URI, 'G' for GET, 'P' for POST, 'C' for Cookie.
      *
      * @return bool
      */
-    public function has($name, $source = 'GP') {
+    public function has($name, $source = 'UGP') {
         $source = strtoupper($source);
 
         if (
-            (strstr($source, 'G') && isset($this->getParams[$name]))
+            (strstr($source, 'U') && isset($this->routeParams[$name]))
+            || (strstr($source, 'G') && isset($this->getParams[$name]))
             || (strstr($source, 'P') && isset($this->postParams[$name]))
             || (strstr($source, 'C') && isset($this->cookies[$name]))
         ) {
