@@ -44,12 +44,19 @@ class RequestMock implements IRequest {
     protected $params = array();
 
     /**
+     * The protocol for the request
+     *
+     * @var string
+     */
+    protected $protocol;
+
+    /**
      * Constructor
      *
      * @param string $target
      * @param string $method
      */
-    public function __construct($target, $method = IRequest::METHOD_HTTP_GET) {
+    public function __construct($target, $method = IRequest::METHOD_HTTP_GET, $protocol = IRequest::PROTOCOL_HTTP) {
         $this->target = $target;
         $this->method = $method;
     }
@@ -105,4 +112,14 @@ class RequestMock implements IRequest {
     public function getAllParams() {
         return $this->params;
     }
+
+    /**
+     * Returns the protocol used in the request.
+     *
+     * @return string   The used protocol. {@uses self::PROTOCOL_*}
+     */
+    public function getProtocol() {
+        return $this->protocol;
+    }
+
 }
