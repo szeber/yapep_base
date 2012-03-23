@@ -622,4 +622,13 @@ class HttpRequest implements IRequest {
         return $preferenceValue;
     }
 
+    /**
+     * Returns the protocol used in the request.
+     *
+     * @return string   The used protocol. {@uses self::PROTOCOL_*}
+     */
+    public function getProtocol() {
+        return ($this->getServer('HTTPS', 'off') == 'on' ? self::PROTOCOL_HTTPS : self::PROTOCOL_HTTP);
+    }
+
 }

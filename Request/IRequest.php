@@ -35,6 +35,13 @@ interface IRequest {
     /** DELETE HTTP method. */
     const METHOD_HTTP_DELETE = 'DELETE';
 
+    /** HTTP protocol */
+    const PROTOCOL_HTTP = 'http';
+    /** HTTPS protocol */
+    const PROTOCOL_HTTPS = 'https';
+    /** CLI request */
+    const PROTOCOL_CLI = 'cli';
+
     /**
      * Returns the target of the request. (eg the URI for HTTP requests)
      *
@@ -66,4 +73,11 @@ interface IRequest {
      * @param mixed $value
      */
     public function setParam($name, $value);
+
+    /**
+     * Returns the protocol used in the request.
+     *
+     * @return string   The used protocol. {@uses self::PROTOCOL_*}
+     */
+    public function getProtocol();
 }
