@@ -506,7 +506,10 @@ class HttpResponse implements IResponse {
         $name, $value, $expiration = 0, $path = '/', $domain = null, $secure = false, $httpOnly = false
     ) {
         if (is_null($domain)) {
-            $domain = Config::getInstance()->get('system.response.defaultCookieDomain', null);
+            $domain = Config::getInstance()->get('system.response.defaultCookieDomain', false);
+            if (false === $domain) {
+                $domain = null;
+            }
         }
         $this->cookies[$name] = array(
             'name'       => $name,

@@ -9,6 +9,7 @@
  */
 
 namespace YapepBase;
+use YapepBase\Exception\ConfigException;
 
 /**
  * Config singleton class.
@@ -91,16 +92,24 @@ class Config {
      * In wildcard mode the whole section that begins as the name before the wildcard, will be returned.
      * If no results are found, the default will be returned. If name is '*', all the settings are returned.
      *
+     * For compatibility reasons right now we only trigger a E_USER_NOTICE, and not throw exceptions for config option
+     * requests that are not set and don't have a default set for them.
+     *
      * @param string $name               The name of the setting to look for.
-     * @param mixed  $default            If the setting is not found, this value will be returned.
+     * @param mixed  $default            If the setting is not found, this value will be returned. A NULL value is
+     *                                   considered as no default being set, so if the configuration option is not
+     *                                   found, it will throw an exception.
      * @param bool   $keepOriginalName   If TRUE, the original key will be kept for wildcard names,
      *                                   if FALSE the key will begin at the wildcard in the result array.
      *
      * @return mixed|array   The result.
+     *
+     * @throws \YapepBase\Exception\ConfigException   If the name is empty or the config is not found and no default
+     *                                                is set.
      */
     public function get($name, $default = null, $keepOriginalName = false) {
         if (empty($name)) {
-            return $default;
+            throw new ConfigException('Getting a configuration with an empty name');
         }
 
         if ('*' == $name) {
@@ -124,10 +133,21 @@ class Config {
                     $result[$key] = $value;
                 }
             }
+            // If no default is set and te result is not found, trigger an E_USER_NOTICE
+            // This is for compatibility reasons, this will later change to an exception!
+            // TODO: Change the trigger_error to a ConfigException
+            if (empty($result) && is_null($default)) {
+                trigger_error('Configuration option not found. Key: ' . $name, E_USER_NOTICE);
+            }
             return (empty($result) ? $default : $result);
         }
 
-        // No matches, return the default
+        // No matches, return the default or trigger an error if no default is set.
+        // This is for compatibility reasons, this will later change to an exception!
+        // TODO: Change the trigger_error to a ConfigException
+        if (empty($result) && is_null($default)) {
+            trigger_error('Configuration option not found. Key: ' . $name, E_USER_NOTICE);
+        }
         return $default;
     }
 
