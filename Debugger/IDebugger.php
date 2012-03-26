@@ -62,10 +62,13 @@ interface IDebugger {
      * @param string $file      The name of the file, where the error occured.
      * @param int    $line      The number of the line where the error occured.
      * @param array  $context   The variables from the actual context.
+     * @param array  $trace     The backtrace for the error.
      *
      * @return void
      */
-	public function logError($code, $message, $file = '', $line = 0, array $context = array());
+	public function logError(
+        $code, $message, $file = '', $line = 0, array $context = array(), array $trace = array()
+    );
 
     /**
      * Logs the given query.
