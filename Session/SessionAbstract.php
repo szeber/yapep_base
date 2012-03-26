@@ -256,7 +256,7 @@ abstract class SessionAbstract implements ISession {
      * @return string
      */
     protected function generateId() {
-        return Random::pseudoString(32);
+        return Random::getPseudoString(32);
     }
 
     /**
