@@ -102,6 +102,7 @@ class Application {
 
     /**
      * Singleton __clone() method
+     *
      * @codeCoverageIgnore
      */
     protected function __clone() {}
@@ -110,6 +111,7 @@ class Application {
      * Singleton getter
      *
      * @return \YapepBase\Application
+     *
      * @codeCoverageIgnore
      */
     public static function getInstance() {
@@ -249,11 +251,12 @@ class Application {
      * Handles a fatal exception.
      *
      * @param \Exception $exception
+     *
+     * @throws \Exception   Re-throws the received exception for the exception handler to handle.
      */
     protected function handleFatalException(\Exception $exception) {
         if ($this->request instanceof \YapepBase\Request\HttpRequest) {
-            trigger_error('Unhandled exception of type: ' . get_class($exception) .'. Message: '
-                . $exception->getMessage(), E_USER_ERROR);
+            $this->errorHandlerRegistry->handleException($exception);
             // We have an HTTP request, try to run
             try {
                 $this->runErrorAction(500);

@@ -18,7 +18,7 @@ use YapepBase\Response\IResponse;
 use YapepBase\Request\IRequest;
 
 /**
- * BaseController class
+ * Base class for generic controllers.
  *
  * @package    YapepBase
  * @subpackage Controller
@@ -42,8 +42,8 @@ abstract class BaseController implements IController {
     /**
      * Constructor.
      *
-     * @param \YapepBase\Request\HttpRequest   $request    The request object. Must be a HttpRequest or descendant.
-     * @param \YapepBase\Response\HttpResponse $response   The response object. Must be a HttpResponse or descendant.
+     * @param \YapepBase\Request\HttpRequest|\YapepBase\Request\IRequest     $request    The request object.
+     * @param \YapepBase\Response\HttpResponse|\YapepBase\Response\IResponse $response   The response object.
      *
      * @throws \YapepBase\Exception\ControllerException   On error. (eg. incompatible request or response object)
      */
@@ -132,7 +132,7 @@ abstract class BaseController implements IController {
      * Be careful to set the route params in the request before calling this method, if the target action uses any.
      * The called action will use the same request and response objects.
      *
-     * @param string $controller   The name of the controller.
+     * @param string $controllerName   The name of the controller.
      * @param string $action
      *
      * @throws \YapepBase\Exception\RedirectException     To stop execution of the controller.
@@ -153,7 +153,7 @@ abstract class BaseController implements IController {
      * @param string $nameOrData   The name of the key, or the storable data in an associative array.
      * @param mixed  $value        The value.
      *
-     * @throws Exception   If the key already exist.
+     * @throws \Exception   If the key already exist.
      *
      * @return void
      */

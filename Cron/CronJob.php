@@ -197,6 +197,9 @@ abstract class CronJob {
 
     /**
      * Signal handler
+     *
+     * @param int $signo   The signal number.
+     *
      * @codeCoverageIgnore
      */
     final protected function handleSignal($signo) {

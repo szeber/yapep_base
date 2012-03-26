@@ -24,8 +24,8 @@ interface IController {
     /**
      * Constructor
      *
-     * @param IRequest  $request    The request object
-     * @param IResponse $response   The response object
+     * @param \YapepBase\Request\IRequest   $request    The request object
+     * @param \YapepBase\Response\IResponse $response   The response object
      *
      * @throws \YapepBase\Exception\ControllerException   On error. (eg. incompatible request or response object)
      */

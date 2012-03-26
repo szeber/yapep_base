@@ -18,10 +18,13 @@ namespace YapepBase\Autoloader;
  * @subpackage Autoloader
  */
 class SimpleAutoloader extends AutoloaderBase {
+
     /**
      * Gets possible file names for all directories to autoload.
-     * @param   string $className
-     * @return  array of string
+     *
+     * @param string $className
+     *
+     * @return array
      */
     protected function getFileNames($className) {
         $namespacePath = \explode('\\', $className);
@@ -36,9 +39,11 @@ class SimpleAutoloader extends AutoloaderBase {
 
     /**
      * Load a file which should contain a class.
-     * @param   string  $fileName
-     * @param   string  $className
-     * @return  bool    TRUE if loading was successful.
+     *
+     * @param string  $fileName
+     * @param string  $className
+     *
+     * @return bool    TRUE if loading was successful.
      */
     protected function loadFile($fileName, $className) {
         try {
@@ -54,7 +59,7 @@ class SimpleAutoloader extends AutoloaderBase {
     /**
      * Loads the specified class if it can be found by name.
      *
-     * @param  string $className
+     * @param string $className
      *
      * @return bool   TRUE if the class was loaded, FALSE if it can't be loaded.
      */

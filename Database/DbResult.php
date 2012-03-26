@@ -16,7 +16,9 @@ use \PDO;
 use \Iterator;
 
 /**
- * DbResult class
+ * Database result class.
+ *
+ * Wrapper for the PDOResult object.
  *
  * @package    YapepBase
  * @subpackage Database

@@ -18,9 +18,9 @@ use YapepBase\Log\ILogger;
 use YapepBase\ErrorHandler\ErrorHandlerHelper;
 
 /**
- * Logging error handler class
+ * Logging error handler class.
  *
- * Logs errors to the specified logger
+ * Logs errors to the specified logger.
  *
  * @package    YapepBase
  * @subpackage ErrorHandler

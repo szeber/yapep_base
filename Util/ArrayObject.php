@@ -16,9 +16,12 @@ use YapepBase\Exception\IndexOutOfBoundsException;
  * This class implements a common array handling for \YapepBase\Util\Collection. No other classes should implement this,
  * because it will most likely not prevail if parts are reimplemented in C.
  *
+ * @package      YapepBase
+ * @subpackage   Util
  * @internal
  */
 abstract class ArrayObject implements \Iterator, \ArrayAccess, \Countable, \Serializable {
+
     /**
      * Stores the collection elements
      *
@@ -44,9 +47,7 @@ abstract class ArrayObject implements \Iterator, \ArrayAccess, \Countable, \Seri
      *
      * @codeCoverageIgnore
      */
-    protected function typeCheck($element) {
-
-    }
+    protected function typeCheck($element) {}
 
     /**
      * Create a new data object

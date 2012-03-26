@@ -19,34 +19,45 @@ use YapepBase\Exception\SyslogException;
  * Warning: do NOT exchange the numeric values to the PHP native syslog constanst!
  */
 class NativeSyslogConnection extends SyslogConnection {
+
     /**
      * Program identification string (tag)
+     *
      * @var string
      */
     protected $ident = 'php';
+
     /**
      * Options for logging (currently only LOG_PID is supported)
+     *
      * @var int
      */
     protected $options = 0;
+
     /**
      * Syslog facility. Must be dividable by 8 by RFC
+     *
      * @var int
      */
     protected $facility = 8;
+
     /**
-     * Path of the log socket to use/
+     * Path of the log socket to use.
+     *
      * @var string
      */
     protected $path = '/dev/log';
+
     /**
      * Open log socket storage
+     *
      * @var resource
      */
     protected $sock;
 
     /**
      * Handle socket errors.
+     *
      * @throws SyslogException if a socket error occured.
      */
     protected function handleError() {
@@ -59,7 +70,9 @@ class NativeSyslogConnection extends SyslogConnection {
 
     /**
      * Opens the log socket.
+     *
      * @return \YapepBase\Syslog\NativeSyslogConnection
+     *
      * @throws \YapepBase\Exception\SyslogException on error
      */
     public function open() {
@@ -92,7 +105,9 @@ class NativeSyslogConnection extends SyslogConnection {
 
     /**
      * Closes the log socket.
+     *
      * @return \YapepBase\Syslog\NativeSyslogConnection
+     *
      * @throws \YapepBase\Exception\SyslogException on error
      */
     public function close() {
@@ -107,12 +122,16 @@ class NativeSyslogConnection extends SyslogConnection {
 
     /**
      * Write a log message to the log socket.
+     *
      * @param  int     $priority
      * @param  string  $message
      * @param  string  $ident     Defaults to the ident set via setIdent()
      * @param  int     $date      Timestamp for log message. Defaults to now.
+     *
      * @return \YapepBase\Syslog\NativeSyslogConnection
+     *
      * @throws \YapepBase\Exception\SyslogException on error
+     * 
      * @todo   Reconnect, if the connection is lost.
      */
     public function log($priority, $message, $ident = null, $date = null) {

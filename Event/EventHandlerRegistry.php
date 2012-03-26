@@ -13,7 +13,7 @@ namespace YapepBase\Event;
 use YapepBase\Exception\Exception;
 
 /**
- * EventHandlerRegistry class
+ * Registry class storing the registered event handlers.
  *
  * @package    YapepBase
  * @subpackage Event

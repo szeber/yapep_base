@@ -13,6 +13,9 @@ namespace YapepBase\Syslog;
 
 /**
  * This class is a container for generic Syslog (client and server) functions and constants.
+ *
+ * @package      YapepBase
+ * @subpackage   Syslog
  */
 class Syslog {
     /**

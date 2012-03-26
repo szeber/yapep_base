@@ -29,7 +29,7 @@ use YapepBase\Mime\MimeType;
 
 
 /**
- * SystemContainer class
+ * Generic DI container implementation used in the framework.
  *
  * @package    YapepBase
  * @subpackage DependencyInjection

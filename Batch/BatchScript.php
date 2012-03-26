@@ -14,12 +14,15 @@ use YapepBase\Application;
 use YapepBase\Event\Event;
 
 /**
- * BatchScript class
+ * Base class for batch scripts.
+ *
+ * Handles envent dispatching for application start and finish, and handles unhandled exceptions.
  *
  * @package    YapepBase
  * @subpackage Batch
  */
 abstract class BatchScript {
+
     /**
      * Helper method to execute the script
      */
@@ -31,8 +34,7 @@ abstract class BatchScript {
             $instance = new static();
             $instance->execute();
         } catch (\Exception $exception) {
-            trigger_error('Unhandled exception of type: ' . get_class($exception) .'. Message: '
-                . $exception->getMessage(), E_USER_ERROR);
+            Application::getInstance()->getErrorHandlerRegistry()->handleException($exception);
         }
         $eventHandlerRegistry->raise(new Event(Event::TYPE_APPFINISH));
     }

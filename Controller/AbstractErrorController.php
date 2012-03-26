@@ -13,7 +13,7 @@ namespace YapepBase\Controller;
 use YapepBase\Exception\ControllerException;
 
 /**
- * AbstractErrorController class
+ * Base class for error controllers.
  *
  * @package    YapepBase
  * @subpackage Controller
@@ -23,14 +23,14 @@ abstract class AbstractErrorController extends HttpController {
     /**
      * Runs on page not found (404) errors
      *
-     * @return \YapepBase\View\Template|string
+     * @return \YapepBase\View\TemplateAbstract|string
      */
     abstract protected function do404();
 
     /**
      * Runs on internal server error (500) erorrs
      *
-     * @return \YapepBase\View\Template|string
+     * @return \YapepBase\View\TemplateAbstract|string
      */
     abstract protected function do500();
 
@@ -54,7 +54,7 @@ abstract class AbstractErrorController extends HttpController {
                 throw $exception;
             }
             // Action not found for the specified error code, log the error and run with 500 instead.
-            trigger_error('Action not found for error code: ' . $errorCode);
+            trigger_error('Action not found for error code: ' . $errorCode, E_USER_WARNING);
             $this->run(500);
         }
     }

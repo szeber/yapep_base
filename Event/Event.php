@@ -12,7 +12,7 @@
 namespace YapepBase\Event;
 
 /**
- * Event class
+ * Class that describes an event.
  *
  * @package    YapepBase
  * @subpackage Event

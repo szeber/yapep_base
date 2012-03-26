@@ -14,7 +14,7 @@ use YapepBase\Exception\Exception;
 use YapepBase\Session\SessionAbstract;
 
 /**
- * SessionContainer class
+ * Registry containig all registered sessions.
  *
  * @package    YapepBase
  * @subpackage Session

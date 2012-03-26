@@ -19,7 +19,7 @@ use YapepBase\Application;
 use YapepBase\Debugger\IDebugger;
 
 /**
- * DbConnection class
+ * Base class for database connections.
  *
  * @package    YapepBase
  * @subpackage Database
@@ -141,12 +141,11 @@ abstract class DbConnection {
      *
      * You can't use LIMIT or OFFSET clause in your query, becouse then it will be duplicated in the method.
      *
-     * @param string $query          Th query to execute.
-     * @param array  $params         The parameters for the query.
-     * @param int    $pageNumber     The number of the requested page.
-     * @param int    $itemsPerPage   How many items should be listed in the page.
-     * @param int    &$itemCount     The count of all items in the result without the pagination.
-     *                               If it is set to FALSE then it wont be populated. (outgoing parameter)
+     * @param string   $query          Th query to execute.
+     * @param array    $params         The parameters for the query.
+     * @param int      $pageNumber     The number of the requested page.
+     * @param int      $itemsPerPage   How many items should be listed in the page.
+     * @param bool|int $itemCount      If it is set to FALSE then it wont be populated. (outgoing parameter)
      *
      * @return \YapepBase\Database\DbResult   The result of the query.
      *
@@ -158,10 +157,10 @@ abstract class DbConnection {
         }
 
         $query .= '
-			LIMIT
-				' . (int)$itemsPerPage . '
-			OFFSET
-				' . (int)(($pageNumber - 1) * $itemsPerPage);
+            LIMIT
+                ' . (int)$itemsPerPage . '
+            OFFSET
+                ' . (int)(($pageNumber - 1) * $itemsPerPage);
 
         $result = $this->query($query, $params);
 

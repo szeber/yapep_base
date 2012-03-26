@@ -21,7 +21,7 @@ use YapepBase\Exception\ConfigException;
 use YapepBase\Config;
 
 /**
- * SessionAbstract class
+ * Base class for session handlers.
  *
  * @package    YapepBase
  * @subpackage Session
@@ -89,6 +89,13 @@ abstract class SessionAbstract implements ISession {
 
     /**
      * Constructor
+     *
+     * Configuration options:
+     * <ul>
+     *     <li>namespace: The namespace used for the session. This namespace is used to register to the session
+     *                    registry, and also used as part of the key used during the storage of the session data.</li>
+     *     <li>lifetime:  The lifetime of the sesssion in seconds. Optional.</li>
+     * </ul>
      *
      * @param string                        $configName
      * @param \YapepBase\Storage\IStorage   $storage

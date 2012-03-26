@@ -17,7 +17,7 @@ use YapepBase\Exception\DatabaseException;
 use YapepBase\Config;
 
 /**
- * DbFactory class
+ * Factory class for database connections.
  *
  * Global database settings are set in the format:
  * system.database.<optionName>

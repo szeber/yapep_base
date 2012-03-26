@@ -13,7 +13,7 @@
 namespace YapepBase\ErrorHandler;
 
 /**
- * ErrorHandlerHelper class
+ * Contains helper methods for error handlers.
  *
  * @package    YapepBase
  * @subpackage ErrorHandler

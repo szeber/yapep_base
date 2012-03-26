@@ -20,7 +20,7 @@ use YapepBase\Request\IRequest;
 use YapepBase\Mime\MimeType;
 
 /**
- * HttpController class
+ * Base class for HTTP controllers.
  *
  * @package    YapepBase
  * @subpackage Controller

@@ -16,7 +16,12 @@ use YapepBase\Exception\ControllerException;
 use YapepBase\View\RestTemplate;
 
 /**
- * RestController class
+ * Base class for restful API controllers.
+ *
+ * Global configuration options:
+ * <ul>
+ *     <li>application.rest.xmlRootNode: The root node for XML output format.</li>
+ * </ul>
  *
  * @package    YapepBase
  * @subpackage Controller

@@ -15,8 +15,12 @@ namespace YapepBase\Util;
  * This is a generic Collection (array) class, which can be used as an object
  * container and overridden by child classes. Can be accessed as a native PHP
  * array.
+ *
+ * @package      YapepBase
+ * @subpackage   Util
  */
 class Collection extends ArrayObject {
+
     /**
      * Throws a \YapepBase\Exception\ValueException, if $offset is not an integer
      *

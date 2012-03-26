@@ -1,26 +1,48 @@
 <?php
+/**
+ * This file is part of YAPEPBase. It was merged from janoszen's Alternate-Class-Repository project.
+ *
+ * @package      YapepBase
+ * @subpackage   Util
+ * @author       Janos Pasztor <net@janoszen.hu>
+ * @copyright    2011 The YAPEP Project All rights reserved.
+ * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
+ */
 
 namespace YapepBase\Util;
 
+/**
+ * CSV parser class.
+ *
+ * @package      YapepBase
+ * @subpackage   Util
+ */
 class CsvParser {
+
     /**
      * Separator used for separating fields
+     *
      * @var      string
      */
     protected $separator = ',';
+
     /**
      * Delimiter signalling start/end of field. Optional.
+     *
      * @var      string
      */
     protected $delimiter = '"';
+
     /**
      * Escape character used for escaping delimiter within the field.
+     *
      * @var      string
      */
     protected $escape    = '\\';
 
     /**
      * Sets the character, that should be used for delimiting fields.
+     *
      * @param    string   $delimiter
      */
     public function setDelimiter($delimiter) {
@@ -29,6 +51,7 @@ class CsvParser {
 
     /**
      * Returns the character, that is used for delimiting fields.
+     *
      * @return   string
      */
     public function getDelimiter() {
@@ -36,7 +59,8 @@ class CsvParser {
     }
 
     /**
-     * Sets the field separator character
+     * Sets the field separator character.
+     *
      * @param    string   $separator
      */
     public function setSeparator($separator) {
@@ -44,7 +68,8 @@ class CsvParser {
     }
 
     /**
-     * Returns the field separator character
+     * Returns the field separator character.
+     *
      * @return   string
      */
     public function getSeparator() {
@@ -53,6 +78,7 @@ class CsvParser {
 
     /**
      * Sets the escape character used to escape literals.
+     *
      * @param    string   $escape
      */
     public function setEscape($escape) {
@@ -60,7 +86,8 @@ class CsvParser {
     }
 
     /**
-     * Returns the character used to escape literals
+     * Returns the character used to escape literals.
+     *
      * @return   string
      */
     public function getEscape() {
@@ -68,8 +95,10 @@ class CsvParser {
     }
 
     /**
-     * Parses a single row of CSV data into a number-indexed array
+     * Parses a single row of CSV data into a number-indexed array.
+     *
      * @param    string   $row
+     *
      * @return   array
      */
     public function parseRow($row) {
@@ -152,8 +181,10 @@ class CsvParser {
     }
 
     /**
-     * Parses a multiline CSV string
+     * Parses a multiline CSV string.
+     *
      * @param    string   $string
+     *
      * @return   array
      */
     public function parseString($string) {
@@ -169,7 +200,9 @@ class CsvParser {
 
     /**
      * Parses a multiline CSV string using the first line as headers for creating associative arrays.
+     *
      * @param    string   $string
+     *
      * @return   array
      */
     public function parseStringWithHeaders($string) {

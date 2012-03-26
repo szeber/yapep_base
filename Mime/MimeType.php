@@ -14,6 +14,9 @@ namespace YapepBase\Mime;
 
 /**
  * This class contains the most commonly used MIME types as constants
+ *
+ * @package      YapepBase
+ * @subpackage   Mime
  */
 class MimeType {
     /** HTML content type */

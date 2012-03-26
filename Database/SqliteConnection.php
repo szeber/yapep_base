@@ -14,7 +14,7 @@ namespace YapepBase\Database;
 use \PDO;
 
 /**
- * SqliteConnection class
+ * Sqlite database connection implementation.
  *
  * @package    YapepBase
  * @subpackage Database

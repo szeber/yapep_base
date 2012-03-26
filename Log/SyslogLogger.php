@@ -41,6 +41,10 @@ class SyslogLogger extends LoggerAbstract {
 
     /**
      * Creates a syslog connection.
+     *
+     * @param string                              $configName   The name of the configuration to use.
+     * @param \YapepBase\Syslog\ISyslogConnection $connection   The Syslog connection to use.
+     *
      * @todo  2011-12-09  Janoszen  Move platform testing to a separate class.
      */
     public function __construct($configName, \YapepBase\Syslog\ISyslogConnection $connection = null) {
@@ -80,7 +84,7 @@ class SyslogLogger extends LoggerAbstract {
     /**
      * Logs the message
      *
-     * @param IMessage $message
+     * @param \YapepBase\Log\Message\IMessage $message
      */
     protected function logMessage(IMessage $message) {
         $this->connection->log($message->getPriority(), $this->getLogMessage($message));
@@ -89,7 +93,7 @@ class SyslogLogger extends LoggerAbstract {
     /**
      * Returns the log message prepared from the message
      *
-     * @param IMessage $message
+     * @param \YapepBase\Log\Message\IMessage $message
      *
      * @return string
      */

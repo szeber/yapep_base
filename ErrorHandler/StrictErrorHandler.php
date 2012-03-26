@@ -13,6 +13,9 @@ namespace YapepBase\ErrorHandler;
 
 /**
  * This error handler converts all warnings, notices to ErrorException.
+ *
+ * @package      YapepBase
+ * @subpackage   ErrorHandler
  */
 class StrictErrorHandler implements IErrorHandler {
     /**
@@ -39,7 +42,7 @@ class StrictErrorHandler implements IErrorHandler {
     /**
      * Handles an uncaught exception. The exception must extend the \Exception class to be handled.
      *
-     * @param Exception $exception   The exception to handle.
+     * @param \Exception $exception   The exception to handle.
      * @param string $errorId        The internal ID of the error.
      * @codeCoverageIgnore
      */

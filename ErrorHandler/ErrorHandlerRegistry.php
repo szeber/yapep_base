@@ -15,7 +15,7 @@ use YapepBase\Application;
 use YapepBase\Config;
 
 /**
- * ErrorHandlerRegistry class
+ * Registry class holding the registered error handlers.
  *
  * @package    YapepBase
  * @subpackage ErrorHandler

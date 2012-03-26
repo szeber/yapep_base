@@ -13,7 +13,7 @@ namespace YapepBase\Log;
 use YapepBase\Log\Message\IMessage;
 
 /**
- * LoggerRegistry class
+ * Registry class storing the registered loggers.
  *
  * @package    YapepBase
  * @subpackage Log

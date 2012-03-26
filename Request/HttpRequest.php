@@ -14,7 +14,9 @@ namespace YapepBase\Request;
 use YapepBase\UtilityFunctions;
 
 /**
- * HttpRequest class
+ * Request class for HTTP requests.
+ *
+ * Stores the details for the current request.
  *
  * @package    YapepBase
  * @subpackage Request

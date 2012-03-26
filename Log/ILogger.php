@@ -25,7 +25,7 @@ interface ILogger {
     /**
      * Logs the message
      *
-     * @param IMessage $message
+     * @param \YapepBase\Log\Message\IMessage $message
      */
     public function log(IMessage $message);
 }

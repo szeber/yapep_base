@@ -16,7 +16,7 @@ use YapepBase\Config;
 use YapepBase\Log\Message\IMessage;
 
 /**
- * LoggerAbstract class
+ * Abstract base class usable by loggers.
  *
  * @package    YapepBase
  * @subpackage Log
@@ -68,7 +68,7 @@ abstract class LoggerAbstract implements ILogger {
     /**
      * Logs the message
      *
-     * @param IMessage $message
+     * @param \YapepBase\Log\Message\IMessage $message
      */
     public function log(IMessage $message) {
         if (!$message->checkIsEmpty()) {

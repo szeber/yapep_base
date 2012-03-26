@@ -15,7 +15,7 @@ use YapepBase\Storage\IStorage;
 use YapepBase\ErrorHandler\ErrorHandlerHelper;
 
 /**
- * DebugDataCreator class
+ * Error handler that dumps debugging information to a specified storage.
  *
  * @package    YapepBase
  * @subpackage ErrorHandler
