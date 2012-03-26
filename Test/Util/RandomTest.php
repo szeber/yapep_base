@@ -27,11 +27,11 @@ class RandomTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * Tests using the \mt_rand() function
 	 */
-	public function testPseudoNumberMT() {
+	public function testGetPseudoNumberMT() {
 		if (!\function_exists('\mt_rand')) {
 			$this->markTestSkipped('\mt_rand() is not available');
 		}
-		$number = Random::pseudoNumber(0, 1, Random::NUMBER_METHOD_MTRAND);
+		$number = Random::getPseudoNumber(0, 1, Random::NUMBER_METHOD_MTRAND);
 		$this->assertEquals('double', \gettype($number));
 		$this->assertGreaterThanOrEqual(0, $number);
 		$this->assertLessThanOrEqual(1, $number);
@@ -40,8 +40,8 @@ class RandomTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * Tests using the \rand() function
 	 */
-	public function testPseudoNumber() {
-		$number = Random::pseudoNumber(0, 1, Random::NUMBER_METHOD_RAND);
+	public function testGetPseudoNumber() {
+		$number = Random::getPseudoNumber(0, 1, Random::NUMBER_METHOD_RAND);
 		$this->assertEquals('double', \gettype($number));
 		$this->assertGreaterThanOrEqual(0, $number);
 		$this->assertLessThanOrEqual(1, $number);
@@ -50,9 +50,9 @@ class RandomTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * Tests the method check
 	 */
-	public function testPseudoNumberMethodChecks() {
+	public function testGetPseudoNumberMethodChecks() {
 	    try {
-	        Random::pseudoNumber(0, 1, 'nonexistent');
+	        Random::getPseudoNumber(0, 1, 'nonexistent');
             $this->fail('The method check fails');
 	    } catch (Exception $exception) {}
 	}
@@ -60,36 +60,36 @@ class RandomTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * Tests using the \openssl_random_pseudo_bytes() function
 	 */
-	public function testPseudoStringOpenSSL() {
+	public function testGetPseudoStringOpenSSL() {
 		if (!\function_exists('\openssl_random_pseudo_bytes')) {
 			$this->markTestSkipped('\openssl_random_pseudo_bytes() is not available');
 		}
-		$string = Random::pseudoString(61, Random::STRING_METHOD_OPENSSL);
+		$string = Random::getPseudoString(61, Random::STRING_METHOD_OPENSSL);
 		$this->assertRegExp('/^[-_a-zA-Z0-9]{61}$/', $string);
 	}
 
 	/**
 	 * Tests using the \uniqid() function
 	 */
-	public function testPseudoStringUniqid() {
-		$string = Random::pseudoString(61, Random::STRING_METHOD_UNIQID);
+	public function testGetPseudoStringUniqid() {
+		$string = Random::getPseudoString(61, Random::STRING_METHOD_UNIQID);
 		$this->assertRegExp('/^[-_a-zA-Z0-9]{61}$/', $string);
 	}
 
 	/**
 	 * Tests using the \md5(time()) functions
 	 */
-	public function testPseudoStringTime() {
-		$string = Random::pseudoString(61, Random::STRING_METHOD_TIME);
+	public function testGetPseudoStringTime() {
+		$string = Random::getPseudoString(61, Random::STRING_METHOD_TIME);
 		$this->assertRegExp('/^[-_a-zA-Z0-9]{61}$/', $string);
 	}
 
 	/**
 	 * Tests the method check
 	 */
-	public function testPseudoStringMethodChecks() {
+	public function testGetPseudoStringMethodChecks() {
 	    try {
-	        Random::pseudoString(61, 'nonexistent');
+	        Random::getPseudoString(61, 'nonexistent');
             $this->fail('The method check fails');
 	    } catch (Exception $exception) {}
 	}
