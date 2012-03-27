@@ -117,7 +117,7 @@ abstract class SessionAbstract implements ISession {
         $this->request  = $request;
         $this->response = $response;
 
-        $config = Config::getInstance()->get($configName);
+        $config = Config::getInstance()->get($configName, false);
         if (empty($config)) {
             throw new ConfigException('Configuration not found for session handler');
         }

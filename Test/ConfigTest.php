@@ -2,9 +2,12 @@
 
 namespace YapepBase\Test;
 use YapepBase\Config;
+use YapepBase\Exception\ConfigException;
 
 /**
  * Config test case.
+ *
+ * @todo add checks for exception handling when we start throwing exceptions for not-set config values
  */
 class ConfigTest extends \PHPUnit_Framework_TestCase
 {
@@ -75,10 +78,12 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
      * Tests default handling
      */
     public function testDefault() {
-        $this->assertNull($this->Config->get(''), 'Empty request does not return not specified default');
-
-        $this->assertNull($this->Config->get('nonexistent'), 'Not specified default is not NULL');
         $this->assertSame('test', $this->Config->get('nonexistent', 'test'), 'Specified default does not match');
+
+        try {
+            $this->Config->get('');
+            $this->fail('Empty request does not throw an exception');
+        } catch (ConfigException $exception) {}
     }
 
     /**
@@ -113,7 +118,6 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
      * Test default value handling
      */
     public function testDefaults() {
-        $this->assertNull($this->Config->get('test'));
         $this->assertSame('123', $this->Config->get('test', '123'));
     }
 
@@ -131,7 +135,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
 
         $this->Config->set($testData);
 
-        $this->assertNull($this->Config->get('test*', null), 'Returning invalid wildcard returns the default');
+        $this->assertSame(false, $this->Config->get('test*', false), 'Returning invalid wildcard returns the default');
 
         $result = $this->Config->get('test.*');
         $this->assertInternalType('array', $result);

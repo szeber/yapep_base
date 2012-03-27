@@ -95,7 +95,7 @@ class DbFactory {
             if (is_null(static::$paramPrefix)) {
                 static::$paramPrefix = (string)$config->get('system.database.paramPrefix', '');
             }
-            $data = $config->get('application.database.' . $connectionName . '.' . $connectionType . '.*');
+            $data = $config->get('application.database.' . $connectionName . '.' . $connectionType . '.*', false);
             if (empty($data) || !is_array($data)) {
                 throw new DatabaseException('Database connection configuration not found');
             }
