@@ -19,32 +19,52 @@ use YapepBase\Exception\Exception;
  * @subpackage Util
  */
 class Random {
-
+    /**
+     * Automatically picks a random number generation method.
+     */
     const NUMBER_METHOD_AUTO = 'auto';
 
+    /**
+     * Generates a random number using the rand() method.
+     */
     const NUMBER_METHOD_RAND = 'rand';
 
+    /**
+     * Generates a random number using the mtrand() method. 
+     */
     const NUMBER_METHOD_MTRAND = 'mtrand';
 
+    /**
+     * Automatically picks a random string generation method. 
+     */
     const STRING_METHOD_AUTO = 'auto';
 
+    /**
+     * Generates a random string using time() and md5() 
+     */
     const STRING_METHOD_TIME = 'time';
 
+    /**
+     * Generates a random string using the uniquid() method. 
+     */
     const STRING_METHOD_UNIQID = 'uniqid';
 
+    /**
+     * Generates a random string using the openssl_random_pseudo_bytes() method.
+     */
     const STRING_METHOD_OPENSSL = 'openssl';
 
     /**
      * Generate a pseudo-random number between $min and $max. If possible, this function will use mt_rand() for
      * random number generation. Otherwise it will fall back to rand(), which uses the libc random number generator.
      *
-     * @param  double $min
-     * @param  double $max
-     * @param  int    $method   Random generator method to use. If not available, fallback to auto.
+     * @param  float  $min
+     * @param  float  $max
+     * @param  string $method   Random generator method to use. If not available, fallback to auto.
      *
-     * @return double
+     * @return float
      */
-    static function pseudoNumber($min = 0, $max = 1, $method = self::NUMBER_METHOD_AUTO) {
+    static function getPseudoNumber($min = 0, $max = 1, $method = self::NUMBER_METHOD_AUTO) {
         switch ($method) {
             case self::NUMBER_METHOD_AUTO :
             case self::NUMBER_METHOD_MTRAND :
@@ -70,13 +90,13 @@ class Random {
      * Generate a pseudo-random string in the given length. This string is NOT suitable for cryptographic purposes!
      *
      * @param  integer $length
-     * @param  integer $method   The method to use for random string generation. Falls back to default if the
+     * @param  string  $method   The method to use for random string generation. Falls back to default if the
      *                           method is not available.
      * @return string
      *
-     * @throws \YapepBase\Exception   If the method is invalid
+     * @throws \YapepBase\Exception\Exception   If the method is invalid
      */
-    static function pseudoString($length = 23, $method = self::STRING_METHOD_AUTO) {
+    static function getPseudoString($length = 23, $method = self::STRING_METHOD_AUTO) {
         $string = '';
         switch ($method) {
             case self::STRING_METHOD_AUTO :
@@ -108,5 +128,41 @@ class Random {
                 break;
         }
         return $string;
+    }
+
+    /**
+     * Generate a pseudo-random number between $min and $max. If possible, this function will use mt_rand() for
+     * random number generation. Otherwise it will fall back to rand(), which uses the libc random number generator.
+     *
+     * @param  float  $min
+     * @param  float  $max
+     * @param  string $method   Random generator method to use. If not available, fallback to auto.
+     *
+     * @return float
+     *
+     * @deprecated please use the getPseudoNumber method instead
+     */
+    static function pseudoNumber($min = 0, $max = 1, $method = self::NUMBER_METHOD_AUTO) {
+        trigger_error('\YapepBase\Util\Random::pseudoNumber() is deprecated. Please use getPseudoNumber() instead.',
+            E_USER_DEPRECATED);
+        return self::getPseudoNumber($min, $max, $method);
+    }
+
+    /**
+     * Generate a pseudo-random string in the given length. This string is NOT suitable for cryptographic purposes!
+     *
+     * @param  integer $length
+     * @param  string  $method   The method to use for random string generation. Falls back to default if the
+     *                           method is not available.
+     * @return string
+     * 
+     * @deprecated please use the getPseudoString method instead
+     *
+     * @throws \YapepBase\Exception\Exception   If the method is invalid
+     */
+    static function pseudoString($length = 23, $method = self::STRING_METHOD_AUTO) {
+        trigger_error('\YapepBase\Util\Random::pseudoString() is deprecated. Please use getPseudoString() instead.',
+            E_USER_DEPRECATED);
+        return self::getPseudoString($length, $method);
     }
 }
