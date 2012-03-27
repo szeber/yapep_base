@@ -17,12 +17,12 @@ namespace YapepBase\Response;
  */
 interface IOutput {
 
-    /**
-     * Outputs all parameters.
-     *
-     * @param string $string1 First string to output
-     * @param string $string2 Second string to output
-     * @param string $stringn n-th string to output
-     */
-    public function out();
+	/**
+	 * Outputs all parameters.
+	 *
+	 * @param string $string1 First string to output
+	 * @param string $string2 Second string to output
+	 * @param string $stringn n-th string to output
+	 */
+	public function out();
 }

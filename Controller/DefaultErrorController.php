@@ -18,22 +18,22 @@ namespace YapepBase\Controller;
  * @subpackage Controller
  */
 class DefaultErrorController extends AbstractErrorController {
-    /**
-     * Runs on page not found (404) errors
-     *
-     * @return \YapepBase\View\TemplateAbstract|string
-     */
-    protected function do404() {
-        return '<h1>404 - Page not found</h1>';
-    }
+	/**
+	 * Runs on page not found (404) errors
+	 *
+	 * @return \YapepBase\View\TemplateAbstract|string
+	 */
+	protected function do404() {
+		return '<h1>404 - Page not found</h1>';
+	}
 
-    /**
-     * Runs on internal server error (500) erorrs
-     *
-     * @return \YapepBase\View\TemplateAbstract|string
-     */
-    protected function do500() {
-        return '<h1>500 - Internal server error</h1>';
-    }
+	/**
+	 * Runs on internal server error (500) erorrs
+	 *
+	 * @return \YapepBase\View\TemplateAbstract|string
+	 */
+	protected function do500() {
+		return '<h1>500 - Internal server error</h1>';
+	}
 
 }

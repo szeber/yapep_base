@@ -21,20 +21,20 @@ use \PDO;
  */
 class SqliteConnection extends DbConnection {
 
-    /**
-     * Opens the connection.
-     *
-     * @param array $configuration   The configuration for the connection.
-     *
-     * @throws \PDOException   On connection errors.
-     */
-    protected function connect (array $configuration)
-    {
-        $dsn = 'sqlite:' . $configuration['path'];
-        $options = ((!empty($configuration['options']) && is_array($options)) ? $configuration['options'] : array());
+	/**
+	 * Opens the connection.
+	 *
+	 * @param array $configuration   The configuration for the connection.
+	 *
+	 * @throws \PDOException   On connection errors.
+	 */
+	protected function connect (array $configuration)
+	{
+		$dsn = 'sqlite:' . $configuration['path'];
+		$options = ((!empty($configuration['options']) && is_array($options)) ? $configuration['options'] : array());
 
-        $this->connection = new PDO($dsn, null, null, $options);
-    }
+		$this->connection = new PDO($dsn, null, null, $options);
+	}
 
 
 }

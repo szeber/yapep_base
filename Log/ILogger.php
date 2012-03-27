@@ -22,10 +22,10 @@ use YapepBase\Log\Message\IMessage;
 
 interface ILogger {
 
-    /**
-     * Logs the message
-     *
-     * @param \YapepBase\Log\Message\IMessage $message
-     */
-    public function log(IMessage $message);
+	/**
+	 * Logs the message
+	 *
+	 * @param \YapepBase\Log\Message\IMessage $message
+	 */
+	public function log(IMessage $message);
 }

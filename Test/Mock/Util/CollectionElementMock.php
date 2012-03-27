@@ -8,8 +8,8 @@ namespace YapepBase\Test\Mock\Util;
  * @codeCoverageIgnore
  */
 class CollectionElementMock {
-    protected $id;
-    function __construct() {
-        $this->id = uniqid('', true);
-    }
+	protected $id;
+	function __construct() {
+		$this->id = uniqid('', true);
+	}
 }

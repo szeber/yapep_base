@@ -20,58 +20,58 @@ use YapepBase\Log\Message\IMessage;
  */
 class LoggerRegistry implements ILogger {
 
-    /**
-     * Registered loggers.
-     *
-     * @var array
-     */
-    protected $loggers = array();
+	/**
+	 * Registered loggers.
+	 *
+	 * @var array
+	 */
+	protected $loggers = array();
 
-    /**
-     * Adds an error handler to the registry.
-     *
-     * @param \YapepBase\Log\ILogger $logger
-     */
-    public function addLogger(ILogger $logger) {
-        $this->loggers[] = $logger;
-    }
+	/**
+	 * Adds an error handler to the registry.
+	 *
+	 * @param \YapepBase\Log\ILogger $logger
+	 */
+	public function addLogger(ILogger $logger) {
+		$this->loggers[] = $logger;
+	}
 
-    /**
-     * Removes a logger from the registry.
-     *
-     * @param \YapepBase\Log\ILogger $logger
-     *
-     * @return bool   TRUE if the logger was removed successfully, FALSE otherwise.
-     */
-    public function removeLogger(ILogger $logger) {
-        $index = array_search($logger, $this->loggers);
-        if (false === $index) {
-            return false;
-        }
-        unset($this->loggers[$index]);
-        return true;
-    }
+	/**
+	 * Removes a logger from the registry.
+	 *
+	 * @param \YapepBase\Log\ILogger $logger
+	 *
+	 * @return bool   TRUE if the logger was removed successfully, FALSE otherwise.
+	 */
+	public function removeLogger(ILogger $logger) {
+		$index = array_search($logger, $this->loggers);
+		if (false === $index) {
+			return false;
+		}
+		unset($this->loggers[$index]);
+		return true;
+	}
 
-    /**
-     * Returns the loggers assigned to the registry.
-     *
-     * @return array
-     */
-    public function getLoggers() {
-        return $this->loggers;
-    }
+	/**
+	 * Returns the loggers assigned to the registry.
+	 *
+	 * @return array
+	 */
+	public function getLoggers() {
+		return $this->loggers;
+	}
 
-    /**
-     * Logs the message
-     *
-     * @param \YapepBase\Log\Message\IMessage $message
-     */
-    public function log(IMessage $message) {
-        if (!$message->checkIsEmpty()) {
-            foreach ($this->loggers as $logger) {
-                /** @var ILogger $logger */
-                $logger->log($message);
-            }
-        }
-    }
+	/**
+	 * Logs the message
+	 *
+	 * @param \YapepBase\Log\Message\IMessage $message
+	 */
+	public function log(IMessage $message) {
+		if (!$message->checkIsEmpty()) {
+			foreach ($this->loggers as $logger) {
+				/** @var ILogger $logger */
+				$logger->log($message);
+			}
+		}
+	}
 }

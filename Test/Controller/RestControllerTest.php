@@ -19,92 +19,92 @@ use YapepBase\Request\HttpRequest;
  */
 class RestControllerTest extends \PHPUnit_Framework_TestCase {
 
-    /**
-     * Returns an HttpRequest instance
-     *
-     * @param string $uri
-     * @param string $method
-     *
-     * @return \YapepBase\Request\HttpRequest
-     */
-    protected function getRequest($method = 'GET', $uri = '/') {
-        $server = array(
-            'REQUEST_URI'    => $uri,
-            'REQUEST_METHOD' => $method,
-        );
-        return new HttpRequest(array(), array(), array(), $server, array(), array());
-    }
+	/**
+	 * Returns an HttpRequest instance
+	 *
+	 * @param string $uri
+	 * @param string $method
+	 *
+	 * @return \YapepBase\Request\HttpRequest
+	 */
+	protected function getRequest($method = 'GET', $uri = '/') {
+		$server = array(
+			'REQUEST_URI'    => $uri,
+			'REQUEST_METHOD' => $method,
+		);
+		return new HttpRequest(array(), array(), array(), $server, array(), array());
+	}
 
-    function testXml() {
-        $this->markTestIncomplete();
-        return;
+	function testXml() {
+		$this->markTestIncomplete();
+		return;
 
-        $request = $this->getRequest();
-        $out = new OutputMock();
-        $response = new HttpResponse($out);
-        $c = new RestMockController($request, $response);
-        $c->run('xml');
-        $response->send();
-        $this->assertEquals(array('application/xml; charset=UTF-8'), $out->headers['Content-Type']);
-        $this->assertEquals('<rest><test1>test</test1></rest>', $out->out);
-    }
+		$request = $this->getRequest();
+		$out = new OutputMock();
+		$response = new HttpResponse($out);
+		$c = new RestMockController($request, $response);
+		$c->run('xml');
+		$response->send();
+		$this->assertEquals(array('application/xml; charset=UTF-8'), $out->headers['Content-Type']);
+		$this->assertEquals('<rest><test1>test</test1></rest>', $out->out);
+	}
 
-    function testJson() {
-        $this->markTestIncomplete();
-        return;
+	function testJson() {
+		$this->markTestIncomplete();
+		return;
 
-        $request = $this->getRequest();
-        $out = new OutputMock();
-        $response = new HttpResponse($out);
-        $c = new RestMockController($request, $response);
-        $c->run('json');
-        $response->send();
-        $this->assertEquals(array('application/json; charset=UTF-8'), $out->headers['Content-Type']);
-        $this->assertEquals('{"test1":"test"}', $out->out);
-    }
+		$request = $this->getRequest();
+		$out = new OutputMock();
+		$response = new HttpResponse($out);
+		$c = new RestMockController($request, $response);
+		$c->run('json');
+		$response->send();
+		$this->assertEquals(array('application/json; charset=UTF-8'), $out->headers['Content-Type']);
+		$this->assertEquals('{"test1":"test"}', $out->out);
+	}
 
-    function testString() {
-        $this->markTestIncomplete();
-        return;
+	function testString() {
+		$this->markTestIncomplete();
+		return;
 
-        $request = $this->getRequest();
-        $out = new OutputMock();
-        $response = new HttpResponse($out);
-        $c = new RestMockController($request, $response);
-        $c->run('string');
-        $response->send();
-        $this->assertEquals(array('text/plain; charset=UTF-8'), $out->headers['Content-Type']);
-        $this->assertEquals('test', $out->out);
-    }
+		$request = $this->getRequest();
+		$out = new OutputMock();
+		$response = new HttpResponse($out);
+		$c = new RestMockController($request, $response);
+		$c->run('string');
+		$response->send();
+		$this->assertEquals(array('text/plain; charset=UTF-8'), $out->headers['Content-Type']);
+		$this->assertEquals('test', $out->out);
+	}
 
-    function testUnknown() {
-        $this->markTestIncomplete();
-        return;
+	function testUnknown() {
+		$this->markTestIncomplete();
+		return;
 
-        $request = $this->getRequest();
-        $out = new OutputMock();
-        $response = new HttpResponse($out);
-        $c = new RestMockController($request, $response);
-        $c->run('unknown');
-        try {
-            $response->send();
-            $this->fail('Rendering with unsupported content type should result in a ViewException');
-        } catch (ViewException $e) { }
-    }
+		$request = $this->getRequest();
+		$out = new OutputMock();
+		$response = new HttpResponse($out);
+		$c = new RestMockController($request, $response);
+		$c->run('unknown');
+		try {
+			$response->send();
+			$this->fail('Rendering with unsupported content type should result in a ViewException');
+		} catch (ViewException $e) { }
+	}
 
-    function testInvalid() {
-        $this->markTestIncomplete();
-        return;
+	function testInvalid() {
+		$this->markTestIncomplete();
+		return;
 
-        $request = $this->getRequest();
-        $out = new OutputMock();
-        $response = new HttpResponse($out);
-        $c = new RestMockController($request, $response);
-        try {
-            $c->run('invalid');
-            $this->fail('Running with non-view return value type should result in a ControllerException');
-        } catch (ControllerException $e) {
-            $this->assertEquals(ControllerException::ERR_INVALID_ACTION_RETURN_VALUE, $e->getCode());
-        }
-    }
+		$request = $this->getRequest();
+		$out = new OutputMock();
+		$response = new HttpResponse($out);
+		$c = new RestMockController($request, $response);
+		try {
+			$c->run('invalid');
+			$this->fail('Running with non-view return value type should result in a ControllerException');
+		} catch (ControllerException $e) {
+			$this->assertEquals(ControllerException::ERR_INVALID_ACTION_RETURN_VALUE, $e->getCode());
+		}
+	}
 }

@@ -19,38 +19,38 @@ use YapepBase\Event\IEventHandler;
  * @subpackage Session
  */
 interface ISession extends \ArrayAccess, IEventHandler {
-    /**
-     * Registers the instance as an event handler
-     */
-    public function registerEventHandler();
+	/**
+	 * Registers the instance as an event handler
+	 */
+	public function registerEventHandler();
 
-    /**
-     * Removes event handler registration
-     */
-    public function removeEventHandler();
+	/**
+	 * Removes event handler registration
+	 */
+	public function removeEventHandler();
 
-    /**
-     * Creates a new session.
-     */
-    public function create();
+	/**
+	 * Creates a new session.
+	 */
+	public function create();
 
-    /**
-     * Destroys the session.
-     */
-    public function destroy();
+	/**
+	 * Destroys the session.
+	 */
+	public function destroy();
 
-    /**
-     * Returns the session's namespace
-     *
-     * @return string
-     */
-    public function getNamespace();
+	/**
+	 * Returns the session's namespace
+	 *
+	 * @return string
+	 */
+	public function getNamespace();
 
-    /**
-     * Returns the session ID
-     *
-     * @return string
-     */
-    public function getId();
+	/**
+	 * Returns the session ID
+	 *
+	 * @return string
+	 */
+	public function getId();
 
 }

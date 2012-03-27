@@ -16,16 +16,16 @@ namespace YapepBase\Exception;
  * element doesn't exist.
  */
 class IndexOutOfBoundsException extends \Exception {
-    /**
-     * Exception constructor
-     *
-     * @param integer|string|bool $offset the offset in question
-     */
-    function __construct($offset = false) {
-        if ($offset !== false) {
-            parent::__construct("Index out of bounds: " . $offset);
-        } else {
-            parent::__construct("Index out of bounds");
-        }
-    }
+	/**
+	 * Exception constructor
+	 *
+	 * @param integer|string|bool $offset the offset in question
+	 */
+	function __construct($offset = false) {
+		if ($offset !== false) {
+			parent::__construct("Index out of bounds: " . $offset);
+		} else {
+			parent::__construct("Index out of bounds");
+		}
+	}
 }

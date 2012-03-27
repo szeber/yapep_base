@@ -7,7 +7,7 @@ namespace YapepBase\Test\Mock\Controller;
  * @codeCoverageIgnore
  */
 class ApplicationMockController extends \YapepBase\Controller\BaseController {
-    public function doTest() {
-        return 'test';
-    }
+	public function doTest() {
+		return 'test';
+	}
 }

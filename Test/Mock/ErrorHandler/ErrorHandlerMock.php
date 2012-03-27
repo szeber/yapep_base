@@ -22,38 +22,38 @@ use YapepBase\ErrorHandler\IErrorHandler;
  */
 class ErrorHandlerMock implements IErrorHandler {
 
-    public $handledErrors = array();
+	public $handledErrors = array();
 
-    public $handledExceptions = array();
+	public $handledExceptions = array();
 
-    public $handledShutdowns = array();
+	public $handledShutdowns = array();
 
-    public function handleError($errorLevel, $message, $file, $line, $context, $errorId, array $backTrace = array()) {
-        $this->handledErrors[] = array(
-            'errorLevel' => $errorLevel,
-            'message'    => $message,
-            'file'       => $file,
-            'line'       => $line,
-            'context'    => $context,
-            'errorId'    => $errorId,
-            'backTrace'  => $backTrace,
-        );
-    }
+	public function handleError($errorLevel, $message, $file, $line, $context, $errorId, array $backTrace = array()) {
+		$this->handledErrors[] = array(
+			'errorLevel' => $errorLevel,
+			'message'    => $message,
+			'file'       => $file,
+			'line'       => $line,
+			'context'    => $context,
+			'errorId'    => $errorId,
+			'backTrace'  => $backTrace,
+		);
+	}
 
-    public function handleException(\Exception $exception, $errorId) {
-        $this->handledExceptions[] = array(
-            'exception' => $exception,
-            'errorId'   => $errorId,
-        );
-    }
+	public function handleException(\Exception $exception, $errorId) {
+		$this->handledExceptions[] = array(
+			'exception' => $exception,
+			'errorId'   => $errorId,
+		);
+	}
 
-    public function handleShutdown($errorLevel, $message, $file, $line, $errorId) {
-        $this->handledShutdowns[] = array(
-            'errorLevel' => $errorLevel,
-            'message'    => $message,
-            'file'       => $file,
-            'line'       => $line,
-            'errorId'    => $errorId,
-        );
-    }
+	public function handleShutdown($errorLevel, $message, $file, $line, $errorId) {
+		$this->handledShutdowns[] = array(
+			'errorLevel' => $errorLevel,
+			'message'    => $message,
+			'file'       => $file,
+			'line'       => $line,
+			'errorId'    => $errorId,
+		);
+	}
 }

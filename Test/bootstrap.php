@@ -13,13 +13,13 @@ include_once(__DIR__ . '/../bootstrap.php');
 
 // Find vfsStream, and register autoloading for it, if available
 foreach(explode(\PATH_SEPARATOR, get_include_path()) as $path) {
-    if (file_exists($path . \DIRECTORY_SEPARATOR . 'vfsStream')) {
-        $autoloader = new \YapepBase\Autoloader\SimpleAutoloader();
-        $autoloader->setClassPath(array($path . \DIRECTORY_SEPARATOR . 'vfsStream'));
-        $autoloader->register();
-        unset($autoloader);
-        break;
-    }
+	if (file_exists($path . \DIRECTORY_SEPARATOR . 'vfsStream')) {
+		$autoloader = new \YapepBase\Autoloader\SimpleAutoloader();
+		$autoloader->setClassPath(array($path . \DIRECTORY_SEPARATOR . 'vfsStream'));
+		$autoloader->register();
+		unset($autoloader);
+		break;
+	}
 }
 
 unset($path);

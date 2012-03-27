@@ -22,29 +22,29 @@ use YapepBase\Config;
  */
 abstract class StorageAbstract implements IStorage {
 
-    /**
-     * Constructor.
-     *
-     * @param string $configName   The name of the configuration to use.
-     *
-     * @throws \YapepBase\Exception\ConfigException    On configuration errors.
-     * @throws \YapepBase\Exception\StorageException   On storage errors.
-     */
-    public function __construct($configName) {
-        $config = Config::getInstance()->get($configName, false);
-        if (false === $config) {
-            throw new ConfigException('Configuration not found: ' . $configName);
-        }
-        $this->setupConfig($config);
-    }
+	/**
+	 * Constructor.
+	 *
+	 * @param string $configName   The name of the configuration to use.
+	 *
+	 * @throws \YapepBase\Exception\ConfigException    On configuration errors.
+	 * @throws \YapepBase\Exception\StorageException   On storage errors.
+	 */
+	public function __construct($configName) {
+		$config = Config::getInstance()->get($configName, false);
+		if (false === $config) {
+			throw new ConfigException('Configuration not found: ' . $configName);
+		}
+		$this->setupConfig($config);
+	}
 
-    /**
-     * Sets up the backend.
-     *
-     * @param array $config   The configuration data for the backend.
-     *
-     * @throws \YapepBase\Exception\ConfigException    On configuration errors.
-     * @throws \YapepBase\Exception\StorageException   On storage errors.
-     */
-    abstract protected function setupConfig(array $config);
+	/**
+	 * Sets up the backend.
+	 *
+	 * @param array $config   The configuration data for the backend.
+	 *
+	 * @throws \YapepBase\Exception\ConfigException    On configuration errors.
+	 * @throws \YapepBase\Exception\StorageException   On storage errors.
+	 */
+	abstract protected function setupConfig(array $config);
 }

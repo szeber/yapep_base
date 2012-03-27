@@ -16,104 +16,104 @@ use YapepBase\Exception\StorageException;
  */
 class MemcacheStorageTest extends \PHPUnit_Framework_TestCase {
 
-    /**
-     * @var \YapepBase\Test\Mock\Storage\MemcacheMock
-     */
-    protected $memcacheMock;
+	/**
+	 * @var \YapepBase\Test\Mock\Storage\MemcacheMock
+	 */
+	protected $memcacheMock;
 
-    /**
-     * Sets up the fixture, for example, opens a network connection.
-     * This method is called before a test is executed.
-     */
-    protected function setUp() {
-        parent::setUp();
-        $container = new SystemContainer();
-        $container[SystemContainer::KEY_MEMCACHE] = $container->share(function($container) {
-            return new MemcacheMock();
-        });
-        Application::getInstance()->setDiContainer($container);
-        $this->memcacheMock = Application::getInstance()->getDiContainer()->getMemcache();
-        Config::getInstance()->set(array(
-            'test.host' => 'localhost',
-            'test2.host' => 'localhost',
-            'test2.port' => 11222,
-            'test2.keyPrefix' => 'test.',
-            'test2.keySuffix' => '.test',
-            'test3.host' => 'localhost',
-            'test3.hashKey' => true,
-            'test3.keyPrefix' => 'test.',
-            'test4.port' => 11211,
-        ));
-    }
+	/**
+	 * Sets up the fixture, for example, opens a network connection.
+	 * This method is called before a test is executed.
+	 */
+	protected function setUp() {
+		parent::setUp();
+		$container = new SystemContainer();
+		$container[SystemContainer::KEY_MEMCACHE] = $container->share(function($container) {
+			return new MemcacheMock();
+		});
+		Application::getInstance()->setDiContainer($container);
+		$this->memcacheMock = Application::getInstance()->getDiContainer()->getMemcache();
+		Config::getInstance()->set(array(
+			'test.host' => 'localhost',
+			'test2.host' => 'localhost',
+			'test2.port' => 11222,
+			'test2.keyPrefix' => 'test.',
+			'test2.keySuffix' => '.test',
+			'test3.host' => 'localhost',
+			'test3.hashKey' => true,
+			'test3.keyPrefix' => 'test.',
+			'test4.port' => 11211,
+		));
+	}
 
-    /**
-     * Tears down the fixture, for example, closes a network connection.
-     * This method is called after a test is executed.
-     */
-    protected function tearDown() {
-        Config::getInstance()->clear();
-        Application::getInstance()->setDiContainer(new SystemContainer());
-    }
+	/**
+	 * Tears down the fixture, for example, closes a network connection.
+	 * This method is called after a test is executed.
+	 */
+	protected function tearDown() {
+		Config::getInstance()->clear();
+		Application::getInstance()->setDiContainer(new SystemContainer());
+	}
 
-    public function testConnection() {
-        $storage = new MemcacheStorage('test.*');
-        $this->assertEquals('localhost', $this->memcacheMock->host, 'Host mismatch');
-        $this->assertEquals(11211, $this->memcacheMock->port, 'Default port does not match');
+	public function testConnection() {
+		$storage = new MemcacheStorage('test.*');
+		$this->assertEquals('localhost', $this->memcacheMock->host, 'Host mismatch');
+		$this->assertEquals(11211, $this->memcacheMock->port, 'Default port does not match');
 
-        $storage = new MemcacheStorage('test2.*');
-        $this->assertEquals(11222, $this->memcacheMock->port, 'Non-default port does not match');
-    }
+		$storage = new MemcacheStorage('test2.*');
+		$this->assertEquals(11222, $this->memcacheMock->port, 'Non-default port does not match');
+	}
 
-    public function testFunctionality() {
-        $storage = new MemcacheStorage('test.*');
-        $this->assertEmpty($this->memcacheMock->data, 'Data is not empty after connecting');
+	public function testFunctionality() {
+		$storage = new MemcacheStorage('test.*');
+		$this->assertEmpty($this->memcacheMock->data, 'Data is not empty after connecting');
 
-        $this->assertFalse($storage->get('test'), 'Not set value does not return false');
+		$this->assertFalse($storage->get('test'), 'Not set value does not return false');
 
-        $storage->set('test', 'testValue', 100);
-        $this->assertSame('testValue', $storage->get('test'), 'Stored value does not match');
-        $this->assertEquals(100, $this->memcacheMock->data['test']['ttl'], 'Expiration does not match');
+		$storage->set('test', 'testValue', 100);
+		$this->assertSame('testValue', $storage->get('test'), 'Stored value does not match');
+		$this->assertEquals(100, $this->memcacheMock->data['test']['ttl'], 'Expiration does not match');
 
-        $storage->delete('test');
+		$storage->delete('test');
 
-        $this->assertFalse($storage->get('test'), 'Deletion failed');
-    }
+		$this->assertFalse($storage->get('test'), 'Deletion failed');
+	}
 
-    public function testPrefixedStorage() {
-        $storage = new MemcacheStorage('test2.*');
-        $storage->set('test', 'testValue');
-        $this->assertTrue(isset($this->memcacheMock->data['test.test.test']), 'Prefixed storage fails');
-    }
+	public function testPrefixedStorage() {
+		$storage = new MemcacheStorage('test2.*');
+		$storage->set('test', 'testValue');
+		$this->assertTrue(isset($this->memcacheMock->data['test.test.test']), 'Prefixed storage fails');
+	}
 
-    public function testHashedStorage() {
-        $storage = new MemcacheStorage('test3.*');
-        $storage->set('test', 'testValue');
-        $this->assertTrue(isset($this->memcacheMock->data[md5('test.test')]), 'Hashed storage fails');
-    }
+	public function testHashedStorage() {
+		$storage = new MemcacheStorage('test3.*');
+		$storage->set('test', 'testValue');
+		$this->assertTrue(isset($this->memcacheMock->data[md5('test.test')]), 'Hashed storage fails');
+	}
 
-    public function testStorageSettings() {
-        $storage = new MemcacheStorage('test.*');
-        $this->assertTrue($storage->isTtlSupported(), 'TTL should be supported');
-        $this->assertFalse($storage->isPersistent(), 'Memcache should not be persistent');
-    }
+	public function testStorageSettings() {
+		$storage = new MemcacheStorage('test.*');
+		$this->assertTrue($storage->isTtlSupported(), 'TTL should be supported');
+		$this->assertFalse($storage->isPersistent(), 'Memcache should not be persistent');
+	}
 
-    public function testErrorHandling() {
-        try {
-            new MemcacheStorage('nonexistent.*');
-            $this->fail('No ConfigException thrown for nonexistent config option');
-        } catch (ConfigException $exception) {}
+	public function testErrorHandling() {
+		try {
+			new MemcacheStorage('nonexistent.*');
+			$this->fail('No ConfigException thrown for nonexistent config option');
+		} catch (ConfigException $exception) {}
 
-        try {
-            new MemcacheStorage('test4.*');
-            $this->fail('No ConfigException thrown for config without a host');
-        } catch (ConfigException $exception) {}
+		try {
+			new MemcacheStorage('test4.*');
+			$this->fail('No ConfigException thrown for config without a host');
+		} catch (ConfigException $exception) {}
 
-        try {
-            $this->memcacheMock->connectionSuccessful = false;
-            new MemcacheStorage('test.*');
-            $this->fail('No StorageException thrown for failed connection');
-        } catch (StorageException $exception) {}
-    }
+		try {
+			$this->memcacheMock->connectionSuccessful = false;
+			new MemcacheStorage('test.*');
+			$this->fail('No StorageException thrown for failed connection');
+		} catch (StorageException $exception) {}
+	}
 
 }
 

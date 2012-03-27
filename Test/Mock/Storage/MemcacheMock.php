@@ -20,32 +20,32 @@ namespace YapepBase\Test\Mock\Storage;
  */
 class MemcacheMock {
 
-    public $host;
-    public $port;
-    public $connectionSuccessful = true;
-    public $data = array();
+	public $host;
+	public $port;
+	public $connectionSuccessful = true;
+	public $data = array();
 
-    public function connect($host, $port) {
-        $this->host = $host;
-        $this->port = $port;
-        return (bool)$this->connectionSuccessful;
-    }
+	public function connect($host, $port) {
+		$this->host = $host;
+		$this->port = $port;
+		return (bool)$this->connectionSuccessful;
+	}
 
-    public function set($key, $var, $flag, $expire) {
-        $this->data[$key] = array(
-            'value' => $var,
-            'flag'  => $flag,
-            'ttl'   => $expire,
-        );
-    }
+	public function set($key, $var, $flag, $expire) {
+		$this->data[$key] = array(
+			'value' => $var,
+			'flag'  => $flag,
+			'ttl'   => $expire,
+		);
+	}
 
-    public function get($key) {
-        return (isset($this->data[$key]) ? $this->data[$key]['value'] : false);
-    }
+	public function get($key) {
+		return (isset($this->data[$key]) ? $this->data[$key]['value'] : false);
+	}
 
-    public function delete($key) {
-        if (isset($this->data[$key])) {
-            unset($this->data[$key]);
-        }
-    }
+	public function delete($key) {
+		if (isset($this->data[$key])) {
+			unset($this->data[$key]);
+		}
+	}
 }

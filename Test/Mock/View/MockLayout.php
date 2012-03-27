@@ -9,10 +9,10 @@ use \YapepBase\View\LayoutAbstract;
  * @codeCoverageIgnore
  */
 class MockLayout extends LayoutAbstract {
-    /**
-     * Render the fake content
-     */
-    protected function renderContent() {
-        echo 'Layout: ' . $this->getTemplateOutput();
-    }
+	/**
+	 * Render the fake content
+	 */
+	protected function renderContent() {
+		echo 'Layout: ' . $this->getTemplateOutput();
+	}
 }

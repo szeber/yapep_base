@@ -18,23 +18,23 @@ namespace YapepBase;
  */
 class UtilityFunctions {
 
-    /**
-     * Recursively strips slashes from the specified data.
-     *
-     * Usable to undo magic_quotes.
-     *
-     * @param mixed $data
-     *
-     * @return mixed
-     */
-    public static function recursiveStripSlashes($data) {
-        if (is_array($data) || ($data instanceof \Iterator && $data instanceof \ArrayAccess)) {
-            foreach($data as $key => $value) {
-                $data[$key] = self::recursiveStripSlashes($value);
-            }
-            return $data;
-        } else {
-            return stripslashes($data);
-        }
-    }
+	/**
+	 * Recursively strips slashes from the specified data.
+	 *
+	 * Usable to undo magic_quotes.
+	 *
+	 * @param mixed $data
+	 *
+	 * @return mixed
+	 */
+	public static function recursiveStripSlashes($data) {
+		if (is_array($data) || ($data instanceof \Iterator && $data instanceof \ArrayAccess)) {
+			foreach($data as $key => $value) {
+				$data[$key] = self::recursiveStripSlashes($value);
+			}
+			return $data;
+		} else {
+			return stripslashes($data);
+		}
+	}
 }

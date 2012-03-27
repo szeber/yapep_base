@@ -27,82 +27,82 @@ use YapepBase\ErrorHandler\ErrorHandlerHelper;
  */
 class LoggingErrorHandler implements IErrorHandler {
 
-    /**
-     * The logger to use
-     *
-     * @var \YapepBase\Log\ILogger
-     */
-    protected $logger;
+	/**
+	 * The logger to use
+	 *
+	 * @var \YapepBase\Log\ILogger
+	 */
+	protected $logger;
 
-    /**
-     * Constructor
-     *
-     * @param \YapepBase\Log\ILogger $logger
-     */
-    public function __construct(ILogger $logger) {
-        $this->logger = $logger;
-    }
+	/**
+	 * Constructor
+	 *
+	 * @param \YapepBase\Log\ILogger $logger
+	 */
+	public function __construct(ILogger $logger) {
+		$this->logger = $logger;
+	}
 
-    /**
-     * Handles a PHP error
-     *
-     * @param int    $errorLevel   The error code {@uses E_*}
-     * @param string $message      The error message.
-     * @param string $file         The file where the error occured.
-     * @param int    $line         The line in the file where the error occured.
-     * @param array  $context      The context of the error. (All variables that exist in the scope the error occured)
-     * @param string $errorId      The internal ID of the error.
-     * @param array  $backTrace    The debug backtrace of the error.
-     */
-    public function handleError($errorLevel, $message, $file, $line, $context, $errorId, array $backTrace = array()) {
-        $helper = new ErrorHandlerHelper();
-        $errorLevelDescription = $helper->getPhpErrorLevelDescription($errorLevel);
+	/**
+	 * Handles a PHP error
+	 *
+	 * @param int    $errorLevel   The error code {@uses E_*}
+	 * @param string $message      The error message.
+	 * @param string $file         The file where the error occured.
+	 * @param int    $line         The line in the file where the error occured.
+	 * @param array  $context      The context of the error. (All variables that exist in the scope the error occured)
+	 * @param string $errorId      The internal ID of the error.
+	 * @param array  $backTrace    The debug backtrace of the error.
+	 */
+	public function handleError($errorLevel, $message, $file, $line, $context, $errorId, array $backTrace = array()) {
+		$helper = new ErrorHandlerHelper();
+		$errorLevelDescription = $helper->getPhpErrorLevelDescription($errorLevel);
 
-        $errorMessage = '[' . $errorLevelDescription . '(' . $errorLevel . ')]: ' . $message . ' on line ' . $line
-            . ' in ' . $file;
+		$errorMessage = '[' . $errorLevelDescription . '(' . $errorLevel . ')]: ' . $message . ' on line ' . $line
+			. ' in ' . $file;
 
-        $message = Application::getInstance()->getDiContainer()->getErrorLogMessage();
-        $message->set($errorMessage, $errorLevelDescription, $errorId,
-            $helper->getLogPriorityForErrorLevel($errorLevel));
+		$message = Application::getInstance()->getDiContainer()->getErrorLogMessage();
+		$message->set($errorMessage, $errorLevelDescription, $errorId,
+			$helper->getLogPriorityForErrorLevel($errorLevel));
 
-        $this->logger->log($message);
-    }
+		$this->logger->log($message);
+	}
 
-    /**
-     * Handles an uncaught exception. The exception must extend the \Exception class to be handled.
-     *
-     * @param \Exception $exception   The exception to handle.
-     * @param string $errorId        The internal ID of the error.
-     */
-    public function handleException(\Exception $exception, $errorId) {
-        $errorMessage = '[' . ErrorHandlerHelper::E_EXCEPTION_DESCRIPTION . ']: Unhandled ' . get_class($exception) .': '
-            . $exception->getMessage() . '(' . $exception->getCode() .') on line ' . $exception->getLine() . ' in '
-            . $exception->getFile();
+	/**
+	 * Handles an uncaught exception. The exception must extend the \Exception class to be handled.
+	 *
+	 * @param \Exception $exception   The exception to handle.
+	 * @param string $errorId        The internal ID of the error.
+	 */
+	public function handleException(\Exception $exception, $errorId) {
+		$errorMessage = '[' . ErrorHandlerHelper::E_EXCEPTION_DESCRIPTION . ']: Unhandled ' . get_class($exception) .': '
+			. $exception->getMessage() . '(' . $exception->getCode() .') on line ' . $exception->getLine() . ' in '
+			. $exception->getFile();
 
-        $message = Application::getInstance()->getDiContainer()->getErrorLogMessage();
-        $message->set($errorMessage, ErrorHandlerHelper::E_EXCEPTION_DESCRIPTION, $errorId, LOG_ERR);
+		$message = Application::getInstance()->getDiContainer()->getErrorLogMessage();
+		$message->set($errorMessage, ErrorHandlerHelper::E_EXCEPTION_DESCRIPTION, $errorId, LOG_ERR);
 
-        $this->logger->log($message);
-    }
+		$this->logger->log($message);
+	}
 
-    /**
-     * Called at script shutdown if the shutdown is because of a fatal error.
-     *
-     * @param int    $errorLevel   The error code {@uses E_*}
-     * @param string $message      The error message.
-     * @param string $file         The file where the error occured.
-     * @param int    $line         The line in the file where the error occured.
-     * @param string $errorId      The internal ID of the error.
-     */
-    function handleShutdown($errorLevel, $message, $file, $line, $errorId) {
-        $helper = new ErrorHandlerHelper();
-        $errorLevelDescription = $helper->getPhpErrorLevelDescription($errorLevel);
+	/**
+	 * Called at script shutdown if the shutdown is because of a fatal error.
+	 *
+	 * @param int    $errorLevel   The error code {@uses E_*}
+	 * @param string $message      The error message.
+	 * @param string $file         The file where the error occured.
+	 * @param int    $line         The line in the file where the error occured.
+	 * @param string $errorId      The internal ID of the error.
+	 */
+	function handleShutdown($errorLevel, $message, $file, $line, $errorId) {
+		$helper = new ErrorHandlerHelper();
+		$errorLevelDescription = $helper->getPhpErrorLevelDescription($errorLevel);
 
-        $errorMessage = '[' . $errorLevelDescription . '(' . $errorLevel . ')]: ' . $message . ' on line ' . $line
-        . ' in ' . $file;
-        $message = Application::getInstance()->getDiContainer()->getErrorLogMessage();
-        $message->set($errorMessage, $errorLevelDescription, $errorId,
-                $helper->getLogPriorityForErrorLevel($errorLevel));
-        $this->logger->log($message);
-    }
+		$errorMessage = '[' . $errorLevelDescription . '(' . $errorLevel . ')]: ' . $message . ' on line ' . $line
+		. ' in ' . $file;
+		$message = Application::getInstance()->getDiContainer()->getErrorLogMessage();
+		$message->set($errorMessage, $errorLevelDescription, $errorId,
+				$helper->getLogPriorityForErrorLevel($errorLevel));
+		$this->logger->log($message);
+	}
 }

@@ -19,10 +19,10 @@ namespace YapepBase\Event;
  */
 interface IEventHandler {
 
-    /**
-     * Handles an event
-     *
-     * @param \YapepBase\Event\Event  $event       The dispatched event.
-     */
-    public function handleEvent(Event $event);
+	/**
+	 * Handles an event
+	 *
+	 * @param \YapepBase\Event\Event  $event       The dispatched event.
+	 */
+	public function handleEvent(Event $event);
 }

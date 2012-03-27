@@ -22,22 +22,22 @@ use YapepBase\Test\Mock\Session\SessionMock;
  */
 class SessionRegistryTest extends \PHPUnit_Framework_TestCase {
 
-    public function testRegistration() {
-        $session = new SessionMock('test');
-        $registry = new SessionRegistry();
+	public function testRegistration() {
+		$session = new SessionMock('test');
+		$registry = new SessionRegistry();
 
-        $registry->register($session);
-        $this->assertSame($session, $registry->getSession('test'));
-    }
+		$registry->register($session);
+		$this->assertSame($session, $registry->getSession('test'));
+	}
 
-    public function testErrorHandling() {
-        $registry = new SessionRegistry();
-        try {
-            $registry->getSession('test');
-            $this->fail('No error thrown for nonexistent session request');
-        } catch (Exception $exception) {}
+	public function testErrorHandling() {
+		$registry = new SessionRegistry();
+		try {
+			$registry->getSession('test');
+			$this->fail('No error thrown for nonexistent session request');
+		} catch (Exception $exception) {}
 
-    }
+	}
 
 }
 

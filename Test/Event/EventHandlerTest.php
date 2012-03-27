@@ -22,47 +22,47 @@ use YapepBase\Event\Event;
  */
 class EventHandlerTest extends \PHPUnit_Framework_TestCase {
 
-    public function testRegistration() {
-        $registry = new EventHandlerRegistry();
-        $eventHandler = new EventHandlerMock();
+	public function testRegistration() {
+		$registry = new EventHandlerRegistry();
+		$eventHandler = new EventHandlerMock();
 
-        $result = $registry->getEventHandlers('test');
-        $this->assertTrue(empty($result), 'The test event handlers are not empty after instantiation.');
+		$result = $registry->getEventHandlers('test');
+		$this->assertTrue(empty($result), 'The test event handlers are not empty after instantiation.');
 
-        $registry->registerEventHandler('test', $eventHandler);
-        $result = $registry->getEventHandlers('test');
-        $this->assertFalse(empty($result), 'The test event handlers are empty after registering.');
-        $this->assertEquals(1, count($result), 'There is not 1 registered event handler.');
+		$registry->registerEventHandler('test', $eventHandler);
+		$result = $registry->getEventHandlers('test');
+		$this->assertFalse(empty($result), 'The test event handlers are empty after registering.');
+		$this->assertEquals(1, count($result), 'There is not 1 registered event handler.');
 
-        $firstHandler = reset($result);
-        $this->assertSame($eventHandler, $firstHandler, 'The event handler is not the same as what was set');
+		$firstHandler = reset($result);
+		$this->assertSame($eventHandler, $firstHandler, 'The event handler is not the same as what was set');
 
-        $registry->removeEventHandler('test', $eventHandler);
-        $result = $registry->getEventHandlers('test');
-        $this->assertTrue(empty($result), 'Removing an event handler fails.');
+		$registry->removeEventHandler('test', $eventHandler);
+		$result = $registry->getEventHandlers('test');
+		$this->assertTrue(empty($result), 'Removing an event handler fails.');
 
-        $registry->registerEventHandler('test', $eventHandler);
-        $registry->clear('test');
-        $result = $registry->getEventHandlers('test');
-        $this->assertTrue(empty($result), 'Clearing the test event handlers fails.');
+		$registry->registerEventHandler('test', $eventHandler);
+		$registry->clear('test');
+		$result = $registry->getEventHandlers('test');
+		$this->assertTrue(empty($result), 'Clearing the test event handlers fails.');
 
-        $registry->registerEventHandler('test', $eventHandler);
-        $registry->clearAll();
-        $result = $registry->getEventHandlers('test');
-        $this->assertTrue(empty($result), 'Clearing all event handlers does not clear the test handlers.');
-    }
+		$registry->registerEventHandler('test', $eventHandler);
+		$registry->clearAll();
+		$result = $registry->getEventHandlers('test');
+		$this->assertTrue(empty($result), 'Clearing all event handlers does not clear the test handlers.');
+	}
 
-    public function testRaise() {
-        $registry = new EventHandlerRegistry();
-        $eventHandler = new EventHandlerMock();
-        $testEvent = new Event('test', array('test' => 'test'));
+	public function testRaise() {
+		$registry = new EventHandlerRegistry();
+		$eventHandler = new EventHandlerMock();
+		$testEvent = new Event('test', array('test' => 'test'));
 
-        $registry->registerEventHandler('test', $eventHandler);
+		$registry->registerEventHandler('test', $eventHandler);
 
-        $registry->raise($testEvent);
+		$registry->raise($testEvent);
 
-        $this->assertEquals(1, $eventHandler->getHandleCounts(), 'The event handler was not called once.');
-        $this->assertSame($testEvent, $eventHandler->getLastHandledEvent(),
-        	'The handled event is not the same as was raised.');
-    }
+		$this->assertEquals(1, $eventHandler->getHandleCounts(), 'The event handler was not called once.');
+		$this->assertSame($testEvent, $eventHandler->getLastHandledEvent(),
+			'The handled event is not the same as was raised.');
+	}
 }

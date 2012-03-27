@@ -6,19 +6,19 @@ namespace YapepBase\Test\Mock\Response;
  * @codeCoverageIgnore
  */
 class ResponseMock implements \YapepBase\Response\IResponse {
-    public function __construct(\YapepBase\Response\IOutput $output = null) {
+	public function __construct(\YapepBase\Response\IOutput $output = null) {
 
-    }
-    public function setBody(\YapepBase\View\IView $body) {
+	}
+	public function setBody(\YapepBase\View\IView $body) {
 
-    }
-    public function setRenderedBody($body) {
+	}
+	public function setRenderedBody($body) {
 
-    }
-    public function send() {
+	}
+	public function send() {
 
-    }
-    public function sendError() {
+	}
+	public function sendError() {
 
-    }
+	}
 }

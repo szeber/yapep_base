@@ -28,9 +28,9 @@ class HttpRequestTest extends \PHPUnit_Framework_TestCase {
 	 */
 	protected $request;
 
-    /**
-     * Prepares the environment before running a test.
-     */
+	/**
+	 * Prepares the environment before running a test.
+	 */
 	protected function setUp() {
 
 		parent::setUp();
@@ -48,7 +48,7 @@ class HttpRequestTest extends \PHPUnit_Framework_TestCase {
 	protected function getRequest(array $additionalServerFields = array()) {
 		$server = array_merge(array(
 			'REQUEST_URI'    => '/target',
-            'REQUEST_METHOD' => 'post',
+			'REQUEST_METHOD' => 'post',
 		), $additionalServerFields);
 
 		$get = array(
@@ -56,17 +56,17 @@ class HttpRequestTest extends \PHPUnit_Framework_TestCase {
 			'username' 	=> 'username_value',
 			'password' 	=> 'password_value',
 		);
-	    $post = array(
+		$post = array(
 			'param' => 'post_param',
-	        'post_param' => 1,
+			'post_param' => 1,
 		);
 		$cookie = array(
 			'param' => 'cookie_param',
-		    'cookie' => 1,
-	    );
-        $env = array(
-            'envParam' => 'env_value',
-        );
+			'cookie' => 1,
+		);
+		$env = array(
+			'envParam' => 'env_value',
+		);
 
 		return new HttpRequest($get, $post, $cookie, $server, $env, array(), true);
 	}
@@ -125,8 +125,8 @@ class HttpRequestTest extends \PHPUnit_Framework_TestCase {
 	 * Tests if the getParam and setParam methods work
 	 */
 	public function testRouteParam() {
-	    $this->request->setParam('test', 'test');
-	    $this->assertEquals('test', $this->request->getParam('test'));
+		$this->request->setParam('test', 'test');
+		$this->assertEquals('test', $this->request->getParam('test'));
 	}
 
 	/**
@@ -162,188 +162,188 @@ class HttpRequestTest extends \PHPUnit_Framework_TestCase {
 		$this->assertNull($this->request->get('nonexistent'), 'Generic getter fails for nonexistent value');
 	}
 
-    public function testGetServer() {
-        $this->assertSame('/target', $this->request->getServer('REQUEST_URI'), 'Get from server fails');
-        $this->assertNull($this->request->getServer('nonexistent'), 'Get nonexistent key from server fails');
-    }
+	public function testGetServer() {
+		$this->assertSame('/target', $this->request->getServer('REQUEST_URI'), 'Get from server fails');
+		$this->assertNull($this->request->getServer('nonexistent'), 'Get nonexistent key from server fails');
+	}
 
-    public function testGetEnv() {
-        $this->assertSame('env_value', $this->request->getEnv('envParam'), 'Get from env fails');
-        $this->assertNull($this->request->getEnv('nonexistent'), 'Get nonexistent key from env fails');
-    }
+	public function testGetEnv() {
+		$this->assertSame('env_value', $this->request->getEnv('envParam'), 'Get from env fails');
+		$this->assertNull($this->request->getEnv('nonexistent'), 'Get nonexistent key from env fails');
+	}
 
-    protected function getOriginalsFromAcceptedTypes(array $types) {
-        $result = array();
-        foreach ($types as $type) {
-            $result[] = $type['original'];
-        }
-        return $result;
-    }
+	protected function getOriginalsFromAcceptedTypes(array $types) {
+		$result = array();
+		foreach ($types as $type) {
+			$result[] = $type['original'];
+		}
+		return $result;
+	}
 
-    protected function checkPreferredValuesAreValid($acceptHeader, array $validArrays) {
+	protected function checkPreferredValuesAreValid($acceptHeader, array $validArrays) {
 		$request = $this->getRequest(array(
 			'HTTP_ACCEPT' => $acceptHeader,
-	    ));
+		));
 		$preferredTypes = $this->getOriginalsFromAcceptedTypes($request->getAcceptedContentTypesByPreference());
 		return in_array($preferredTypes, $validArrays);
-    }
+	}
 
-    public function testGetAcceptedContentTypes() {
-        $this->assertSame(array(), $this->request->getAcceptedContentTypes(),
-        	'Request without an accept header should return an empty array');
-        $request = $this->getRequest(array(
+	public function testGetAcceptedContentTypes() {
+		$this->assertSame(array(), $this->request->getAcceptedContentTypes(),
+			'Request without an accept header should return an empty array');
+		$request = $this->getRequest(array(
 			'HTTP_ACCEPT' => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-	    ));
-	    $expected = array(
-	        array(
-    	        'type' => 'text',
-	            'subType' => 'html',
-	            'mimeType' => 'text/html',
-	            'original' => 'text/html',
-	            'params' => array(
-	                'q' => 1.0,
-	            ),
-	        ),
-	        array(
-    	        'type' => 'application',
-	            'subType' => 'xhtml+xml',
-	            'mimeType' => 'application/xhtml+xml',
-	            'original' => 'application/xhtml+xml',
-	        	'params' => array(
-	                'q' => 1.0,
-	            ),
-	        ),
-	        array(
-    	        'type' => 'application',
-	            'subType' => 'xml',
-	            'mimeType' => 'application/xml',
-	            'original' => 'application/xml;q=0.9',
-	            'params' => array(
-	                'q' => 0.9,
-	            ),
-	        ),
-	        array(
-    	        'type' => '*',
-	            'subType' => '*',
-	            'mimeType' => '*/*',
-	            'original' => '*/*;q=0.8',
-	            'params' => array(
-	                'q' => 0.8,
-	            ),
-	        ),
-        );
-	    $this->assertEquals($expected, $request->getAcceptedContentTypes());
-        $request = $this->getRequest(array(
+		));
+		$expected = array(
+			array(
+				'type' => 'text',
+				'subType' => 'html',
+				'mimeType' => 'text/html',
+				'original' => 'text/html',
+				'params' => array(
+					'q' => 1.0,
+				),
+			),
+			array(
+				'type' => 'application',
+				'subType' => 'xhtml+xml',
+				'mimeType' => 'application/xhtml+xml',
+				'original' => 'application/xhtml+xml',
+				'params' => array(
+					'q' => 1.0,
+				),
+			),
+			array(
+				'type' => 'application',
+				'subType' => 'xml',
+				'mimeType' => 'application/xml',
+				'original' => 'application/xml;q=0.9',
+				'params' => array(
+					'q' => 0.9,
+				),
+			),
+			array(
+				'type' => '*',
+				'subType' => '*',
+				'mimeType' => '*/*',
+				'original' => '*/*;q=0.8',
+				'params' => array(
+					'q' => 0.8,
+				),
+			),
+		);
+		$this->assertEquals($expected, $request->getAcceptedContentTypes());
+		$request = $this->getRequest(array(
 			'HTTP_ACCEPT' => ',text/html;q=0.6;level=1;test',
-	    ));
-	    $expected = array(
-	        array(
-    	        'type' => 'text',
-	            'subType' => 'html',
-	            'mimeType' => 'text/html',
-	            'original' => 'text/html;q=0.6;level=1;test',
-	            'params' => array(
-	                'q' => 0.6,
-	                'level' => 1
-	            ),
-	        ),
-        );
-	    $this->assertEquals($expected, $request->getAcceptedContentTypes());
-    }
+		));
+		$expected = array(
+			array(
+				'type' => 'text',
+				'subType' => 'html',
+				'mimeType' => 'text/html',
+				'original' => 'text/html;q=0.6;level=1;test',
+				'params' => array(
+					'q' => 0.6,
+					'level' => 1
+				),
+			),
+		);
+		$this->assertEquals($expected, $request->getAcceptedContentTypes());
+	}
 
-    public function testGetAcceptedTypesByPreference() {
+	public function testGetAcceptedTypesByPreference() {
 		$this->assertTrue($this->checkPreferredValuesAreValid(
 			'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8', array(
-    		    array('text/html', 'application/xhtml+xml', 'application/xml;q=0.9', '*/*;q=0.8'),
-    		    array('application/xhtml+xml', 'text/html', 'application/xml;q=0.9', '*/*;q=0.8'),
-	        )
-	    ));
+				array('text/html', 'application/xhtml+xml', 'application/xml;q=0.9', '*/*;q=0.8'),
+				array('application/xhtml+xml', 'text/html', 'application/xml;q=0.9', '*/*;q=0.8'),
+			)
+		));
 		$this->assertTrue($this->checkPreferredValuesAreValid(
 			'text/plain; q=0.5, text/html,
-	           text/x-dvi; q=0.8, text/x-c', array(
-    		    array('text/html', 'text/x-c', 'text/x-dvi; q=0.8', 'text/plain; q=0.5'),
-    		    array('text/x-c', 'text/html', 'text/x-dvi; q=0.8', 'text/plain; q=0.5'),
-	        )
-	    ));
+			   text/x-dvi; q=0.8, text/x-c', array(
+				array('text/html', 'text/x-c', 'text/x-dvi; q=0.8', 'text/plain; q=0.5'),
+				array('text/x-c', 'text/html', 'text/x-dvi; q=0.8', 'text/plain; q=0.5'),
+			)
+		));
 		$this->assertTrue($this->checkPreferredValuesAreValid(
 			'text/*, text/html, text/html;level=1, */*', array(
-    		    array('text/html;level=1', 'text/html', 'text/*', '*/*'),
-	        )
-	    ));
+				array('text/html;level=1', 'text/html', 'text/*', '*/*'),
+			)
+		));
 		$this->assertTrue($this->checkPreferredValuesAreValid(
 			'text/*;q=0.3, text/html;q=0.7, text/html;level=1,
-               text/html;level=2;q=0.4, */*;q=0.5', array(
-    		    array('text/html;level=1', 'text/html;q=0.7', '*/*;q=0.5', 'text/html;level=2;q=0.4', 'text/*;q=0.3'),
-	        )
-	    ));
+			   text/html;level=2;q=0.4, */*;q=0.5', array(
+				array('text/html;level=1', 'text/html;q=0.7', '*/*;q=0.5', 'text/html;level=2;q=0.4', 'text/*;q=0.3'),
+			)
+		));
 		$this->assertTrue($this->checkPreferredValuesAreValid(
 			'text/html,*/*,*/*', array(
-    		    array('text/html', '*/*', '*/*'),
-	        )
-	    ));
+				array('text/html', '*/*', '*/*'),
+			)
+		));
 		$this->assertTrue($this->checkPreferredValuesAreValid(
 			'text/html,text/*,application/*', array(
-    		    array('text/html', 'text/*', 'application/*'),
-    		    array('text/html', 'application/*', 'text/*'),
-    		    )
-	    ));
-    }
+				array('text/html', 'text/*', 'application/*'),
+				array('text/html', 'application/*', 'text/*'),
+				)
+		));
+	}
 
-    public function testGetContentTypePreferenceValue() {
-        $this->assertSame(1.0, $this->request->getContentTypePreferenceValue('image/jpeg'),
-        	'Request without an accept header should accept any content type with a value of 1.0');
-        $request = $this->getRequest(array(
-			'HTTP_ACCEPT' => 'text/*;q=0.3, text/html;q=0.7, text/html;level=1,
-               text/html;level=2;q=0.4, */*;q=0.5',
-	    ));
-	    $this->assertSame(0.0, $request->getContentTypePreferenceValue('invalid'), 'Invalid content type check fails');
-	    $this->assertSame(1.0, $request->getContentTypePreferenceValue('text/html; level=1'),
-	    	'text/html; level=1 fails');
-	    $this->assertSame(0.7, $request->getContentTypePreferenceValue('text/html'),
-	    	'text/html fails');
-	    $this->assertSame(0.3, $request->getContentTypePreferenceValue('text/plain'),
-	    	'text/plain fails');
-	    $this->assertSame(0.5, $request->getContentTypePreferenceValue('image/jpeg'),
-	    	'image/jpeg fails');
-	    $this->assertSame(0.4, $request->getContentTypePreferenceValue('text/html; level=2'),
-	    	'text/html; level=2 fails');
-	    $this->assertSame(0.7, $request->getContentTypePreferenceValue('text/html; level=3'),
-	    	'text/html; level=3 fails');
-    }
-
-    public function testCheckIfContentTypeIsPreferred() {
-        $this->assertTrue($this->request->checkIfContentTypeIsPreferred('image/jpeg'),
-        	'Request without an accept header should accept any content type');
+	public function testGetContentTypePreferenceValue() {
+		$this->assertSame(1.0, $this->request->getContentTypePreferenceValue('image/jpeg'),
+			'Request without an accept header should accept any content type with a value of 1.0');
 		$request = $this->getRequest(array(
 			'HTTP_ACCEPT' => 'text/*;q=0.3, text/html;q=0.7, text/html;level=1,
-               text/html;level=2;q=0.4',
-	    ));
-        $this->assertFalse($request->checkIfContentTypeIsPreferred('invalid'), 'Invalid content type check fails');
-	    $this->assertTrue($request->checkIfContentTypeIsPreferred('text/html; level=1'),
-	    	'text/html; level=1 fails');
-	    $this->assertTrue($request->checkIfContentTypeIsPreferred('text/html'),
-	    	'text/html fails');
-	    $this->assertTrue($request->checkIfContentTypeIsPreferred('text/plain'),
-	    	'text/plain fails');
-	    $this->assertFalse($request->checkIfContentTypeIsPreferred('image/jpeg'),
-	    	'image/jpeg fails');
-	    $this->assertTrue($request->checkIfContentTypeIsPreferred('text/html; level=2'),
-	    	'text/html; level=2 fails');
-	    $this->assertTrue($request->checkIfContentTypeIsPreferred('text/html; level=3'),
-	    	'text/html; level=3 fails');
-    }
+			   text/html;level=2;q=0.4, */*;q=0.5',
+		));
+		$this->assertSame(0.0, $request->getContentTypePreferenceValue('invalid'), 'Invalid content type check fails');
+		$this->assertSame(1.0, $request->getContentTypePreferenceValue('text/html; level=1'),
+			'text/html; level=1 fails');
+		$this->assertSame(0.7, $request->getContentTypePreferenceValue('text/html'),
+			'text/html fails');
+		$this->assertSame(0.3, $request->getContentTypePreferenceValue('text/plain'),
+			'text/plain fails');
+		$this->assertSame(0.5, $request->getContentTypePreferenceValue('image/jpeg'),
+			'image/jpeg fails');
+		$this->assertSame(0.4, $request->getContentTypePreferenceValue('text/html; level=2'),
+			'text/html; level=2 fails');
+		$this->assertSame(0.7, $request->getContentTypePreferenceValue('text/html; level=3'),
+			'text/html; level=3 fails');
+	}
 
-    public function testHas() {
-        $this->assertFalse($this->request->has('username', 'PC'));
-        $this->assertTrue($this->request->has('username', 'G'));
+	public function testCheckIfContentTypeIsPreferred() {
+		$this->assertTrue($this->request->checkIfContentTypeIsPreferred('image/jpeg'),
+			'Request without an accept header should accept any content type');
+		$request = $this->getRequest(array(
+			'HTTP_ACCEPT' => 'text/*;q=0.3, text/html;q=0.7, text/html;level=1,
+			   text/html;level=2;q=0.4',
+		));
+		$this->assertFalse($request->checkIfContentTypeIsPreferred('invalid'), 'Invalid content type check fails');
+		$this->assertTrue($request->checkIfContentTypeIsPreferred('text/html; level=1'),
+			'text/html; level=1 fails');
+		$this->assertTrue($request->checkIfContentTypeIsPreferred('text/html'),
+			'text/html fails');
+		$this->assertTrue($request->checkIfContentTypeIsPreferred('text/plain'),
+			'text/plain fails');
+		$this->assertFalse($request->checkIfContentTypeIsPreferred('image/jpeg'),
+			'image/jpeg fails');
+		$this->assertTrue($request->checkIfContentTypeIsPreferred('text/html; level=2'),
+			'text/html; level=2 fails');
+		$this->assertTrue($request->checkIfContentTypeIsPreferred('text/html; level=3'),
+			'text/html; level=3 fails');
+	}
 
-        $this->assertTrue($this->request->hasGet('username'));
-        $this->assertFalse($this->request->hasGet('post_param'));
+	public function testHas() {
+		$this->assertFalse($this->request->has('username', 'PC'));
+		$this->assertTrue($this->request->has('username', 'G'));
 
-        $this->assertTrue($this->request->hasPost('post_param'));
-        $this->assertFalse($this->request->hasPost('cookie'));
+		$this->assertTrue($this->request->hasGet('username'));
+		$this->assertFalse($this->request->hasGet('post_param'));
 
-        $this->assertTrue($this->request->hasCookie('cookie'));
-        $this->assertFalse($this->request->hasCookie('post_param'));
-    }
+		$this->assertTrue($this->request->hasPost('post_param'));
+		$this->assertFalse($this->request->hasPost('cookie'));
+
+		$this->assertTrue($this->request->hasCookie('cookie'));
+		$this->assertFalse($this->request->hasCookie('post_param'));
+	}
 }

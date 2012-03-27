@@ -7,17 +7,17 @@ use YapepBase\View\IView;
  * @codeCoverageIgnore
  */
 class ViewMock implements IView {
-    protected $content = '';
+	protected $content = '';
 
-    public function set($content = '') {
-        $this->content = $content;
-    }
+	public function set($content = '') {
+		$this->content = $content;
+	}
 
-    public function render() {
-        echo $this->content;
-    }
+	public function render() {
+		echo $this->content;
+	}
 
-    function __toString() {
-        return $this->content;
-    }
+	function __toString() {
+		return $this->content;
+	}
 }

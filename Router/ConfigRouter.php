@@ -25,20 +25,20 @@ use YapepBase\Request\IRequest;
  */
 class ConfigRouter extends ArrayRouter {
 
-    /**
-     * Constructor.
-     *
-     * @param IRequest $request
-     * @param string   $configName   The name of the configuration where the routes are stored
-     *
-     * @throws RouterException   On error
-     */
-    public function __construct(IRequest $request, $configName) {
-        $routes = Config::getInstance()->get($configName, false);
-        if (!is_array($routes)) {
-            throw new RouterException('No route config found', RouterException::ERR_ROUTE_CONFIG);
-        }
-        parent::__construct($request, $routes);
-    }
+	/**
+	 * Constructor.
+	 *
+	 * @param IRequest $request
+	 * @param string   $configName   The name of the configuration where the routes are stored
+	 *
+	 * @throws RouterException   On error
+	 */
+	public function __construct(IRequest $request, $configName) {
+		$routes = Config::getInstance()->get($configName, false);
+		if (!is_array($routes)) {
+			throw new RouterException('No route config found', RouterException::ERR_ROUTE_CONFIG);
+		}
+		parent::__construct($request, $routes);
+	}
 
 }

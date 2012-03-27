@@ -23,24 +23,24 @@ use YapepBase\Event\Event;
  */
 abstract class BatchScript {
 
-    /**
-     * Helper method to execute the script
-     */
-    public static function run() {
-        $application = Application::getInstance();
-        $eventHandlerRegistry = $application->getDiContainer()->getEventHandlerRegistry();
-        try {
-            $eventHandlerRegistry->raise(new Event(Event::TYPE_APPSTART));
-            $instance = new static();
-            $instance->execute();
-        } catch (\Exception $exception) {
-            Application::getInstance()->getErrorHandlerRegistry()->handleException($exception);
-        }
-        $eventHandlerRegistry->raise(new Event(Event::TYPE_APPFINISH));
-    }
+	/**
+	 * Helper method to execute the script
+	 */
+	public static function run() {
+		$application = Application::getInstance();
+		$eventHandlerRegistry = $application->getDiContainer()->getEventHandlerRegistry();
+		try {
+			$eventHandlerRegistry->raise(new Event(Event::TYPE_APPSTART));
+			$instance = new static();
+			$instance->execute();
+		} catch (\Exception $exception) {
+			Application::getInstance()->getErrorHandlerRegistry()->handleException($exception);
+		}
+		$eventHandlerRegistry->raise(new Event(Event::TYPE_APPFINISH));
+	}
 
-    /**
-     * Executes the script.
-     */
-    abstract protected function execute();
+	/**
+	 * Executes the script.
+	 */
+	abstract protected function execute();
 }

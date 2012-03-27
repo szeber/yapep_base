@@ -9,10 +9,10 @@ use \YapepBase\View\BlockAbstract;
  * @codeCoverageIgnore
  */
 class MockBlock extends BlockAbstract {
-    /**
-     * Render the fake content
-     */
-    protected function renderContent() {
-        echo 'Block: ' . $this->getTemplateOutput();
-    }
+	/**
+	 * Render the fake content
+	 */
+	protected function renderContent() {
+		echo 'Block: ' . $this->getTemplateOutput();
+	}
 }

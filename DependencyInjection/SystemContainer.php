@@ -36,341 +36,341 @@ use YapepBase\Mime\MimeType;
  */
 class SystemContainer extends Pimple {
 
-    // Container keys
-    /** Error log message key. */
-    const KEY_ERROR_LOG_MESSAGE = 'errorLogMessage';
-    /** Error handler registry key. */
-    const KEY_ERROR_HANDLER_REGISTRY = 'errorHandlerRegistry';
-    /** Event handler container key. */
-    const KEY_EVENT_HANDLER_REGISTRY = 'eventHandlerRegistry';
-    /** Session registry key. */
-    const KEY_SESSION_REGISTRY = 'sessionRegistry';
-    /** Logger registry key. */
-    const KEY_LOGGER_REGISTRY = 'loggerRegistry';
-    /** Memcache key. */
-    const KEY_MEMCACHE = 'memcache';
-    /** Memcache key. */
-    const KEY_MEMCACHED = 'memcached';
-    /** Key containing the default error controller class' name. */
-    const KEY_DEFAULT_ERROR_CONTROLLER_NAME = 'defaultErrorControllerName';
-    /** Key containing the ViewDo. */
-    const KEY_VIEW_DO = 'viewDo';
+	// Container keys
+	/** Error log message key. */
+	const KEY_ERROR_LOG_MESSAGE = 'errorLogMessage';
+	/** Error handler registry key. */
+	const KEY_ERROR_HANDLER_REGISTRY = 'errorHandlerRegistry';
+	/** Event handler container key. */
+	const KEY_EVENT_HANDLER_REGISTRY = 'eventHandlerRegistry';
+	/** Session registry key. */
+	const KEY_SESSION_REGISTRY = 'sessionRegistry';
+	/** Logger registry key. */
+	const KEY_LOGGER_REGISTRY = 'loggerRegistry';
+	/** Memcache key. */
+	const KEY_MEMCACHE = 'memcache';
+	/** Memcache key. */
+	const KEY_MEMCACHED = 'memcached';
+	/** Key containing the default error controller class' name. */
+	const KEY_DEFAULT_ERROR_CONTROLLER_NAME = 'defaultErrorControllerName';
+	/** Key containing the ViewDo. */
+	const KEY_VIEW_DO = 'viewDo';
 
-    /** Name of the namespace which holds the templates. */
-    const NAMESPACE_SEARCH_TEMPLATE = 'template';
-    /** Name of the namespace which holds the controllers. */
-    const NAMESPACE_SEARCH_CONTROLLER = 'controller';
+	/** Name of the namespace which holds the templates. */
+	const NAMESPACE_SEARCH_TEMPLATE = 'template';
+	/** Name of the namespace which holds the controllers. */
+	const NAMESPACE_SEARCH_CONTROLLER = 'controller';
 
-    /**
-     * DebugConsole object.
-     *
-     * @var \YapepBase\Debugger\IDebugger
-     */
-    protected $debugger;
+	/**
+	 * DebugConsole object.
+	 *
+	 * @var \YapepBase\Debugger\IDebugger
+	 */
+	protected $debugger;
 
-    /**
-     * List of namespaces to search in for each namespace search.
-     *
-     * @var array
-     */
-    protected $searchNamespaces = array(
-        self::NAMESPACE_SEARCH_TEMPLATE => array(),
-        self::NAMESPACE_SEARCH_CONTROLLER => array(),
-    );
+	/**
+	 * List of namespaces to search in for each namespace search.
+	 *
+	 * @var array
+	 */
+	protected $searchNamespaces = array(
+		self::NAMESPACE_SEARCH_TEMPLATE => array(),
+		self::NAMESPACE_SEARCH_CONTROLLER => array(),
+	);
 
-    /**
-     * Constructor. Sets up the system DI objects.
-     */
-    public function __construct() {
-        $this[self::KEY_ERROR_LOG_MESSAGE] = function($container) {
-            return new ErrorMessage();
-        };
-        $this[self::KEY_ERROR_HANDLER_REGISTRY] = function($container) {
-            return new ErrorHandlerRegistry();
-        };
-        $this[self::KEY_EVENT_HANDLER_REGISTRY] = $this->share(function($container) {
-            return new EventHandlerRegistry();
-        });
-        $this[self::KEY_SESSION_REGISTRY] = $this->share(function($container) {
-            return new SessionRegistry();
-        });
-        $this[self::KEY_LOGGER_REGISTRY] = $this->share(function($container) {
-            return new LoggerRegistry();
-        });
-        if (class_exists('\Memcache')) {
-            $this[self::KEY_MEMCACHE] = function($container) {
-                return new \Memcache();
-            };
-        }
-        if (class_exists('\Memcached')) {
-            $this[self::KEY_MEMCACHED] = function($container) {
-                return new \Memcached();
-            };
-        }
-        $this[self::KEY_DEFAULT_ERROR_CONTROLLER_NAME] = '\\YapepBase\\Controller\\DefaultErrorController';
+	/**
+	 * Constructor. Sets up the system DI objects.
+	 */
+	public function __construct() {
+		$this[self::KEY_ERROR_LOG_MESSAGE] = function($container) {
+			return new ErrorMessage();
+		};
+		$this[self::KEY_ERROR_HANDLER_REGISTRY] = function($container) {
+			return new ErrorHandlerRegistry();
+		};
+		$this[self::KEY_EVENT_HANDLER_REGISTRY] = $this->share(function($container) {
+			return new EventHandlerRegistry();
+		});
+		$this[self::KEY_SESSION_REGISTRY] = $this->share(function($container) {
+			return new SessionRegistry();
+		});
+		$this[self::KEY_LOGGER_REGISTRY] = $this->share(function($container) {
+			return new LoggerRegistry();
+		});
+		if (class_exists('\Memcache')) {
+			$this[self::KEY_MEMCACHE] = function($container) {
+				return new \Memcache();
+			};
+		}
+		if (class_exists('\Memcached')) {
+			$this[self::KEY_MEMCACHED] = function($container) {
+				return new \Memcached();
+			};
+		}
+		$this[self::KEY_DEFAULT_ERROR_CONTROLLER_NAME] = '\\YapepBase\\Controller\\DefaultErrorController';
 
-        $this[self::KEY_VIEW_DO] = $this->share(function($container) {
-            return new ViewDo(MimeType::HTML);
-        });
-    }
+		$this[self::KEY_VIEW_DO] = $this->share(function($container) {
+			return new ViewDo(MimeType::HTML);
+		});
+	}
 
-    /**
-     * Returns a logging ErrorMessage instance
-     *
-     * @return \YapepBase\Log\Message\ErrorMessage
-     */
-    public function getErrorLogMessage() {
-        return $this[self::KEY_ERROR_LOG_MESSAGE];
-    }
+	/**
+	 * Returns a logging ErrorMessage instance
+	 *
+	 * @return \YapepBase\Log\Message\ErrorMessage
+	 */
+	public function getErrorLogMessage() {
+		return $this[self::KEY_ERROR_LOG_MESSAGE];
+	}
 
-    /**
-     * Returns an error handler registry instance
-     *
-     * @return \YapepBase\ErrorHandler\ErrorHandlerRegistry
-     */
-    public function getErrorHandlerRegistry() {
-        return $this[self::KEY_ERROR_HANDLER_REGISTRY];
-    }
+	/**
+	 * Returns an error handler registry instance
+	 *
+	 * @return \YapepBase\ErrorHandler\ErrorHandlerRegistry
+	 */
+	public function getErrorHandlerRegistry() {
+		return $this[self::KEY_ERROR_HANDLER_REGISTRY];
+	}
 
-    /**
-     * Returns an event handler registry instance
-     *
-     * @return \YapepBase\Event\EventHandlerRegistry
-     */
-    public function getEventHandlerRegistry() {
-        return $this[self::KEY_EVENT_HANDLER_REGISTRY];
-    }
+	/**
+	 * Returns an event handler registry instance
+	 *
+	 * @return \YapepBase\Event\EventHandlerRegistry
+	 */
+	public function getEventHandlerRegistry() {
+		return $this[self::KEY_EVENT_HANDLER_REGISTRY];
+	}
 
-    /**
-     * Returns a session registry instance
-     *
-     * @return \YapepBase\Session\SessionRegistry
-     */
-    public function getSessionRegistry() {
-        return $this[self::KEY_SESSION_REGISTRY];
-    }
+	/**
+	 * Returns a session registry instance
+	 *
+	 * @return \YapepBase\Session\SessionRegistry
+	 */
+	public function getSessionRegistry() {
+		return $this[self::KEY_SESSION_REGISTRY];
+	}
 
-    /**
-     * @return \YapepBase\Log\LoggerRegistry
-     */
-    public function getLoggerRegistry() {
-        return $this[self::KEY_LOGGER_REGISTRY];
-    }
+	/**
+	 * @return \YapepBase\Log\LoggerRegistry
+	 */
+	public function getLoggerRegistry() {
+		return $this[self::KEY_LOGGER_REGISTRY];
+	}
 
-    /**
-     * Returns a memcache instance
-     *
-     * @return \Memcache
-     *
-     * @throws \YapepBase\Exception\Exception   If there is no Memcache support in PHP.
-     */
-    public function getMemcache() {
-        // @codeCoverageIgnoreStart
-        if (!isset($this[self::KEY_MEMCACHE])) {
-            throw new Exception('No memcache support in PHP');
-        }
-        // @codeCoverageIgnoreEnd
-        return $this[self::KEY_MEMCACHE];
-    }
+	/**
+	 * Returns a memcache instance
+	 *
+	 * @return \Memcache
+	 *
+	 * @throws \YapepBase\Exception\Exception   If there is no Memcache support in PHP.
+	 */
+	public function getMemcache() {
+		// @codeCoverageIgnoreStart
+		if (!isset($this[self::KEY_MEMCACHE])) {
+			throw new Exception('No memcache support in PHP');
+		}
+		// @codeCoverageIgnoreEnd
+		return $this[self::KEY_MEMCACHE];
+	}
 
-    /**
-     * Returns a memcache instance
-     *
-     * @return \Memcached
-     *
-     * @throws \YapepBase\Exception\Exception   If there is no Memcached support in PHP.
-     */
-    public function getMemcached() {
-        // @codeCoverageIgnoreStart
-        if (!isset($this[self::KEY_MEMCACHED])) {
-            throw new Exception('No memcached support in PHP');
-        }
-        // @codeCoverageIgnoreEnd
-        return $this[self::KEY_MEMCACHED];
-    }
+	/**
+	 * Returns a memcache instance
+	 *
+	 * @return \Memcached
+	 *
+	 * @throws \YapepBase\Exception\Exception   If there is no Memcached support in PHP.
+	 */
+	public function getMemcached() {
+		// @codeCoverageIgnoreStart
+		if (!isset($this[self::KEY_MEMCACHED])) {
+			throw new Exception('No memcached support in PHP');
+		}
+		// @codeCoverageIgnoreEnd
+		return $this[self::KEY_MEMCACHED];
+	}
 
-    /**
-     * Returns an instance of the default error controller.
-     *
-     * @param \YapepBase\Request\IRequest   $request    The request object.
-     * @param \YapepBase\Response\IResponse $response   The response object.
-     *
-     * @return \YapepBase\Controller\DefaultErrorController
-     */
-    public function getDefaultErrorController(IRequest $request, IResponse $response) {
-        return new $this[self::KEY_DEFAULT_ERROR_CONTROLLER_NAME]($request, $response);
-    }
+	/**
+	 * Returns an instance of the default error controller.
+	 *
+	 * @param \YapepBase\Request\IRequest   $request    The request object.
+	 * @param \YapepBase\Response\IResponse $response   The response object.
+	 *
+	 * @return \YapepBase\Controller\DefaultErrorController
+	 */
+	public function getDefaultErrorController(IRequest $request, IResponse $response) {
+		return new $this[self::KEY_DEFAULT_ERROR_CONTROLLER_NAME]($request, $response);
+	}
 
-    /**
-     * Returns the ViewDo.
-     *
-     * @return \YapepBase\View\ViewDo
-     */
-    public function getViewDo() {
-        return $this[self::KEY_VIEW_DO];
-    }
+	/**
+	 * Returns the ViewDo.
+	 *
+	 * @return \YapepBase\View\ViewDo
+	 */
+	public function getViewDo() {
+		return $this[self::KEY_VIEW_DO];
+	}
 
-    /**
-     * Adds a namespace to the namespace roots for the given type, to search classes in.
-     *
-     * @param string $type
-     * @param string $namespace
-     */
-    public function addSearchNamespace($type, $namespace) {
-        $this->searchNamespaces[$type][] = $namespace;
-    }
+	/**
+	 * Adds a namespace to the namespace roots for the given type, to search classes in.
+	 *
+	 * @param string $type
+	 * @param string $namespace
+	 */
+	public function addSearchNamespace($type, $namespace) {
+		$this->searchNamespaces[$type][] = $namespace;
+	}
 
-    /**
-     * Sets a list of namespace roots to search the given type of classes in.
-     *
-     * @param string $type         The type of class to search for {@uses self::NAMESPACE_SEARCH_*}
-     * @param array  $namespaces   The list of namespaces
-     */
-    public function setSearchNamespaces($type, array $namespaces = array()) {
-        $this->searchNamespaces[$type] = $namespaces;
-    }
+	/**
+	 * Sets a list of namespace roots to search the given type of classes in.
+	 *
+	 * @param string $type         The type of class to search for {@uses self::NAMESPACE_SEARCH_*}
+	 * @param array  $namespaces   The list of namespaces
+	 */
+	public function setSearchNamespaces($type, array $namespaces = array()) {
+		$this->searchNamespaces[$type] = $namespaces;
+	}
 
-    /**
-     * Searches for the class in all the search namespaces for the given type
-     *
-     * @param string $type             The type of class to search for. {@uses self::NAMESPACE_SEARCH_*}
-     * @param string $className
-     *
-     * @return string class name
-     *
-     * @throws \YapepBase\Exception\DiException           If the class is not found
-     */
-    protected function searchForClass($type, $className) {
-        if (isset($this->searchNamespaces[$type]) && is_array($this->searchNamespaces[$type])) {
-            foreach ($this->searchNamespaces[$type] as $nsroot) {
-                $fullName = $nsroot . '\\' . $className;
-                if (\class_exists($fullName, true)) {
-                    return $fullName;
-                }
-            }
-        }
-        throw new DiException('Class ' . $className . ' not found.', DiException::ERR_NAMESPACE_SEARCH_CLASS_NOT_FOUND);
+	/**
+	 * Searches for the class in all the search namespaces for the given type
+	 *
+	 * @param string $type             The type of class to search for. {@uses self::NAMESPACE_SEARCH_*}
+	 * @param string $className
+	 *
+	 * @return string class name
+	 *
+	 * @throws \YapepBase\Exception\DiException           If the class is not found
+	 */
+	protected function searchForClass($type, $className) {
+		if (isset($this->searchNamespaces[$type]) && is_array($this->searchNamespaces[$type])) {
+			foreach ($this->searchNamespaces[$type] as $nsroot) {
+				$fullName = $nsroot . '\\' . $className;
+				if (\class_exists($fullName, true)) {
+					return $fullName;
+				}
+			}
+		}
+		throw new DiException('Class ' . $className . ' not found.', DiException::ERR_NAMESPACE_SEARCH_CLASS_NOT_FOUND);
 
-    }
+	}
 
-    /**
-     * Searches for the controller in all the controller search namespaces
-     *
-     * @param  string $controllerName
-     *
-     * @return string controller name
-     *
-     * @throws \YapepBase\Exception\ControllerException   If the controller was not found
-     */
-    protected function searchForController($controllerName) {
-        try {
-            return $this->searchForClass(self::NAMESPACE_SEARCH_CONTROLLER, $controllerName . 'Controller');
-        } catch (DiException $e) {
-            throw new ControllerException('Controller ' . $controllerName . ' not found in '
-                . \implode('; ', $this->searchNamespaces[self::NAMESPACE_SEARCH_CONTROLLER]),
-                ControllerException::ERR_CONTROLLER_NOT_FOUND);
-        }
-    }
+	/**
+	 * Searches for the controller in all the controller search namespaces
+	 *
+	 * @param  string $controllerName
+	 *
+	 * @return string controller name
+	 *
+	 * @throws \YapepBase\Exception\ControllerException   If the controller was not found
+	 */
+	protected function searchForController($controllerName) {
+		try {
+			return $this->searchForClass(self::NAMESPACE_SEARCH_CONTROLLER, $controllerName . 'Controller');
+		} catch (DiException $e) {
+			throw new ControllerException('Controller ' . $controllerName . ' not found in '
+				. \implode('; ', $this->searchNamespaces[self::NAMESPACE_SEARCH_CONTROLLER]),
+				ControllerException::ERR_CONTROLLER_NOT_FOUND);
+		}
+	}
 
-    /**
-     * Searches for the template in all the template search namespaces
-     *
-     * @param string $templateName
-     *
-     * @return string template name
-     *
-     * @throws \YapepBase\Exception\ViewException If the template was not found
-     */
-    protected function searchForTemplate($templateName) {
-        try {
-            return $this->searchForClass(self::NAMESPACE_SEARCH_TEMPLATE, $templateName . 'Template');
-        } catch (DiException $e) {
-            throw new ViewException('Template ' . $templateName . ' not found in '
-                . \implode('; ', $this->searchNamespaces[self::NAMESPACE_SEARCH_TEMPLATE]),
-                ViewException::ERR_TEMPLATE_NOT_FOUND);
-        }
-    }
+	/**
+	 * Searches for the template in all the template search namespaces
+	 *
+	 * @param string $templateName
+	 *
+	 * @return string template name
+	 *
+	 * @throws \YapepBase\Exception\ViewException If the template was not found
+	 */
+	protected function searchForTemplate($templateName) {
+		try {
+			return $this->searchForClass(self::NAMESPACE_SEARCH_TEMPLATE, $templateName . 'Template');
+		} catch (DiException $e) {
+			throw new ViewException('Template ' . $templateName . ' not found in '
+				. \implode('; ', $this->searchNamespaces[self::NAMESPACE_SEARCH_TEMPLATE]),
+				ViewException::ERR_TEMPLATE_NOT_FOUND);
+		}
+	}
 
-    /**
-     * Returns a controller by it's name.
-     *
-     * @param string                        $controllerName   The name of the controller class to return.
-     *                                                        (Without the namespace and Controller suffix)
-     * @param \YapepBase\Request\IRequest   $request          The request object for the controller.
-     * @param \YapepBase\Response\IResponse $response         The response object for the controller.
-     *
-     * @return \YapepBase\Controller\IController
-     *
-     * @throws \YapepBase\Exception\ControllerException   If the controller was not found
-     */
-    public function getController($controllerName, IRequest $request, IResponse $response) {
-        $fullClassName = $this->searchForController($controllerName);
-        return new $fullClassName($request, $response);
-    }
+	/**
+	 * Returns a controller by it's name.
+	 *
+	 * @param string                        $controllerName   The name of the controller class to return.
+	 *                                                        (Without the namespace and Controller suffix)
+	 * @param \YapepBase\Request\IRequest   $request          The request object for the controller.
+	 * @param \YapepBase\Response\IResponse $response         The response object for the controller.
+	 *
+	 * @return \YapepBase\Controller\IController
+	 *
+	 * @throws \YapepBase\Exception\ControllerException   If the controller was not found
+	 */
+	public function getController($controllerName, IRequest $request, IResponse $response) {
+		$fullClassName = $this->searchForController($controllerName);
+		return new $fullClassName($request, $response);
+	}
 
-    /**
-     * Returns a template by it's name
-     *
-     * @param string $templateName   The name of the template class to return.
-     *                               (Without the namespace and Template suffix)
-     *
-     * @return \YapepBase\View\TemplateAbstract
-     *
-     * @throws \YapepBase\Exception\ViewException If the block was not found
-     */
-    public function getTemplate($templateName) {
-        $fullClassName = $this->searchForTemplate($templateName);
-        return new $fullClassName();
-    }
+	/**
+	 * Returns a template by it's name
+	 *
+	 * @param string $templateName   The name of the template class to return.
+	 *                               (Without the namespace and Template suffix)
+	 *
+	 * @return \YapepBase\View\TemplateAbstract
+	 *
+	 * @throws \YapepBase\Exception\ViewException If the block was not found
+	 */
+	public function getTemplate($templateName) {
+		$fullClassName = $this->searchForTemplate($templateName);
+		return new $fullClassName();
+	}
 
-    /**
-     * Set a list of namespace roots to search for controllers in.
-     *
-     * @param array $namespaces a list of namespace roots to search for the controller in.
-     *
-     * @deprecated   Use setSearchNamespaces() instead
-     *
-     * @codeCoverageIgnore
-     */
-    public function setControllerSearchNamespaces(array $namespaces = array()) {
-        trigger_error(__METHOD__ . ' called, use ' . __CLASS__ . '::setSearchNamespaces instead', E_USER_DEPRECATED);
-        $this->setSearchNamespaces(self::NAMESPACE_SEARCH_CONTROLLER, $namespaces);
-    }
+	/**
+	 * Set a list of namespace roots to search for controllers in.
+	 *
+	 * @param array $namespaces a list of namespace roots to search for the controller in.
+	 *
+	 * @deprecated   Use setSearchNamespaces() instead
+	 *
+	 * @codeCoverageIgnore
+	 */
+	public function setControllerSearchNamespaces(array $namespaces = array()) {
+		trigger_error(__METHOD__ . ' called, use ' . __CLASS__ . '::setSearchNamespaces instead', E_USER_DEPRECATED);
+		$this->setSearchNamespaces(self::NAMESPACE_SEARCH_CONTROLLER, $namespaces);
+	}
 
-    /**
-     * Adds a namespace to the namespace roots to search for controllers in.
-     *
-     * @param string $namespace a single namespace to add to the search list
-     *
-     * @deprecated   Use addSearchNamespace() instead
-     *
-     * @codeCoverageIgnore
-     */
-    public function addControllerSearchNamespace($namespace) {
-        trigger_error(__METHOD__ . ' called, use ' . __CLASS__ . '::addSearchNamespace instead', E_USER_DEPRECATED);
-        $this->addSearchNamespace(self::NAMESPACE_SEARCH_CONTROLLER, $namespace);
-    }
+	/**
+	 * Adds a namespace to the namespace roots to search for controllers in.
+	 *
+	 * @param string $namespace a single namespace to add to the search list
+	 *
+	 * @deprecated   Use addSearchNamespace() instead
+	 *
+	 * @codeCoverageIgnore
+	 */
+	public function addControllerSearchNamespace($namespace) {
+		trigger_error(__METHOD__ . ' called, use ' . __CLASS__ . '::addSearchNamespace instead', E_USER_DEPRECATED);
+		$this->addSearchNamespace(self::NAMESPACE_SEARCH_CONTROLLER, $namespace);
+	}
 
-    /**
-     * Stores the given debugger.
-     *
-     * @param \YapepBase\Debugger\IDebugger $debugger   The debugger object.
-     *
-     * @return void
-     */
-    public function setDebugger(IDebugger $debugger) {
-        $this->debugger = $debugger;
-    }
+	/**
+	 * Stores the given debugger.
+	 *
+	 * @param \YapepBase\Debugger\IDebugger $debugger   The debugger object.
+	 *
+	 * @return void
+	 */
+	public function setDebugger(IDebugger $debugger) {
+		$this->debugger = $debugger;
+	}
 
-    /**
-     * Retursn the Debugger.
-     *
-     * @return bool|\YapepBase\Debugger\IDebugger   The debugger object, or false if its not set.
-     */
-    public function getDebugger() {
-        if (empty($this->debugger)) {
-            return false;
-        }
-        return $this->debugger;
-    }
+	/**
+	 * Retursn the Debugger.
+	 *
+	 * @return bool|\YapepBase\Debugger\IDebugger   The debugger object, or false if its not set.
+	 */
+	public function getDebugger() {
+		if (empty($this->debugger)) {
+			return false;
+		}
+		return $this->debugger;
+	}
 }

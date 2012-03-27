@@ -51,10 +51,10 @@ class RandomTest extends \PHPUnit_Framework_TestCase {
 	 * Tests the method check
 	 */
 	public function testGetPseudoNumberMethodChecks() {
-	    try {
-	        Random::getPseudoNumber(0, 1, 'nonexistent');
-            $this->fail('The method check fails');
-	    } catch (Exception $exception) {}
+		try {
+			Random::getPseudoNumber(0, 1, 'nonexistent');
+			$this->fail('The method check fails');
+		} catch (Exception $exception) {}
 	}
 
 	/**
@@ -88,9 +88,9 @@ class RandomTest extends \PHPUnit_Framework_TestCase {
 	 * Tests the method check
 	 */
 	public function testGetPseudoStringMethodChecks() {
-	    try {
-	        Random::getPseudoString(61, 'nonexistent');
-            $this->fail('The method check fails');
-	    } catch (Exception $exception) {}
+		try {
+			Random::getPseudoString(61, 'nonexistent');
+			$this->fail('The method check fails');
+		} catch (Exception $exception) {}
 	}
 }

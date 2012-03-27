@@ -23,66 +23,66 @@ use YapepBase\Storage\IStorage;
  */
 class StorageMock implements IStorage {
 
-    protected $ttlSupport;
-    protected $persistent;
-    protected $data;
+	protected $ttlSupport;
+	protected $persistent;
+	protected $data;
 
-    public function __construct($ttlSupport, $persistent, array $data = array()) {
-        $this->ttlSupport = $ttlSupport;
-        $this->persistent = $persistent;
-        $this->data = $data;
-    }
+	public function __construct($ttlSupport, $persistent, array $data = array()) {
+		$this->ttlSupport = $ttlSupport;
+		$this->persistent = $persistent;
+		$this->data = $data;
+	}
 
-    public function getData() {
-        return $this->data;
-    }
-
-	/**
-	 * (non-PHPdoc)
-     * @see YapepBase\Storage.IStorage::set()
-     */
-    public function set($key, $data, $ttl = 0) {
-        if ($ttl != 0 && !$this->ttlSupport) {
-            throw new ParameterException('TTL option is set, when we have no TTL support.');
-        }
-
-        $this->data[$key] = $data;
-    }
-    /**
-	 * (non-PHPdoc)
-     * @see YapepBase\Storage.IStorage::delete()
-     */
-    public function delete($key) {
-        if (isset($this->data[$key])) {
-            unset($this->data[$key]);
-        }
-    }
+	public function getData() {
+		return $this->data;
+	}
 
 	/**
 	 * (non-PHPdoc)
-     * @see YapepBase\Storage.IStorage::get()
-     */
-    public function get($key) {
-        if (isset($this->data[$key])) {
-            return $this->data[$key];
-        }
-        return false;
-    }
+	 * @see YapepBase\Storage.IStorage::set()
+	 */
+	public function set($key, $data, $ttl = 0) {
+		if ($ttl != 0 && !$this->ttlSupport) {
+			throw new ParameterException('TTL option is set, when we have no TTL support.');
+		}
+
+		$this->data[$key] = $data;
+	}
+	/**
+	 * (non-PHPdoc)
+	 * @see YapepBase\Storage.IStorage::delete()
+	 */
+	public function delete($key) {
+		if (isset($this->data[$key])) {
+			unset($this->data[$key]);
+		}
+	}
 
 	/**
 	 * (non-PHPdoc)
-     * @see YapepBase\Storage.IStorage::isPersistent()
-     */
-    public function isPersistent() {
-        return $this->persistent;
-    }
+	 * @see YapepBase\Storage.IStorage::get()
+	 */
+	public function get($key) {
+		if (isset($this->data[$key])) {
+			return $this->data[$key];
+		}
+		return false;
+	}
 
 	/**
 	 * (non-PHPdoc)
-     * @see YapepBase\Storage.IStorage::isTtlSupported()
-     */
-    public function isTtlSupported() {
-        return $this->ttlSupport;
-    }
+	 * @see YapepBase\Storage.IStorage::isPersistent()
+	 */
+	public function isPersistent() {
+		return $this->persistent;
+	}
+
+	/**
+	 * (non-PHPdoc)
+	 * @see YapepBase\Storage.IStorage::isTtlSupported()
+	 */
+	public function isTtlSupported() {
+		return $this->ttlSupport;
+	}
 
 }

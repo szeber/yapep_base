@@ -21,39 +21,39 @@ use YapepBase\View\LayoutAbstract;
  * @subpackage View
  */
 abstract class TemplateAbstract extends ViewAbstract {
-    /**
-     * Holds the layout.
-     *
-     * @var \YapepBase\View\LayoutAbstract
-     */
-    protected $layout = null;
+	/**
+	 * Holds the layout.
+	 *
+	 * @var \YapepBase\View\LayoutAbstract
+	 */
+	protected $layout = null;
 
-    /**
-     * Sets the layout.
-     *
-     * @param \YapepBase\View\LayoutAbstract $layout   The layout object.
-     *
-     * @return void
-     */
-    public function setLayout(LayoutAbstract $layout) {
-        $this->layout = $layout;
-    }
+	/**
+	 * Sets the layout.
+	 *
+	 * @param \YapepBase\View\LayoutAbstract $layout   The layout object.
+	 *
+	 * @return void
+	 */
+	public function setLayout(LayoutAbstract $layout) {
+		$this->layout = $layout;
+	}
 
-    /**
-     * Renders the view and prints it.
-     *
-     * @return void
-     */
-    public function render() {
-        if ($this->layout !== null) {
-            ob_start();
-            parent::render();
-            $content = ob_get_clean();
-            $this->layout->setInnerContent($content);
-            $this->layout->render();
-        }
-        else {
-            parent::render();
-        }
-    }
+	/**
+	 * Renders the view and prints it.
+	 *
+	 * @return void
+	 */
+	public function render() {
+		if ($this->layout !== null) {
+			ob_start();
+			parent::render();
+			$content = ob_get_clean();
+			$this->layout->setInnerContent($content);
+			$this->layout->render();
+		}
+		else {
+			parent::render();
+		}
+	}
 }

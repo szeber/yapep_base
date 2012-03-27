@@ -19,19 +19,19 @@ namespace YapepBase\View;
  */
 interface IView {
 
-    /**
-     * Renders the view and prints it.
-     *
-     * @return void
-     */
-    public function render();
+	/**
+	 * Renders the view and prints it.
+	 *
+	 * @return void
+	 */
+	public function render();
 
-    /**
-     * Returns the rendered content.
-     *
-     * It returns the same as the {@link render()} prints.
-     *
-     * @return string
-     */
-    public function __toString();
+	/**
+	 * Returns the rendered content.
+	 *
+	 * It returns the same as the {@link render()} prints.
+	 *
+	 * @return string
+	 */
+	public function __toString();
 }

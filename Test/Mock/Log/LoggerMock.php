@@ -23,19 +23,19 @@ use YapepBase\Log\Message\IMessage;
  */
 class LoggerMock implements ILogger {
 
-    /**
-     * Stores the logged messages.
-     *
-     * @var array
-     */
-    public $loggedMessages = array();
+	/**
+	 * Stores the logged messages.
+	 *
+	 * @var array
+	 */
+	public $loggedMessages = array();
 
-    /**
-     * Logs the message
-     *
-     * @param IMessage $message
-     */
-    public function log(IMessage $message) {
-        $this->loggedMessages[] = $message;
-    }
+	/**
+	 * Logs the message
+	 *
+	 * @param IMessage $message
+	 */
+	public function log(IMessage $message) {
+		$this->loggedMessages[] = $message;
+	}
 }

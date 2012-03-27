@@ -22,26 +22,26 @@ namespace YapepBase\Log\Message;
  */
 class ErrorMessage extends MessageAbstract {
 
-    /**
-     * Retuns the log tag
-     *
-     * @return string
-     */
-    public function getTag() {
-        return 'phpErrorLog';
-    }
+	/**
+	 * Retuns the log tag
+	 *
+	 * @return string
+	 */
+	public function getTag() {
+		return 'phpErrorLog';
+	}
 
-    /**
-     * Sets the message data.
-     *
-     * @param string $errorMessage   The message of the error.
-     * @param string $errorType      The textual representation of the error type. {@uses ErrorHandlerHelper::E_*}
-     * @param string $errorId        The ID of the error.
-     * @param int    $priority       The severity of the error {@uses LOG_*}
-     */
-    public function set($errorMessage, $errorType, $errorId, $priority) {
-        $this->message = $errorMessage;
-        $this->fields = array($errorType, $errorId);
-        $this->priority = $priority;
-    }
+	/**
+	 * Sets the message data.
+	 *
+	 * @param string $errorMessage   The message of the error.
+	 * @param string $errorType      The textual representation of the error type. {@uses ErrorHandlerHelper::E_*}
+	 * @param string $errorId        The ID of the error.
+	 * @param int    $priority       The severity of the error {@uses LOG_*}
+	 */
+	public function set($errorMessage, $errorType, $errorId, $priority) {
+		$this->message = $errorMessage;
+		$this->fields = array($errorType, $errorId);
+		$this->priority = $priority;
+	}
 }

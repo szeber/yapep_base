@@ -16,17 +16,17 @@ namespace YapepBase\Exception;
  */
 class ValueException extends Exception {
 
-    /**
-     *
-     * @param mixed $object the object which does not match the required type
-     * @param string $required the type required
-     */
-    function __construct($value, $required = "") {
-        $message = 'Invalid value: ' . $value;
-        if ($required) {
-            $message .= ' expected ' . $required;
-        }
-        parent::__construct($message);
-    }
+	/**
+	 *
+	 * @param mixed $object the object which does not match the required type
+	 * @param string $required the type required
+	 */
+	function __construct($value, $required = "") {
+		$message = 'Invalid value: ' . $value;
+		if ($required) {
+			$message .= ' expected ' . $required;
+		}
+		parent::__construct($message);
+	}
 
 }

@@ -10,12 +10,12 @@ use \YapepBase\Exception\RedirectException;
  */
 class RedirectExceptionTest extends \PHPUnit_Framework_TestCase {
 
-    /**
-     * @covers \YapepBase\Exception\RedirectException
-     */
-    public function testTarget() {
-        $e = new RedirectException('http://www.example.com/', RedirectException::TYPE_EXTERNAL);
-        $this->assertEquals('http://www.example.com/', $e->getTarget());
-        $this->assertEquals(RedirectException::TYPE_EXTERNAL, $e->getCode());
-    }
+	/**
+	 * @covers \YapepBase\Exception\RedirectException
+	 */
+	public function testTarget() {
+		$e = new RedirectException('http://www.example.com/', RedirectException::TYPE_EXTERNAL);
+		$this->assertEquals('http://www.example.com/', $e->getTarget());
+		$this->assertEquals(RedirectException::TYPE_EXTERNAL, $e->getCode());
+	}
 }

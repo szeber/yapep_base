@@ -21,35 +21,35 @@ use YapepBase\Session\SessionAbstract;
  */
 class SessionRegistry {
 
-    /**
-     * Stores the registered namespaces
-     *
-     * @var array
-     */
-    protected $namespaces = array();
+	/**
+	 * Stores the registered namespaces
+	 *
+	 * @var array
+	 */
+	protected $namespaces = array();
 
-    /**
-     * Returns the session coresponding to namespace
-     *
-     * @param string $namespace
-     *
-     * @return \YapepBase\Session\ISession   The session object.
-     *
-     * @throws \YapepBase\Exception\Exception   If no session is registered with the specified namespace.
-     */
-    public function getSession($namespace) {
-        if (!isset($this->namespaces[$namespace])) {
-            throw new Exception('Namespace not registered: ' . $namespace);
-        }
-        return $this->namespaces[$namespace];
-    }
+	/**
+	 * Returns the session coresponding to namespace
+	 *
+	 * @param string $namespace
+	 *
+	 * @return \YapepBase\Session\ISession   The session object.
+	 *
+	 * @throws \YapepBase\Exception\Exception   If no session is registered with the specified namespace.
+	 */
+	public function getSession($namespace) {
+		if (!isset($this->namespaces[$namespace])) {
+			throw new Exception('Namespace not registered: ' . $namespace);
+		}
+		return $this->namespaces[$namespace];
+	}
 
-    /**
-     * Registers a session
-     *
-     * @param \YapepBase\Session\ISession $session   The session object
-     */
-    public function register(ISession $session) {
-        $this->namespaces[$session->getNamespace()] = $session;
-    }
+	/**
+	 * Registers a session
+	 *
+	 * @param \YapepBase\Session\ISession $session   The session object
+	 */
+	public function register(ISession $session) {
+		$this->namespaces[$session->getNamespace()] = $session;
+	}
 }

@@ -22,44 +22,44 @@ use YapepBase\Event\IEventHandler;
  */
 class EventHandlerMock implements IEventHandler{
 
-    /**
-     * Stores the handled event
-     *
-     * @var \YapepBase\Event\Event
-     */
-    protected $lastHandledEvent;
+	/**
+	 * Stores the handled event
+	 *
+	 * @var \YapepBase\Event\Event
+	 */
+	protected $lastHandledEvent;
 
-    /**
-     * Stores the number of event handlings.
-     *
-     * @var unknown_type
-     */
-    protected $handleCounts = 0;
+	/**
+	 * Stores the number of event handlings.
+	 *
+	 * @var unknown_type
+	 */
+	protected $handleCounts = 0;
 
-    /**
-     * (non-PHPdoc)
-     * @see YapepBase\Event.IEventHandler::handleEvent()
-     */
-    public function handleEvent(Event $event) {
-        $this->lastHandledEvent = $event;
-        $this->handleCounts++;
-    }
+	/**
+	 * (non-PHPdoc)
+	 * @see YapepBase\Event.IEventHandler::handleEvent()
+	 */
+	public function handleEvent(Event $event) {
+		$this->lastHandledEvent = $event;
+		$this->handleCounts++;
+	}
 
-    /**
-     * Returns the last handled event
-     *
-     * @return \YapepBase\Event\Event
-     */
-    public function getLastHandledEvent() {
-        return $this->lastHandledEvent;
-    }
+	/**
+	 * Returns the last handled event
+	 *
+	 * @return \YapepBase\Event\Event
+	 */
+	public function getLastHandledEvent() {
+		return $this->lastHandledEvent;
+	}
 
-    /**
-     * Returns the number of times the handleEvent method was called
-     *
-     * @return int
-     */
-    public function getHandleCounts() {
-        return $this->handleCounts;
-    }
+	/**
+	 * Returns the number of times the handleEvent method was called
+	 *
+	 * @return int
+	 */
+	public function getHandleCounts() {
+		return $this->handleCounts;
+	}
 }

@@ -20,38 +20,38 @@ namespace YapepBase\Log\Message;
  */
 interface IMessage {
 
-    /**
-     * Returns the fields set for the log message
-     *
-     * @return array
-     */
-    public function getFields();
+	/**
+	 * Returns the fields set for the log message
+	 *
+	 * @return array
+	 */
+	public function getFields();
 
-    /**
-     * Retuns the log tag
-     *
-     * @return string
-     */
-    public function getTag();
+	/**
+	 * Retuns the log tag
+	 *
+	 * @return string
+	 */
+	public function getTag();
 
-    /**
-     * Returns the priority for the message
-     *
-     * @return int   {@uses LOG_*}
-     */
-    public function getPriority();
+	/**
+	 * Returns the priority for the message
+	 *
+	 * @return int   {@uses LOG_*}
+	 */
+	public function getPriority();
 
-    /**
-     * Returns the log message
-     *
-     * @return string
-     */
-    public function getMessage();
+	/**
+	 * Returns the log message
+	 *
+	 * @return string
+	 */
+	public function getMessage();
 
-    /**
-     * Checks the object is empty or not.
-     *
-     * @return bool
-     */
-    public function checkIsEmpty();
+	/**
+	 * Checks the object is empty or not.
+	 *
+	 * @return bool
+	 */
+	public function checkIsEmpty();
 }

@@ -19,18 +19,18 @@ namespace YapepBase\Mime;
  * @subpackage   Mime
  */
 class MimeType {
-    /** HTML content type */
-    const HTML = 'text/html';
-    /** XHTML content type */
-    const XHTML = 'application/xhtml+xml';
-    /** CSS content type */
-    const CSS = 'text/css';
-    /** Javascript content type */
-    const JAVASCRIPT = 'appliation/javascript';
-    /** JSON content type */
-    const JSON = 'application/json';
-    /** XML content type */
-    const XML = 'application/xml';
-    /** Plain text content type */
-    const PLAINTEXT = 'text/plain';
+	/** HTML content type */
+	const HTML = 'text/html';
+	/** XHTML content type */
+	const XHTML = 'application/xhtml+xml';
+	/** CSS content type */
+	const CSS = 'text/css';
+	/** Javascript content type */
+	const JAVASCRIPT = 'appliation/javascript';
+	/** JSON content type */
+	const JSON = 'application/json';
+	/** XML content type */
+	const XML = 'application/xml';
+	/** Plain text content type */
+	const PLAINTEXT = 'text/plain';
 }
