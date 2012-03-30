@@ -206,6 +206,8 @@ class CliUserInterfaceHelper {
 		$shortName, $longName, $description, $usageIndexes, $isOptional = false, $paramName = null,
 		$paramIsOptional = false
 	) {
+		$description = preg_replace('/\s{2,}/', ' ', str_replace(array("\n", "\r"), ' ', trim($description)));
+
 		$switchData = array(
 			'shortName'       => $shortName,
 			'longName'        => $longName,
