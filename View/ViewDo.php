@@ -13,6 +13,7 @@ namespace YapepBase\View;
 use YapepBase\View\ViewAbstract;
 use YapepBase\Application;
 use YapepBase\Mime\MimeType;
+use YapepBase\Exception\Exception;
 
 /**
  * A simple data storage object used by the View layer.
@@ -103,7 +104,7 @@ class ViewDo {
 	 * @param string $nameOrData   The name of the key, or the storable data in an associative array.
 	 * @param mixed  $value        The value.
 	 *
-	 * @throws Exception   If the key already exist.
+	 * @throws \YapepBase\Exception\Exception   If the key already exist.
 	 *
 	 * @return void
 	 */
