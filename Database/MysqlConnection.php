@@ -34,9 +34,26 @@ class MysqlConnection extends DbConnection {
 		if (!empty($configuration['port'])) {
 			$dsn .= ';port=' . $configuration['port'];
 		}
-		$options = ((!empty($configuration['options']) && is_array($options)) ? $configuration['options'] : array());
-		$options[PDO::MYSQL_ATTR_INIT_COMMAND]
-			= 'SET NAMES ' . (empty($configuration['charset']) ? 'utf8' : $configuration['charset']);
+		$options = ((!empty($configuration['options']) && is_array($configuration['options']))
+			? $configuration['options']
+			: array()
+		);
+
+		if (!isset($options[PDO::MYSQL_ATTR_INIT_COMMAND])) {
+			$options[PDO::MYSQL_ATTR_INIT_COMMAND] = '';
+		} elseif (';' != substr(trim($options[PDO::MYSQL_ATTR_INIT_COMMAND]), -1, 1)) {
+			$options[PDO::MYSQL_ATTR_INIT_COMMAND] .= ';';
+		}
+
+		$options[PDO::MYSQL_ATTR_INIT_COMMAND] .= 'SET NAMES ' . (
+			empty($configuration['charset'])
+				? 'utf8'
+				: $configuration['charset']
+		) . ';';
+
+		if (isset($configuration['useTraditionalStrictMode']) && $configuration['useTraditionalStrictMode']) {
+			$options[PDO::MYSQL_ATTR_INIT_COMMAND] .= 'SET @@SESSION.sql_mode = \'TRADITIONAL\'; ';
+		}
 
 		$this->connection = new PDO($dsn, $configuration['user'], $configuration['password'], $options);
 

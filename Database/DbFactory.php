@@ -44,6 +44,11 @@ use YapepBase\Config;
  *         <li>database: The database name.</li>
  *         <li>charset: The character set of the connection.</li>
  *         <li>isPersistent: If TRUE, the connection will be persistent. Optional, defaults to FALSE.</li>
+ *         <li>useTraditionalStrictMode: If TRUE, the connection will use TRADITIONAL sql_mode for each connection.
+ *                                       Only needed if the server does not set it. Care should be taken about enabling
+ *                                       this option, because it may break a lot of queries, that degrade gracefully
+ *                                       without this option.
+ *                                       {@see http://dev.mysql.com/doc/refman/5.0/en/server-sql-mode.html}</li>
  *     </ul>
  *
  * SQLite configuration
