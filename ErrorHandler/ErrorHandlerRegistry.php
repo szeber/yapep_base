@@ -25,6 +25,15 @@ class ErrorHandlerRegistry {
 	/** The default timeout for the error ID in seconds. */
 	const ERROR_HANDLING_DEFAULT_ID_TIMEOUT = 600;   // 10 minutes
 
+	/** Error type. */
+	const TYPE_ERROR = 'error';
+
+	/** Shutdown type. */
+	const TYPE_SHUTDOWN = 'shutdown';
+
+	/** Exception type. */
+	const TYPE_EXCEPTION = 'exception';
+
 	/**
 	 * Array containing the assigned error handlers.
 	 *
@@ -38,6 +47,13 @@ class ErrorHandlerRegistry {
 	 * @var bool
 	 */
 	protected $isRegistered = false;
+
+	/**
+	 * Stores the data of the error that's being handled at the moment.
+	 *
+	 * @var array
+	 */
+	protected $currentlyHandledError = array();
 
 	/**
 	 * Constructor.
@@ -141,10 +157,23 @@ class ErrorHandlerRegistry {
 		// We are the first element, remove it from the trace
 		array_shift($backTrace);
 
+		$this->currentlyHandledError = array(
+			'type'    => self::TYPE_ERROR,
+			'level'   => $errorLevel,
+			'message' => $message,
+			'file'    => $file,
+			'line'    => $line,
+			'context' => $context,
+			'trace'   => $backTrace,
+			'errorId' => $errorId,
+		);
+
 		foreach($this->errorHandlers as $errorHandler) {
 			/** @var IErrorHandler $errorHandler */
 			$errorHandler->handleError($errorLevel, $message, $file, $line, $context, $errorId, $backTrace);
 		}
+
+		$this->currentlyHandledError = array();
 
 		// @codeCoverageIgnoreStart
 		if ($this->isErrorFatal($errorLevel)) {
@@ -183,6 +212,12 @@ class ErrorHandlerRegistry {
 
 		$errorId = $this->generateErrorId($exception->getMessage(), $exception->getFile(), $exception->getLine());
 
+		$this->currentlyHandledError = array(
+			'type'      => self::TYPE_ERROR,
+			'exception' => $exception,
+			'errorId'   => $errorId,
+		);
+
 		foreach($this->errorHandlers as $errorHandler) {
 			/** @var IErrorHandler $errorHandler */
 			$errorHandler->handleException($exception, $errorId);
@@ -220,6 +255,39 @@ class ErrorHandlerRegistry {
 			/** @var IErrorHandler $errorHandler */
 			$errorHandler->handleShutdown($error['type'], $error['message'], $error['file'], $error['line'], $errorId);
 		}
+
+		// If we have a previously unhandled error, handle it. This can be caused by errors in one of the registered
+		// error handlers, or by a php bug, that is triggered by a strict error that is triggered while autoloading.
+		// {@see https://bugs.php.net/bug.php?id=54054}
+		if (!empty($this->currentlyHandledError)) {
+			$message = 'A fatal error occured while handling the error with the id: '
+				. $this->currentlyHandledError['errorId'] . '. Fatal error ID: ' . $errorId;
+
+		// If we have a previously unhandled error, handle it. This can be caused by errors in one of the registered
+			foreach($this->errorHandlers as $errorHandler) {
+				$errorHandler->handleShutdown($error['type'], $message, $error['file'], $error['line'],
+					$this->generateErrorId($message, $error['file'], $error['line']));
+			}
+
+			switch ($this->currentlyHandledError['type']) {
+				case self::TYPE_ERROR:
+					foreach($this->errorHandlers as $errorHandler) {
+						$errorHandler->handleError($this->currentlyHandledError['level'],
+							$this->currentlyHandledError['message'], $this->currentlyHandledError['file'],
+							$this->currentlyHandledError['line'], $this->currentlyHandledError['context'],
+							$this->currentlyHandledError['errorId'], $this->currentlyHandledError['trace']);
+					}
+					break;
+
+				case self::TYPE_EXCEPTION:
+					foreach($this->errorHandlers as $errorHandler) {
+						$errorHandler->handleException($this->currentlyHandledError['exception'],
+							$this->currentlyHandledError['errorId']);
+					}
+					break;
+			}
+		}
+
 	}
 
 	/**
