@@ -222,6 +222,8 @@ class ErrorHandlerRegistry {
 			/** @var IErrorHandler $errorHandler */
 			$errorHandler->handleException($exception, $errorId);
 		}
+
+		$this->currentlyHandledError = array();
 	}
 
 	/**
