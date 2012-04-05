@@ -95,6 +95,7 @@ class ViewDo {
 		}
 
 		// We reached the desired depth
+		// @todo shouln'd we use array_pop here?
 		return $target[$keyParts[count($keyParts) - 1]];
 	}
 
