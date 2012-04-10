@@ -35,7 +35,7 @@ namespace YapepBase\Ldap;
  * Using LdapAuthenticationProvider against a standard OpenLDAP database:
  * 
  * $connection = new LdapConnection();
- * $aaa        = new LdapAuthenticationProvider();
+ * $aaa        = new LdapAuthenticationProvider($connection);
  * $aaa->setAuthMode(LdapAuthenticationProvider::AUTHMODE_BIND);
  * $aaa->setGroupMode(LdapAuthenticationProvider::AUTHMODE_USER);
  * $aaa->setUserDn(new LdapDn(array(
