@@ -21,7 +21,10 @@ use YapepBase\Application;
 class UrlHelper {
 
 	/**
-	 * Returns the target for the specified controller and action
+	 * Returns the target for the specified controller and action.
+	 *
+	 * If an exception occurs (eg. non-existing route), it returns '#' and triggers an error of it with level
+	 * E_USER_ERROR.
 	 *
 	 * @param string $controller   Name of the controller
 	 * @param string $action       Name of the action
@@ -30,7 +33,12 @@ class UrlHelper {
 	 * @return string   The target
 	 */
 	public static function getRouteTarget($controller, $action, $params = array()) {
-		return Application::getInstance()->getRouter()->getTargetForControllerAction($controller, $action, $params);
+		try {
+			return Application::getInstance()->getRouter()->getTargetForControllerAction($controller, $action, $params);
+		} catch (\Exception $exception) {
+			trigger_error('Exception of type ' . get_class($exception) . ' occured in ' . __METHOD__, E_USER_ERROR);
+			return '#';
+		}
 	}
 
 	/**

@@ -41,7 +41,12 @@ abstract class ViewAbstract implements IView {
 	 * @return void
 	 */
 	public function render() {
-		$this->renderContent();
+		try {
+			$this->renderContent();
+		} catch (\Exception $exception) {
+			trigger_error('Unhandled exception of type ' . get_class($exception) . ' occured while rendering template',
+				E_USER_ERROR);
+		}
 	}
 
 	/**

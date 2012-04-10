@@ -20,4 +20,6 @@ namespace YapepBase\Exception;
  */
 class DatabaseException extends Exception {
 
+	/** Duplicate key violation error code. */
+	const ERR_DUPLICATE_KEY_VIOLATION = 23000;
 }

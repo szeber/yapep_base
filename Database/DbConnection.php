@@ -76,7 +76,10 @@ abstract class DbConnection {
 		try {
 			$this->connect($configuration);
 		} catch (PDOException $exception) {
-			throw new DatabaseException($exception->getMessage(), (int)$exception->getCode(), $exception);
+			$message = null;
+			$code = 0;
+			$this->parsePdoException($exception, $message, $code);
+			throw new DatabaseException($message, $code, $exception);
 		}
 		$this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 	}
@@ -132,7 +135,10 @@ abstract class DbConnection {
 		}
 		catch (PDOException $exception) {
 			$this->transactionFailed = true;
-			throw new DatabaseException($exception->getMessage(), 0, $exception);
+			$message = null;
+			$code = 0;
+			$this->parsePdoException($exception, $message, $code);
+			throw new DatabaseException($message, $code, $exception);
 		}
 	}
 
@@ -264,7 +270,32 @@ abstract class DbConnection {
 		try {
 			return $this->connection->lastInsertId($name);
 		} catch (PDOException $exception) {
-			throw new DatabaseException($exception->getMessage(), 0, $exception);
+			$message = null;
+			$code = 0;
+			$this->parsePdoException($exception, $message, $code);
+			throw new DatabaseException($message, $code, $exception);
+		}
+	}
+
+	/**
+	 * Parses the message and code from the specified PDOException.
+	 *
+	 * @param \PDOException $exception   The exception to parse
+	 * @param string        $message     The parsed message (outgoing param).
+	 * @param int           $code        The parsed code (outgoing param).
+	 *
+	 * @return \YapepBase\Exception\DatabaseException
+	 */
+	protected function parsePdoException(PDOException $exception, &$message, &$code) {
+		$message = $exception->getMessage();
+		$code = (int)$exception->getCode();
+		$matches = array();
+
+		// Parse the ANSI error code from the message.
+		// Regex is based on the one from samuelelliot+php dot net at gmail dot com.
+		if (strstr($message, 'SQLSTATE[') && preg_match('/SQLSTATE\[(\w+)\]: (.+)$/', $message, $matches)) {
+			$message = $matches[2];
+			$code = $matches[1];
 		}
 	}
 }
