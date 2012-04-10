@@ -43,6 +43,14 @@ class LdapDn {
 			}
 		}
 	}
+	
+	/**
+	 * Returns the DN parts in the array('id' => 'ou', 'value' => 'something') format.
+	 * @return array 
+	 */
+	public function getParts() {
+		return $this->elements;
+	}
 
 	/**
 	 * Converts the DN object into a string
