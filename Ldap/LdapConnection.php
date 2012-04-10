@@ -77,11 +77,11 @@ class LdapConnection {
 	 */
 	public function connect($hostname = false, $port = false) {
 		if ($hostname && $port) {
-			$link = ldap_connect($hostname, $port);
+			$link = @ldap_connect($hostname, $port);
 		} else if ($hostname) {
-			$link = ldap_connect($hostname);
+			$link = @ldap_connect($hostname);
 		} else {
-			$link = ldap_connect();
+			$link = @ldap_connect();
 		}
 
 		if (!$link) {
@@ -96,7 +96,7 @@ class LdapConnection {
 	 * Disconnects from the LDAP server. 
 	 */
 	public function disconnect() {
-		ldap_close($this->link);
+		@ldap_close($this->link);
 		$this->link = null;
 	}
 
@@ -113,16 +113,16 @@ class LdapConnection {
 		if ($rdn) {
 			if ($password)
 			{
-				$bind = ldap_bind($this->link, (string)$rdn, $password);
+				$bind = @ldap_bind($this->link, (string)$rdn, $password);
 			} else {
-				$bind = ldap_bind($this->link, (string)$rdn);
+				$bind = @ldap_bind($this->link, (string)$rdn);
 			}
 
 			if (!$bind) {
 				throw new LdapBindException($this->link);
 			}
 		} else {
-			$bind = ldap_bind();
+			$bind = @ldap_bind();
 			if (!$bind) {
 				throw new LdapBindException($this->link);
 			}
@@ -149,7 +149,7 @@ class LdapConnection {
 			$this->connect();
 		}
 
-		$result = ldap_add($this->link, (string)$dn, $entry->getAsArray());
+		$result = @ldap_add($this->link, (string)$dn, $entry->getAsArray());
 
 		if (!$result) {
 			throw new LdapAddException($this->link);
@@ -168,7 +168,7 @@ class LdapConnection {
 			$this->connect();
 		}
 
-		$result = ldap_modify($this->link, (string)$dn, $entry->getAsArray());
+		$result = @ldap_modify($this->link, (string)$dn, $entry->getAsArray());
 
 		if (!$result) {
 			throw new LdapModifyException($this->link);
@@ -185,7 +185,7 @@ class LdapConnection {
 			$this->connect();
 		}
 
-		$result = ldap_delete($this->link, (string)$dn);
+		$result = @ldap_delete($this->link, (string)$dn);
 
 		if (!$result) {
 			throw new LdapDeleteException($this->link);
@@ -246,11 +246,11 @@ class LdapConnection {
 			$filterparams[":_" . $key] = $value;
 	    }
 	    if ($scope == self::SCOPE_SUB) {
-			$result = ldap_search($this->link, (string)$rootdn, strtr($filter, $filterparams), $attributes);
+			$result = @ldap_search($this->link, (string)$rootdn, strtr($filter, $filterparams), $attributes);
 	    } else {
-			$result = ldap_list($this->link, (string)$rootdn, strtr($filter, $filterparams), $attributes);
+			$result = @ldap_list($this->link, (string)$rootdn, strtr($filter, $filterparams), $attributes);
 	    }
-		$result = ldap_get_entries($this->link, $result);
+		$result = @ldap_get_entries($this->link, $result);
 		$result = $this->postprocess($result);
 		if ($result === false) {
 			throw new LdapSearchException($this->link);

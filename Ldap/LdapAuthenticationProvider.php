@@ -312,10 +312,10 @@ class LdapAuthenticationProvider {
 				'LdapAuthenticationProvider::setUserAttribute() before calling authenticateAndAuthorize()');
 		}
 		
-		$dn = $this->userDn;
+		$dn = clone $this->userDn;
 		$parts = $dn->getParts();
 		$firstpart = array('id' => $this->userAttribute, 'value' => $username);
-		array_unshift($firstpart, $parts);
+		array_unshift($parts, $firstpart);
 		$dn->parseDN($parts);
 		return $dn;
 	}
@@ -335,10 +335,10 @@ class LdapAuthenticationProvider {
 				'LdapAuthenticationProvider::setGroupAttribute() before calling authenticateAndAuthorize()');
 		}
 		
-		$dn = $this->groupDn;
+		$dn = clone $this->groupDn;
 		$parts = $dn->getParts();
 		$firstpart = array('id' => $this->groupAttribute, 'value' => $group);
-		array_unshift($firstpart, $parts);
+		array_unshift($parts, $firstpart);
 		$dn->parseDN($parts);
 		return $dn;
 	}
@@ -380,7 +380,7 @@ class LdapAuthenticationProvider {
 				$filterparams,
 				array('dn'),
 				LdapConnection::DEREF_NEVER,
-				LdapConnection::SCOPE_ONE);
+				LdapConnection::SCOPE_SUB);
 			if (count($results)) {
 				return true;
 			} else {
@@ -414,7 +414,7 @@ class LdapAuthenticationProvider {
 		if ($this->groupAttributeOnUser) {
 			$base = $this->buildUserDn($username);
 			if ($this->groupAttributeOnUserIsDn) {
-				$param = $this->buildGroupDn($this->requiredGroup);
+				$param = (string)$this->buildGroupDn($this->requiredGroup);
 			} else {
 				$param = $this->requiredGroup;
 			}
@@ -422,7 +422,7 @@ class LdapAuthenticationProvider {
 		} else if ($this->userAttributeOnGroup) {
 			$base = $this->buildGroupDn($this->requiredGroup);
 			if ($this->userAttributeOnGroupIsDn) {
-				$param = $this->buildUserDn($username);
+				$param = (string)$this->buildUserDn($username);
 			} else {
 				$param = $username;
 			}
@@ -441,7 +441,7 @@ class LdapAuthenticationProvider {
 			array('param' => $param),
 			array('dn'),
 			LdapConnection::DEREF_NEVER,
-			LdapConnection::SCOPE_ONE);
+			LdapConnection::SCOPE_SUB);
 		
 		if (count($results)) {
 			return true;

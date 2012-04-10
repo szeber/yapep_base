@@ -37,6 +37,7 @@ class LdapDn {
 	 * @param   array   $dn
 	 */
 	public function parseDN($dn = array()) {
+		$this->elements = array();
 		foreach($dn as $entry) {
 			if (isset($entry['id']) && isset($entry['value'])) {
 				$this->elements[] = array('id' => $entry['id'], 'value' => $entry['value']);
