@@ -27,7 +27,8 @@ namespace YapepBase\Ldap;
  * 
  * Important: due to the nature of LDAP, the application cannot verify potentially wrong configuration. If the ACL's
  * are not set up correctly for the chosen operation mode, you might get empty results, which will return a failure for
- * the AAA process.
+ * the AAA process. If the LdapAuthenticationProvider detects a verifiably wrong configuration, it will throw a
+ * \YapepBase\Exception\ParameterException.
  * 
  * Examples:
  * 
@@ -110,6 +111,12 @@ class LdapAuthenticationProvider {
 	 * @var string
 	 */
 	protected $userAttribute;
+	
+	/**
+	 * The attribute, that contains the user's password.
+	 * @var string
+	 */
+	protected $userPasswordAttribute = 'userPassword';
 
 	/**
 	 * The structural attribute for the grup.
@@ -219,6 +226,14 @@ class LdapAuthenticationProvider {
 	}
 	
 	/**
+	 * Sets the userPassword attribute. Only user with self::AUTHMODE_SEARCH, defaults to userPassword.
+	 * @param string $attribute
+	 */
+	public function setUserPasswordAttribute($attribute) {
+		$this->userPasswordAttribute = (string)$attribute;
+	}
+	
+	/**
 	 * Set the group attribute to search for.
 	 * @param   string   $attribute 
 	 */
@@ -271,20 +286,69 @@ class LdapAuthenticationProvider {
 	 * @return  bool
 	 */
 	public function authenticateAndAuthorize($username, $password) {
-		if (!$this->userDn) {
-			throw new \YapepBase\Exception\ParameterException('User root DN is not configured. Please call ' .
-			'LdapAuthenticationProvider::setUserDn() before calling authenticateAndAuthorize()');
-		}
-		
 		if (!$this->authenticate($username, $password)) {
 			return false;
 		}
+		
+		if (!$this->authorize($username)) {
+			return false;
+		}
+		
+		return true;
 	}
 	
+	/**
+	 * Builds a user LdapDn object.
+	 * @param   string   $username 
+	 * @return  LdapDn
+	 */
+	protected function buildUserDn($username) {
+		if (!$this->userDn) {
+			throw new \YapepBase\Exception\ParameterException('User root DN is not configured. Please call ' .
+				'LdapAuthenticationProvider::setUserDn() before calling authenticateAndAuthorize()');
+		}
+		if (!$this->userAttribute) {
+			throw new \YapepBase\Exception\ParameterException('User attribute is not configured. Please call ' .
+				'LdapAuthenticationProvider::setUserAttribute() before calling authenticateAndAuthorize()');
+		}
+		
+		$dn = $this->userDn;
+		$parts = $dn->getParts();
+		$firstpart = array('id' => $this->userAttribute, 'value' => $username);
+		array_unshift($firstpart, $parts);
+		$dn->parseDN($parts);
+		return $dn;
+	}
+
+	/**
+	 * Builds a group LdapDn object.
+	 * @param   string   $group
+	 * @return  LdapDn
+	 */
+	protected function buildGroupDn($group) {
+		if (!$this->groupDn) {
+			throw new \YapepBase\Exception\ParameterException('Group root DN is not configured. Please call ' .
+				'LdapAuthenticationProvider::setGroupDn() before calling authenticateAndAuthorize()');
+		}
+		if (!$this->groupAttribute) {
+			throw new \YapepBase\Exception\ParameterException('Group attribute is not configured. Please call ' .
+				'LdapAuthenticationProvider::setGroupAttribute() before calling authenticateAndAuthorize()');
+		}
+		
+		$dn = $this->groupDn;
+		$parts = $dn->getParts();
+		$firstpart = array('id' => $this->groupAttribute, 'value' => $group);
+		array_unshift($firstpart, $parts);
+		$dn->parseDN($parts);
+		return $dn;
+	}
+
 	/**
 	 * Authenticates a user against an LDAP database.
 	 * @param   string   $username
 	 * @param   string   $password 
+	 * @return  bool
+	 * @throws  \YapepBase\Exception\ParameterException   if the configuration is verifiably wrong.
 	 */
 	protected function authenticate($username, $password) {
 		if (!is_int($this->authMode)) {
@@ -293,25 +357,93 @@ class LdapAuthenticationProvider {
 		}
 		
 		if ($this->authMode == self::AUTHMODE_BIND) {
-			$dn = $this->userDn;
-			$parts = $dn->getParts();
-			$firstpart = array('id' => $this->userAttribute, 'value' => $username);
-			array_unshift($firstpart, $parts);
-			$dn->parseDN($parts);
-			
+			$dn = $this->buildUserDn($username);
 			try {
 				$this->connection->bind($dn, $password);
 			} catch (\YapepBase\Exception\LdapBindException $e) {
 				return false;
 			}
-			
 			return true;
 		} else if ($this->authMode == self::AUTHMODE_SEARCH) {
 			try {
 				$this->connection->bind($this->bindDn, $this->password);
 			} catch (\YapepBase\Exception\LdapBindException $e) {
+				throw new \YapepBase\Exception\ParameterException('Can\'t bind to LDAP server with the given ' .
+					'credentials.');
+			}
+			$base = $this->buildUserDn($username);
+			$filter = array($this->userPasswordAttribute . '=:_userPassword');
+			$filterparams = array('userPassword' => $password);
+			$results = $this->connection->search(
+				$base,
+				$filter,
+				$filterparams,
+				array('dn'),
+				LdapConnection::DEREF_NEVER,
+				LdapConnection::SCOPE_ONE);
+			if (count($results)) {
+				return true;
+			} else {
 				return false;
 			}
+		} else {
+			throw new \YapepBase\Exception\ParameterException('Invalid authentication mode configured. Please call ' .
+				'LdapAuthenticationProvider::setAuthMode() before calling authenticateAndAuthorize()');
+		}
+	}
+	
+	/**
+	 * Authorize after a successful authentication.
+	 * @param   string   $username
+	 * @return  bool
+	 */
+	protected function authorize($username) {
+		if (!$this->requiredGroup) {
+			return true;
+		}
+		
+		if ($this->groupMode == self::GROUPMODE_REBIND) {
+			try {
+				$this->connection->bind($this->userDn, $this->password);
+			} catch (\YapepBase\Exception\LdapBindException $e) {
+				throw new \YapepBase\Exception\ParameterException('Can\'t bind to LDAP server with the given ' .
+					'credentials.');
+			}
+		}
+		
+		if ($this->groupAttributeOnUser) {
+			$base = $this->buildUserDn($username);
+			if ($this->groupAttributeOnUserIsDn) {
+				$param = $this->buildGroupDn($this->requiredGroup);
+			} else {
+				$param = $this->requiredGroup;
+			}
+			$filter = $this->groupAttributeOnUser;
+		} else if ($this->userAttributeOnGroup) {
+			$base = $this->buildGroupDn($this->requiredGroup);
+			if ($this->userAttributeOnGroupIsDn) {
+				$param = $this->buildUserDn($username);
+			} else {
+				$param = $username;
+			}
+			$filter = $this->userAttributeOnGroup;
+		} else {
+			throw new \YapepBase\Exception\ParameterException('Neither group attribute for user object, not user ' .
+				'attribute for group object are set, authorization can\'t be performed. Please use ' .
+				'LdapAuthenticationProvider::setGroupAttributeOnUser() or ' . 
+				'LdapAuthenticationProvider::setUserAttributeOnGroup() before calling ' .
+				'LdapAuthenticationProvider::authenticateAndAuthorize()');
+		}
+		
+		$results = $this->connection->search(
+			$base,
+			$filter . '=:_param',
+			array('param' => $param),
+			array('dn'),
+			LdapConnection::DEREF_NEVER,
+			LdapConnection::SCOPE_ONE);
+		
+		if (count($results)) {
 			return true;
 		} else {
 			return false;
