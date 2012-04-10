@@ -23,7 +23,8 @@ class LdapDn {
 
 	/**
 	 * Constructs a DN object from parts in an associative array.
-	 * @param   array   $dn 
+	 * @param   array   $dn   DN parts as an array with subarrays in the array('id' => 'uid', 'value' => 'something')
+	 *                        format.
 	 */
 	public function __construct($dn = array()) {
 		if (is_array($dn)) {
