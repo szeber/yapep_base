@@ -87,7 +87,7 @@ class Config {
 	/**
 	 * Returns the setting specified by the name.
 	 *
-	 * The name can be a simple string, or can end in an '*' character for wildcard lookup.
+	 * The name can be a simple string, or can end in an '.*' character for wildcard lookup.
 	 * In normal mode, if the setting is not found by the name, the specified default will be returned.
 	 * In wildcard mode the whole section that begins as the name before the wildcard, will be returned.
 	 * If no results are found, the default will be returned. If name is '*', all the settings are returned.
@@ -125,7 +125,7 @@ class Config {
 		if ('.*' == substr($name, -2, 2)) {
 			$name = substr($name, 0, -1);
 			$result = array();
-			foreach($this->configurationData as $key => $value) {
+			foreach ($this->configurationData as $key => $value) {
 				if (0 === strpos($key, $name)) {
 					if (!$keepOriginalName) {
 						$key = substr($key, strlen($name));
