@@ -111,8 +111,7 @@ class LdapConnection {
 		}
 
 		if ($rdn) {
-			if ($password)
-			{
+			if ($password) {
 				$bind = @ldap_bind($this->link, (string)$rdn, $password);
 			} else {
 				$bind = @ldap_bind($this->link, (string)$rdn);
@@ -162,8 +161,7 @@ class LdapConnection {
 	 * @param   LdapEntry   $enrty  the data in the entry.
 	 * @throws  \YapepBase\Exception\LdapModifyException   if the modify fails
 	 */
-	function modify(LdapDn $dn, LdapEntry $entry)
-	{
+	function modify(LdapDn $dn, LdapEntry $entry) {
 		if (!$this->link) {
 			$this->connect();
 		}
