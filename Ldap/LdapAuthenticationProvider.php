@@ -2,10 +2,10 @@
 /**
  * This file is part of YAPEPBase.
  *
- * @package      YapepBase
- * @subpackage   Exception
- * @copyright    2011 The YAPEP Project All rights reserved.
- * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
+ * @package    YapepBase
+ * @subpackage Exception
+ * @copyright  2011 The YAPEP Project All rights reserved.
+ * @license    http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
 namespace YapepBase\Ldap;
@@ -54,6 +54,9 @@ namespace YapepBase\Ldap;
  * } else {
  *     //so something else
  * }
+ *
+ * @package    YapepBase
+ * @subpackage Ldap
  */
 class LdapAuthenticationProvider {
 	/**
@@ -292,7 +295,7 @@ class LdapAuthenticationProvider {
 	}
 
 	/**
-	 * Set bind parameters for AUTHMODE_SEARCH and GROUPMODE_REBIND.
+	 * Sets bind parameters for AUTHMODE_SEARCH and GROUPMODE_REBIND.
 	 *
 	 * @param LdapDn $bindDn
 	 * @param string $password
@@ -355,8 +358,9 @@ class LdapAuthenticationProvider {
 		$dn = clone $this->userDn;
 		$parts = $dn->getParts();
 		$firstPart = array('id' => $this->userAttribute, 'value' => $username);
+
 		array_unshift($parts, $firstPart);
-		$dn->parseDN($parts);
+		$dn->parseDn($parts);
 		return $dn;
 	}
 
@@ -382,8 +386,9 @@ class LdapAuthenticationProvider {
 		$dn = clone $this->groupDn;
 		$parts = $dn->getParts();
 		$firstPart = array('id' => $this->groupAttribute, 'value' => $group);
+
 		array_unshift($parts, $firstPart);
-		$dn->parseDN($parts);
+		$dn->parseDn($parts);
 		return $dn;
 	}
 

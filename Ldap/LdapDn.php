@@ -2,41 +2,50 @@
 /**
  * This file is part of YAPEPBase.
  *
- * @package      YapepBase
- * @subpackage   Exception
- * @author       Janos Pasztor <net@janoszen.hu>
- * @copyright    2011 The YAPEP Project All rights reserved.
- * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
+ * @package    YapepBase
+ * @subpackage Ldap
+ * @copyright  2011 The YAPEP Project All rights reserved.
+ * @license    http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
 namespace YapepBase\Ldap;
 
 /**
- * An object, that represents the distinguished name, which is the object's location in the LDAP tree. 
+ * An object, that represents the distinguished name, which is the object's location in the LDAP tree.
+ *
+ * @package    YapepBase
+ * @subpackage Ldap
  */
 class LdapDn {
+
 	/**
 	 * Contains the elements in the DN
+	 *
 	 * @var array
 	 */
 	protected $elements = array();
 
 	/**
 	 * Constructs a DN object from parts in an associative array.
-	 * @param   array   $dn   DN parts as an array with subarrays in the array('id' => 'uid', 'value' => 'something')
+	 *
+	 * @todo This array structure should be changed to something more controllable structure.
+	 * @todo Maybe we should use an object, or we should create setter methods [emul]
+	 *
+	 * @param array $dn   DN parts as an array with subarrays in the array('id' => 'uid', 'value' => 'something')
 	 *                        format.
 	 */
 	public function __construct($dn = array()) {
 		if (is_array($dn)) {
-			$this->parseDN($dn);
+			$this->parseDn($dn);
 		}
 	}
 
 	/**
 	 * Parses a string into the object.
-	 * @param   array   $dn
+	 *
+	 * @param array $dn
 	 */
-	public function parseDN($dn = array()) {
+	public function parseDn($dn = array()) {
 		$this->elements = array();
 		foreach($dn as $entry) {
 			if (isset($entry['id']) && isset($entry['value'])) {
@@ -44,35 +53,39 @@ class LdapDn {
 			}
 		}
 	}
-	
+
 	/**
 	 * Returns the DN parts in the array('id' => 'ou', 'value' => 'something') format.
-	 * @return array 
+	 *
+	 * @return array
 	 */
 	public function getParts() {
 		return $this->elements;
 	}
 
 	/**
-	 * Converts the DN object into a string
+	 * Converts the DN object into a string.
+	 *
 	 * @return   string
 	 */
 	public function __toString() {
 		$elements = array();
 		foreach ($this->elements as $element) {
-			$elements[] = $this->escape($element['id']) . "=" . $this->escape($element['value']);
+			$elements[] = $this->escape($element['id']) . '=' . $this->escape($element['value']);
 		}
-		return implode(",", $elements);
+		return implode(',', $elements);
 	}
 
 	/**
 	 * Escapes a string for use in an LDAP DN
-	 * @param   string   $string
-	 * @return  string 
+	 *
+	 * @param string $string
+	 *
+	 * @return string
 	 */
 	static function escape($string) {
-		if (preg_match("/(\\|,|\+|=|\"|<|>|#|;)/", $string)) {
-			return "\"" . strtr($string, array("\"" => "\\\"", "\\" => "\\\\")) . "\"";
+		if (preg_match('/(\\|,|\+|=|"|<|>|#|;)/', $string)) {
+			return '"' . strtr($string, array('"' => '\\"', '\\' => '\\\\')) . '"';
 		}
 
 		return $string;

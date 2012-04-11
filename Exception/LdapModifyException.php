@@ -14,6 +14,6 @@ namespace YapepBase\Exception;
 /**
  * This is an exception to signal errors with the connection
  */
-class LdapConnectionException extends LdapException {
+class LdapModifyException extends LdapException {
 	
 }
