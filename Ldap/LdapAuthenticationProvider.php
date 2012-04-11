@@ -14,26 +14,26 @@ namespace YapepBase\Ldap;
 /**
  * This class provides an authentication and authoriziation solution against an LDAP database. OpenLDAP and
  * ActiveDirectory are both supported.
- * 
+ *
  * AAA is performed as follows:
- * 
+ *
  * - If the authentication mode is search, a pre-set DN and password is used for binding. In this case only
  *   plain text passwords work. The authentication is performed using an LDAP search.
  * - If the authentication mode is bind, the username and password provided is used to bind against the LDAP server.
- * 
+ *
  * - If the group mode is rebind, the pre-set DN is used for re-binding to the LDAP server. The group membership search
  *   is then performed using that user.
  * - If the group mode is user, the previously authenticated user is used for searching for group membership.
- * 
+ *
  * Important: due to the nature of LDAP, the application cannot verify potentially wrong configuration. If the ACL's
  * are not set up correctly for the chosen operation mode, you might get empty results, which will return a failure for
  * the AAA process. If the LdapAuthenticationProvider detects a verifiably wrong configuration, it will throw a
  * \YapepBase\Exception\ParameterException.
- * 
+ *
  * Examples:
- * 
+ *
  * Using LdapAuthenticationProvider against a standard OpenLDAP database:
- * 
+ *
  * $connection = new LdapConnection();
  * $aaa        = new LdapAuthenticationProvider($connection);
  * $aaa->setAuthMode(LdapAuthenticationProvider::AUTHMODE_BIND);
@@ -58,60 +58,60 @@ namespace YapepBase\Ldap;
  */
 class LdapAuthenticationProvider {
 	/**
-	 * Try authentication binding with the user. 
+	 * Try authentication binding with the user.
 	 */
 	const AUTHMODE_BIND = 0;
 	/**
 	 * Try authentication using a search user. Works only with plain text passwords.
 	 */
 	const AUTHMODE_SEARCH = 1;
-	
+
 	/**
 	 * Perform the group check using the bind parameters from the authentication phase. If authmode is set to BIND,
 	 * the user must have permissions to read group attributes.
 	 */
-	const GROUPMODE_USER = 0;	
+	const GROUPMODE_USER = 0;
 	/**
 	 * Rebind for the group check with a new user.
 	 */
 	const GROUPMODE_REBIND = 1;
-	
+
 	/**
 	 * LDAP connection to user for AAA.
 	 * @var \YapepBase\Ldap\LdapConnection
 	 */
 	protected $connection;
-	
+
 	/**
 	 * Authentication mode. See self::AUTHMODE_* for details.
 	 * @var int
 	 */
 	protected $authMode;
-	
+
 	/**
 	 * Group authorization mode. See self::GROUPMODE_* for details.
 	 * @var int
 	 */
 	protected $groupMode;
-	
+
 	/**
 	 * User base DN.
 	 * @var \YapepBase\Ldap\LdapDn
 	 */
 	protected $userDn;
-	
+
 	/**
 	 * Group base DN.
 	 * @var \YapepBase\Ldap\LdapDn
 	 */
 	protected $groupDn;
-	
+
 	/**
 	 * The structural attribute for the user.
 	 * @var string
 	 */
 	protected $userAttribute;
-	
+
 	/**
 	 * The attribute, that contains the user's password.
 	 * @var string
@@ -123,19 +123,19 @@ class LdapAuthenticationProvider {
 	 * @var string
 	 */
 	protected $groupAttribute;
-	
+
 	/**
 	 * The attribute on the group that identifies the user.
 	 * @var string
 	 */
 	protected $groupAttributeOnUser;
-	
+
 	/**
 	 * The group attribute on the user object is a full DN
 	 * @var bool
 	 */
 	protected $groupAttributeOnUserIsDn;
-	
+
 	/**
 	 * The attribute on the user that identifies the group.
 	 * @var string
@@ -147,36 +147,36 @@ class LdapAuthenticationProvider {
 	 * @var bool
 	 */
 	protected $userAttributeOnGroupIsDn;
-	
+
 	/**
 	 * The DN to use for binding.
 	 * @var LdapDn
 	 */
 	protected $bindDn;
-	
+
 	/**
 	 * The password to use for binding.
 	 * @var string
 	 */
 	protected $password;
-	
+
 	/**
 	 * The required group for authorization.
-	 * @var string 
+	 * @var string
 	 */
 	protected $requiredGroup;
-	
+
 	/**
 	 * Sets up the connection to run queries against.
-	 * @param LdapConnection $connection 
+	 * @param LdapConnection $connection
 	 */
 	public function __construct(LdapConnection $connection) {
 		$this->connection = $connection;
 	}
-	
+
 	/**
 	 * Sets the authentication mode. See self::AUTHMODE_* for details.
-	 * @param   int   $authMode 
+	 * @param   int   $authMode
 	 */
 	public function setAuthMode($authMode) {
 		switch ($authMode) {
@@ -187,7 +187,7 @@ class LdapAuthenticationProvider {
 				break;
 		}
 	}
-	
+
 	/**
 	 * Set the mode for group check. See self::GROUPMODE_* for details.
 	 * @param   int   $groupMode
@@ -201,7 +201,7 @@ class LdapAuthenticationProvider {
 				break;
 		}
 	}
-	
+
 	/**
 	 * Sets the base DN for usernames.
 	 * @param   LdapDn   $dn
@@ -209,22 +209,22 @@ class LdapAuthenticationProvider {
 	public function setUserDn(LdapDn $dn) {
 		$this->userDn = $dn;
 	}
-	
+
 	/**
 	 * Sets the base DN for groups.
 	 */
 	public function setGroupDn(LdapDn $dn) {
 		$this->groupDn = $dn;
 	}
-	
+
 	/**
 	 * Sets the user attribute to bind/search with.
-	 * @param   string   $attribute 
+	 * @param   string   $attribute
 	 */
 	public function setUserAttribute($attribute) {
 		$this->userAttribute = (string)$attribute;
 	}
-	
+
 	/**
 	 * Sets the userPassword attribute. Only user with self::AUTHMODE_SEARCH, defaults to userPassword.
 	 * @param string $attribute
@@ -232,15 +232,15 @@ class LdapAuthenticationProvider {
 	public function setUserPasswordAttribute($attribute) {
 		$this->userPasswordAttribute = (string)$attribute;
 	}
-	
+
 	/**
 	 * Set the group attribute to search for.
-	 * @param   string   $attribute 
+	 * @param   string   $attribute
 	 */
 	public function setGroupAttribute($attribute) {
 		$this->groupAttribute = (string)$attribute;
 	}
-	
+
 	/**
 	 * Sets the group attribute on the user if any and specifies, if it is a full DN.
 	 * @param   string   $attribute
@@ -264,13 +264,13 @@ class LdapAuthenticationProvider {
 	/**
 	 * Set bind parameters for AUTHMODE_SEARCH and GROUPMODE_REBIND.
 	 * @param   LdapDn   $bindDn
-	 * @param   string   $password 
+	 * @param   string   $password
 	 */
 	public function setBindParams(LdapDn $bindDn, $password) {
 		$this->bindDn   = $bindDn;
 		$this->password = (string)$password;
 	}
-	
+
 	/**
 	 * Sets the required group name. If it is not called, authorization is not performed.
 	 * @param   string   $group
@@ -278,9 +278,9 @@ class LdapAuthenticationProvider {
 	public function setRequiredGroup($group) {
 		$this->requiredGroup = (string)$group;
 	}
-	
+
 	/**
-	 * Authenticates and authorizes the user. 
+	 * Authenticates and authorizes the user.
 	 * @param   string   $username
 	 * @param   string   $password
 	 * @return  bool
@@ -289,17 +289,17 @@ class LdapAuthenticationProvider {
 		if (!$this->authenticate($username, $password)) {
 			return false;
 		}
-		
+
 		if (!$this->authorize($username)) {
 			return false;
 		}
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * Builds a user LdapDn object.
-	 * @param   string   $username 
+	 * @param   string   $username
 	 * @return  LdapDn
 	 */
 	protected function buildUserDn($username) {
@@ -311,12 +311,12 @@ class LdapAuthenticationProvider {
 			throw new \YapepBase\Exception\ParameterException('User attribute is not configured. Please call ' .
 				'LdapAuthenticationProvider::setUserAttribute() before calling authenticateAndAuthorize()');
 		}
-		
+
 		$dn = clone $this->userDn;
 		$parts = $dn->getParts();
 		$firstpart = array('id' => $this->userAttribute, 'value' => $username);
 		array_unshift($parts, $firstpart);
-		$dn->parseDN($parts);
+		$dn->parseDn($parts);
 		return $dn;
 	}
 
@@ -334,19 +334,19 @@ class LdapAuthenticationProvider {
 			throw new \YapepBase\Exception\ParameterException('Group attribute is not configured. Please call ' .
 				'LdapAuthenticationProvider::setGroupAttribute() before calling authenticateAndAuthorize()');
 		}
-		
+
 		$dn = clone $this->groupDn;
 		$parts = $dn->getParts();
 		$firstpart = array('id' => $this->groupAttribute, 'value' => $group);
 		array_unshift($parts, $firstpart);
-		$dn->parseDN($parts);
+		$dn->parseDn($parts);
 		return $dn;
 	}
 
 	/**
 	 * Authenticates a user against an LDAP database.
 	 * @param   string   $username
-	 * @param   string   $password 
+	 * @param   string   $password
 	 * @return  bool
 	 * @throws  \YapepBase\Exception\ParameterException   if the configuration is verifiably wrong.
 	 */
@@ -355,7 +355,7 @@ class LdapAuthenticationProvider {
 			throw new \YapepBase\Exception\ParameterException('Authentication mode is not configured. Please call ' .
 				'LdapAuthenticationProvider::setAuthMode() before calling authenticateAndAuthorize()');
 		}
-		
+
 		if ($this->authMode == self::AUTHMODE_BIND) {
 			$dn = $this->buildUserDn($username);
 			try {
@@ -391,7 +391,7 @@ class LdapAuthenticationProvider {
 				'LdapAuthenticationProvider::setAuthMode() before calling authenticateAndAuthorize()');
 		}
 	}
-	
+
 	/**
 	 * Authorize after a successful authentication.
 	 * @param   string   $username
@@ -401,7 +401,7 @@ class LdapAuthenticationProvider {
 		if (!$this->requiredGroup) {
 			return true;
 		}
-		
+
 		if ($this->groupMode == self::GROUPMODE_REBIND) {
 			try {
 				$this->connection->bind($this->userDn, $this->password);
@@ -410,7 +410,7 @@ class LdapAuthenticationProvider {
 					'credentials.');
 			}
 		}
-		
+
 		if ($this->groupAttributeOnUser) {
 			$base = $this->buildUserDn($username);
 			if ($this->groupAttributeOnUserIsDn) {
@@ -430,11 +430,11 @@ class LdapAuthenticationProvider {
 		} else {
 			throw new \YapepBase\Exception\ParameterException('Neither group attribute for user object, not user ' .
 				'attribute for group object are set, authorization can\'t be performed. Please use ' .
-				'LdapAuthenticationProvider::setGroupAttributeOnUser() or ' . 
+				'LdapAuthenticationProvider::setGroupAttributeOnUser() or ' .
 				'LdapAuthenticationProvider::setUserAttributeOnGroup() before calling ' .
 				'LdapAuthenticationProvider::authenticateAndAuthorize()');
 		}
-		
+
 		$results = $this->connection->search(
 			$base,
 			$filter . '=:_param',
@@ -442,7 +442,7 @@ class LdapAuthenticationProvider {
 			array('dn'),
 			LdapConnection::DEREF_NEVER,
 			LdapConnection::SCOPE_SUB);
-		
+
 		if (count($results)) {
 			return true;
 		} else {
