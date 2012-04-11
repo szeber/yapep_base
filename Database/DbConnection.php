@@ -293,7 +293,7 @@ abstract class DbConnection {
 
 		// Parse the ANSI error code from the message.
 		// Regex is based on the one from samuelelliot+php dot net at gmail dot com.
-		if (strstr($message, 'SQLSTATE[') && preg_match('/SQLSTATE\[(\w+)\]: (.+)$/', $message, $matches)) {
+		if (strstr($message, 'SQLSTATE[') && preg_match('/SQLSTATE\[(\d+)\]: (.+)$/', $message, $matches)) {
 			$message = $matches[2];
 			$code = $matches[1];
 		}
