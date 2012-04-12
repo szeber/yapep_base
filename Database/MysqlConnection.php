@@ -54,11 +54,10 @@ class MysqlConnection extends DbConnection {
 		if (isset($configuration['useTraditionalStrictMode']) && $configuration['useTraditionalStrictMode']) {
 			$options[PDO::MYSQL_ATTR_INIT_COMMAND] .= 'SET @@SESSION.sql_mode = \'TRADITIONAL\'; ';
 		}
+		if (isset($configuration['timezone'])) {
+			$options[PDO::MYSQL_ATTR_INIT_COMMAND] .= 'SET time_zone="' . $configuration['timezone'] . '";';
+		}
 
 		$this->connection = new PDO($dsn, $configuration['user'], $configuration['password'], $options);
-
-		if (isset($configuration['timezone'])) {
-			$this->query('SET time_zone=:_tz', array('tz' => $configuration['timezone']));
-		}
 	}
 }

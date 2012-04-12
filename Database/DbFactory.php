@@ -49,6 +49,8 @@ use YapepBase\Config;
  *                                       this option, because it may break a lot of queries, that degrade gracefully
  *                                       without this option.
  *                                       {@see http://dev.mysql.com/doc/refman/5.0/en/server-sql-mode.html}</li>
+ *	       <li>timezone: The timezone to set for the connection. Must already be escaped; may not be supported by
+ *                       database server. Optional.</li>
  *     </ul>
  *
  * SQLite configuration
