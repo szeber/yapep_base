@@ -298,4 +298,19 @@ abstract class DbConnection {
 			$code = $matches[1];
 		}
 	}
+
+	/**
+	 * Returns the provided string, with all wildcard characters escaped.
+	 *
+	 * This method should be used to escape the string part in the "LIKE 'string' ESCAPE 'escapeCharacter'" statement.
+	 *
+	 * @param string $string            The string to escape.
+	 * @param string $escapeCharacter   The character to use as the escape character. Defaults to backslash.
+	 *
+	 * @return string
+	 */
+	 public function escapeWildcards($string, $escapeCharacter = '\\') {
+		 return preg_replace('/([_%' . preg_quote($escapeCharacter, '/') . '])/',
+			 addcslashes($escapeCharacter, '$\\') . '$1', $string);
+	 }
 }
