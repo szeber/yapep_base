@@ -29,12 +29,14 @@ class UrlHelper {
 	 * @param string $controller   Name of the controller
 	 * @param string $action       Name of the action
 	 * @param array  $params       Route params
+	 * @param array  $getParams    The parameters should be placed in the url.
 	 *
 	 * @return string   The target
 	 */
-	public static function getRouteTarget($controller, $action, $params = array()) {
+	public static function getRouteTarget($controller, $action, array $params = array(), array $getParams = array()) {
 		try {
-			return Application::getInstance()->getRouter()->getTargetForControllerAction($controller, $action, $params);
+			$url = Application::getInstance()->getRouter()->getTargetForControllerAction($controller, $action, $params);
+			return $url . http_build_query($getParams);
 		} catch (\Exception $exception) {
 			trigger_error('Exception of type ' . get_class($exception) . ' occured in ' . __METHOD__, E_USER_ERROR);
 			return '#';
