@@ -200,6 +200,16 @@ class HttpRequest implements IRequest {
 	}
 
 	/**
+	 * Returns all of the parameters received through URI.
+	 *
+	 * @return array
+	 */
+	public function getAllUri() {
+		return $this->routeParams;
+	}
+
+
+	/**
 	 * Returns all of the parameters received through GET.
 	 *
 	 * @return array
