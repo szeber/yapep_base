@@ -35,6 +35,7 @@ namespace YapepBase\Cron;
  * $myCronJob->run();
  *
  * @abstract
+ * @deprecated Use \YapepBase\Batch\LockingBatchScript instead
  */
 abstract class CronJob {
 

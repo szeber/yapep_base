@@ -98,6 +98,9 @@ class CliUserInterfaceHelper {
 	/** Number of spaces used for 1 level of indentation */
 	const INDENT_SPACE_COUNT = 4;
 
+	/** The key of the all usages subarray in the usage switches array. */
+	const ALL_USAGE_KEY = 'all';
+
 	/**
 	 * Name of the script
 	 *
@@ -131,7 +134,7 @@ class CliUserInterfaceHelper {
 	 *
 	 * @var array
 	 */
-	protected $usageSwitches = array();
+	protected $usageSwitches = array(self::ALL_USAGE_KEY => array());
 
 	/**
 	 * Description of the script.
@@ -195,7 +198,8 @@ class CliUserInterfaceHelper {
 	 * @param string    $longName          Long name of the switch.
 	 * @param string    $description       Description of the switch.
 	 * @param int|array $usageIndexes      An array containing the usage indexes for the switch, or optionally an int
-	 *                                     if the switch is only valid for one usage method. {@see self::addUsage()}
+	 *                                     if the switch is only valid for one usage method. If set to NULL, it will be
+	 *                                     added to all usages.{@see self::addUsage()}
 	 * @param bool      $isOptional        If TRUE, the switch is not required.
 	 * @param null      $paramName         Name of the switch parameter to display.
 	 * @param bool      $paramIsOptional   If TRUE, the switch parameter is treated as optional.
@@ -242,14 +246,16 @@ class CliUserInterfaceHelper {
 		}
 
 		$this->switches[] = $switchData;
-		if (is_array($usageIndexes)) {
+		if (is_null($usageIndexes)) {
+			$this->usageSwitches[self::ALL_USAGE_KEY][] = $switchData;
+		} elseif (is_array($usageIndexes)) {
 			foreach ($usageIndexes as $index) {
 				if (!isset($this->usageSwitches[$index])) {
 					throw new Exception('The specified usage index is not set: ' . $index);
 				}
 				$this->usageSwitches[$index][] = $switchData;
 			}
-		} elseif (isset($this->usageSwitches[$usageIndexes])) {
+		} elseif (is_numeric($usageIndexes) && isset($this->usageSwitches[$usageIndexes])) {
 			$this->usageSwitches[$usageIndexes][] = $switchData;
 		} else {
 			throw new Exception('The specified usage index is not set: ' . $usageIndexes);
@@ -288,7 +294,8 @@ class CliUserInterfaceHelper {
 		}
 		$message .= (count($this->usages) > 1 ? 'Usages:' : 'Usage:') . "\n\n";
 		foreach ($this->usages as $index => $usage) {
-			$message .= $this->getUsageWithSwitches($usage, $this->usageSwitches[$index]);
+			$message .= $this->getUsageWithSwitches($usage,
+				array_merge($this->usageSwitches[self::ALL_USAGE_KEY], $this->usageSwitches[$index]));
 		}
 
 		if ($showHelp) {
@@ -358,7 +365,7 @@ class CliUserInterfaceHelper {
 				$switchVersions[] = $switchVersion;
 			}
 			if (!empty($switchData['longName'])) {
-				$switchVersion = '-' . $switchData['longName'];
+				$switchVersion = '--' . $switchData['longName'];
 				if (!empty($switchData['paramName'])) {
 					$switchVersion .= (
 					$switchData['paramIsOptional']
