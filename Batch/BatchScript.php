@@ -47,11 +47,18 @@ abstract class BatchScript {
 
 			$eventHandlerRegistry->raise(new Event(Event::TYPE_APPSTART));
 			$instance = new static();
-			$instance->execute();
+			$instance->runScript();
 		} catch (\Exception $exception) {
 			Application::getInstance()->getErrorHandlerRegistry()->handleException($exception);
 		}
 		$eventHandlerRegistry->raise(new Event(Event::TYPE_APPFINISH));
+	}
+
+	/**
+	 * Starts script execution.
+	 */
+	protected function runScript() {
+		$this->execute();
 	}
 
 	/**
