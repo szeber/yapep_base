@@ -36,7 +36,7 @@ class UrlHelper {
 	public static function getRouteTarget($controller, $action, array $params = array(), array $getParams = array()) {
 		try {
 			$url = Application::getInstance()->getRouter()->getTargetForControllerAction($controller, $action, $params);
-			return $url . http_build_query($getParams);
+			return $url . (empty($getParams) ? '' : ('?' . http_build_query($getParams)));
 		} catch (\Exception $exception) {
 			trigger_error('Exception of type ' . get_class($exception) . ' occured in ' . __METHOD__, E_USER_ERROR);
 			return '#';
@@ -65,5 +65,23 @@ class UrlHelper {
 
 		$url = empty($params) ? $url : $url . '?' . http_build_query($params);
 		return $url;
+	}
+
+	/**
+	 * Checks if the given uri is the same as the actual.
+	 *
+	 * @param string $controller   Name of the controller
+	 * @param string $action       Name of the action
+	 *
+	 * @return bool
+	 */
+	public static function checkIsCurrentUri($controller, $action) {
+		$request = Application::getInstance()->getRequest();
+
+		$currentUri = $request->getTarget();
+		$uriParams = $request->getAllUri();
+		$givenUri = self::getRouteTarget($controller, $action, $uriParams);
+
+		return $givenUri == $currentUri;
 	}
 }
