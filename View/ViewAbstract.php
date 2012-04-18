@@ -15,6 +15,7 @@ use YapepBase\Application;
 use YapepBase\Exception\ViewException;
 use YapepBase\Mime\MimeType;
 use YapepBase\Config;
+use YapepBase\View\ViewDo;
 
 /**
  * ViewAbstract class what should be extended by every View class.
@@ -23,6 +24,14 @@ use YapepBase\Config;
  * @subpackage View
  */
 abstract class ViewAbstract implements IView {
+
+	/**
+	 * The ViewDo instance used by the view
+	 *
+	 * @var \YapepBase\View\ViewDo
+	 */
+	protected $viewDo;
+
 	/**
 	 * Stores the content type
 	 *
@@ -42,6 +51,9 @@ abstract class ViewAbstract implements IView {
 	 */
 	public function render() {
 		try {
+			if (empty($this->viewDo)) {
+				$this->viewDo = Application::getInstance()->getDiContainer()->getViewDo();
+			}
 			$this->renderContent();
 		} catch (\Exception $exception) {
 			trigger_error('Unhandled exception of type ' . get_class($exception) . ' occured while rendering template',
@@ -81,6 +93,7 @@ abstract class ViewAbstract implements IView {
 	 * @return void
 	 */
 	protected function renderBlock(BlockAbstract $block) {
+		$block->setViewDo($this->viewDo);
 		$block->render();
 	}
 
@@ -93,7 +106,7 @@ abstract class ViewAbstract implements IView {
 	 * @return mixed   The data stored with the given key.
 	 */
 	public function get($key, $raw = false) {
-		return Application::getInstance()->getDiContainer()->getViewDo()->get($key, $raw);
+		return $this->viewDo->get($key, $raw);
 	}
 
 	/**
@@ -105,7 +118,7 @@ abstract class ViewAbstract implements IView {
 	 * @return bool   FALSE if it has a value/exist, TRUE if not.
 	 */
 	public function checkIsEmpty($key, $checkIsSet = false) {
-		return Application::getInstance()->getDiContainer()->getViewDo()->checkIsEmpty($key, $checkIsSet);
+		return $this->viewDo->checkIsEmpty($key, $checkIsSet);
 	}
 
 	/**
@@ -116,6 +129,15 @@ abstract class ViewAbstract implements IView {
 	 * @return bool   TRUE if its an array, FALSE if not.
 	 */
 	public function checkIsArray($key) {
-		return Application::getInstance()->getDiContainer()->getViewDo()->checkIsArray($key);
+		return $this->viewDo->checkIsArray($key);
+	}
+
+	/**
+	 * Sets the view DO instance used by the view.
+	 *
+	 * @param \YapepBase\View\ViewDo $viewDo  The ViewDo instance to use.
+	 */
+	public function setViewDo(ViewDo $viewDo) {
+		$this->viewDo = $viewDo;
 	}
 }
