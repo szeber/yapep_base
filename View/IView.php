@@ -35,11 +35,4 @@ interface IView {
 	 * @return string
 	 */
 	public function __toString();
-
-	/**
-	 * Sets the view DO instance used by the view.
-	 *
-	 * @param \YapepBase\View\ViewDo $viewDo  The ViewDo instance to use.
-	 */
-	public function setViewDo(ViewDo $viewDo);
 }

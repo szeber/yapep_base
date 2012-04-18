@@ -37,7 +37,6 @@ abstract class TemplateAbstract extends ViewAbstract {
 	 */
 	public function setLayout(LayoutAbstract $layout) {
 		$this->layout = $layout;
-		$this->layout->setViewDo($this->viewDo);
 	}
 
 	/**

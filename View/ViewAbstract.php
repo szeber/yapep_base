@@ -51,9 +51,6 @@ abstract class ViewAbstract implements IView {
 	 */
 	public function render() {
 		try {
-			if (empty($this->viewDo)) {
-				$this->viewDo = Application::getInstance()->getDiContainer()->getViewDo();
-			}
 			$this->renderContent();
 		} catch (\Exception $exception) {
 			trigger_error('Unhandled exception of type ' . get_class($exception) . ' occured while rendering template',
@@ -93,20 +90,19 @@ abstract class ViewAbstract implements IView {
 	 * @return void
 	 */
 	protected function renderBlock(BlockAbstract $block) {
-		$block->setViewDo($this->viewDo);
 		$block->render();
 	}
 
 	/**
 	 * Returns the the value registered to the given key.
-	 *
+	 *Unnamed
 	 * @param string $key   The name of the key.
 	 * @param bool   $raw   if TRUE it will return the raw (unescaped) data.
 	 *
 	 * @return mixed   The data stored with the given key.
 	 */
 	public function get($key, $raw = false) {
-		return $this->viewDo->get($key, $raw);
+		return $this->getViewDo()->get($key, $raw);
 	}
 
 	/**
@@ -118,7 +114,7 @@ abstract class ViewAbstract implements IView {
 	 * @return bool   FALSE if it has a value/exist, TRUE if not.
 	 */
 	public function checkIsEmpty($key, $checkIsSet = false) {
-		return $this->viewDo->checkIsEmpty($key, $checkIsSet);
+		return $this->getViewDo()->checkIsEmpty($key, $checkIsSet);
 	}
 
 	/**
@@ -129,7 +125,7 @@ abstract class ViewAbstract implements IView {
 	 * @return bool   TRUE if its an array, FALSE if not.
 	 */
 	public function checkIsArray($key) {
-		return $this->viewDo->checkIsArray($key);
+		return $this->getViewDo()->checkIsArray($key);
 	}
 
 	/**
@@ -137,7 +133,19 @@ abstract class ViewAbstract implements IView {
 	 *
 	 * @param \YapepBase\View\ViewDo $viewDo  The ViewDo instance to use.
 	 */
-	public function setViewDo(ViewDo $viewDo) {
+	protected function setViewDo(ViewDo $viewDo) {
 		$this->viewDo = $viewDo;
+	}
+
+	/**
+	 * Returns the currently used view DO instance.
+	 *
+	 * @return \YapepBase\View\ViewDo
+	 */
+	protected function getViewDo() {
+		if (empty($this->viewDo)) {
+			$this->viewDo = Application::getInstance()->getDiContainer()->getViewDo();
+		}
+		return $this->viewDo;
 	}
 }
