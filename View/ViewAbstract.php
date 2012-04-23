@@ -25,7 +25,7 @@ use YapepBase\View\ViewDo;
  * @package    YapepBase
  * @subpackage View
  */
-abstract class ViewAbstract implements IView {
+abstract class ViewAbstract {
 
 	/**
 	 * The ViewDo instance used by the view
@@ -72,7 +72,7 @@ abstract class ViewAbstract implements IView {
 	 *
 	 * @return void
 	 */
-	public function render() {
+	protected function render() {
 		try {
 			$this->renderContent();
 		} catch (\Exception $exception) {

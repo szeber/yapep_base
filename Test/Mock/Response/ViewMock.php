@@ -1,17 +1,22 @@
 <?php
 
 namespace YapepBase\Test\Mock\Response;
-use YapepBase\View\IView;
+
+use YapepBase\View\ViewAbstract;
 use YapepBase\View\ViewDo;
 
 /**
  * @codeCoverageIgnore
  */
-class ViewMock implements IView {
+class ViewMock extends ViewAbstract {
 	protected $content = '';
 
 	public function set($content = '') {
 		$this->content = $content;
+	}
+
+	protected function renderContent() {
+		echo $this->content;
 	}
 
 	public function render() {

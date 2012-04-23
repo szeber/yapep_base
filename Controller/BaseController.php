@@ -4,18 +4,17 @@
  *
  * @package      YapepBase
  * @subpackage   Controller
- * @author       Zsolt Szeberenyi <szeber@yapep.org>
  * @copyright    2011 The YAPEP Project All rights reserved.
  * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
 namespace YapepBase\Controller;
-use YapepBase\View\IView;
 use YapepBase\Application;
 use YapepBase\Exception\RedirectException;
 use YapepBase\Exception\ControllerException;
 use YapepBase\Response\IResponse;
 use YapepBase\Request\IRequest;
+use YapepBase\View\ViewAbstract;
 
 /**
  * Base class for generic controllers.
@@ -97,8 +96,8 @@ abstract class BaseController implements IController {
 		}
 		$this->before();
 		$result = $this->runAction($methodName);
-		if (!empty($result) && !is_string($result) && !($result instanceof IView)) {
-			throw new ControllerException('Result of the action is not an instance of IView or string',
+		if (!empty($result) && !is_string($result) && !($result instanceof ViewAbstract)) {
+			throw new ControllerException('Result of the action is not an instance of ViewAbstract or string',
 				ControllerException::ERR_INVALID_ACTION_RESULT);
 		}
 		if (!empty($result)) {
@@ -112,11 +111,11 @@ abstract class BaseController implements IController {
 	}
 
 	/**
-	 * Runs the action and returns the result as an IView instance
+	 * Runs the action and returns the result as an ViewAbstract instance
 	 *
 	 * @param string $methodName
 	 *
-	 * @return IView
+	 * @return ViewAbstract
 	 *
 	 * @throws \YapepBase\Exception\ControllerException   On controller specific error. (eg. action not found)
 	 * @throws \YapepBase\Exception\Exception             On framework related errors.

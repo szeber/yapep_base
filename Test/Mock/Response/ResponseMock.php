@@ -9,7 +9,7 @@ class ResponseMock implements \YapepBase\Response\IResponse {
 	public function __construct(\YapepBase\Response\IOutput $output = null) {
 
 	}
-	public function setBody(\YapepBase\View\IView $body) {
+	public function setBody(\YapepBase\View\ViewAbstract $body) {
 
 	}
 	public function setRenderedBody($body) {

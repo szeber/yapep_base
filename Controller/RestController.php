@@ -38,7 +38,7 @@ abstract class RestController extends HttpController {
 	}
 
 	/**
-	 * Runs the action and returns the result as an IView instance.
+	 * Runs the action and returns the result as an ViewAbstract instance.
 	 *
 	 * @param string $methodName   The name of the method that contains the action.
 	 *

@@ -4,13 +4,13 @@
  *
  * @package      YapepBase
  * @subpackage   Response
- * @author       Zsolt Szeberenyi <szeber@yapep.org>
  * @copyright    2011 The YAPEP Project All rights reserved.
  * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
 namespace YapepBase\Response;
-use YapepBase\View\IView;
+
+use YapepBase\View\ViewAbstract;
 
 /**
  * Response interface
@@ -31,9 +31,9 @@ interface IResponse {
 	/**
 	 * Sets the response body.
 	 *
-	 * @param \YapepBase\View\IView $body
+	 * @param \YapepBase\View\ViewAbstract $body
 	 */
-	public function setBody(IView $body);
+	public function setBody(ViewAbstract $body);
 
 	/**
 	 * Sets the already rendered body.

@@ -4,24 +4,19 @@
  *
  * @package      YapepBase
  * @subpackage   Response
- * @author       Zsolt Szeberenyi <szeber@yapep.org>
  * @copyright    2011 The YAPEP Project All rights reserved.
  * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
 
 namespace YapepBase\Response;
-use YapepBase\View\IView;
-
-use YapepBase\Exception\Exception;
-
-use YapepBase\Exception\RedirectException;
-
-use YapepBase\Request\HttpRequest;
-
-use YapepBase\Mime\MimeType;
 
 use YapepBase\Config;
+use YapepBase\Exception\Exception;
+use YapepBase\Exception\RedirectException;
+use YapepBase\Mime\MimeType;
+use YapepBase\Request\HttpRequest;
+use YapepBase\View\ViewAbstract;
 
 /**
  * HttpResponse class
@@ -42,7 +37,7 @@ class HttpResponse implements IResponse {
 	/**
 	 * The response body.
 	 *
-	 * @var \YapepBase\View\IView $body
+	 * @var \YapepBase\View\ViewAbstract $body
 	 */
 	protected $body;
 
@@ -282,9 +277,9 @@ class HttpResponse implements IResponse {
 	/**
 	 * Sets the response body
 	 *
-	 * @param \YapepBase\View\IView $body
+	 * @param \YapepBase\View\ViewAbstract $body
 	 */
-	public function setBody(IView $body) {
+	public function setBody(ViewAbstract $body) {
 		$this->body = $body;
 	}
 
@@ -312,7 +307,7 @@ class HttpResponse implements IResponse {
 	 * @param int    $statusCode      The status code for the response.
 	 * @param string $statusMessage   The message for the status code.
 	 *
-	 * @return return_type
+	 * @return void
 	 */
 	public function setStatusCode($statusCode, $statusMessage = '') {
 		if (!$statusMessage) {
