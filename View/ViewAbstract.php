@@ -12,9 +12,11 @@
 namespace YapepBase\View;
 
 use YapepBase\Application;
+use YapepBase\Config;
+use YapepBase\Exception\Exception;
 use YapepBase\Exception\ViewException;
 use YapepBase\Mime\MimeType;
-use YapepBase\Config;
+use YapepBase\Storage\IStorage;
 use YapepBase\View\ViewDo;
 
 /**
@@ -38,6 +40,27 @@ abstract class ViewAbstract implements IView {
 	 * @var string
 	 */
 	protected $contentType;
+
+	/**
+	 * Storage object which will be used for caching the rendered view object.
+	 *
+	 * @var \YapepBase\Storage\IStorage
+	 */
+	private $storage;
+
+	/**
+	 * The key which will be used for storing the rendered view object.
+	 *
+	 * @var string
+	 */
+	private $storageKey;
+
+	/**
+	 * Time to leave in seconds for storing the view object.
+	 *
+	 * @var int
+	 */
+	private $storageTtl;
 
 	/**
 	 * Does the actual rendering.
@@ -66,9 +89,16 @@ abstract class ViewAbstract implements IView {
 	 * @return string
 	 */
 	public function __toString() {
-		ob_start();
-		$this->render();
-		return ob_get_clean();
+		$result = $this->getFromStorage();
+
+		if ($result === false) {
+			ob_start();
+			$this->render();
+			$result = ob_get_clean();
+
+			$this->setToStorage($result);
+		}
+		return $result;
 	}
 
 	/**
@@ -147,5 +177,71 @@ abstract class ViewAbstract implements IView {
 			$this->viewDo = Application::getInstance()->getDiContainer()->getViewDo();
 		}
 		return $this->viewDo;
+	}
+
+	/**
+	 * Sets the storage object which will be used for cacheing the rendered view.
+	 *
+	 * @param \YapepBase\Storage\IStorage $storage        The object for caching.
+	 * @param array                       $keyModifiers   Associative array which holds the keys and values,
+	 *                                                    what will take into consideration in the caching process.
+	 * @param int                         $ttl            Time to leave in seconds.
+	 *
+	 * @return void
+	 *
+	 * @throws \YapepBase\Exception\Exception   If the storage has benn already set.
+	 */
+	protected function setStorage(IStorage $storage, array $keyModifiers, $ttl) {
+		if ($this->storage !== null) {
+			throw new Exception('Storage already set');
+		}
+
+		$this->storage = $storage;
+		$this->storageKey = $this->generateKeyForStorage($keyModifiers);
+		$this->storageTtl = $ttl;
+	}
+
+	/**
+	 * Generates the key for storing the rendered view.
+	 *
+	 * @param array $keyModifiers   Associative array which holds the keys and values,
+	 *                              what will take into consideration in the caching process.
+	 *
+	 * @return string   The generated key.
+	 */
+	private function generateKeyForStorage(array $keyModifiers) {
+		$modifiers = array();
+		foreach ($keyModifiers as $fieldName => $value) {
+			$modifiers[] = $fieldName . '=' . $value;
+		}
+		return get_called_class() . '.' . implode('.', $modifiers);
+	}
+
+	/**
+	 * Stores the given data
+	 *
+	 * @param string $data   The data should be stored.
+	 *
+	 * @return void
+	 */
+	private function setToStorage($data) {
+		if ($this->storage === null) {
+			return;
+		}
+
+		$this->storage->set($this->storageKey, (string)$data, $this->storageTtl);
+	}
+
+	/**
+	 * Returns the stored data.
+	 *
+	 * @return string|bool   The stored data or FALSE if its not stored.
+	 */
+	private function getFromStorage() {
+		if ($this->storage === null) {
+			return false;
+		}
+
+		return $this->storage->get($this->storageKey);
 	}
 }
