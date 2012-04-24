@@ -120,7 +120,7 @@ abstract class ViewAbstract {
 	 * @return void
 	 */
 	protected function renderBlock(BlockAbstract $block) {
-		$block->render();
+		echo (string)$block;
 	}
 
 	/**
