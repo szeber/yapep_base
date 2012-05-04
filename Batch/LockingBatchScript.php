@@ -9,9 +9,10 @@
  */
 
 // Set the ticks, so we can handle signals
-declare(ticks = 1) ;
+declare(ticks = 1);
 
 namespace YapepBase\Batch;
+
 use YapepBase\Config;
 use YapepBase\Exception\Exception;
 use YapepBase\Exception\ParameterException;
@@ -108,6 +109,8 @@ abstract class LockingBatchScript extends BatchScript {
 	 */
 	public function __construct() {
 		$this->cliHelper = new CliUserInterfaceHelper($this->getScriptDescription());
+		$this->setSignalHandler();
+
 		if (function_exists('pcntl_signal')) {
 			pcntl_signal(SIGTERM, array(&$this, "handleSignal"), true);
 			pcntl_signal(SIGHUP, array(&$this, "handleSignal"), true);
@@ -183,14 +186,14 @@ abstract class LockingBatchScript extends BatchScript {
 		);
 
 		if (!is_dir($this->pidPath)) {
-			throw new ParameterException('The pid path does not exist');
+			throw new ParameterException('The pid path does not exist: ' . $this->pidPath);
 		}
 
 		if (
 			!is_writable($this->pidPath)
 			|| (file_exists($this->getFullPidFile()) && !is_writable($this->getFullPidFile()))
 		) {
-			throw new ParameterException('The pid file is not writable');
+			throw new ParameterException('The pid file is not writable: '. $this->getFullPidFile());
 		}
 
 		if (isset($switches['help'])) {
@@ -239,7 +242,7 @@ abstract class LockingBatchScript extends BatchScript {
 	 */
 	protected function releaseLock() {
 		if ($this->lockFileDescriptor) {
-			$fp           = $this->lockFileDescriptor;
+			$fp = $this->lockFileDescriptor;
 			$this->lockFileDescriptor = null;
 			ftruncate($fp, 0);
 			flock($fp, LOCK_UN);
@@ -268,7 +271,7 @@ abstract class LockingBatchScript extends BatchScript {
 	 *
 	 * @codeCoverageIgnore
 	 */
-	final protected function handleSignal($signo) {
+	final public function handleSignal($signo) {
 		if ($this->handleSignals) {
 			switch ($signo) {
 				case SIGTERM:
@@ -285,12 +288,8 @@ abstract class LockingBatchScript extends BatchScript {
 	/**
 	 * This function is called, if the process receives an interrupt, term signal, etc. It can be used to clean up
 	 * stuff. Note, that this function is not guaranteed to run or it may run after execution.
-	 *
-	 * @codeCoverageIgnore
 	 */
-	protected function abort() {
-
-	}
+	abstract protected function abort();
 
 	/**
 	 * Returns the script's decription.
