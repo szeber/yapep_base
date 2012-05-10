@@ -40,6 +40,15 @@ abstract class TemplateAbstract extends ViewAbstract {
 	}
 
 	/**
+	 * Returns the current layout
+	 *
+	 * @return \YapepBase\View\LayoutAbstract
+	 */
+	public function getLayout() {
+		return $this->layout;
+	}
+
+	/**
 	 * Renders the view and prints it.
 	 *
 	 * @return void
