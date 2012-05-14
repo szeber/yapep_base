@@ -225,17 +225,22 @@ class Application {
 			$eventHandlerRegistry->raise(new Event(Event::TYPE_APPSTART));
 			$controllerName = null;
 			$action = null;
-			$this->router->getRoute($controllerName, $action);
+			try {
+				$this->router->getRoute($controllerName, $action);
+			} catch (RouterException $exception) {
+				if ($exception->getCode() == RouterException::ERR_NO_ROUTE_FOUND) {
+					// The route was not found, generate a 404 HttpException
+					throw new HttpException('Route not found. Controller/action: ' . $controllerName . '/' . $action,
+						404);
+				} else {
+					// This was not a no route found error, re-throw the exception
+					throw $exception;
+				}
+			}
 			$controller = $this->getDiContainer()->getController($controllerName, $this->request, $this->response);
 			$controller->run($action);
 			$this->response->send();
 			// @codeCoverageIgnoreStart
-		} catch (RouterException $exception) {
-			if ($exception->getCode() == RouterException::ERR_NO_ROUTE_FOUND) {
-				$this->runErrorAction(404);
-			} else {
-				$this->handleFatalException($exception);
-			}
 		} catch (HttpException $exception) {
 			$this->runErrorAction($exception->getCode());
 		} catch (RedirectException $exception) {

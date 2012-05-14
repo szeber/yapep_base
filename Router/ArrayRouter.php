@@ -226,7 +226,8 @@ class ArrayRouter implements IRouter {
 	public function getTargetForControllerAction($controller, $action, $params = array()) {
 		$key = $controller . '/' . $action;
 		if (!isset($this->routes[$key])) {
-			throw new RouterException('No route found for controller and action', RouterException::ERR_NO_ROUTE_FOUND);
+			throw new RouterException('No route found for controller and action: ' . $controller . '/' . $action,
+				RouterException::ERR_NO_ROUTE_FOUND);
 		}
 		$target = preg_replace('/^\s*\[[^\]]+\]\s*/', '', $this->routes[$key]);
 		if (strstr($this->routes[$key], '{')) {
