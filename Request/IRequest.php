@@ -69,8 +69,10 @@ interface IRequest {
 	/**
 	 * Sets a route param
 	 *
-	 * @param string $name
-	 * @param mixed $value
+	 * @param string $name    Name of the param
+	 * @param mixed  $value   Value of the param
+	 *
+	 * @return void
 	 */
 	public function setParam($name, $value);
 

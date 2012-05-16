@@ -190,7 +190,7 @@ class HttpRequestTest extends \PHPUnit_Framework_TestCase {
 
 	public function testGetAcceptedContentTypes() {
 		$this->assertSame(array(), $this->request->getAcceptedContentTypes(),
-			'Request without an accept header should return an empty array');
+			'Request without an accept setHeader should return an empty array');
 		$request = $this->getRequest(array(
 			'HTTP_ACCEPT' => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
 		));
@@ -291,7 +291,7 @@ class HttpRequestTest extends \PHPUnit_Framework_TestCase {
 
 	public function testGetContentTypePreferenceValue() {
 		$this->assertSame(1.0, $this->request->getContentTypePreferenceValue('image/jpeg'),
-			'Request without an accept header should accept any content type with a value of 1.0');
+			'Request without an accept setHeader should accept any content type with a value of 1.0');
 		$request = $this->getRequest(array(
 			'HTTP_ACCEPT' => 'text/*;q=0.3, text/html;q=0.7, text/html;level=1,
 			   text/html;level=2;q=0.4, */*;q=0.5',
@@ -313,7 +313,7 @@ class HttpRequestTest extends \PHPUnit_Framework_TestCase {
 
 	public function testCheckIfContentTypeIsPreferred() {
 		$this->assertTrue($this->request->checkIfContentTypeIsPreferred('image/jpeg'),
-			'Request without an accept header should accept any content type');
+			'Request without an accept setHeader should accept any content type');
 		$request = $this->getRequest(array(
 			'HTTP_ACCEPT' => 'text/*;q=0.3, text/html;q=0.7, text/html;level=1,
 			   text/html;level=2;q=0.4',

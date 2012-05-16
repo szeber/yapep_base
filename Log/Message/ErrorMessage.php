@@ -38,6 +38,8 @@ class ErrorMessage extends MessageAbstract {
 	 * @param string $errorType      The textual representation of the error type. {@uses ErrorHandlerHelper::E_*}
 	 * @param string $errorId        The ID of the error.
 	 * @param int    $priority       The severity of the error {@uses LOG_*}
+	 *
+	 * @return void
 	 */
 	public function set($errorMessage, $errorType, $errorId, $priority) {
 		$this->message = $errorMessage;

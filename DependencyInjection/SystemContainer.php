@@ -151,6 +151,8 @@ class SystemContainer extends Pimple {
 	}
 
 	/**
+	 * Returns a logger registry instance.
+	 *
 	 * @return \YapepBase\Log\LoggerRegistry
 	 */
 	public function getLoggerRegistry() {
@@ -213,8 +215,10 @@ class SystemContainer extends Pimple {
 	/**
 	 * Adds a namespace to the namespace roots for the given type, to search classes in.
 	 *
-	 * @param string $type
-	 * @param string $namespace
+	 * @param string $type        The type of the namespace. {@uses self::NAMESPACE_SEARCH_*}
+	 * @param string $namespace   The namespace root to add.
+	 *
+	 * @return void
 	 */
 	public function addSearchNamespace($type, $namespace) {
 		$this->searchNamespaces[$type][] = $namespace;
@@ -225,6 +229,8 @@ class SystemContainer extends Pimple {
 	 *
 	 * @param string $type         The type of class to search for {@uses self::NAMESPACE_SEARCH_*}
 	 * @param array  $namespaces   The list of namespaces
+	 *
+	 * @return void
 	 */
 	public function setSearchNamespaces($type, array $namespaces = array()) {
 		$this->searchNamespaces[$type] = $namespaces;
@@ -233,8 +239,8 @@ class SystemContainer extends Pimple {
 	/**
 	 * Searches for the class in all the search namespaces for the given type
 	 *
-	 * @param string $type             The type of class to search for. {@uses self::NAMESPACE_SEARCH_*}
-	 * @param string $className
+	 * @param string $type        The type of class to search for. {@uses self::NAMESPACE_SEARCH_*}
+	 * @param string $className   The name of class to search for.
 	 *
 	 * @return string class name
 	 *
@@ -256,7 +262,7 @@ class SystemContainer extends Pimple {
 	/**
 	 * Searches for the controller in all the controller search namespaces
 	 *
-	 * @param  string $controllerName
+	 * @param string $controllerName   Name of the controller
 	 *
 	 * @return string controller name
 	 *
@@ -275,7 +281,7 @@ class SystemContainer extends Pimple {
 	/**
 	 * Searches for the template in all the template search namespaces
 	 *
-	 * @param string $templateName
+	 * @param string $templateName   Name of the template
 	 *
 	 * @return string template name
 	 *
@@ -326,7 +332,9 @@ class SystemContainer extends Pimple {
 	/**
 	 * Set a list of namespace roots to search for controllers in.
 	 *
-	 * @param array $namespaces a list of namespace roots to search for the controller in.
+	 * @param array $namespaces   A list of namespace roots to search for the controller in.
+	 *
+	 * @return void
 	 *
 	 * @deprecated   Use setSearchNamespaces() instead
 	 *
@@ -340,7 +348,9 @@ class SystemContainer extends Pimple {
 	/**
 	 * Adds a namespace to the namespace roots to search for controllers in.
 	 *
-	 * @param string $namespace a single namespace to add to the search list
+	 * @param string $namespace   A single namespace to add to the search list
+	 *
+	 * @return void
 	 *
 	 * @deprecated   Use addSearchNamespace() instead
 	 *
@@ -363,7 +373,7 @@ class SystemContainer extends Pimple {
 	}
 
 	/**
-	 * Retursn the Debugger.
+	 * Returns the Debugger.
 	 *
 	 * @return bool|\YapepBase\Debugger\IDebugger   The debugger object, or false if its not set.
 	 */

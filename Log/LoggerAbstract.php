@@ -51,6 +51,8 @@ abstract class LoggerAbstract implements ILogger {
 	 * It really logs the message.
 	 *
 	 * @param Message\IMessage $message   The message that should be logged.
+	 *
+	 * @return void
 	 */
 	abstract protected function logMessage(IMessage $message);
 
@@ -58,6 +60,8 @@ abstract class LoggerAbstract implements ILogger {
 	 * Verifies the configuration. If there is an error with the config, it throws an exception.
 	 *
 	 * @param string $configName   The name of the configuration to validate.
+	 *
+	 * @return void
 	 *
 	 * @throws \YapepBase\Exception\ConfigException   On configuration errors.
 	 */
@@ -68,7 +72,9 @@ abstract class LoggerAbstract implements ILogger {
 	/**
 	 * Logs the message
 	 *
-	 * @param \YapepBase\Log\Message\IMessage $message
+	 * @param \YapepBase\Log\Message\IMessage $message   The message to log.
+	 *
+	 * @return void
 	 */
 	public function log(IMessage $message) {
 		if (!$message->checkIsEmpty()) {

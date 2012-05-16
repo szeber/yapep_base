@@ -13,6 +13,9 @@ namespace YapepBase\Exception;
 
 /**
  * This is an exception to signal errors while the bind operation.
+ *
+ * @package      YapepBase
+ * @subpackage   Syslog
  */
 class LdapConnectionException extends LdapException {
 

@@ -64,6 +64,8 @@ abstract class ViewAbstract {
 
 	/**
 	 * Does the actual rendering.
+	 *
+	 * @return void
 	 */
 	abstract protected function renderContent();
 
@@ -125,7 +127,7 @@ abstract class ViewAbstract {
 
 	/**
 	 * Returns the the value registered to the given key.
-	 *Unnamed
+	 *
 	 * @param string $key   The name of the key.
 	 * @param bool   $raw   if TRUE it will return the raw (unescaped) data.
 	 *
@@ -161,7 +163,9 @@ abstract class ViewAbstract {
 	/**
 	 * Sets the view DO instance used by the view.
 	 *
-	 * @param \YapepBase\View\ViewDo $viewDo  The ViewDo instance to use.
+	 * @param \YapepBase\View\ViewDo $viewDo   The ViewDo instance to use.
+	 *
+	 * @return void
 	 */
 	protected function setViewDo(ViewDo $viewDo) {
 		$this->viewDo = $viewDo;

@@ -23,13 +23,13 @@ class UtilityFunctions {
 	 *
 	 * Usable to undo magic_quotes.
 	 *
-	 * @param mixed $data
+	 * @param mixed $data   The data to sanitize
 	 *
 	 * @return mixed
 	 */
 	public static function recursiveStripSlashes($data) {
 		if (is_array($data) || ($data instanceof \Iterator && $data instanceof \ArrayAccess)) {
-			foreach($data as $key => $value) {
+			foreach ($data as $key => $value) {
 				$data[$key] = self::recursiveStripSlashes($value);
 			}
 			return $data;

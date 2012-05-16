@@ -49,7 +49,7 @@ class DbResult implements Iterator {
 	/**
 	 * Constructor.
 	 *
-	 * @param \PDOStatement $statement
+	 * @param \PDOStatement $statement   The PDO statement instance to wrap.
 	 */
 	public function __construct(PDOStatement $statement) {
 		$this->statement = $statement;

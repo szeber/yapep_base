@@ -68,7 +68,7 @@ abstract class LayoutAbstract extends ViewAbstract {
 	protected $links = array();
 
 	/**
-	 * Javascript files which are should be included in the header.
+	 * Javascript files which are should be included in the setHeader.
 	 *
 	 * @var array
 	 */
@@ -208,7 +208,7 @@ abstract class LayoutAbstract extends ViewAbstract {
 	protected function renderMetas() {
 		$result = '';
 		foreach ($this->metas as $name => $content) {
-			$result .= '<meta name="'.$name.'" content="'.$content.'" />'."\n";
+			$result .= '<meta name="' . $name . '" content="' . $content . '" />' . "\n";
 		}
 		echo $result;
 	}
@@ -239,7 +239,7 @@ abstract class LayoutAbstract extends ViewAbstract {
 	protected function renderHttpMetas() {
 		$result = '';
 		foreach ($this->httpMetas as $name => $content) {
-			$result .= '<meta http-equiv="'.$name.'" content="'.$content.'" />'."\n";
+			$result .= '<meta http-equiv="' . $name . '" content="' . $content . '" />' . "\n";
 		}
 		echo $result;
 	}
@@ -266,16 +266,16 @@ abstract class LayoutAbstract extends ViewAbstract {
 	protected function renderLinks() {
 		$result = '';
 		foreach ($this->links as $link) {
-			$result .= '<link rel="'.$link['rel'].'" href="'.$link['href'].'"'
-				.(empty($link['type']) ? '' : ' type="'.$link['type'].'"')
-				.(empty($link['title']) ? '' : ' title="'.$link['title'].'"')
-				.' />'."\n";
+			$result .= '<link rel="' . $link['rel'] . '" href="' . $link['href'] . '"'
+				. (empty($link['type']) ? '' : ' type="' . $link['type'] . '"')
+				. (empty($link['title']) ? '' : ' title="' . $link['title'] . '"')
+				. ' />' . "\n";
 		}
 		echo $result;
 	}
 
 	/**
-	 * Adds a Javascript file to the header.
+	 * Adds a Javascript file to the setHeader.
 	 *
 	 * @param string $file   The path of the javascript file.
 	 *
@@ -286,14 +286,14 @@ abstract class LayoutAbstract extends ViewAbstract {
 	}
 
 	/**
-	 * Displays the javascripts in the header (<var>script</var> tags).
+	 * Displays the javascripts in the setHeader (<var>script</var> tags).
 	 *
 	 * @return void
 	 */
 	protected function renderHeaderJavaScripts() {
 		$result = '';
 		foreach (array_unique($this->headerJavaScripts) as $file) {
-			$result .= '<script type="text/javascript" src="'.$file.'"></script>'."\n";
+			$result .= '<script type="text/javascript" src="' . $file . '"></script>' . "\n";
 		}
 		echo $result;
 	}
@@ -317,7 +317,7 @@ abstract class LayoutAbstract extends ViewAbstract {
 	protected function renderFooterJavaScripts() {
 		$result = '';
 		foreach (array_unique($this->footerJavaScripts) as $file) {
-			$result .= '<script type="text/javascript" src="'.$file.'"></script>'."\n";
+			$result .= '<script type="text/javascript" src="' . $file . '"></script>' . "\n";
 		}
 		echo $result;
 	}
@@ -332,6 +332,8 @@ abstract class LayoutAbstract extends ViewAbstract {
 	 * @param string $value           The value of the variable. Must be a string that is the valid javascript
 	 *                                representation of the value.
 	 * @param bool   $treatAsString   If TRUE, the value will be treated as a string and placed within single quotes.
+	 *
+	 * @return void
 	 */
 	public function addJavaScriptVariable($name, $value, $treatAsString) {
 		if ($treatAsString) {

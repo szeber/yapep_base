@@ -54,6 +54,8 @@ abstract class BaseController implements IController {
 	/**
 	 * Runs before the action.
 	 *
+	 * @return void
+	 *
 	 * @throws \YapepBase\Exception\ControllerException   On error.
 	 */
 	protected function before() {
@@ -62,6 +64,8 @@ abstract class BaseController implements IController {
 
 	/**
 	 * Runs after the action
+	 *
+	 * @return void
 	 *
 	 * @throws \YapepBase\Exception\ControllerException   On error.
 	 */
@@ -82,6 +86,8 @@ abstract class BaseController implements IController {
 	 * Runs the specified action
 	 *
 	 * @param string $action   The name of the action (without the controller specific prefix)
+	 *
+	 * @return void
 	 *
 	 * @throws \YapepBase\Exception\ControllerException   On controller specific error. (eg. action not found)
 	 * @throws \YapepBase\Exception\Exception             On framework related errors.
@@ -113,7 +119,7 @@ abstract class BaseController implements IController {
 	/**
 	 * Runs the action and returns the result as an ViewAbstract instance
 	 *
-	 * @param string $methodName
+	 * @param string $methodName   Name of the method
 	 *
 	 * @return ViewAbstract
 	 *
@@ -132,7 +138,9 @@ abstract class BaseController implements IController {
 	 * The called action will use the same request and response objects.
 	 *
 	 * @param string $controllerName   The name of the controller.
-	 * @param string $action
+	 * @param string $action           The name of the action.
+	 *
+	 * @return void
 	 *
 	 * @throws \YapepBase\Exception\RedirectException     To stop execution of the controller.
 	 * @throws \YapepBase\Exception\ControllerException   On controller specific error. (eg. action not found)
@@ -152,9 +160,9 @@ abstract class BaseController implements IController {
 	 * @param string $nameOrData   The name of the key, or the storable data in an associative array.
 	 * @param mixed  $value        The value.
 	 *
-	 * @throws \Exception   If the key already exist.
-	 *
 	 * @return void
+	 *
+	 * @throws \Exception   If the key already exists.
 	 */
 	public function setToView($nameOrData, $value = null) {
 		Application::getInstance()->getDiContainer()->getViewDo()->set($nameOrData, $value);

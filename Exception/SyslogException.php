@@ -13,6 +13,9 @@ namespace YapepBase\Exception;
 
 /**
  * Generic exception for Syslog
+ *
+ * @package      YapepBase
+ * @subpackage   Syslog
  */
 class SyslogException extends \YapepBase\Exception\Exception {
 

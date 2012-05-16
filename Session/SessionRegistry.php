@@ -31,7 +31,7 @@ class SessionRegistry {
 	/**
 	 * Returns the session coresponding to namespace
 	 *
-	 * @param string $namespace
+	 * @param string $namespace   The namespace.
 	 *
 	 * @return \YapepBase\Session\ISession   The session object.
 	 *
@@ -48,6 +48,8 @@ class SessionRegistry {
 	 * Registers a session
 	 *
 	 * @param \YapepBase\Session\ISession $session   The session object
+	 *
+	 * @return void
 	 */
 	public function register(ISession $session) {
 		$this->namespaces[$session->getNamespace()] = $session;

@@ -13,14 +13,18 @@ namespace YapepBase\Exception;
 
 /**
  * This Exception states, that an invalid type was provided.
+ *
+ * @package      YapepBase
+ * @subpackage   Exception
  */
 class TypeException extends Exception {
 	/**
+	 * Constructor
 	 *
-	 * @param mixed $object the object which does not match the required type
-	 * @param string $required the type required
+	 * @param mixed  $object     The object which does not match the required type
+	 * @param string $required   The type required
 	 */
-	function __construct($object, $required = "") {
+	public function __construct($object, $required = '') {
 		$type = 'unknown';
 		switch (\gettype($object)) {
 			case 'object':

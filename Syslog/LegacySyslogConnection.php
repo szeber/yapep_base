@@ -17,6 +17,8 @@ use YapepBase\Exception\SyslogException;
  *
  * This class is not testable.
  *
+ * @package      YapepBase
+ * @subpackage   Syslog
  * @codeCoverageIgnore
  */
 class LegacySyslogConnection extends SyslogConnection {
@@ -24,7 +26,9 @@ class LegacySyslogConnection extends SyslogConnection {
 	/**
 	 * Set the path of the log socket. Only works before open()/openlog(). Normally you shouldn't need to use it.
 	 *
-	 * @param  string  $path  Defaults to /dev/log
+	 * @param string $path   Defaults to /dev/log.
+	 *
+	 * @return void
 	 *
 	 * @throws \YapepBase\Exception\NotImplementedException because PHP's syslog functions do not accept a log socket.
 	 */
@@ -56,10 +60,10 @@ class LegacySyslogConnection extends SyslogConnection {
 	/**
 	 * Write a log message to the log socket.
 	 *
-	 * @param  int     $priority
-	 * @param  string  $message
-	 * @param  string  $ident     Defaults to the ident set via setIdent()
-	 * @param  int     $date      Timestamp for log message. Defaults to now.
+	 * @param int    $priority   The priority.
+	 * @param string $message    The message.
+	 * @param string $ident      Defaults to the ident set via setIdent()
+	 * @param int    $date       Timestamp for log message. Defaults to now.
 	 *
 	 * @return \YapepBase\Syslog\LegacySyslogConnection
 	 *
@@ -89,7 +93,7 @@ class LegacySyslogConnection extends SyslogConnection {
 				} else {
 					throw new SyslogException('closelog() failed');
 				}
-			} else if (isset($e)) {
+			} elseif (isset($e)) {
 				throw $e;
 			}
 		}

@@ -30,7 +30,9 @@ class LoggerRegistry implements ILogger {
 	/**
 	 * Adds an error handler to the registry.
 	 *
-	 * @param \YapepBase\Log\ILogger $logger
+	 * @param \YapepBase\Log\ILogger $logger   The logger to add.
+	 *
+	 * @return void
 	 */
 	public function addLogger(ILogger $logger) {
 		$this->loggers[] = $logger;
@@ -39,7 +41,7 @@ class LoggerRegistry implements ILogger {
 	/**
 	 * Removes a logger from the registry.
 	 *
-	 * @param \YapepBase\Log\ILogger $logger
+	 * @param \YapepBase\Log\ILogger $logger   The logger to remove.
 	 *
 	 * @return bool   TRUE if the logger was removed successfully, FALSE otherwise.
 	 */
@@ -64,7 +66,9 @@ class LoggerRegistry implements ILogger {
 	/**
 	 * Logs the message
 	 *
-	 * @param \YapepBase\Log\Message\IMessage $message
+	 * @param \YapepBase\Log\Message\IMessage $message   The message to log.
+	 *
+	 * @return void
 	 */
 	public function log(IMessage $message) {
 		if (!$message->checkIsEmpty()) {

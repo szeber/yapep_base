@@ -39,6 +39,8 @@ abstract class AbstractErrorController extends HttpController {
 	 *
 	 * @param int $errorCode   The name of the action (without the controller specific prefix)
 	 *
+	 * @return void
+	 *
 	 * @throws \YapepBase\Exception\ControllerException   On controller specific error.
 	 * @throws \YapepBase\Exception\Exception             On framework related errors.
 	 * @throws \YapepBase\Exception\RedirectException     On redirections.

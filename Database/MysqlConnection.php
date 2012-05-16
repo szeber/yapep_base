@@ -26,10 +26,11 @@ class MysqlConnection extends DbConnection {
 	 *
 	 * @param array $configuration   The configuration for the connection.
 	 *
+	 * @return void
+	 *
 	 * @throws \PDOException   On connection errors.
 	 */
-	protected function connect (array $configuration)
-	{
+	protected function connect(array $configuration) {
 		$dsn = 'mysql:host=' . $configuration['host'] . ';dbname=' . $configuration['database'];
 		if (!empty($configuration['port'])) {
 			$dsn .= ';port=' . $configuration['port'];

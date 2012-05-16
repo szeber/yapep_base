@@ -13,7 +13,10 @@ namespace YapepBase\Exception;
 
 /**
  * This is an exception to signal errors while the delete operation.
+ *
+ * @package      YapepBase
+ * @subpackage   Syslog
  */
 class LdapDeleteException extends LdapException {
-	
+
 }

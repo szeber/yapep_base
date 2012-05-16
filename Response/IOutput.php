@@ -20,9 +20,7 @@ interface IOutput {
 	/**
 	 * Outputs all parameters.
 	 *
-	 * @param string $string1 First string to output
-	 * @param string $string2 Second string to output
-	 * @param string $stringn n-th string to output
+	 * @return void
 	 */
 	public function out();
 }

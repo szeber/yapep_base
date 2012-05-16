@@ -131,7 +131,7 @@ class HttpResponseTest extends \PHPUnit_Framework_TestCase {
 				$this->createCleanResponse();
 				$this->response->setStatusCode($statuscode);
 				$this->response->send();
-				$this->fail('Standards compliancy test should fail with status code ' . $statuscode . ' and no Location header.');
+				$this->fail('Standards compliancy test should fail with status code ' . $statuscode . ' and no Location setHeader.');
 			} catch (\YapepBase\Exception\StandardsComplianceException $e) {}
 			$this->createCleanResponse();
 			$this->response->setStatusCode($statuscode);
@@ -146,7 +146,7 @@ class HttpResponseTest extends \PHPUnit_Framework_TestCase {
 			$this->createCleanResponse();
 			$this->response->setStatusCode(304);
 			$this->response->send();
-			$this->fail('Standards compliancy test should fail with status code 304 and missing Date header.');
+			$this->fail('Standards compliancy test should fail with status code 304 and missing Date setHeader.');
 		} catch (\YapepBase\Exception\StandardsComplianceException $e) {}
 		$this->createCleanResponse();
 		$this->response->setStatusCode(304);
@@ -160,7 +160,7 @@ class HttpResponseTest extends \PHPUnit_Framework_TestCase {
 			$this->createCleanResponse();
 			$this->response->setStatusCode(401);
 			$this->response->send();
-			$this->fail('Standards compliancy test should fail with status code 401 and missing WWW-Authenticate header.');
+			$this->fail('Standards compliancy test should fail with status code 401 and missing WWW-Authenticate setHeader.');
 		} catch (\YapepBase\Exception\StandardsComplianceException $e) {}
 		$this->createCleanResponse();
 		$this->response->setStatusCode(401);
@@ -174,7 +174,7 @@ class HttpResponseTest extends \PHPUnit_Framework_TestCase {
 			$this->createCleanResponse();
 			$this->response->setStatusCode(405);
 			$this->response->send();
-			$this->fail('Standards compliancy test should fail with status code 405 and missing Allow header.');
+			$this->fail('Standards compliancy test should fail with status code 405 and missing Allow setHeader.');
 		} catch (\YapepBase\Exception\StandardsComplianceException $e) {}
 		$this->createCleanResponse();
 		$this->response->setStatusCode(405);
@@ -216,18 +216,18 @@ class HttpResponseTest extends \PHPUnit_Framework_TestCase {
 
 		$this->createCleanResponse();
 		try {
-			$this->response->addHeader('This is an invalid header line');
-			$this->fail('Invalid header lines are not caught!');
+			$this->response->addHeader('This is an invalid setHeader line');
+			$this->fail('Invalid setHeader lines are not caught!');
 		} catch (\YapepBase\Exception\ParameterException $e) {}
 
 		try {
 			$this->response->addHeader('');
-			$this->fail('Empty header lines are not caught!');
+			$this->fail('Empty setHeader lines are not caught!');
 		} catch (\YapepBase\Exception\ParameterException $e) {}
 
 		try {
 			$this->response->addHeader('X-Test-Header', '');
-			$this->fail('Empty header values are not caught!');
+			$this->fail('Empty setHeader values are not caught!');
 		} catch (\YapepBase\Exception\ParameterException $e) {}
 
 		try {

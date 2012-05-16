@@ -26,12 +26,14 @@ class SqliteConnection extends DbConnection {
 	 *
 	 * @param array $configuration   The configuration for the connection.
 	 *
+	 * @return void
+	 *
 	 * @throws \PDOException   On connection errors.
 	 */
-	protected function connect (array $configuration)
-	{
+	protected function connect(array $configuration) {
 		$dsn = 'sqlite:' . $configuration['path'];
-		$options = ((!empty($configuration['options']) && is_array($options)) ? $configuration['options'] : array());
+		$options = ((!empty($configuration['options']) && is_array($configuration['options']))
+			? $configuration['options'] : array());
 
 		$this->connection = new PDO($dsn, null, null, $options);
 	}

@@ -30,8 +30,10 @@ class EventHandlerRegistry {
 	/**
 	 * Registers a new event handler for the given event type
 	 *
-	 * @param string                         $eventType
-	 * @param \YapepBase\Event\IEventHandler $eventHandler
+	 * @param string                         $eventType      The event type. {@uses Event::TYPE_*}
+	 * @param \YapepBase\Event\IEventHandler $eventHandler   The event handler.
+	 *
+	 * @return void
 	 */
 	public function registerEventHandler($eventType, IEventHandler $eventHandler) {
 		if (!isset($this->eventHandlers[$eventType])) {
@@ -43,8 +45,10 @@ class EventHandlerRegistry {
 	/**
 	 * Removes an event handler
 	 *
-	 * @param string                         $eventType
-	 * @param \YapepBase\Event\IEventHandler $eventHandler
+	 * @param string                         $eventType      The event type. {@uses Event::TYPE_*}
+	 * @param \YapepBase\Event\IEventHandler $eventHandler   The event handler.
+	 *
+	 * @return void
 	 */
 	public function removeEventHandler($eventType, IEventHandler $eventHandler) {
 		if (
@@ -58,7 +62,7 @@ class EventHandlerRegistry {
 	/**
 	 * Returns an array containing all the event handlers registered to the event type
 	 *
-	 * @param string $eventType
+	 * @param string $eventType   the event type. {@uses Event::TYPE_*}
 	 *
 	 * @return array
 	 */
@@ -69,7 +73,9 @@ class EventHandlerRegistry {
 	/**
 	 * Clears all event handlers for an event type
 	 *
-	 * @param string $eventType
+	 * @param string $eventType   The event type. {@uses Event::TYPE_*}
+	 *
+	 * @return void
 	 */
 	public function clear($eventType) {
 		$this->eventHandlers[$eventType] = array();
@@ -77,6 +83,8 @@ class EventHandlerRegistry {
 
 	/**
 	 * Clears all event handlers for all event types
+	 *
+	 * @return void
 	 */
 	public function clearAll() {
 		$this->eventHandlers = array();
@@ -85,12 +93,15 @@ class EventHandlerRegistry {
 	/**
 	 * Raises an event
 	 *
-	 * @param Event $event
+	 * @param Event $event   The event to raise.
+	 *
+	 * @return void
 	 */
 	public function raise(Event $event) {
 		$type = $event->getType();
 		if (!empty($this->eventHandlers[$type])) {
-			foreach($this->eventHandlers[$type] as $handler) {
+			foreach ($this->eventHandlers[$type] as $handler) {
+				/** @var \YapepBase\Event\IEventHandler $handler */
 				$handler->handleEvent($event);
 			}
 		}

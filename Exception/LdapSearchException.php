@@ -13,7 +13,10 @@ namespace YapepBase\Exception;
 
 /**
  * This is an exception to signal errors during a search operation.
+ *
+ * @package      YapepBase
+ * @subpackage   Syslog
  */
 class LdapSearchException extends LdapException {
-	
+
 }

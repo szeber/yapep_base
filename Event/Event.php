@@ -45,8 +45,8 @@ class Event {
 	/**
 	 * Constructor
 	 *
-	 * @param string $type
-	 * @param array  $data
+	 * @param string $type   The event type. {@uses self::TYPE_*}
+	 * @param array  $data   The event data.
 	 */
 	public function __construct($type, array $data = array()) {
 		$this->type = $type;

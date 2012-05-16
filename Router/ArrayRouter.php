@@ -57,7 +57,7 @@ class ArrayRouter implements IRouter {
 	 * Constructor
 	 *
 	 * @param \YapepBase\Request\IRequest $request   The request instance
-	 * @param array    $routes    The list of available routes
+	 * @param array                       $routes    The list of available routes
 	 */
 	public function __construct(IRequest $request, array $routes) {
 		$this->request = $request;
@@ -92,7 +92,7 @@ class ArrayRouter implements IRouter {
 	 *
 	 * @throws RouterException   On errors. (Includig if the route is not found)
 	 */
-	public function getRoute (&$controller = null, &$action = null) {
+	public function getRoute(&$controller = null, &$action = null) {
 		$target = $this->getTarget();
 		$method = $this->getMethod();
 
@@ -130,7 +130,7 @@ class ArrayRouter implements IRouter {
 					// The target doesn't match the path
 					continue;
 				}
-				foreach($params as $name => $value) {
+				foreach ($params as $name => $value) {
 					if (is_numeric($name)) {
 						continue;
 					}
@@ -161,7 +161,9 @@ class ArrayRouter implements IRouter {
 	 */
 	protected function getRegexForPath($path) {
 		$matches = array();
-		if (!preg_match_all('/\{([-_.a-zA-Z0-9]+):([-_.a-zA-Z0-9]+)(\(([^}]*)\))?\}/', $path, $matches, PREG_SET_ORDER)) {
+		if (
+			!preg_match_all('/\{([-_.a-zA-Z0-9]+):([-_.a-zA-Z0-9]+)(\(([^}]*)\))?\}/', $path, $matches, PREG_SET_ORDER)
+		) {
 			throw new RouterException('Invalid param syntax in route', RouterException::ERR_SYNTAX_PARAM);
 		}
 
@@ -230,7 +232,7 @@ class ArrayRouter implements IRouter {
 		}
 		$target = preg_replace('/^\s*\[[^\]]+\]\s*/', '', $this->routes[$key]);
 		if (strstr($this->routes[$key], '{')) {
-			foreach($params as $key => $value) {
+			foreach ($params as $key => $value) {
 				$target = preg_replace('/\{' . preg_quote($key, '/') . ':[^}]+\}/', $value, $target);
 			}
 			if (strstr($target, '{')) {

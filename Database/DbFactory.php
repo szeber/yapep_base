@@ -107,7 +107,8 @@ class DbFactory {
 				throw new DatabaseException('Database connection configuration not found');
 			}
 			static::validateConnectionConfig($data);
-			static::$connections[$connectionName][$connectionType] = static::makeConnection($data, $connectionName, $connectionType);
+			static::$connections[$connectionName][$connectionType] = static::makeConnection($data, $connectionName,
+				$connectionType);
 			if (self::TYPE_READ_WRITE == $connectionType
 				|| isset(static::$connections[$connectionName][self::TYPE_READ_ONLY])
 			) {
@@ -122,6 +123,8 @@ class DbFactory {
 	 * Validates the database connection config.
 	 *
 	 * @param array $configuration   The config to validate.
+	 *
+	 * @return void
 	 *
 	 * @throws DatabaseException   On configuration errors.
 	 */
@@ -156,7 +159,7 @@ class DbFactory {
 	/**
 	 * Creates a database connection instance/
 	 *
-	 * @param array $configuration     The configuration data.
+	 * @param array  $configuration    The configuration data.
 	 * @param string $connectionName   The name of the connection.
 	 * @param string $connectionType   The type of the connection. {@uses self::TYPE_*}
 	 *

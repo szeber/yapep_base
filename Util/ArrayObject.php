@@ -32,7 +32,9 @@ abstract class ArrayObject implements \Iterator, \ArrayAccess, \Countable, \Seri
 	/**
 	 * Throws a \YapepBase\Exception\ValueException, if $offset is not of the required type
 	 *
-	 * @param mixed $offset
+	 * @param mixed $offset   The offset.
+	 *
+	 * @return void
 	 *
 	 * @throws \YapepBase\Exception\ValueException if $offset is not of the required type
 	 */
@@ -43,6 +45,8 @@ abstract class ArrayObject implements \Iterator, \ArrayAccess, \Countable, \Seri
 	 *
 	 * @param mixed $element   The element to check.
 	 *
+	 * @return void
+	 *
 	 * @throws \YapepBase\Exception\TypeException if the Collection cannot contain this element type.
 	 *
 	 * @codeCoverageIgnore
@@ -52,14 +56,14 @@ abstract class ArrayObject implements \Iterator, \ArrayAccess, \Countable, \Seri
 	/**
 	 * Create a new data object
 	 *
-	 * @param array $data
+	 * @param array $data   The data to check.
 	 */
 	public function __construct($data = null) {
 		if (\is_array($data)) {
 			foreach ($data as $key => $value) {
 				$this->offsetSet($key, $value);
 			}
-		} else if (!\is_null($data)) {
+		} elseif (!\is_null($data)) {
 			$this->offsetSet(null, $data);
 		}
 	}
@@ -80,7 +84,7 @@ abstract class ArrayObject implements \Iterator, \ArrayAccess, \Countable, \Seri
 	 *
 	 * Implemented as required by the ArrayAccess interface.
 	 *
-	 * @param int $offset the offset to check
+	 * @param int $offset   The offset to check.
 	 *
 	 * @return bool
 	 *
@@ -100,7 +104,7 @@ abstract class ArrayObject implements \Iterator, \ArrayAccess, \Countable, \Seri
 	 *
 	 * Implemented as required by the ArrayAccess interface.
 	 *
-	 * @param int $offset the offset to fetch
+	 * @param int $offset   The offset to fetch.
 	 *
 	 * @return mixed
 	 *
@@ -121,8 +125,10 @@ abstract class ArrayObject implements \Iterator, \ArrayAccess, \Countable, \Seri
 	 *
 	 * Implemented as required by the ArrayAccess interface.
 	 *
-	 * @param int|string $offset
-	 * @param mixed      $value
+	 * @param int|string $offset   The offset.
+	 * @param mixed      $value    The value.
+	 *
+	 * @return void
 	 */
 	public function offsetSet($offset, $value) {
 		$this->typeCheck($value);
@@ -139,7 +145,7 @@ abstract class ArrayObject implements \Iterator, \ArrayAccess, \Countable, \Seri
 	 *
 	 * Implemented as required by the ArrayAccess interface.
 	 *
-	 * @param int $offset
+	 * @param int $offset   The offset.
 	 *
 	 * @return \YapepBase\Util\Collection
 	 *
@@ -244,7 +250,9 @@ abstract class ArrayObject implements \Iterator, \ArrayAccess, \Countable, \Seri
 	/**
 	 * Loads this Collection from a serialized string. Does NOT do a typeCheck.
 	 *
-	 * @param string $serialized
+	 * @param string $serialized   The serialized string.
+	 *
+	 * @return void
 	 */
 	public function unserialize($serialized) {
 		$this->data = unserialize($serialized);
@@ -253,11 +261,11 @@ abstract class ArrayObject implements \Iterator, \ArrayAccess, \Countable, \Seri
 	/**
 	 * Add a single element
 	 *
-	 * @param mixed $element
+	 * @param mixed $element   The element.
 	 *
-	 * @return self
+	 * @return \YapepBase\Util\ArrayObject
 	 */
-	function add($element) {
+	public function add($element) {
 		$this->typeCheck($element);
 		$this[] = $element;
 		return $this;
@@ -266,13 +274,13 @@ abstract class ArrayObject implements \Iterator, \ArrayAccess, \Countable, \Seri
 	/**
 	 * Add all elements from an other collection to this one.
 	 *
-	 * @param \YapepBase\Util\ArrayObject $collection
+	 * @param \YapepBase\Util\ArrayObject $collection   The collection.
 	 *
 	 * @return \YapepBase\Util\ArrayObject Returns this Collection in a consistent manner.
 	 *
 	 * @throws \YapepBase\Exception\TypeException   If an element fails the typeCheck.
 	 */
-	function addAll(ArrayObject $collection) {
+	public function addAll(ArrayObject $collection) {
 		/**
 		 * Add a typecheck to return in a consistent manner, if it fails.
 		 */
@@ -287,30 +295,32 @@ abstract class ArrayObject implements \Iterator, \ArrayAccess, \Countable, \Seri
 
 	/**
 	 * Deletes all elemens.
+	 *
+	 * @return void
 	 */
-	function clear() {
+	public function clear() {
 		$this->data = array();
 	}
 
 	/**
 	 * Checks if an element is contained here.
 	 *
-	 * @param mixed $element
+	 * @param mixed $element   The element.
 	 *
 	 * @return bool
 	 */
-	function contains($element) {
+	public function contains($element) {
 		return in_array($element, $this->data);
 	}
 
 	/**
 	 * Checks all elements in a Collection if they are contained in this ArrayObject.
 	 *
-	 * @param \YapepBase\Util\ArrayObject $other
+	 * @param \YapepBase\Util\ArrayObject $other   The other collection.
 	 *
 	 * @return bool
 	 */
-	function containsAll(ArrayObject $other) {
+	public function containsAll(ArrayObject $other) {
 		foreach ($other as $element) {
 			if (!$this->contains($element)) {
 				return false;
@@ -322,11 +332,11 @@ abstract class ArrayObject implements \Iterator, \ArrayAccess, \Countable, \Seri
 	/**
 	 * Removes an element by reference.
 	 *
-	 * @param mixed $element
+	 * @param mixed $element   The element.
 	 *
 	 * @return bool if the data has changed.
 	 */
-	function remove($element) {
+	public function remove($element) {
 		$key = array_search($element, $this->data);
 		if ($key === false) {
 			return false;
@@ -339,11 +349,11 @@ abstract class ArrayObject implements \Iterator, \ArrayAccess, \Countable, \Seri
 	/**
 	 * Remove all elements contained in an other ArrayObject
 	 *
-	 * @param \YapepBase\Util\ArrayObject $other
+	 * @param \YapepBase\Util\ArrayObject $other   The other object.
 	 *
 	 * @return \YapepBase\Util\ArrayObject
 	 */
-	function removeAll(ArrayObject $other) {
+	public function removeAll(ArrayObject $other) {
 		foreach ($other as $elements) {
 			$this->remove($elements);
 		}
@@ -353,11 +363,11 @@ abstract class ArrayObject implements \Iterator, \ArrayAccess, \Countable, \Seri
 	/**
 	 * Retains all elements contained in a different collection
 	 *
-	 * @param \YapepBase\Util\ArrayObject $other
+	 * @param \YapepBase\Util\ArrayObject $other   The other collection.
 	 *
 	 * @return \YapepBase\Util\ArrayObject
 	 */
-	function retainAll(ArrayObject $other) {
+	public function retainAll(ArrayObject $other) {
 		foreach ($this as $key => $value) {
 			if (!$other->contains($value)) {
 				unset($this[$key]);

@@ -59,6 +59,7 @@ namespace YapepBase\Ldap;
  * @subpackage Ldap
  */
 class LdapAuthenticationProvider {
+
 	/**
 	 * Try authentication binding with the user.
 	 */
@@ -196,6 +197,8 @@ class LdapAuthenticationProvider {
 	 * Sets the authentication mode.
 	 *
 	 * @param int $authMode   {@uses self::AUTHMODE_* }.
+	 *
+	 * @return void
 	 */
 	public function setAuthMode($authMode) {
 		switch ($authMode) {
@@ -211,6 +214,8 @@ class LdapAuthenticationProvider {
 	 * Set the mode for group check.
 	 *
 	 * @param int $groupMode   {@uses self::GROUPMODE_*}
+	 *
+	 * @return void
 	 */
 	public function setGroupMode($groupMode) {
 		switch ($groupMode) {
@@ -225,7 +230,9 @@ class LdapAuthenticationProvider {
 	/**
 	 * Sets the base DN for usernames.
 	 *
-	 * @param LdapDn $dn
+	 * @param LdapDn $dn   The base DN.
+	 *
+	 * @return void
 	 */
 	public function setUserDn(LdapDn $dn) {
 		$this->userDn = $dn;
@@ -234,7 +241,9 @@ class LdapAuthenticationProvider {
 	/**
 	 * Sets the base DN for groups.
 	 *
-	 * @param LdapDn $dn
+	 * @param LdapDn $dn   The base DN.
+	 *
+	 * @return void
 	 */
 	public function setGroupDn(LdapDn $dn) {
 		$this->groupDn = $dn;
@@ -243,41 +252,49 @@ class LdapAuthenticationProvider {
 	/**
 	 * Sets the user attribute to bind/search with.
 	 *
-	 * @param string $attribute
+	 * @param string $attribute   The attribute.
+	 *
+	 * @return void
 	 */
 	public function setUserAttribute($attribute) {
-		// TODO: Castind should be replaced by type checking and ParameterException throwing [emul]
+		// TODO: Casting should be replaced by type checking and ParameterException throwing [emul]
 		$this->userAttribute = (string)$attribute;
 	}
 
 	/**
 	 * Sets the userPassword attribute. Only user with self::AUTHMODE_SEARCH, defaults to userPassword.
 	 *
-	 * @param string $attribute
+	 * @param string $attribute   The attribute.
+	 *
+	 * @return void
 	 */
 	public function setUserPasswordAttribute($attribute) {
-		// TODO: Castind should be replaced by type checking and ParameterException throwing [emul]
+		// TODO: Casting should be replaced by type checking and ParameterException throwing [emul]
 		$this->userPasswordAttribute = (string)$attribute;
 	}
 
 	/**
 	 * Set the group attribute to search for.
 	 *
-	 * @param string $attribute
+	 * @param string $attribute   The attribute.
+	 *
+	 * @return void
 	 */
 	public function setGroupAttribute($attribute) {
-		// TODO: Castind should be replaced by type checking and ParameterException throwing [emul]
+		// TODO: Casting should be replaced by type checking and ParameterException throwing [emul]
 		$this->groupAttribute = (string)$attribute;
 	}
 
 	/**
 	 * Sets the group attribute on the user if any and specifies, if it is a full DN.
 	 *
-	 * @param string $attribute
+	 * @param string $attribute   The attribute.
 	 * @param bool   $isDn        The attribute contains a full DN.
+	 *
+	 * @return void
 	 */
 	public function setGroupAttributeOnUser($attribute, $isDn) {
-		// TODO: Castind should be replaced by type checking and ParameterException throwing [emul]
+		// TODO: Casting should be replaced by type checking and ParameterException throwing [emul]
 		$this->groupAttributeOnUser     = (string)$attribute;
 		$this->groupAttributeOnUserIsDn = (bool)$isDn;
 	}
@@ -285,11 +302,13 @@ class LdapAuthenticationProvider {
 	/**
 	 * Sets the user attribute on the group if any and specifies, if it is a full DN.
 	 *
-	 * @param string $attribute
+	 * @param string $attribute   The attribute.
 	 * @param bool   $isDn        The attribute contains a full DN.
+	 *
+	 * @return void
 	 */
 	public function setUserAttributeOnGroup($attribute, $isDn) {
-		// TODO: Castind should be replaced by type checking and ParameterException throwing [emul]
+		// TODO: Casting should be replaced by type checking and ParameterException throwing [emul]
 		$this->userAttributeOnGroup     = (string)$attribute;
 		$this->userAttributeOnGroupIsDn = (bool)$isDn;
 	}
@@ -297,30 +316,34 @@ class LdapAuthenticationProvider {
 	/**
 	 * Sets bind parameters for AUTHMODE_SEARCH and GROUPMODE_REBIND.
 	 *
-	 * @param LdapDn $bindDn
-	 * @param string $password
+	 * @param LdapDn $bindDn     The DN to bind to.
+	 * @param string $password   The password.
+	 *
+	 * @return void
 	 */
 	public function setBindParams(LdapDn $bindDn, $password) {
 		$this->bindDn   = $bindDn;
-		// TODO: Castind should be replaced by type checking and ParameterException throwing [emul]
+		// TODO: Casting should be replaced by type checking and ParameterException throwing [emul]
 		$this->password = (string)$password;
 	}
 
 	/**
 	 * Sets the required group name. If it is not called, authorization is not performed.
 	 *
-	 * @param string $group
+	 * @param string $group   The group name.
+	 *
+	 * @return void
 	 */
 	public function setRequiredGroup($group) {
-		// TODO: Castind should be replaced by type checking and ParameterException throwing [emul]
+		// TODO: Casting should be replaced by type checking and ParameterException throwing [emul]
 		$this->requiredGroup = (string)$group;
 	}
 
 	/**
 	 * Authenticates and authorizes the user.
 	 *
-	 * @param string $username
-	 * @param string $password
+	 * @param string $username   The username.
+	 * @param string $password   The password.
 	 *
 	 * @return bool   TRUE if the given user is autheticated and authorized.
 	 */
@@ -339,7 +362,7 @@ class LdapAuthenticationProvider {
 	/**
 	 * Builds a user LdapDn object.
 	 *
-	 * @param string $username
+	 * @param string $username   The username.
 	 *
 	 * @return LdapDn
 	 *
@@ -367,7 +390,7 @@ class LdapAuthenticationProvider {
 	/**
 	 * Builds a group LdapDn object.
 	 *
-	 * @param string $group
+	 * @param string $group   The group name.
 	 *
 	 * @return  LdapDn
 	 *
@@ -395,8 +418,8 @@ class LdapAuthenticationProvider {
 	/**
 	 * Authenticates a user against an LDAP database.
 	 *
-	 * @param string $username
-	 * @param string $password
+	 * @param string $username   The username.
+	 * @param string $password   The password.
 	 *
 	 * @return bool
 	 *
@@ -418,7 +441,7 @@ class LdapAuthenticationProvider {
 				return false;
 			}
 			return true;
-		} else if ($this->authMode == self::AUTHMODE_SEARCH) {
+		} elseif ($this->authMode == self::AUTHMODE_SEARCH) {
 			try {
 				$this->connection->bind($this->bindDn, $this->password);
 			} catch (\YapepBase\Exception\LdapBindException $e) {
@@ -451,7 +474,7 @@ class LdapAuthenticationProvider {
 	/**
 	 * Authorize after a successful authentication.
 	 *
-	 * @param string $username
+	 * @param string $username   The username.
 	 *
 	 * @return bool
 	 *
@@ -481,7 +504,7 @@ class LdapAuthenticationProvider {
 				$param = $this->requiredGroup;
 			}
 			$filter = $this->groupAttributeOnUser;
-		} else if ($this->userAttributeOnGroup) {
+		} elseif ($this->userAttributeOnGroup) {
 			$base = $this->buildGroupDn($this->requiredGroup);
 			if ($this->userAttributeOnGroupIsDn) {
 				$param = (string)$this->buildUserDn($username);

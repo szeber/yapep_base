@@ -47,7 +47,7 @@ class AutoRouter implements IRouter {
 	 *
 	 * @return string   The controller and action separated by a '/' character.
 	 *
-	 * @throws RouterException   On errors. (Includig if the route is not found)
+	 * @throws \YapepBase\Exception\RouterException   On errors. (Including if the route is not found)
 	 */
 	public function getRoute(&$controller = null, &$action = null) {
 		$target = explode('/', trim($this->request->getTarget(), '/ '));
@@ -65,20 +65,20 @@ class AutoRouter implements IRouter {
 		foreach ($target as $key => $value) {
 			$this->request->setParam($key, $value);
 		}
-		return $controller.'/'.$action;
+		return $controller . '/' . $action;
 
 	}
 
 	/**
 	 * Converts a path part to a controller or action name.
 	 *
-	 * @param string $string
+	 * @param string $string   The path.
 	 *
 	 * @return string
 	 */
 	protected function convertPathPartToName($string) {
 		$parts = preg_split('/[-_ A-Z]/', preg_replace('/[^-_a-zA-Z0-9]/', '', $string));
-		foreach($parts as $key => $value) {
+		foreach ($parts as $key => $value) {
 			$parts[$key] = ucfirst($value);
 		}
 		return implode('', $parts);
@@ -87,7 +87,7 @@ class AutoRouter implements IRouter {
 	/**
 	 * Converts a controller or action name to a path part
 	 *
-	 * @param string $name
+	 * @param string $name   The name of the controller or action.
 	 *
 	 * @return string
 	 */
@@ -104,7 +104,7 @@ class AutoRouter implements IRouter {
 	 *
 	 * @return string   The target.
 	 *
-	 * @throws RouterException   On errors. (Includig if the route is not found)
+	 * @throws \YapepBase\Exception\RouterException   On errors. (Including if the route is not found)
 	 */
 	public function getTargetForControllerAction($controller, $action, $params = array()) {
 		if ('Index' == $action && 'Index' == $controller && empty($params)) {

@@ -139,7 +139,7 @@ class HttpRequest implements IRequest {
 	/**
 	 * Returns TRUE if there is a GET parameter set in the request with the specified name.
 	 *
-	 * @param string $name
+	 * @param string $name   The name of the get param.
 	 *
 	 * @return bool
 	 */
@@ -165,7 +165,7 @@ class HttpRequest implements IRequest {
 	/**
 	 * Returns TRUE if there is a POST parameter set in the request with the specified name.
 	 *
-	 * @param string $name
+	 * @param string $name   Name of the post param.
 	 *
 	 * @return bool
 	 */
@@ -191,7 +191,7 @@ class HttpRequest implements IRequest {
 	/**
 	 * Returns TRUE if there is a cookie set in the request with the specified name.
 	 *
-	 * @param string $name
+	 * @param string $name   name of the cookie
 	 *
 	 * @return bool
 	 */
@@ -358,8 +358,10 @@ class HttpRequest implements IRequest {
 	/**
 	 * Sets a route param
 	 *
-	 * @param string $name
-	 * @param mixed $value
+	 * @param string $name    Name of the param.
+	 * @param mixed  $value   Value of the param.
+	 *
+	 * @return void
 	 */
 	public function setParam($name, $value) {
 		$this->routeParams[$name] = $value;
@@ -376,7 +378,7 @@ class HttpRequest implements IRequest {
 	}
 
 	/**
-	 * Parses the accept header and returns an array with all the parsed accepted content types.
+	 * Parses the accept setHeader and returns an array with all the parsed accepted content types.
 	 *
 	 * The returned array has the following keys:
 	 * <ul>
@@ -387,7 +389,6 @@ class HttpRequest implements IRequest {
 	 *                 it's value.</li>
 	 *   <li>original: The original, unparsed content type item</li>
 	 * </ul>
-	 *
 	 *
 	 * @return array   The parsed array
 	 */
@@ -425,7 +426,7 @@ class HttpRequest implements IRequest {
 	 *   <li>original: The original, unparsed content type item</li>
 	 * </ul>
 	 *
-	 * @param string $type
+	 * @param string $type   The content type {@uses \YapepBase\Mime\MimeType::*}
 	 *
 	 * @return array|bool   The array with the values or FALSE if it is invalid
 	 */
@@ -525,7 +526,7 @@ class HttpRequest implements IRequest {
 	 * @param array $acceptedType         The content type to check against. May contain wildcards.
 	 * @param int   $specificity          The level of specificity (outgoing parameter).
 	 *
-	 * @return return_type
+	 * @return bool
 	 *
 	 * @see HttpRequest::parseContentType()
 	 */
@@ -551,7 +552,7 @@ class HttpRequest implements IRequest {
 				$specificity = 2;
 				return true;
 			}
-			foreach($acceptedType['params'] as $key => $value) {
+			foreach ($acceptedType['params'] as $key => $value) {
 				if (!isset($checkedContentType['params'][$key]) || $checkedContentType['params'][$key] != $value) {
 					return false;
 				}
@@ -566,9 +567,9 @@ class HttpRequest implements IRequest {
 	/**
 	 * Returns TRUE if the provided content type is one of the content types accepted by the client, FALSE otherwise.
 	 *
-	 * IF there was no Accept header in the request, it will always return TRUE for a valid content type.
+	 * IF there was no Accept setHeader in the request, it will always return TRUE for a valid content type.
 	 *
-	 * @param string $contentType
+	 * @param string $contentType   The content type {@uses \YapepBase\Mime\MimeType::*}
 	 *
 	 * @return bool
 	 */
@@ -584,7 +585,7 @@ class HttpRequest implements IRequest {
 			return true;
 		}
 
-		foreach($acceptedTypes as $acceptedType) {
+		foreach ($acceptedTypes as $acceptedType) {
 					if ($this->checkIfContentTypesMatch($parsed, $acceptedType)) {
 				return true;
 			}
@@ -597,9 +598,9 @@ class HttpRequest implements IRequest {
 	 *
 	 * If the returned value is 0.0, the client does not accept the content type. If just checking if the client
 	 * accepts the content type use HttpRequest::checkIfContentTypeIsPreferred() instead, since it's faster.
-	 * If there was no Accept header in the request, it will return 1.0 for a valid content type.
+	 * If there was no Accept setHeader in the request, it will return 1.0 for a valid content type.
 	 *
-	 * @param string $contentType
+	 * @param string $contentType   The content type {@uses \YapepBase\Mime\MimeType::*}
 	 *
 	 * @return float
 	 *
@@ -625,7 +626,7 @@ class HttpRequest implements IRequest {
 			return 1.0;
 		}
 
-		foreach($acceptedTypes as $acceptedType) {
+		foreach ($acceptedTypes as $acceptedType) {
 			if (
 				$this->checkIfContentTypesMatch($parsed, $acceptedType, $specificity)
 				&& ($specificity >= $preferenceSpecificity || ($specificity == $preferenceSpecificity

@@ -27,9 +27,9 @@ interface ISyslogConnection {
 	/**
 	 * This function is a replacement for the native openlog() call.
 	 *
-	 * @param  string  $ident
-	 * @param  int     $option Log options, only LOG_PID is recognized.
-	 * @param  int     $facility
+	 * @param string $ident      The ident.
+	 * @param int    $option     Log options, only LOG_PID is recognized.
+	 * @param int    $facility   The facility.
 	 *
 	 * @return bool
 	 */
@@ -38,8 +38,8 @@ interface ISyslogConnection {
 	/**
 	 * This function is a replacement for the native syslog() call.
 	 *
-	 * @param  int     $priority
-	 * @param  string  $message
+	 * @param int    $priority   The priority.
+	 * @param string $message    The message.
 	 *
 	 * @return bool
 	 */
@@ -47,6 +47,7 @@ interface ISyslogConnection {
 
 	/**
 	 * This function is a replacement for the native closelog() function
+	 *
 	 * @return bool
 	 */
 	public function closelog();
@@ -70,10 +71,10 @@ interface ISyslogConnection {
 	/**
 	 * Write a log message to the log socket.
 	 *
-	 * @param  int     $priority
-	 * @param  string  $message
-	 * @param  string  $ident     Defaults to the ident set via setIdent()
-	 * @param  int     $date      Timestamp for log message. Some implementations MAY not respect this.
+	 * @param int    $priority   The priority.
+	 * @param string $message    The message.
+	 * @param string $ident      Defaults to the ident set via setIdent()
+	 * @param int    $date       Timestamp for log message. Some implementations MAY not respect this.
 	 *
 	 * @return \YapepBase\Syslog\ISyslogConnection
 	 *
@@ -85,7 +86,7 @@ interface ISyslogConnection {
 	/**
 	 * Set the path of the log socket. Some implementations MAY not respect this setting.
 	 *
-	 * @param  string  $path  Defaults to /dev/log
+	 * @param string $path   Defaults to /dev/log.
 	 *
 	 * @return \YapepBase\Syslog\ISyslogConnection
 	 *
@@ -106,7 +107,7 @@ interface ISyslogConnection {
 	/**
 	 * Sets the application identification.
 	 *
-	 * @param  string  $ident
+	 * @param string $ident   The ident.
 	 *
 	 * @return \YapepBase\Syslog\ISyslogConnection
 	 */
@@ -122,7 +123,7 @@ interface ISyslogConnection {
 	/**
 	 * Sets log options. Only accepts LOG_PID at the moment.
 	 *
-	 * @param  int  $options
+	 * @param int $options   The options.
 	 *
 	 * @return \YapepBase\Syslog\NativeSyslogConnection
 	 */
@@ -131,14 +132,14 @@ interface ISyslogConnection {
 	/**
 	 * Return the options set for logging.
 	 *
-	 * @return  int
+	 * @return int
 	 */
 	public function getOptions();
 
 	/**
 	 * Set the default facility.
 	 *
-	 * @param  int  $facility
+	 * @param int $facility   The facility.
 	 *
 	 * @return \YapepBase\Syslog\ISyslogConnection
 	 *

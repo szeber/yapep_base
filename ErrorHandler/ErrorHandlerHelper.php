@@ -62,13 +62,14 @@ class ErrorHandlerHelper {
 	/**
 	 * Returns the description for the provided error level
 	 *
-	 * @param int $errorLevel
+	 * @param int $errorLevel   The error level to check.
 	 *
 	 * @return string
+	 *
 	 * @codeCoverageIgnore
 	 */
 	public function getPhpErrorLevelDescription($errorLevel) {
-		switch($errorLevel) {
+		switch ($errorLevel) {
 			case E_ERROR:
 				$description = self::E_ERROR_DESCRIPTION;
 				break;
@@ -145,13 +146,13 @@ class ErrorHandlerHelper {
 	/**
 	 * Returns the applicable log priority for the specified errorlevel
 	 *
-	 * @param int $errorLevel
+	 * @param int $errorLevel   The error level to check.
 	 *
 	 * @return int
 	 * @codeCoverageIgnore
 	 */
 	public function getLogPriorityForErrorLevel($errorLevel) {
-		switch($errorLevel) {
+		switch ($errorLevel) {
 			case E_ERROR:
 			case E_PARSE:
 			case E_CORE_ERROR:

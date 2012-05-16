@@ -14,6 +14,9 @@ namespace YapepBase\Exception;
 
 /**
  * This exception shows, that a certain setting is not implemented/supported.
+ *
+ * @package      YapepBase
+ * @subpackage   Syslog
  */
 class NotImplementedException extends Exception {
 

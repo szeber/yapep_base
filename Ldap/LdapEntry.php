@@ -30,7 +30,9 @@ class LdapEntry {
 	 * Creates an LDAP entry from a key-value array. If multiple values belong to an
 	 * attribute, it shall be stored in an array within the key.
 	 *
-	 * @param array $attributes
+	 * @param array $attributes   The attributes to set.
+	 *
+	 * @return void
 	 */
 	public function __construct(array $attributes = array()) {
 		$this->setAsArray($attributes);
@@ -40,7 +42,9 @@ class LdapEntry {
 	 * Sets the LDAP attributes from a key-value array. If multiple values belong to an
 	 * attribute, it shall be stored in an array within the key.
 	 *
-	 * @param array $attributes
+	 * @param array $attributes   The attributes to set.
+	 *
+	 * @return void
 	 */
 	public function setAsArray($attributes) {
 		$this->attributes = $attributes;

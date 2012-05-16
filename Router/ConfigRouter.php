@@ -28,8 +28,8 @@ class ConfigRouter extends ArrayRouter {
 	/**
 	 * Constructor.
 	 *
-	 * @param IRequest $request
-	 * @param string   $configName   The name of the configuration where the routes are stored
+	 * @param IRequest $request      The request instance.
+	 * @param string   $configName   The name of the configuration where the routes are stored.
 	 *
 	 * @throws RouterException   On error
 	 */

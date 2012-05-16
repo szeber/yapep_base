@@ -179,7 +179,7 @@ class CliUserInterfaceHelper {
 	/**
 	 * Adds a new usage method to the script.
 	 *
-	 * @param $description
+	 * @param string $description   Description of the usage method.
 	 *
 	 * @return int
 	 */
@@ -203,6 +203,8 @@ class CliUserInterfaceHelper {
 	 * @param bool      $isOptional        If TRUE, the switch is not required.
 	 * @param null      $paramName         Name of the switch parameter to display.
 	 * @param bool      $paramIsOptional   If TRUE, the switch parameter is treated as optional.
+	 *
+	 * @return void
 	 *
 	 * @throws \YapepBase\Exception\Exception
 	 */
@@ -265,7 +267,9 @@ class CliUserInterfaceHelper {
 	/**
 	 * Sets the error message
 	 *
-	 * @param string $message
+	 * @param string $message   The error message.
+	 *
+	 * @return void
 	 */
 	public function setErrorMessage($message) {
 		$this->errorMessage = $message;
@@ -323,13 +327,13 @@ class CliUserInterfaceHelper {
 				$switchLine = str_pad('  ' . $shortName
 					. (empty($switchData['shortName']) || empty($switchData['longName']) ? '  ' : ', ')
 					. (empty($switchData['longName']) ? '' : '--'
-					. str_pad($switchData['longName'], $this->longestSwitchNameLength, ' ', STR_PAD_RIGHT)), $linePad, ' ',
-					STR_PAD_RIGHT) . $switchData['description'];
+					. str_pad($switchData['longName'], $this->longestSwitchNameLength, ' ', STR_PAD_RIGHT)),
+					$linePad, ' ', STR_PAD_RIGHT) . $switchData['description'];
 
 				$fistSwitchLine = $this->getWrappedString($switchLine, $linePad);
 
 				if (strlen($switchLine)) {
-					$fistSwitchLine .= "\n" .$this->getIndentedBlock($switchLine, $indentCount);
+					$fistSwitchLine .= "\n" . $this->getIndentedBlock($switchLine, $indentCount);
 				} else {
 					$fistSwitchLine .= "\n";
 				}
@@ -394,7 +398,7 @@ class CliUserInterfaceHelper {
 		$indentLength = $indentBy * self::INDENT_SPACE_COUNT;
 		$string = trim($string);
 		$lines = array();
-		while(strlen($string) > 0) {
+		while (strlen($string) > 0) {
 			$string = str_pad('', $indentLength, ' ') . $string;
 			$lines[] = $this->getWrappedString($string, $indentLength + 5);
 		}

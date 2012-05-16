@@ -76,6 +76,8 @@ class SyslogLogger extends LoggerAbstract {
 
 	/**
 	 * Closes the syslog connection.
+	 *
+	 * @return void
 	 */
 	public function __destruct() {
 		$this->connection->close();
@@ -84,7 +86,9 @@ class SyslogLogger extends LoggerAbstract {
 	/**
 	 * Logs the message
 	 *
-	 * @param \YapepBase\Log\Message\IMessage $message
+	 * @param \YapepBase\Log\Message\IMessage $message   The message to log.
+	 *
+	 * @return void
 	 */
 	protected function logMessage(IMessage $message) {
 		$this->connection->log($message->getPriority(), $this->getLogMessage($message));
@@ -93,7 +97,7 @@ class SyslogLogger extends LoggerAbstract {
 	/**
 	 * Returns the log message prepared from the message
 	 *
-	 * @param \YapepBase\Log\Message\IMessage $message
+	 * @param \YapepBase\Log\Message\IMessage $message   The message to log.
 	 *
 	 * @return string
 	 */
@@ -116,6 +120,8 @@ class SyslogLogger extends LoggerAbstract {
 	 * Verifies the configuration. If there is an error with the config, it throws an exception.
 	 *
 	 * @param string $configName   The name of the configuration to validate.
+	 *
+	 * @return void
 	 *
 	 * @throws \YapepBase\Exception\ConfigException   On configuration errors.
 	 */

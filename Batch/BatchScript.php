@@ -35,6 +35,8 @@ abstract class BatchScript {
 
 	/**
 	 * Helper method to execute the script
+	 *
+	 * @return void
 	 */
 	public static function run() {
 		$application = Application::getInstance();
@@ -56,6 +58,8 @@ abstract class BatchScript {
 
 	/**
 	 * Starts script execution.
+	 *
+	 * @return void
 	 */
 	protected function runScript() {
 		$this->execute();
@@ -77,6 +81,8 @@ abstract class BatchScript {
 
 	/**
 	 * Executes the script.
+	 *
+	 * @return void
 	 */
 	abstract protected function execute();
 }

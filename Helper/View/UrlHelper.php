@@ -52,6 +52,7 @@ class UrlHelper {
 	 * @return string   The generated URL.
 	 */
 	public static function getCurrentUrl($withParams = true, array $extraParams = array()) {
+		/** @var \YapepBase\Request\HttpRequest $request  */
 		$request = Application::getInstance()->getRequest();
 
 		$url = $request->getTarget();
@@ -76,6 +77,7 @@ class UrlHelper {
 	 * @return bool
 	 */
 	public static function checkIsCurrentUri($controller, $action) {
+		/** @var \YapepBase\Request\HttpRequest $request  */
 		$request = Application::getInstance()->getRequest();
 
 		$currentUri = $request->getTarget();

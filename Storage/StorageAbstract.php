@@ -43,6 +43,8 @@ abstract class StorageAbstract implements IStorage {
 	 *
 	 * @param array $config   The configuration data for the backend.
 	 *
+	 * @return void
+	 *
 	 * @throws \YapepBase\Exception\ConfigException    On configuration errors.
 	 * @throws \YapepBase\Exception\StorageException   On storage errors.
 	 */

@@ -29,6 +29,8 @@ interface IStorage {
 	 * @param mixed  $data   The data to store.
 	 * @param int    $ttl    The expiration time of the data in seconds if supported by the backend.
 	 *
+	 * @return void
+	 *
 	 * @throws \YapepBase\Exception\StorageException      On error.
 	 * @throws \YapepBase\Exception\ParameterException    If TTL is set and not supported by the backend.
 	 */
@@ -37,7 +39,7 @@ interface IStorage {
 	/**
 	 * Retrieves data from the cache identified by the specified key. Returns FALSE if the key does not exist.
 	 *
-	 * @param string $key
+	 * @param string $key   The key.
 	 *
 	 * @return mixed   The data or FALSE if the specified key does not exist.
 	 *
@@ -48,7 +50,9 @@ interface IStorage {
 	/**
 	 * Deletes the data specified by the key
 	 *
-	 * @param string $key
+	 * @param string $key   The key.
+	 *
+	 * @return void
 	 *
 	 * @throws \YapepBase\Exception\StorageException      On error.
 	 */

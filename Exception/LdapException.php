@@ -13,11 +13,15 @@ namespace YapepBase\Exception;
 
 /**
  * This is the generic LDAP exception
+ *
+ * @package      YapepBase
+ * @subpackage   Syslog
  */
 class LdapException extends \Exception {
 	/**
 	 * Extracts the error message and code from the connection
-	 * @param   resource   $link 
+	 *
+	 * @param resource $link   The link resource
 	 */
 	public function __construct($link) {
 		parent::__construct(ldap_error($link), ldap_errno($link));

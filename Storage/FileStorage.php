@@ -91,6 +91,8 @@ class FileStorage extends StorageAbstract {
 	 *
 	 * @param array $config   The configuration data for the backend.
 	 *
+	 * @return void
+	 *
 	 * @throws \YapepBase\Exception\ConfigException    On configuration errors.
 	 * @throws \YapepBase\Exception\StorageException   On storage errors.
 	 */
@@ -124,7 +126,7 @@ class FileStorage extends StorageAbstract {
 	/**
 	 * Returns the full path for the specified filename
 	 *
-	 * @param string $fileName
+	 * @param string $fileName   The file name.
 	 *
 	 * @return string
 	 *
@@ -148,6 +150,8 @@ class FileStorage extends StorageAbstract {
 	 * @param mixed  $data   The data to store.
 	 * @param int    $ttl    The expiration time of the data in seconds if supported by the backend.
 	 *
+	 * @return void
+	 *
 	 * @throws \YapepBase\Exception\StorageException      On error.
 	 * @throws \YapepBase\Exception\ParameterException    If TTL is set and not supported by the backend.
 	 */
@@ -164,9 +168,9 @@ class FileStorage extends StorageAbstract {
 	/**
 	 * Returns the data prepared to be written.
 	 *
-	 * @param string $key
-	 * @param mixed  $data
-	 * @param int    $ttl
+	 * @param string $key    The key.
+	 * @param mixed  $data   The data to save.
+	 * @param int    $ttl    The TTL.
 	 *
 	 * @return string
 	 *
@@ -186,7 +190,7 @@ class FileStorage extends StorageAbstract {
 	/**
 	 * Processes the data read from the file
 	 *
-	 * @param string $data
+	 * @param string $data   The data.
 	 *
 	 * @return mixed
 	 *
@@ -210,7 +214,7 @@ class FileStorage extends StorageAbstract {
 	/**
 	 * Retrieves data from the cache identified by the specified key
 	 *
-	 * @param string $key
+	 * @param string $key   The key.
 	 *
 	 * @return mixed
 	 *
@@ -234,7 +238,9 @@ class FileStorage extends StorageAbstract {
 	/**
 	 * Deletes the data specified by the key
 	 *
-	 * @param string $key
+	 * @param string $key   The ket.
+	 *
+	 * @return void
 	 *
 	 * @throws \YapepBase\Exception\StorageException      On error.
 	 */

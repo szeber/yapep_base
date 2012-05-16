@@ -88,7 +88,9 @@ class HttpSession extends SessionAbstract {
 	/**
 	 * Validates the configuration.
 	 *
-	 * @param array $config
+	 * @param array $config   The configuration array.
+	 *
+	 * @return void
 	 *
 	 * @throws \YapepBase\Exception\ConfigException   On configuration problems
 	 * @throws \YapepBase\Exception\Exception         On other problems
@@ -124,6 +126,8 @@ class HttpSession extends SessionAbstract {
 	/**
 	 * This method is called when the session has been initialized (loaded or created).
 	 *
+	 * @return void
+	 *
 	 * @see YapepBase\Session.SessionAbstract::sessionInitialized()
 	 *
 	 * @todo move cache limiter to response&controller
@@ -141,6 +145,8 @@ class HttpSession extends SessionAbstract {
 	/**
 	 * Creates a new session.
 	 *
+	 * @return void
+	 *
 	 * @see YapepBase\Session.SessionAbstract::create()
 	 */
 	public function create() {
@@ -151,6 +157,8 @@ class HttpSession extends SessionAbstract {
 
 	/**
 	 * Destroys the session.
+	 *
+	 * @return void
 	 *
 	 * @see YapepBase\Session.SessionAbstract::destroy()
 	 */

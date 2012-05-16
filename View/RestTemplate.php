@@ -37,7 +37,9 @@ class RestTemplate extends ViewAbstract {
 	/**
 	 * Sets the view's content
 	 *
-	 * @param array $content
+	 * @param array $content   The content
+	 *
+	 * @return void
 	 */
 	public function setContent(array $content) {
 		$this->content = $content;
@@ -46,9 +48,9 @@ class RestTemplate extends ViewAbstract {
 	/**
 	 * Sets the root node name for XML format output.
 	 *
-	 * @param string $nodeName
+	 * @param string $nodeName   The node name
 	 *
-	 * @return return_type
+	 * @return void
 	 */
 	public function setRootNode($nodeName) {
 		$this->rootNodeName = (string)$nodeName;
@@ -57,11 +59,7 @@ class RestTemplate extends ViewAbstract {
 	/**
 	 * Renders the view and returns it.
 	 *
-	 * @param string $contentType   The content type of the response.
-	 *                              {@uses \YapepBase\Mime\MimeType::*}
-	 * @param bool   $return        If TRUE, the method will return the output, otherwise it will print it.
-	 *
-	 * @return string   The rendered view or NULL if not returned
+	 * @return void
 	 */
 	public function render() {
 		echo $this->renderContent();
@@ -71,6 +69,8 @@ class RestTemplate extends ViewAbstract {
 	 * Renders the content, and returns it.
 	 *
 	 * @return string
+	 *
+	 * @throws \YapepBase\Exception\ViewException
 	 */
 	protected function renderContent() {
 		switch ($this->contentType) {
@@ -94,14 +94,14 @@ class RestTemplate extends ViewAbstract {
 	 *
 	 * For a well formed XML, the data has to already be escaped.
 	 *
-	 * @param mixed $data
+	 * @param mixed $data   The data.
 	 *
-	 * @return return_type
+	 * @return string
 	 */
 	protected function getXmlFromData($data) {
 		if (is_array($data) || (($data instanceof \Iterator) && ($data instanceof \ArrayAccess))) {
 			$xml = '';
-			foreach($data as $key => $value) {
+			foreach ($data as $key => $value) {
 				$xml .= '<' . $key . '>' . $this->getXmlFromData($value) . '</' . $key . '>';
 			}
 			return $xml;

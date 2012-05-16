@@ -88,6 +88,8 @@ abstract class DbConnection {
 	 * Opens the connection
 	 *
 	 * @param array $configuration   The configuration for the connection
+	 *
+	 * @return void
 	 */
 	abstract protected function connect(array $configuration);
 
@@ -237,6 +239,8 @@ abstract class DbConnection {
 
 	/**
 	 * Sets a transaction's status to failed.
+	 *
+	 * @return void
 	 */
 	public function failTransaction() {
 		$this->transactionFailed = true;
@@ -309,8 +313,8 @@ abstract class DbConnection {
 	 *
 	 * @return string
 	 */
-	 public function escapeWildcards($string, $escapeCharacter = '\\') {
-		 return preg_replace('/([_%' . preg_quote($escapeCharacter, '/') . '])/',
-			 addcslashes($escapeCharacter, '$\\') . '$1', $string);
-	 }
+	public function escapeWildcards($string, $escapeCharacter = '\\') {
+		return preg_replace('/([_%' . preg_quote($escapeCharacter, '/') . '])/',
+			addcslashes($escapeCharacter, '$\\') . '$1', $string);
+	}
 }

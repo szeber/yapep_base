@@ -29,6 +29,8 @@ class LdapConnection {
 
 	/**
 	 * The connection link.
+	 *
+	 * @var resource
 	 */
 	protected $link;
 
@@ -61,8 +63,8 @@ class LdapConnection {
 	/**
 	 * If the function has parameters, connects to the LDAP server.
 	 *
-	 * @param string $hostname
-	 * @param int    $port
+	 * @param bool|string $hostname   The hostname or FALSE for localhost.
+	 * @param bool|int    $port       The port or FALSE for default port.
 	 */
 	public function __construct($hostname = false, $port = false) {
 		if ($hostname) {
@@ -82,13 +84,17 @@ class LdapConnection {
 	/**
 	 * Explicitly connects the LDAP server
 	 *
-	 * @param string $hostname
-	 * @param int    $port
+	 * @param bool|string $hostname   The hostname or FALSE for localhost.
+	 * @param bool|int    $port       The port or FALSE for default port.
+	 *
+	 * @return void
+	 *
+	 * @throws \YapepBase\Exception\LdapConnectionException   On connection errors.
 	 */
 	public function connect($hostname = false, $port = false) {
 		if ($hostname && $port) {
 			$link = @ldap_connect($hostname, $port);
-		} else if ($hostname) {
+		} elseif ($hostname) {
 			$link = @ldap_connect($hostname);
 		} else {
 			$link = @ldap_connect();
@@ -104,6 +110,8 @@ class LdapConnection {
 
 	/**
 	 * Disconnects from the LDAP server.
+	 *
+	 * @return void
 	 */
 	public function disconnect() {
 		@ldap_close($this->link);
@@ -113,19 +121,23 @@ class LdapConnection {
 	/**
 	 * Binds (authenticates) with the LDAP server. Pass empty parameters to do an anonymous bind.
 	 *
-	 * @param \YapepBase\Ldap\LdapDn $rdn
-	 * @param string                 $password
+	 * @param \YapepBase\Ldap\LdapDn $rootDn     The root DN.
+	 * @param string                 $password   The password.
+	 *
+	 * @return void
+	 *
+	 * @throws \YapepBase\Exception\LdapBindException
 	 */
-	public function bind(LdapDn $rdn = null, $password = '') {
+	public function bind(LdapDn $rootDn = null, $password = '') {
 		if (!$this->link) {
 			$this->connect();
 		}
 
-		if ($rdn) {
+		if ($rootDn) {
 			if ($password) {
-				$bind = @ldap_bind($this->link, (string)$rdn, $password);
+				$bind = @ldap_bind($this->link, (string)$rootDn, $password);
 			} else {
-				$bind = @ldap_bind($this->link, (string)$rdn);
+				$bind = @ldap_bind($this->link, (string)$rootDn);
 			}
 
 			if (!$bind) {
@@ -141,6 +153,10 @@ class LdapConnection {
 
 	/**
 	 * Unbinds (deauthenticates) from an LDAP server. Useful, if you want to change users within a connection.
+	 *
+	 * @return void
+	 *
+	 * @throws \YapepBase\Exception\LdapBindException
 	 */
 	public function unbind() {
 		if (!ldap_unbind($this->link)) {
@@ -153,6 +169,8 @@ class LdapConnection {
 	 *
 	 * @param \YapepBase\Ldap\LdapDn    $dn      The distinguised name of the entry.
 	 * @param \YapepBase\Ldap\LdapEntry $entry   The data in the entry.
+	 *
+	 * @return void
 	 *
 	 * @throws \YapepBase\Exception\LdapAddException   If the add fails
 	 */
@@ -171,12 +189,14 @@ class LdapConnection {
 	/**
 	 * Runs an LDAP modify operation on the server.
 	 *
-	 * @param \YapepBase\Ldap\LdapDn    $dn     The distinguised name of the entry.
-	 * @param \YapepBase\Ldap\LdapEntry $entry  The data in the entry.
+	 * @param \YapepBase\Ldap\LdapDn    $dn      The distinguised name of the entry.
+	 * @param \YapepBase\Ldap\LdapEntry $entry   The data in the entry.
+	 *
+	 * @return void
 	 *
 	 * @throws \YapepBase\Exception\LdapModifyException   If the modify fails.
 	 */
-	function modify(LdapDn $dn, LdapEntry $entry) {
+	public function modify(LdapDn $dn, LdapEntry $entry) {
 		if (!$this->link) {
 			$this->connect();
 		}
@@ -191,11 +211,13 @@ class LdapConnection {
 	/**
 	 * Deletes an entry from the LDAP.
 	 *
-	 * @param \YapepBase\Ldap\LdapDn $dn
+	 * @param \YapepBase\Ldap\LdapDn $dn   The DN to delete.
+	 *
+	 * @return void
 	 *
 	 * @throws \YapepBase\Exception\LdapDeleteException   If the deletion fails.
 	 */
-	function delete(LdapDn $dn) {
+	public function delete(LdapDn $dn) {
 		if (!$this->link) {
 			$this->connect();
 		}
@@ -210,56 +232,56 @@ class LdapConnection {
 	/**
 	 * Decodes a hexadecimal character.
 	 *
-	 * @param string $value
+	 * @param string $value   The value to decode.
 	 *
 	 * @return string
 	 */
 	protected function decodeHex($value) {
-	    return chr(hexdec($value));
+		return chr(hexdec($value));
 	}
 
 	/**
 	 * Decode a hexadecimal value.
 	 *
-	 * @param string $value
+	 * @param string $value   The value to decode.
 	 *
 	 * @return string
 	 */
 	protected function decode($value) {
 		// TODO: Is the " really necessary? You should change this to ' [emul]
-	    return preg_replace("/(\x([0-9A-Fa-f][0-9A-Fa-f]))/e", "\$this->decodeHex('\\2')", $value);
+		return preg_replace('/(\x([0-9A-Fa-f][0-9A-Fa-f]))/e', '$this->decodeHex(\'\\2\')', $value);
 	}
 
 	/**
 	 * Postprocesses an LDAP entry. (Decodes hex characters, etc.)
 	 *
-	 * @param array|string $data
+	 * @param array|string $data   The data to process.
 	 *
 	 * @return  array|string
 	 */
 	protected function postprocess($data) {
-	    if (is_array($data)) {
+		if (is_array($data)) {
 			if (isset($data['count'])) {
 				unset($data['count']);
 			}
 			foreach ($data as $key => $value) {
 				$data[$key] = $this->postprocess($value);
 			}
-	    } else {
+		} else {
 			$data = $this->decode($data);
-	    }
-	    return $data;
+		}
+		return $data;
 	}
 
 	/**
 	 * Runs a search operation on the LDAP server and returns the result.
 	 *
-	 * @param \YapepBase\Ldap\LdapDn $rootdn
+	 * @param \YapepBase\Ldap\LdapDn $rootDn         The root DN.
 	 * @param string                 $filter         The filter with params encoded as :_placeholder.
-	 * @param array                  $filterParams
+	 * @param array                  $filterParams   The filter parameters.
 	 * @param array                  $attributes     Attributes to request. Optional.
-	 * @param int                    $deref          Dereference options. Use self::DEREF_*
-	 * @param int                    $scope          Scoping options. Use self::SCOPE_*
+	 * @param int                    $deref          Dereference options. {Uses self::DEREF_*}
+	 * @param int                    $scope          Scoping options. {Uses self::SCOPE_*}
 	 *
 	 * @todo Unfinished, usage of the $deref should be implemented later [emul]
 	 *
@@ -267,21 +289,21 @@ class LdapConnection {
 	 *
 	 * @throws \YapepBase\Exception\LdapSearchException   If an error occured during the ldap query process.
 	 */
-	public function search(LdapDn $rootdn, $filter, $filterParams = array(), $attributes = array(),
+	public function search(LdapDn $rootDn, $filter, $filterParams = array(), $attributes = array(),
 		$deref = self::DEREF_NEVER, $scope = self::SCOPE_SUB) {
 
-	    if (!$this->link) {
+		if (!$this->link) {
 			$this->connect();
-	    }
-	    foreach ($filterParams as $key => $value) {
+		}
+		foreach ($filterParams as $key => $value) {
 			unset($filterParams[$key]);
 			$filterParams[':_' . $key] = $value;
-	    }
-	    if ($scope == self::SCOPE_SUB) {
-			$result = @ldap_search($this->link, (string)$rootdn, strtr($filter, $filterParams), $attributes);
-	    } else {
-			$result = @ldap_list($this->link, (string)$rootdn, strtr($filter, $filterParams), $attributes);
-	    }
+		}
+		if ($scope == self::SCOPE_SUB) {
+			$result = @ldap_search($this->link, (string)$rootDn, strtr($filter, $filterParams), $attributes);
+		} else {
+			$result = @ldap_list($this->link, (string)$rootDn, strtr($filter, $filterParams), $attributes);
+		}
 		$result = @ldap_get_entries($this->link, $result);
 		$result = $this->postprocess($result);
 		if ($result === false) {

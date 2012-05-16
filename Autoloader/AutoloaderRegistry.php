@@ -64,7 +64,9 @@ class AutoloaderRegistry {
 	/**
 	 * Sets or clears the flag to automatically register with SPL
 	 *
-	 * @param bool $autoregister
+	 * @param bool $autoregister   The flag value to set.
+	 *
+	 * @return void
 	 */
 	public function setAutoregister($autoregister) {
 		$this->autoregister = (bool)$autoregister;
@@ -72,6 +74,8 @@ class AutoloaderRegistry {
 
 	/**
 	 * Registers this registry with SPL.
+	 *
+	 * @return void
 	 *
 	 * @codeCoverageIgnore
 	 */
@@ -82,6 +86,8 @@ class AutoloaderRegistry {
 	/**
 	 * Unregisters this registry with SPL
 	 *
+	 * @return void
+	 *
 	 * @codeCoverageIgnore
 	 */
 	public function unregisterFromSpl() {
@@ -91,7 +97,7 @@ class AutoloaderRegistry {
 	/**
 	 * Runs through all Autoloaders and tries to load a class.
 	 *
-	 * @param  string  $className
+	 * @param string $className   Name of the class.
 	 *
 	 * @return bool
 	 */
@@ -107,11 +113,13 @@ class AutoloaderRegistry {
 	/**
 	 * Register an autoloader with the registry
 	 *
-	 * @param  \YapepBase\Autoloader\AutoloaderBase $object
-	 * @param  bool                                 $autoregister   Automatically register with SPL.
+	 * @param \YapepBase\Autoloader\AutoloaderBase $object         The autoloader instance to register.
+	 * @param bool                                 $autoRegister   Automatically register with SPL.
+	 *
+	 * @return void
 	 */
-	public function register(\YapepBase\Autoloader\AutoloaderBase $object, $autoregister = null) {
-		if (($autoregister || $this->autoregister) && !$this->registry->count()) {
+	public function register(\YapepBase\Autoloader\AutoloaderBase $object, $autoRegister = null) {
+		if (($autoRegister || $this->autoregister) && !$this->registry->count()) {
 			$this->registerWithSpl();
 		}
 		$this->registry->attach($object);
@@ -119,9 +127,11 @@ class AutoloaderRegistry {
 	/**
 	 * Unregister from registry.
 	 *
-	 * @param \YapepBase\Autoloader\AutoloaderBase $autoloader
+	 * @param \YapepBase\Autoloader\AutoloaderBase $autoloader       The autoloader instance to remove.
 	 * @param bool                                 $autounregister   Automatically unregister from SPL if
 	 *                                                               no more autoloaders are left.
+	 *
+	 * @return void
 	 */
 	public function unregister($autoloader, $autounregister = null) {
 		$this->registry->detach($autoloader);
@@ -132,8 +142,10 @@ class AutoloaderRegistry {
 	/**
 	 * Remove all autoloaders by class name.
 	 *
-	 * @param string $autoloaderClass
+	 * @param string $autoloaderClass   The class of the autoloaders to remove.
 	 * @param bool   $autounregister    Automatically unregister from SPL if no more autoloaders are left.
+	 *
+	 * @return void
 	 */
 	public function unregisterByClass($autoloaderClass, $autounregister = null) {
 		$autoloaderClass = ltrim($autoloaderClass, '\\');

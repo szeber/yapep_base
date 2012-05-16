@@ -37,8 +37,8 @@ use YapepBase\Exception\ParameterException;
  *
  * The following switches are defuned, but not parsed by the class:
  * <ul>
- *     <li>-e: Name of the execution environment. It should be used by the bootstrap. Whether it's required is dependant on the
- *             script's bootstrap.</li>
+ *     <li>-e: Name of the execution environment. It should be used by the bootstrap. Whether it's required is
+ *             dependant on the script's bootstrap.</li>
  * </ul>
  *
  * Configuration options:
@@ -112,14 +112,18 @@ abstract class LockingBatchScript extends BatchScript {
 		$this->setSignalHandler();
 
 		if (function_exists('pcntl_signal')) {
-			pcntl_signal(SIGTERM, array(&$this, "handleSignal"), true);
-			pcntl_signal(SIGHUP, array(&$this, "handleSignal"), true);
-			pcntl_signal(SIGINT, array(&$this, "handleSignal"), true);
+			pcntl_signal(SIGTERM, array(&$this, 'handleSignal'), true);
+			pcntl_signal(SIGHUP, array(&$this, 'handleSignal'), true);
+			pcntl_signal(SIGINT, array(&$this, 'handleSignal'), true);
 		}
 	}
 
 	/**
 	 * Starts script execution.
+	 *
+	 * @return void
+	 *
+	 * @throws \Exception   on errors
 	 */
 	protected function runScript() {
 		$this->prepareSwitches();
@@ -151,6 +155,8 @@ abstract class LockingBatchScript extends BatchScript {
 
 	/**
 	 * Sets the switches used by the script
+	 *
+	 * @return void
 	 */
 	protected function prepareSwitches() {
 		$this->usageIndexes[self::HELP_USAGE] = $this->cliHelper->addUsage('Help');
@@ -174,6 +180,8 @@ abstract class LockingBatchScript extends BatchScript {
 	 * @param array $switches   The parsed switches.
 	 *
 	 * @return bool   Returns TRUE, if the validation of the provided switches was successful.
+	 *
+	 * @throws \YapepBase\Exception\ParameterException   If there are errors regarding the PID file
 	 */
 	protected function parseSwitches(array $switches) {
 		$config = Config::getInstance();
@@ -193,7 +201,7 @@ abstract class LockingBatchScript extends BatchScript {
 			!is_writable($this->pidPath)
 			|| (file_exists($this->getFullPidFile()) && !is_writable($this->getFullPidFile()))
 		) {
-			throw new ParameterException('The pid file is not writable: '. $this->getFullPidFile());
+			throw new ParameterException('The pid file is not writable: ' . $this->getFullPidFile());
 		}
 
 		if (isset($switches['help'])) {
@@ -239,6 +247,8 @@ abstract class LockingBatchScript extends BatchScript {
 
 	/**
 	 * Truncates and releases the lock on the PID file.
+	 *
+	 * @return void
 	 */
 	protected function releaseLock() {
 		if ($this->lockFileDescriptor) {
@@ -252,6 +262,8 @@ abstract class LockingBatchScript extends BatchScript {
 
 	/**
 	 * Sets the signal handlers
+	 *
+	 * @return void
 	 */
 	protected function setSignalHandler() {
 		$this->handleSignals = true;
@@ -259,6 +271,8 @@ abstract class LockingBatchScript extends BatchScript {
 
 	/**
 	 * Removes the signal handlers
+	 *
+	 * @return void
 	 */
 	protected function removeSignalHandler() {
 		$this->handleSignals = false;
@@ -268,6 +282,8 @@ abstract class LockingBatchScript extends BatchScript {
 	 * Signal handler
 	 *
 	 * @param int $signo   The signal number.
+	 *
+	 * @return void
 	 *
 	 * @codeCoverageIgnore
 	 */
@@ -288,6 +304,8 @@ abstract class LockingBatchScript extends BatchScript {
 	/**
 	 * This function is called, if the process receives an interrupt, term signal, etc. It can be used to clean up
 	 * stuff. Note, that this function is not guaranteed to run or it may run after execution.
+	 *
+	 * @return void
 	 */
 	abstract protected function abort();
 

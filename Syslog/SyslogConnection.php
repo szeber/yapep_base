@@ -51,9 +51,9 @@ abstract class SyslogConnection implements ISyslogConnection {
 	/**
 	 * This function is a replacement for the native openlog() call.
 	 *
-	 * @param  string  $ident
-	 * @param  int     $option Log options, only LOG_PID is recognized.
-	 * @param  int     $facility
+	 * @param string $ident      The application ident.
+	 * @param int    $option     Log options, only LOG_PID is recognized.
+	 * @param int    $facility   The facility.
 	 *
 	 * @return bool
 	 */
@@ -72,8 +72,8 @@ abstract class SyslogConnection implements ISyslogConnection {
 	/**
 	 * This function is a replacement for the native syslog() call.
 	 *
-	 * @param  int     $priority
-	 * @param  string  $message
+	 * @param int    $priority   The priority.
+	 * @param string $message    The message.
 	 *
 	 * @return bool
 	 */
@@ -103,7 +103,7 @@ abstract class SyslogConnection implements ISyslogConnection {
 	/**
 	 * Set the path of the log socket. Some implementations MAY not respect this setting.
 	 *
-	 * @param  string  $path  Defaults to /dev/log
+	 * @param string $path   Defaults to /dev/log.
 	 *
 	 * @return \YapepBase\Syslog\ISyslogConnection
 	 *
@@ -129,7 +129,7 @@ abstract class SyslogConnection implements ISyslogConnection {
 	/**
 	 * Sets the application identification.
 	 *
-	 * @param  string  $ident
+	 * @param string $ident   The application ident.
 	 *
 	 * @return \YapepBase\Syslog\SyslogConnection
 	 */
@@ -151,7 +151,7 @@ abstract class SyslogConnection implements ISyslogConnection {
 	/**
 	 * Sets log options. Only accepts LOG_PID at the moment.
 	 *
-	 * @param  int  $options
+	 * @param int $options   The options.
 	 *
 	 * @return \YapepBase\Syslog\SyslogConnection
 	 */
@@ -172,11 +172,11 @@ abstract class SyslogConnection implements ISyslogConnection {
 	/**
 	 * Set the default facility.
 	 *
-	 * @param  int  $facility
+	 * @param int $facility   The facility.
 	 *
 	 * @return \YapepBase\Syslog\SyslogConnection
 	 *
-	 * @throws \YapepBase\Exception\SyslogException on error
+	 * @throws \YapepBase\Exception\ParameterException
 	 */
 	public function setFacility($facility) {
 		if ($facility % 8 == 0 && $facility >= 0 && $facility <= 184) {
@@ -200,7 +200,9 @@ abstract class SyslogConnection implements ISyslogConnection {
 	/**
 	 * Validates the value of the priority field.
 	 *
-	 * @param int $priority
+	 * @param int $priority   The priority.
+	 *
+	 * @return void
 	 *
 	 * @throws \YapepBase\Exception\SyslogException if the value is invalid.
 	 */
@@ -213,7 +215,11 @@ abstract class SyslogConnection implements ISyslogConnection {
 	/**
 	 * Validates the value of the ident field
 	 *
-	 * @param string $ident
+	 * @param string $ident   The ident.
+	 *
+	 * @return void
+	 *
+	 * @throws \YapepBase\Exception\SyslogException
 	 */
 	protected function validateIdent($ident) {
 		if (preg_match('/[\s]/', $ident)) {

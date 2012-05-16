@@ -19,6 +19,7 @@ namespace YapepBase\Exception;
  */
 class DiException extends Exception {
 
+	/** Error code for class not found error during namespace search */
 	const ERR_NAMESPACE_SEARCH_CLASS_NOT_FOUND = 101;
 
 }

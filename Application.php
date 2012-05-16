@@ -37,7 +37,7 @@ use YapepBase\Exception\RouterException;
  *
  * @package    YapepBase
  *
- * @tood debugger support
+ * @todo debugger support
  */
 class Application {
 
@@ -126,7 +126,9 @@ class Application {
 	 *
 	 * Be careful with this method, since it breaks the Singleton pattern.
 	 *
-	 * @param \YapepBase\Application $instance
+	 * @param \YapepBase\Application $instance   The instance to use
+	 *
+	 * @return void
 	 */
 	public static function setInstance(Application $instance) {
 		static::$instance = $instance;
@@ -135,7 +137,9 @@ class Application {
 	/**
 	 * Sets the router used by the application.
 	 *
-	 * @param \YapepBase\Router\IRouter $router
+	 * @param \YapepBase\Router\IRouter $router   The router instance.
+	 *
+	 * @return void
 	 */
 	public function setRouter(IRouter $router) {
 		$this->router = $router;
@@ -153,7 +157,9 @@ class Application {
 	/**
 	 * Sets the DI contianer to be used by the application
 	 *
-	 * @param \YapepBase\DependencyInjection\SystemContainer $diContainer
+	 * @param \YapepBase\DependencyInjection\SystemContainer $diContainer   The DI container instance to use
+	 *
+	 * @return void
 	 */
 	public function setDiContainer(SystemContainer $diContainer) {
 		$this->diContainer = $diContainer;
@@ -183,7 +189,9 @@ class Application {
 	/**
 	 * Sets the request object used by the application.
 	 *
-	 * @param \YapepBase\Request\IRequest $request
+	 * @param \YapepBase\Request\IRequest $request   The request instance.
+	 *
+	 * @return void
 	 */
 	public function setRequest(IRequest $request) {
 		$this->request = $request;
@@ -201,7 +209,9 @@ class Application {
 	/**
 	 * Sets the response object used by the application.
 	 *
-	 * @param \YapepBase\Response\IResponse $response
+	 * @param \YapepBase\Response\IResponse $response   The response instance
+	 *
+	 * @return void
 	 */
 	public function setResponse(IResponse $response) {
 		$this->response = $response;
@@ -218,6 +228,8 @@ class Application {
 
 	/**
 	 * Runs the request on the application
+	 *
+	 * @return void
 	 */
 	public function run() {
 		$eventHandlerRegistry = $this->diContainer->getEventHandlerRegistry();
@@ -250,7 +262,9 @@ class Application {
 	/**
 	 * Handles a fatal exception.
 	 *
-	 * @param \Exception $exception
+	 * @param \Exception $exception   The exception to handle.
+	 *
+	 * @return void
 	 *
 	 * @throws \Exception   Re-throws the received exception for the exception handler to handle.
 	 */
@@ -272,7 +286,9 @@ class Application {
 	/**
 	 * Runs the error controller action for the specified HTTP error code.
 	 *
-	 * @param int $errorCode
+	 * @param int $errorCode   The error code
+	 *
+	 * @return void
 	 */
 	protected function runErrorAction($errorCode) {
 		$controllerName = $this->config->get('system.errorController', 'Error');
@@ -288,6 +304,9 @@ class Application {
 
 	/**
 	 * Sends an error to the output.
+	 *
+	 * @return void
+	 *
 	 * @codeCoverageIgnore
 	 */
 	public function outputError() {

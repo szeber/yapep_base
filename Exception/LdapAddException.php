@@ -13,7 +13,10 @@ namespace YapepBase\Exception;
 
 /**
  * This is an exception to signal errors while the add operation.
+ *
+ * @package      YapepBase
+ * @subpackage   Syslog
  */
 class LdapAddException extends LdapException {
-	
+
 }

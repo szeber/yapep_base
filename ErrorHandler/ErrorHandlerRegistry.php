@@ -70,6 +70,8 @@ class ErrorHandlerRegistry {
 
 	/**
 	 * Registers the error handler container as the system error handler.
+	 *
+	 * @return void
 	 */
 	public function register() {
 		set_error_handler(array($this, 'handleError'));
@@ -80,6 +82,8 @@ class ErrorHandlerRegistry {
 
 	/**
 	 * Unregisters as the system error handler container.
+	 *
+	 * @return void
 	 *
 	 * @codeCoverageIgnore
 	 */
@@ -94,7 +98,9 @@ class ErrorHandlerRegistry {
 	/**
 	 * Adds an error handler to the container.
 	 *
-	 * @param IErrorHandler $errorHandler
+	 * @param IErrorHandler $errorHandler   The error handler instance.
+	 *
+	 * @return void
 	 */
 	public function addErrorHandler(IErrorHandler $errorHandler) {
 		$this->errorHandlers[] = $errorHandler;
@@ -103,7 +109,7 @@ class ErrorHandlerRegistry {
 	/**
 	 * Removes an error handler from the container.
 	 *
-	 * @param IErrorHandler $errorHandler
+	 * @param IErrorHandler $errorHandler   The error handler instance.
 	 *
 	 * @return bool   TRUE if the error handler was removed successfully, FALSE otherwise.
 	 */
@@ -168,7 +174,7 @@ class ErrorHandlerRegistry {
 			'errorId' => $errorId,
 		);
 
-		foreach($this->errorHandlers as $errorHandler) {
+		foreach ($this->errorHandlers as $errorHandler) {
 			/** @var IErrorHandler $errorHandler */
 			$errorHandler->handleError($errorLevel, $message, $file, $line, $context, $errorId, $backTrace);
 		}
@@ -190,9 +196,11 @@ class ErrorHandlerRegistry {
 	/**
 	 * Handles an unhandled exception
 	 *
-	 *
 	 * Should not be called manually, only by PHP.
-	 * @param \Exception $exception
+	 *
+	 * @param \Exception $exception   The exception to handle.
+	 *
+	 * @return void
 	 */
 	public function handleException($exception) {
 		// @codeCoverageIgnoreStart
@@ -218,7 +226,7 @@ class ErrorHandlerRegistry {
 			'errorId'   => $errorId,
 		);
 
-		foreach($this->errorHandlers as $errorHandler) {
+		foreach ($this->errorHandlers as $errorHandler) {
 			/** @var IErrorHandler $errorHandler */
 			$errorHandler->handleException($exception, $errorId);
 		}
@@ -228,6 +236,8 @@ class ErrorHandlerRegistry {
 
 	/**
 	 * Handles script shutdown.
+	 *
+	 * @return void
 	 *
 	 * @codeCoverageIgnore
 	 */
@@ -253,7 +263,7 @@ class ErrorHandlerRegistry {
 
 		$errorId = $this->generateErrorId($error['message'], $error['file'], $error['line']);
 
-		foreach($this->errorHandlers as $errorHandler) {
+		foreach ($this->errorHandlers as $errorHandler) {
 			/** @var IErrorHandler $errorHandler */
 			$errorHandler->handleShutdown($error['type'], $error['message'], $error['file'], $error['line'], $errorId);
 		}
@@ -266,14 +276,14 @@ class ErrorHandlerRegistry {
 				. $this->currentlyHandledError['errorId'] . '. Fatal error ID: ' . $errorId;
 
 		// If we have a previously unhandled error, handle it. This can be caused by errors in one of the registered
-			foreach($this->errorHandlers as $errorHandler) {
+			foreach ($this->errorHandlers as $errorHandler) {
 				$errorHandler->handleShutdown($error['type'], $message, $error['file'], $error['line'],
 					$this->generateErrorId($message, $error['file'], $error['line']));
 			}
 
 			switch ($this->currentlyHandledError['type']) {
 				case self::TYPE_ERROR:
-					foreach($this->errorHandlers as $errorHandler) {
+					foreach ($this->errorHandlers as $errorHandler) {
 						$errorHandler->handleError($this->currentlyHandledError['level'],
 							$this->currentlyHandledError['message'], $this->currentlyHandledError['file'],
 							$this->currentlyHandledError['line'], $this->currentlyHandledError['context'],
@@ -282,7 +292,7 @@ class ErrorHandlerRegistry {
 					break;
 
 				case self::TYPE_EXCEPTION:
-					foreach($this->errorHandlers as $errorHandler) {
+					foreach ($this->errorHandlers as $errorHandler) {
 						$errorHandler->handleException($this->currentlyHandledError['exception'],
 							$this->currentlyHandledError['errorId']);
 					}
@@ -299,9 +309,9 @@ class ErrorHandlerRegistry {
 	 * 'system.errorHandling.defaultIdTimeout' configuration option. If that option is not set, it will default to the
 	 * value of the self::ERROR_HANDLING_DEFAULT_ID_TIMEOUT constant. The value should be set as seconds.
 	 *
-	 * @param string $message      The message of the error.
-	 * @param string $file         The file where the error occured.
-	 * @param int    $line         The line where the error occured.
+	 * @param string $message   The message of the error.
+	 * @param string $file      The file where the error occured.
+	 * @param int    $line      The line where the error occured.
 	 *
 	 * @return string
 	 */
@@ -321,14 +331,14 @@ class ErrorHandlerRegistry {
 	/**
 	 * Returns if the error should be considered fatal by the error level.
 	 *
-	 * @param int $errorLevel
+	 * @param int $errorLevel   The error level to check.
 	 *
 	 * @return bool
 	 *
 	 * @codeCoverageIgnore
 	 */
 	protected function isErrorFatal($errorLevel) {
-		switch($errorLevel) {
+		switch ($errorLevel) {
 			case E_ERROR:
 			case E_PARSE:
 			case E_CORE_ERROR:

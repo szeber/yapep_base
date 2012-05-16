@@ -21,21 +21,29 @@ use YapepBase\Event\IEventHandler;
 interface ISession extends \ArrayAccess, IEventHandler {
 	/**
 	 * Registers the instance as an event handler
+	 *
+	 * @return void
 	 */
 	public function registerEventHandler();
 
 	/**
 	 * Removes event handler registration
+	 *
+	 * @return void
 	 */
 	public function removeEventHandler();
 
 	/**
 	 * Creates a new session.
+	 *
+	 * @return void
 	 */
 	public function create();
 
 	/**
 	 * Destroys the session.
+	 *
+	 * @return void
 	 */
 	public function destroy();
 

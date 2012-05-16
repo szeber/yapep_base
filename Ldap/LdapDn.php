@@ -43,11 +43,13 @@ class LdapDn {
 	/**
 	 * Parses a string into the object.
 	 *
-	 * @param array $dn
+	 * @param array $dn   The DN to parse.
+	 *
+	 * @return void
 	 */
 	public function parseDn($dn = array()) {
 		$this->elements = array();
-		foreach($dn as $entry) {
+		foreach ($dn as $entry) {
 			if (isset($entry['id']) && isset($entry['value'])) {
 				$this->elements[] = array('id' => $entry['id'], 'value' => $entry['value']);
 			}
@@ -66,7 +68,7 @@ class LdapDn {
 	/**
 	 * Converts the DN object into a string.
 	 *
-	 * @return   string
+	 * @return string
 	 */
 	public function __toString() {
 		$elements = array();
@@ -79,11 +81,11 @@ class LdapDn {
 	/**
 	 * Escapes a string for use in an LDAP DN
 	 *
-	 * @param string $string
+	 * @param string $string   The string to escape
 	 *
 	 * @return string
 	 */
-	static function escape($string) {
+	public static function escape($string) {
 		if (preg_match('/(\\|,|\+|=|"|<|>|#|;)/', $string)) {
 			return '"' . strtr($string, array('"' => '\\"', '\\' => '\\\\')) . '"';
 		}

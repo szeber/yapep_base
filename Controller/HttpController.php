@@ -67,6 +67,8 @@ abstract class HttpController extends BaseController {
 	 * @param string $url          The URL to redirect to.
 	 * @param int    $statusCode   The status code of the redirect (3XX).
 	 *
+	 * @return void
+	 *
 	 * @throws \YapepBase\Exception\RedirectException   To stop execution of the controller.
 	 */
 	protected function redirectToUrl($url, $statusCode = 303) {
@@ -84,6 +86,8 @@ abstract class HttpController extends BaseController {
 	 * @param array  $getParams     Associative array containing the GET parameters for the URL.
 	 * @param string $anchor        The anchor for the URL
 	 * @param int    $statusCode    The status code of the redirect (3XX).
+	 *
+	 * @return void
 	 *
 	 * @throws \YapepBase\Exception\RedirectException   To stop execution of the controller.
 	 * @throws \YapepBase\Exception\RouterException     If there was an error creating the URL.

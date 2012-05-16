@@ -97,11 +97,11 @@ abstract class SessionAbstract implements ISession {
 	 *     <li>lifetime:  The lifetime of the sesssion in seconds. Optional.</li>
 	 * </ul>
 	 *
-	 * @param string                        $configName
-	 * @param \YapepBase\Storage\IStorage   $storage
-	 * @param \YapepBase\Request\IRequest   $request
-	 * @param \YapepBase\Response\IResponse $response
-	 * @param bool                          $autoregister
+	 * @param string                        $configName     Name of the session config.
+	 * @param \YapepBase\Storage\IStorage   $storage        The storage object.
+	 * @param \YapepBase\Request\IRequest   $request        The request object.
+	 * @param \YapepBase\Response\IResponse $response       The response object.
+	 * @param bool                          $autoregister   If TRUE, it will automatically register as an event handler.
 	 *
 	 * @throws \YapepBase\Exception\ConfigException   On configuration problems
 	 * @throws \YapepBase\Exception\Exception         On other problems
@@ -142,7 +142,9 @@ abstract class SessionAbstract implements ISession {
 	/**
 	 * Validates the configuration.
 	 *
-	 * @param array $config
+	 * @param array $config   The configuration array.
+	 *
+	 * @return void
 	 *
 	 * @throws \YapepBase\Exception\ConfigException   On configuration problems
 	 * @throws \YapepBase\Exception\Exception         On other problems
@@ -158,6 +160,8 @@ abstract class SessionAbstract implements ISession {
 
 	/**
 	 * This method is called when the session has been initialized (loaded or created).
+	 *
+	 * @return void
 	 */
 	protected function sessionInitialized() {
 		// Empty default implementation. Should be implemented by descendant classes if needed
@@ -167,6 +171,8 @@ abstract class SessionAbstract implements ISession {
 	 * This method is called if a request with a non-existing session ID is received.
 	 *
 	 * It can be used for example to log the request. The method should not return anything, and not stop execution.
+	 *
+	 * @return void
 	 */
 	protected function nonExistentSessionId() {
 		// Empty default implementation. Should be implemented by descendant classes if needed
@@ -174,6 +180,8 @@ abstract class SessionAbstract implements ISession {
 
 	/**
 	 * Registers the instance as an event handler
+	 *
+	 * @return void
 	 */
 	public function registerEventHandler() {
 		$registry = Application::getInstance()->getDiContainer()->getEventHandlerRegistry();
@@ -183,6 +191,8 @@ abstract class SessionAbstract implements ISession {
 
 	/**
 	 * Removes event handler registration
+	 *
+	 * @return void
 	 */
 	public function removeEventHandler() {
 		$registry = Application::getInstance()->getDiContainer()->getEventHandlerRegistry();
@@ -212,6 +222,8 @@ abstract class SessionAbstract implements ISession {
 	 * Loads the session.
 	 *
 	 * If there is no session ID set, it creates a new session instead.
+	 *
+	 * @return void
 	 */
 	protected function loadSession() {
 		if ($this->isLoaded) {
@@ -235,6 +247,8 @@ abstract class SessionAbstract implements ISession {
 	/**
 	 * Saves the session. If it has not been loaded yet, it loads it first.
 	 *
+	 * @return void
+	 *
 	 * @throws \YapepBase\Exception\Exception   If trying to save a not loaded session
 	 */
 	protected function saveSession() {
@@ -246,6 +260,8 @@ abstract class SessionAbstract implements ISession {
 
 	/**
 	 * Creates a new session.
+	 *
+	 * @return void
 	 */
 	public function create() {
 		if (!empty($this->id)) {
@@ -268,6 +284,8 @@ abstract class SessionAbstract implements ISession {
 
 	/**
 	 * Destroys the session.
+	 *
+	 * @return void
 	 */
 	public function destroy() {
 		$this->storage->delete($this->getStorageKey());
@@ -279,7 +297,9 @@ abstract class SessionAbstract implements ISession {
 	/**
 	 * Handles the application start and finish events to load and save the session.
 	 *
-	 * @param \YapepBase\Event\Event $event
+	 * @param \YapepBase\Event\Event $event   The event.
+	 *
+	 * @return void
 	 *
 	 * @see YapepBase\Event.IEventHandler::handleEvent()
 	 */
@@ -307,13 +327,13 @@ abstract class SessionAbstract implements ISession {
 	/**
 	 * Checks whether a key is set in the session
 	 *
-	 * @param string $offset
+	 * @param string $offset   The offset.
 	 *
 	 * @return bool
 	 *
 	 * @see ArrayAccess::offsetExists()
 	 */
-	public function offsetExists ($offset) {
+	public function offsetExists($offset) {
 		return isset($this->data[$offset]);
 
 	}
@@ -321,13 +341,13 @@ abstract class SessionAbstract implements ISession {
 	/**
 	 * Returns a key from the session
 	 *
-	 * @param string offset
+	 * @param string $offset   The offset to return.
 	 *
 	 * @return mixed
 	 *
 	 * @see ArrayAccess::offsetGet()
 	 */
-	public function offsetGet ($offset) {
+	public function offsetGet($offset) {
 		if (isset($this->data[$offset])) {
 			return $this->data[$offset];
 		}
@@ -337,12 +357,14 @@ abstract class SessionAbstract implements ISession {
 	/**
 	 * Sets a key in the session
 	 *
-	 * @param string $offset
-	 * @param mixed  $value
+	 * @param string $offset   The offset.
+	 * @param mixed  $value    The value.
+	 *
+	 * @return void
 	 *
 	 * @see ArrayAccess::offsetSet()
 	 */
-	public function offsetSet ($offset, $value) {
+	public function offsetSet($offset, $value) {
 		$this->data[$offset] = $value;
 
 	}
@@ -350,11 +372,13 @@ abstract class SessionAbstract implements ISession {
 	/**
 	 * Removes a key from the session
 	 *
-	 * @param string $offset
+	 * @param string $offset   The offset.
+	 *
+	 * @return void
 	 *
 	 * @see ArrayAccess::offsetUnset()
 	 */
-	public function offsetUnset ($offset) {
+	public function offsetUnset($offset) {
 		if (isset($this->data[$offset])) {
 			unset($this->data[$offset]);
 		}

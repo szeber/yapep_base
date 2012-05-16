@@ -25,15 +25,15 @@ class OutputMock implements IOutput {
 	}
 
 	/**
-	 * header() is used to send a raw HTTP header. See the » HTTP/1.1 specification for more information on HTTP headers.
+	 * setHeader() is used to send a raw HTTP setHeader. See the » HTTP/1.1 specification for more information on HTTP headers.
 	 *
-	 * @param string $string       The header string to set.
+	 * @param string $string       The setHeader string to set.
 	 * @param bool   $replace      If this is set, current headers are replaced.
 	 *                             Defaults to true.
 	 * @param int    $responsecode The response code to set.
 	 *
 	 */
-	public function header($string, $replace = true, $responsecode = null){
+	public function setHeader($string, $replace = true, $responsecode = null){
 		if (preg_match('/HTTP\/1.1 (?P<code>[0-9]+) (?P<message>.*)/', $string,
 			$matches)) {
 			$this->responseCode = $matches['code'];
@@ -92,7 +92,7 @@ class OutputMock implements IOutput {
 	 *                         (although it is not supported by all browsers),
 	 *                         but that claim is often disputed.
 	 */
-	public function setcookie($name, $value = '', $expire = 0, $path = '/',
+	public function setCookie($name, $value = '', $expire = 0, $path = '/',
 		$domain = '', $secure = false, $httponly = false) {
 		$this->cookies[$name] = array(
 			'name' => $name,

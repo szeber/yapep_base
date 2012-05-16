@@ -85,6 +85,8 @@ class MemcacheStorage extends StorageAbstract {
 	 *
 	 * @param array $config   The configuration data for the backend.
 	 *
+	 * @return void
+	 *
 	 * @throws \YapepBase\Exception\ConfigException    On configuration errors.
 	 * @throws \YapepBase\Exception\StorageException   On storage errors.
 	 */
@@ -107,7 +109,7 @@ class MemcacheStorage extends StorageAbstract {
 	/**
 	 * Returns the key ready to be used on the backend.
 	 *
-	 * @param string $key
+	 * @param string $key   The base key.
 	 *
 	 * @return string
 	 */
@@ -125,6 +127,8 @@ class MemcacheStorage extends StorageAbstract {
 	 * @param string $key    The key to be used to store the data.
 	 * @param mixed  $data   The data to store.
 	 * @param int    $ttl    The expiration time of the data in seconds if supported by the backend.
+	 *
+	 * @return void
 	 *
 	 * @throws \YapepBase\Exception\StorageException      On error.
 	 * @throws \YapepBase\Exception\ParameterException    If TTL is set and not supported by the backend.
@@ -149,7 +153,7 @@ class MemcacheStorage extends StorageAbstract {
 	/**
 	 * Retrieves data from the cache identified by the specified key
 	 *
-	 * @param string $key
+	 * @param string $key   The key.
 	 *
 	 * @return mixed
 	 *
@@ -168,7 +172,8 @@ class MemcacheStorage extends StorageAbstract {
 
 		// If we have a debugger, we have to log the execution time
 		if ($debugger !== false) {
-			$debugger->logQueryExecutionTime(IDebugger::QUERY_TYPE_CACHE, $queryId, microtime(true) - $startTime, $value);
+			$debugger->logQueryExecutionTime(IDebugger::QUERY_TYPE_CACHE, $queryId, microtime(true) - $startTime,
+				$value);
 		}
 
 		return $value;
@@ -177,7 +182,9 @@ class MemcacheStorage extends StorageAbstract {
 	/**
 	 * Deletes the data specified by the key
 	 *
-	 * @param string $key
+	 * @param string $key   The key.
+	 *
+	 * @return void
 	 *
 	 * @throws \YapepBase\Exception\StorageException      On error.
 	 */

@@ -13,7 +13,10 @@ namespace YapepBase\Exception;
 
 /**
  * This is an exception to signal errors with the connection
+ *
+ * @package      YapepBase
+ * @subpackage   Syslog
  */
 class LdapModifyException extends LdapException {
-	
+
 }

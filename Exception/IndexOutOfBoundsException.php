@@ -14,18 +14,21 @@ namespace YapepBase\Exception;
 /**
  * This exception indicates, that an index passed is invalid, because that
  * element doesn't exist.
+ *
+ * @package      YapepBase
+ * @subpackage   Syslog
  */
 class IndexOutOfBoundsException extends \Exception {
 	/**
 	 * Exception constructor
 	 *
-	 * @param integer|string|bool $offset the offset in question
+	 * @param integer|string|bool $offset   The offset in question
 	 */
-	function __construct($offset = false) {
+	public function __construct($offset = false) {
 		if ($offset !== false) {
-			parent::__construct("Index out of bounds: " . $offset);
+			parent::__construct('Index out of bounds: ' . $offset);
 		} else {
-			parent::__construct("Index out of bounds");
+			parent::__construct('Index out of bounds');
 		}
 	}
 }

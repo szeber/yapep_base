@@ -22,7 +22,9 @@ interface IEventHandler {
 	/**
 	 * Handles an event
 	 *
-	 * @param \YapepBase\Event\Event  $event       The dispatched event.
+	 * @param \YapepBase\Event\Event $event   The dispatched event.
+	 *
+	 * @return void
 	 */
 	public function handleEvent(Event $event);
 }

@@ -24,13 +24,15 @@ class Collection extends ArrayObject {
 	/**
 	 * Throws a \YapepBase\Exception\ValueException, if $offset is not an integer
 	 *
-	 * @param int $offset
+	 * @param int $offset   The offset.
+	 *
+	 * @return void
 	 *
 	 * @throws \YapepBase\Exception\ValueException if $offset is not an integer.
 	 */
 	final protected function keyCheck($offset) {
 		if (!\is_int($offset)) {
-			throw new \YapepBase\Exception\ValueException($offset, "integer");
+			throw new \YapepBase\Exception\ValueException($offset, 'integer');
 		}
 	}
 }

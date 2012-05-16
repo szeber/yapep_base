@@ -13,15 +13,19 @@ namespace YapepBase\Exception;
 
 /**
  * This Exception states, that an invalid value was provided.
+ *
+ * @package      YapepBase
+ * @subpackage   Exception
  */
 class ValueException extends Exception {
 
 	/**
+	 * Constructor
 	 *
-	 * @param mixed $object the object which does not match the required type
-	 * @param string $required the type required
+	 * @param mixed  $value      The object which does not match the required type
+	 * @param string $required   The type required
 	 */
-	function __construct($value, $required = "") {
+	public function __construct($value, $required = '') {
 		$message = 'Invalid value: ' . $value;
 		if ($required) {
 			$message .= ' expected ' . $required;

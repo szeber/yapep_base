@@ -204,11 +204,11 @@ class ViewDo {
 	}
 
 	/**
-	 * A valasz formatuma szerint escapelo metodus.
+	 * Escpaes the value based on the response content type.
 	 *
-	 * @param mixed $value   Az escapelendo adat.
+	 * @param mixed $value   The value to escape.
 	 *
-	 * @return mixed   Az escapelt adat.
+	 * @return mixed   The escaped value
 	 */
 	protected function escape($value) {
 		switch ($this->contentType) {

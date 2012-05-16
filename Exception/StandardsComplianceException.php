@@ -15,6 +15,9 @@ namespace YapepBase\Exception;
 /**
  * This exception indicates, that some current standards have been violated and
  * will most likely lead to compatibility issues.
+ *
+ * @package      YapepBase
+ * @subpackage   Syslog
  */
 class StandardsComplianceException extends \Exception {
 

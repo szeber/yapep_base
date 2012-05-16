@@ -17,6 +17,9 @@ use YapepBase\Exception\SyslogException;
  * testable.
  *
  * Warning: do NOT exchange the numeric values to the PHP native syslog constanst!
+ *
+ * @package      YapepBase
+ * @subpackage   Syslog
  */
 class NativeSyslogConnection extends SyslogConnection {
 
@@ -58,6 +61,8 @@ class NativeSyslogConnection extends SyslogConnection {
 	/**
 	 * Handle socket errors.
 	 *
+	 * @return void
+	 *
 	 * @throws SyslogException if a socket error occured.
 	 */
 	protected function handleError() {
@@ -73,7 +78,7 @@ class NativeSyslogConnection extends SyslogConnection {
 	 *
 	 * @return \YapepBase\Syslog\NativeSyslogConnection
 	 *
-	 * @throws \YapepBase\Exception\SyslogException on error
+	 * @throws \Exception|\YapepBase\Exception\SyslogException
 	 */
 	public function open() {
 		try {
@@ -81,7 +86,8 @@ class NativeSyslogConnection extends SyslogConnection {
 			$this->handleError();
 			try {
 				@socket_connect($this->sock, $this->path);
-			} catch (\Exception $e) {}
+			} catch (\Exception $e) {
+			}
 			$this->handleError();
 		} catch (SyslogException $e) {
 			/**
@@ -90,11 +96,13 @@ class NativeSyslogConnection extends SyslogConnection {
 			if ($e->getCode() == SOCKET_EPROTOTYPE) {
 				try {
 					$this->sock = @socket_create(AF_UNIX, SOCK_DGRAM, 0);
-				} catch (\Exception $e) {}
+				} catch (\Exception $e) {
+				}
 				$this->handleError();
 				try {
 					@socket_connect($this->sock, $this->path);
-				} catch (\Exception $e) {}
+				} catch (\Exception $e) {
+				}
 				$this->handleError();
 			} else {
 				throw $e;
@@ -114,7 +122,8 @@ class NativeSyslogConnection extends SyslogConnection {
 		if ($this->sock) {
 			try {
 				@socket_close($this->sock);
-			} catch (\Exception $e) {}
+			} catch (\Exception $e) {
+			}
 			$this->handleError();
 		}
 		return $this;
@@ -123,10 +132,10 @@ class NativeSyslogConnection extends SyslogConnection {
 	/**
 	 * Write a log message to the log socket.
 	 *
-	 * @param  int     $priority
-	 * @param  string  $message
-	 * @param  string  $ident     Defaults to the ident set via setIdent()
-	 * @param  int     $date      Timestamp for log message. Defaults to now.
+	 * @param int    $priority   The priority.
+	 * @param string $message    The message.
+	 * @param string $ident      Defaults to the ident set via setIdent().
+	 * @param int    $date       Timestamp for log message. Defaults to now.
 	 *
 	 * @return \YapepBase\Syslog\NativeSyslogConnection
 	 *
@@ -155,7 +164,8 @@ class NativeSyslogConnection extends SyslogConnection {
 		}
 		try {
 			@socket_write($this->sock, $buf, 1024);
-		} catch (\Exception $e) {}
+		} catch (\Exception $e) {
+		}
 		$this->handleError();
 		return $this;
 	}

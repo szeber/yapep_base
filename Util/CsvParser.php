@@ -22,28 +22,30 @@ class CsvParser {
 	/**
 	 * Separator used for separating fields
 	 *
-	 * @var      string
+	 * @var string
 	 */
 	protected $separator = ',';
 
 	/**
 	 * Delimiter signalling start/end of field. Optional.
 	 *
-	 * @var      string
+	 * @var string
 	 */
 	protected $delimiter = '"';
 
 	/**
 	 * Escape character used for escaping delimiter within the field.
 	 *
-	 * @var      string
+	 * @var string
 	 */
 	protected $escape    = '\\';
 
 	/**
 	 * Sets the character, that should be used for delimiting fields.
 	 *
-	 * @param    string   $delimiter
+	 * @param string $delimiter   The delimiter character.
+	 *
+	 * @return void
 	 */
 	public function setDelimiter($delimiter) {
 		$this->delimiter = $delimiter;
@@ -52,7 +54,7 @@ class CsvParser {
 	/**
 	 * Returns the character, that is used for delimiting fields.
 	 *
-	 * @return   string
+	 * @return string
 	 */
 	public function getDelimiter() {
 		return $this->delimiter;
@@ -61,7 +63,9 @@ class CsvParser {
 	/**
 	 * Sets the field separator character.
 	 *
-	 * @param    string   $separator
+	 * @param string $separator   The separator.
+	 *
+	 * @return void
 	 */
 	public function setSeparator($separator) {
 		$this->separator = $separator;
@@ -70,7 +74,7 @@ class CsvParser {
 	/**
 	 * Returns the field separator character.
 	 *
-	 * @return   string
+	 * @return string
 	 */
 	public function getSeparator() {
 		return $this->separator;
@@ -79,7 +83,9 @@ class CsvParser {
 	/**
 	 * Sets the escape character used to escape literals.
 	 *
-	 * @param    string   $escape
+	 * @param string $escape   The escape character.
+	 *
+	 * @return void
 	 */
 	public function setEscape($escape) {
 		$this->escape = $escape;
@@ -88,7 +94,7 @@ class CsvParser {
 	/**
 	 * Returns the character used to escape literals.
 	 *
-	 * @return   string
+	 * @return string
 	 */
 	public function getEscape() {
 		return $this->escape;
@@ -97,9 +103,9 @@ class CsvParser {
 	/**
 	 * Parses a single row of CSV data into a number-indexed array.
 	 *
-	 * @param    string   $row
+	 * @param string $row   The row.
 	 *
-	 * @return   array
+	 * @return array
 	 */
 	public function parseRow($row) {
 		/**
@@ -136,7 +142,7 @@ class CsvParser {
 				 */
 				array_shift($characters);
 				$lastfield       .= $this->getDelimiter();
-			} else if ($character == $this->getDelimiter()) {
+			} elseif ($character == $this->getDelimiter()) {
 				/**
 				 * We have encountered a field delimiter
 				 */
@@ -144,12 +150,12 @@ class CsvParser {
 					$infield      = true;
 					$fieldexists  = true;
 					$hasDelimiter = true;
-				} else if ($infield && $hasDelimiter) {
+				} elseif ($infield && $hasDelimiter) {
 					$infield      = false;
 				} else {
 					$lastfield   .= $character;
 				}
-			} else if ($character == $this->getSeparator() &&
+			} elseif ($character == $this->getSeparator() &&
 				(!$infield || !$hasDelimiter)) {
 				/**
 				 * We have encountered a field separator, a new field starts.
@@ -159,7 +165,7 @@ class CsvParser {
 				$fieldexists      = false;
 				$hasDelimiter     = false;
 				$infield          = false;
-			} else if (!$infield) {
+			} elseif (!$infield) {
 				/**
 				 * We are not in a field and have encountered something else, than a delimiter.
 				 */
@@ -183,9 +189,9 @@ class CsvParser {
 	/**
 	 * Parses a multiline CSV string.
 	 *
-	 * @param    string   $string
+	 * @param string $string   The string.
 	 *
-	 * @return   array
+	 * @return array
 	 */
 	public function parseString($string) {
 		$string           = explode("\n", strtr(strtr($string, "\r\n", "\n"), "\r", "\n"));
@@ -201,9 +207,9 @@ class CsvParser {
 	/**
 	 * Parses a multiline CSV string using the first line as headers for creating associative arrays.
 	 *
-	 * @param    string   $string
+	 * @param string $string   The string
 	 *
-	 * @return   array
+	 * @return array
 	 */
 	public function parseStringWithHeaders($string) {
 		$data = $this->parseString($string);

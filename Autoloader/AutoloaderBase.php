@@ -20,11 +20,19 @@ use YapepBase\Exception\Exception;
  * @subpackage Autoloader
  */
 abstract class AutoloaderBase {
+
+	/**
+	 * The classpaths to use
+	 *
+	 * @var array
+	 */
 	protected $classpath = array();
 
 	/**
 	 * Set an array of directories to be tried on class loading.
-	 * @param  array  $classpath
+	 *
+	 * @param array $classpath   The classpath.
+	 *
 	 * @return AutoloaderBase
 	 */
 	public function setClassPath(array $classpath) {
@@ -34,7 +42,9 @@ abstract class AutoloaderBase {
 
 	/**
 	 * Add a single directory to the list of dirctories to be tried on class loading.
-	 * @param  string $directory
+	 *
+	 * @param string $directory   The directory.
+	 *
 	 * @return AutoloaderBase
 	 */
 	public function addClassPath($directory) {
@@ -43,6 +53,7 @@ abstract class AutoloaderBase {
 
 	/**
 	 * Returns all paths in the classpath
+	 *
 	 * @return array of string
 	 */
 	public function getClassPath() {
@@ -52,7 +63,7 @@ abstract class AutoloaderBase {
 	/**
 	 * Loads the specified class if it can be found by name.
 	 *
-	 * @param string $className
+	 * @param string $className   Name of the class.
 	 *
 	 * @return bool   TRUE if the class was loaded, FALSE if it can't be loaded.
 	 */
@@ -61,6 +72,8 @@ abstract class AutoloaderBase {
 	/**
 	 * Registers the autoloader with AutoloaderRegistry. This is an alias for
 	 * \YapepBase\Autoloader\AutoloaderRegistry::getInstance()->register($autoloader);
+	 *
+	 * @return void
 	 */
 	public function register() {
 		AutoloaderRegistry::getInstance()->register($this);
@@ -69,6 +82,8 @@ abstract class AutoloaderBase {
 	/**
 	 * Unregisters the autoloader with AutoloaderRegistry. This is an alias for
 	 * \YapepBase\Autoloader\AutoloaderRegistry::getInstance()->unregister($autoloader);
+	 *
+	 * @return void
 	 */
 	public function unregister() {
 		AutoloaderRegistry::getInstance()->unregister($this);

@@ -22,7 +22,7 @@ class SimpleAutoloader extends AutoloaderBase {
 	/**
 	 * Gets possible file names for all directories to autoload.
 	 *
-	 * @param string $className
+	 * @param string $className   Name of the class.
 	 *
 	 * @return array
 	 */
@@ -40,26 +40,27 @@ class SimpleAutoloader extends AutoloaderBase {
 	/**
 	 * Load a file which should contain a class.
 	 *
-	 * @param string  $fileName
-	 * @param string  $className
+	 * @param string $fileName    Name of the file.
+	 * @param string $className   Name of the class.
 	 *
 	 * @return bool    TRUE if loading was successful.
 	 */
 	protected function loadFile($fileName, $className) {
 		try {
-			if (\is_file($fileName) && \is_readable($fileName) && include_once($fileName)) {
+			if (\is_file($fileName) && \is_readable($fileName) && include_once $fileName) {
 				if (\class_exists($className, false) || \interface_exists($className, false)) {
 					return true;
 				}
 			}
-		} catch (\ErrorException $e) { }
+		} catch (\ErrorException $e) {
+		}
 		return false;
 	}
 
 	/**
 	 * Loads the specified class if it can be found by name.
 	 *
-	 * @param string $className
+	 * @param string $className   Name of the class
 	 *
 	 * @return bool   TRUE if the class was loaded, FALSE if it can't be loaded.
 	 */

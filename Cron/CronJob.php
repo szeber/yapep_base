@@ -34,8 +34,9 @@ namespace YapepBase\Cron;
  * $myCronJob->setPidFile('my-cron-job.pid');
  * $myCronJob->run();
  *
- * @abstract
- * @deprecated Use \YapepBase\Batch\LockingBatchScript instead
+ * @package      YapepBase
+ * @subpackage   Cron
+ * @deprecated   Use \YapepBase\Batch\LockingBatchScript instead
  */
 abstract class CronJob {
 
@@ -73,16 +74,18 @@ abstract class CronJob {
 	public function __construct() {
 		$this->pidFile = trim(strtr(get_class($this), '\\', '_'), '_') . '.pid';
 		if (function_exists('pcntl_signal')) {
-			pcntl_signal(SIGTERM, array(&$this, "handleSignal"), true);
-			pcntl_signal(SIGHUP, array(&$this, "handleSignal"), true);
-			pcntl_signal(SIGINT, array(&$this, "handleSignal"), true);
+			pcntl_signal(SIGTERM, array(&$this, 'handleSignal'), true);
+			pcntl_signal(SIGHUP, array(&$this, 'handleSignal'), true);
+			pcntl_signal(SIGINT, array(&$this, 'handleSignal'), true);
 		}
 	}
 
 	/**
 	 * Sets the PID file name (file name only). Normally this is not needed, the class name is used.
 	 *
-	 * @param string $pidFile
+	 * @param string $pidFile   PID file name.
+	 *
+	 * @return void
 	 */
 	public function setPidFile($pidFile) {
 		$this->pidFile = $pidFile;
@@ -101,7 +104,9 @@ abstract class CronJob {
 	 * Set the PID file path. This MUST be on a filesystem, that supports locking.
 	 * DO NOT USE NFS FOR IT! You have been warned.
 	 *
-	 * @param string $pidPath
+	 * @param string $pidPath   The path to the PID file without the file name.
+	 *
+	 * @return void
 	 */
 	public function setPidPath($pidPath) {
 		$this->pidPath = $pidPath;
@@ -154,6 +159,8 @@ abstract class CronJob {
 
 	/**
 	 * Truncates and releases the lock on the PID file.
+	 *
+	 * @return void
 	 */
 	protected function releaseLock() {
 		if ($this->lockFd) {
@@ -167,13 +174,17 @@ abstract class CronJob {
 
 	/**
 	 * Acquires the lock, runs the cronjob and then releases it.
+	 *
+	 * @return void
 	 */
 	final public function run() {
 		if ($this->acquireLock()) {
 			$this->setSignalHandler();
 			try {
 				$this->work();
-			} catch (\Exception $e) { }
+			} catch (\Exception $e) {
+				// Noop
+			}
 			$this->removeSignalHandler();
 			$this->releaseLock();
 			if (isset($e)) {
@@ -184,6 +195,8 @@ abstract class CronJob {
 
 	/**
 	 * Sets the signal handlers
+	 *
+	 * @return void
 	 */
 	protected function setSignalHandler() {
 		$this->handleSignals = true;
@@ -191,6 +204,8 @@ abstract class CronJob {
 
 	/**
 	 * Removes the signal handlers
+	 *
+	 * @return void
 	 */
 	protected function removeSignalHandler() {
 		$this->handleSignals = false;
@@ -200,6 +215,8 @@ abstract class CronJob {
 	 * Signal handler
 	 *
 	 * @param int $signo   The signal number.
+	 *
+	 * @return void
 	 *
 	 * @codeCoverageIgnore
 	 */
@@ -221,6 +238,8 @@ abstract class CronJob {
 	 * This function is called, if the process receives an interrupt, term signal, etc. It can be used to clean up
 	 * stuff. Note, that this function is not guaranteed to run or it may run after execution.
 	 *
+	 * @return void
+	 *
 	 * @codeCoverageIgnore
 	 */
 	protected function abort() {
@@ -229,6 +248,8 @@ abstract class CronJob {
 
 	/**
 	 * Function to do the actual work.
+	 *
+	 * @return void
 	 */
 	abstract protected function work();
 }

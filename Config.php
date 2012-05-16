@@ -31,7 +31,7 @@ class Config {
 
 	/**
 	 * The configuration data
-	 * ...
+	 *
 	 * @var array
 	 */
 	protected $configurationData = array();
@@ -71,10 +71,12 @@ class Config {
 	 *
 	 * Can set a single option when using both parameters, or multiple configuration options as an associative array.
 	 *
-	 * @param string|array $dataOrName    Name of the setting or an associative array containing the settings.
-	 *                                    The key can be divided to sections with '.' as a separator.
-	 * @param mixed        $value         The value of the setting if setting a single configuration option.
-	 *                                    Not used when setting multiple options.
+	 * @param string|array $dataOrName   Name of the setting or an associative array containing the settings.
+	 *                                   The key can be divided to sections with '.' as a separator.
+	 * @param mixed        $value        The value of the setting if setting a single configuration option.
+	 *                                   Not used when setting multiple options.
+	 *
+	 * @return void
 	 */
 	public function set($dataOrName, $value = null) {
 		if (is_array($dataOrName)) {
@@ -154,7 +156,9 @@ class Config {
 	/**
 	 * Removes a configuration setting
 	 *
-	 * @param string $name
+	 * @param string $name   Name of the setting.
+	 *
+	 * @return void
 	 */
 	public function delete($name) {
 		if (isset($this->configurationData[$name])) {
@@ -164,6 +168,8 @@ class Config {
 
 	/**
 	 * Clears all configuration.
+	 *
+	 * @return void
 	 */
 	public function clear() {
 		$this->configurationData = array();
