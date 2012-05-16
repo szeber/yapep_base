@@ -138,4 +138,19 @@ class DbResult implements Iterator {
 	public function fetchColumn($columnNumber = 0) {
 		return $this->statement->fetchColumn($columnNumber);
 	}
+
+	/**
+	 * Returns a column from all rows of the resultset.
+	 *
+	 * @param int $columnNumber   The number of the column in the row (zero indexed).
+	 *
+	 * @return array   A simple 1 dimension array which stores the required columns value from every row.
+	 */
+	public function fetchColumnAll($columnNumber = 0) {
+		$result = array();
+		while (($columnValue = $this->statement->fetchColumn($columnNumber)) !== false) {
+			$result[] = $columnValue;
+		}
+		return $result;
+	}
 }
