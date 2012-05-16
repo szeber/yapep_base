@@ -25,7 +25,11 @@ class PDOStatementMock extends \PDOStatement {
 	}
 
 	public function fetchColumn($column_number = 0) {
-		$row = array_values(current($this->data));
+		$currentValue = current($this->data);
+		if (false === $currentValue) {
+			return false;
+		}
+		$row = array_values($currentValue);
 		next($this->data);
 		return $row[$column_number];
 	}
