@@ -294,8 +294,6 @@ abstract class LockingBatchScript extends BatchScript {
 				case SIGHUP:
 				case SIGINT:
 					$this->abort();
-					$this->releaseLock();
-					exit;
 					break;
 			}
 		}

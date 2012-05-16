@@ -38,7 +38,8 @@ class UrlHelper {
 			$url = Application::getInstance()->getRouter()->getTargetForControllerAction($controller, $action, $params);
 			return $url . (empty($getParams) ? '' : ('?' . http_build_query($getParams)));
 		} catch (\Exception $exception) {
-			trigger_error('Exception of type ' . get_class($exception) . ' occured in ' . __METHOD__, E_USER_ERROR);
+			trigger_error('Exception of type ' . get_class($exception) . ' occured in ' . __METHOD__
+				. '. Requested controller/action: ' . $controller . '/' . $action, E_USER_ERROR);
 			return '#';
 		}
 	}
