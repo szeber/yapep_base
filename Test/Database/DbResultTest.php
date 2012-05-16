@@ -23,24 +23,25 @@ class DbResultTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals('data4', $result->fetchColumn(1));
 	}
 
-	/**
-	 * @todo It seems that phpunit runs to an infinite loop while making this test, so commented out [emul]
-	 */
 	public function testColumnAll() {
-//		$data = array(
-//			array(
-//				'column1' => 'data1',
-//				'column2' => 'data2'
-//			),
-//			array(
-//				'column1' => 'data3',
-//				'column2' => 'data4'
-//			)
-//		);
-//		$statement = new \YapepBase\Test\Mock\Database\PDOStatementMock($data);
-//		$result = new \YapepBase\Database\DbResult($statement);
-//		$this->assertEquals(array('data1', 'data3'), $result->fetchColumnAll(0));
-//		$this->assertEquals(array('data2', 'data4'), $result->fetchColumnAll(1));
+		$data = array(
+			array(
+				'column1' => 'data1',
+				'column2' => 'data2'
+			),
+			array(
+				'column1' => 'data3',
+				'column2' => 'data4'
+			)
+		);
+		$statement = new \YapepBase\Test\Mock\Database\PDOStatementMock($data);
+		$result = new \YapepBase\Database\DbResult($statement);
+		$this->assertEquals(array('data1', 'data3'), $result->fetchColumnAll(0));
+
+		// Since the dataset can only be looped through once, we instantiate a new one
+		$statement = new \YapepBase\Test\Mock\Database\PDOStatementMock($data);
+		$result = new \YapepBase\Database\DbResult($statement);
+		$this->assertEquals(array('data2', 'data4'), $result->fetchColumnAll(1));
 	}
 
 	public function testArray() {
