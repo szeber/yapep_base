@@ -2,4 +2,12 @@ language: php
 php:
     - 5.3
     - 5.4
-before_script: ln -s ../yapep_base ../YapepBase
+before_install:
+    - ln -s yapep_base ../YapepBase
+    - wget http://pecl.php.net/get/memcache-2.2.6.tgz
+    - tar -xzf memcache-2.2.6.tgz
+    - sh -c "cd memcache-2.2.6 && phpize && ./configure --enable-memcache && make && sudo make install"
+    - echo "extension=memcache.so" >> `php --ini | grep "Loaded Configuration" | sed -e "s|.*:\s*||"`
+    - rm -rf memcache-2.2.6
+    - ln -s yapep_base ../YapepBase
+script: phpunit Test
