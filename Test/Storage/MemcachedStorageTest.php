@@ -27,6 +27,9 @@ class MemcachedStorageTest extends \PHPUnit_Framework_TestCase {
 	 */
 	protected function setUp() {
 		parent::setUp();
+		if (!class_exists('Memcached')) {
+			$this->markTestSkipped();
+		}
 		$container = new SystemContainer();
 		$container[SystemContainer::KEY_MEMCACHED] = $container->share(function($container) {
 			return new MemcachedMock();
