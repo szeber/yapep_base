@@ -11,6 +11,7 @@
 
 
 namespace YapepBase\Database;
+
 use YapepBase\Exception\DatabaseException;
 use \PDO;
 use \PDOException;
@@ -149,6 +150,8 @@ abstract class DbConnection {
 	 *
 	 * You can't use LIMIT or OFFSET clause in your query, becouse then it will be duplicated in the method.
 	 *
+	 * Be warned! You have to write the SELECT keyword in uppercase in order to work properly.
+	 *
 	 * @param string   $query          Th query to execute.
 	 * @param array    $params         The parameters for the query.
 	 * @param int      $pageNumber     The number of the requested page.
@@ -161,7 +164,7 @@ abstract class DbConnection {
 	 */
 	public function queryPaged($query, array $params, $pageNumber, $itemsPerPage, &$itemCount = false) {
 		if ($itemCount !== false) {
-			$query = preg_replace('/SELECT/i', '$0 SQL_CALC_FOUND_ROWS', $query, 1);
+			$query = preg_replace('#SELECT#', '$0 SQL_CALC_FOUND_ROWS', $query, 1);
 		}
 
 		$query .= '
@@ -174,6 +177,7 @@ abstract class DbConnection {
 
 		if ($itemCount !== false) {
 			$itemCount = (int)$this->query('SELECT FOUND_ROWS()')->fetchColumn();
+
 		}
 		return $result;
 	}
