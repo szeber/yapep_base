@@ -37,6 +37,7 @@ class DbFactoryTest extends \PHPUnit_Framework_TestCase {
 			$this->config->clear();
 		}
 		$this->config = null;
+		DbFactory::clearConnections();
 		parent::tearDown();
 	}
 
