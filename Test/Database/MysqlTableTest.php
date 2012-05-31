@@ -28,24 +28,59 @@ class MysqlTableTest extends \PHPUnit_Framework_TestCase {
 	protected $connection;
 
 	/**
+	 * @var bool   Is the test runnable.
+	 */
+	protected $isRunnable = true;
+
+	/**
+	 * Cosntructor
+	 */
+	public function __construct() {
+		$rwHost = getenv('YAPEPBASE_TEST_MYSQL_RW_HOST');
+		$roHost = getenv('YAPEPBASE_TEST_MYSQL_RO_HOST');
+
+		// TODO: You have to configure the previous ENV vairables on order to make this test work [emul]
+		if (empty($rwHost) || empty($roHost)) {
+			$this->isRunnable = false;
+		}
+
+		parent::__construct();
+	}
+
+	/**
 	 * Prepares the environment before running a test.
 	 */
 	protected function setUp() {
+		if (!$this->isRunnable) {
+			$this->markTestSkipped('Required ENV variables missing');
+			return;
+		}
+
+		$rwHost     = getenv('YAPEPBASE_TEST_MYSQL_RW_HOST');
+		$rwUser     = getenv('YAPEPBASE_TEST_MYSQL_RW_USER');
+		$rwPassword = getenv('YAPEPBASE_TEST_MYSQL_RW_PASSWORD');
+		$rwDatabase = getenv('YAPEPBASE_TEST_MYSQL_RW_DATABASE');
+
+		$roHost     = getenv('YAPEPBASE_TEST_MYSQL_RO_HOST');
+		$roUser     = getenv('YAPEPBASE_TEST_MYSQL_RO_USER');
+		$roPassword = getenv('YAPEPBASE_TEST_MYSQL_RO_PASSWORD');
+		$roDatabase = getenv('YAPEPBASE_TEST_MYSQL_RO_DATABASE');
+
 		parent::setUp();
 		$this->config = Config::getInstance();
 		$this->config->set(array(
 			'application.database.test.rw.backendType'     => 'mysql',
-			'application.database.test.rw.host'            => 'fst-devl-web01.in.firstload.de',
-			'application.database.test.rw.user'            => 'lfodor',
-			'application.database.test.rw.password'        => 'rie0zuy5tooB',
-			'application.database.test.rw.database'        => 'lfordor',
+			'application.database.test.rw.host'            => $rwHost,
+			'application.database.test.rw.user'            => $rwUser,
+			'application.database.test.rw.password'        => $rwPassword,
+			'application.database.test.rw.database'        => $rwDatabase,
 			'application.database.test.rw.charset'         => 'utf8',
 
 			'application.database.test.ro.backendType'     => 'mysql',
-			'application.database.test.ro.host'            => 'fst-devl-web01.in.firstload.de',
-			'application.database.test.ro.user'            => 'lfodor-ro',
-			'application.database.test.ro.password'        => 'tui0sho0Ieza',
-			'application.database.test.ro.database'        => 'lfordor',
+			'application.database.test.ro.host'            => $roHost,
+			'application.database.test.ro.user'            => $roUser,
+			'application.database.test.ro.password'        => $roPassword,
+			'application.database.test.ro.database'        => $roDatabase,
 			'application.database.test.ro.charset'         => 'utf8',
 		));
 
@@ -69,6 +104,10 @@ class MysqlTableTest extends \PHPUnit_Framework_TestCase {
 	 * Cleans up the environment after running a test.
 	 */
 	protected function tearDown() {
+		if (!$this->isRunnable) {
+			return;
+		}
+
 		$this->connection->query('DROP TABLE IF EXISTS test');
 
 		if (!empty($this->config)) {
