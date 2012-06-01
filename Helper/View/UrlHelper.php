@@ -10,6 +10,8 @@
  */
 
 namespace YapepBase\Helper\View;
+
+use YapepBase\Helper\HelperAbstract;
 use YapepBase\Application;
 
 /**
@@ -18,7 +20,7 @@ use YapepBase\Application;
  * @package    YapepBase
  * @subpackage Helper\View
  */
-class UrlHelper {
+class UrlHelper extends HelperAbstract {
 
 	/**
 	 * Returns the target for the specified controller and action.
