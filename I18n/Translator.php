@@ -10,24 +10,68 @@
 
 namespace YapepBase\I18n;
 
+use YapepBase\Config;
 use YapepBase\Storage\IStorage;
 use YapepBase\Exception\Exception;
-use YapepBase\Exception\ValueException;
-use YapepBase\Exception\ParameterException;
+use YapepBase\Exception\ConfigException;
+use YapepBase\Exception\I18n\ParameterException;
+use YapepBase\Exception\I18n\DictionaryNotFoundException;
+use YapepBase\Exception\I18n\TranslationNotFoundException;
 
 /**
- * Internationalization class, that translates strings
+ * Internationalization class, that translates strings to other languages.
  *
- * With strict parameter checking it checks the following things when translating:
+ * May be used with either string IDs or natural language strings. The string ID method is recommended.
+ *
+ * The parameter names may contain both upper and lowercase alphanumeric, dash or underscore characters [-_a-zA-Z0-9].
+ *
+ * Configuration may be specified in the following format: <b>resource.i18n.translator.[configName].*</b>.
+ *
+ * The following configuration options may be used:
  * <ul>
- *     <li>That all provided parameters are used in the string at least once.</li>
- *     <li>That all parameters in the string are passed in.</li>
+ *     <li>paramPrefix: The prefix for the translation parameters. Defaults to '%'.</li>
+ *     <li>paramSuffix: The suffix for the translation parameters. Defaults to '%'.</li>
+ *     <li>
+ *         strictParamChecking: Enables or disables strict parameter checking. Default to false,
+ *         enabling it is only recommended for development. If enabled, the following checks will be performed:
+ *         <ul>
+ *             <li>All provided parameters are used in the string at least once.</li>
+ *             <li>All parameters in the string are passed in.</li>
+ *         </ul>
+ *         If any of the above checks fail, a ParameterException will be thrown
+ *        {@uses \YapepBase\Exception\I18n\ParameterException}.
+ *     </li>
+ *     <li>
+ *         errorMode: Sets how the non-fatal translation errors are treated. The non-fatal errors include the
+ *         translation not found error. Must be set to one of the ERROR_MODE_* constants. Defaults to exception
+ *         {@uses self::ERROR_MODE_EXCEPTION}. The following error handling modes are available:
+ *         <ul>
+ *             <li>Throwing an exception. This is the default behavior. {@uses self::ERROR_MODE_EXCEPTION}</li>
+ *             <li>Triggering an error of level E_USER_ERROR. {@uses self::ERROR_MODE_ERROR}</li>
+ *             <li>Not treating this as an error condition. Useful if the translated strings are in one of the
+ *                 languages.{@uses self::ERROR_MODE_NONE}</li>
+ *         </ul>
+ *         For all modes except for the exception mode, the original string will be returned with the parameters
+ *         replaced in the source string.
+ *     </li>
  * </ul>
+ * Either the paramPrefix or paramSuffix is required to be non-empty (the defaults suffice), but it's recommended to
+ * set both. If both paramPrefix and paramSuffix are set to empty string, or an invalid error mode is provided a
+ * ConfigException will be thrown on instantiation {@uses \YapepBase\Exception\ConfigException}.
  *
  * @package    YapepBase
  * @subpackage I18n
  */
 class Translator {
+
+	/** In case of non-fatal translation errors an exception will be thrown. */
+	const ERROR_MODE_EXCEPTION = 'exception';
+
+	/** In case of non-fatal translation errors an error of level E_USER_ERROR will be triggered. */
+	const ERROR_MODE_ERROR = 'error';
+
+	/** In case of non-fatal translation errors no error will be reported. */
+	const ERROR_MODE_NONE = 'none';
 
 	/**
 	 * Cached dictionary file data
@@ -37,14 +81,14 @@ class Translator {
 	protected $dictionaryCache = array();
 
 	/**
-	 * The default language for the translations
+	 * The default language for the translations.
 	 *
 	 * @var string
 	 */
 	protected $defaultLanguage;
 
 	/**
-	 * The storage instance used to retrieve the dictionary files
+	 * The storage instance used to retrieve the dictionary files.
 	 *
 	 * @var \YapepBase\Storage\IStorage
 	 */
@@ -55,28 +99,81 @@ class Translator {
 	 *
 	 * @var bool
 	 */
-	protected $strictParamChecking;
+	protected $strictParamChecking = false;
+
+	/**
+	 * Prefix for the parameters.
+	 *
+	 * @var string
+	 */
+	protected $paramPrefix = '%';
+
+	/**
+	 * Suffix for the parameters.
+	 *
+	 * @var string
+	 */
+	protected $paramSuffix;
+
+	/**
+	 * The error mode to use.
+	 *
+	 * @var string
+	 */
+	protected $errorMode;
 
 	/**
 	 * Constructor.
 	 *
-	 * If strict parameter checking opt
+	 * @param \YapepBase\Storage\IStorage $storage           The storage instance used to retrieve the dictionaries.
+	 * @param string                      $defaultLanguage   The default language to use for translations.
+	 * @param string                      $configName        Name of the I18n configuration.
 	 *
-	 * @param \YapepBase\Storage\IStorage $storage               The storage instance used to retrieve the dictionaries.
-	 * @param string                      $defaultLanguage       The default language to use for translations.
-	 * @param bool                        $strictParamChecking   If TRUE enables strict parameter checking.
+	 * @throws \YapepBase\Exception\ConfigException   On configuration problems.
 	 */
-	public function __construct(IStorage $storage, $defaultLanguage, $strictParamChecking = false) {
+	public function __construct(IStorage $storage, $defaultLanguage, $configName) {
 		$this->storage             = $storage;
-		$this->strictParamChecking = $strictParamChecking;
 
+		$this->setConfig($configName);
 		$this->setDefaultLanguage($defaultLanguage);
+	}
+
+	/**
+	 * Sets up the
+	 *
+	 * @param string $configName   Name of the I18n configuration.
+	 *
+	 * @return void
+	 *
+	 * @throws \YapepBase\Exception\ConfigException   On configuration problems.
+	 */
+	protected function setConfig($configName) {
+		$config = Config::getInstance();
+		$configBase = 'resource.i18n.translator.' . $configName;
+
+		$this->paramPrefix         = (string)$config->get($configBase . '.paramPrefix', '%');
+		$this->paramSuffix         = (string)$config->get($configBase . '.paramSuffix', '%');
+		$this->strictParamChecking = (bool)$config->get($configBase . '.strictParamChecking', false);
+		$this->errorMode           = (string)$config->get($configBase . '.errorMode', self::ERROR_MODE_EXCEPTION);
+
+		if (
+			!in_array($this->errorMode,
+				array(self::ERROR_MODE_ERROR, self::ERROR_MODE_EXCEPTION, self::ERROR_MODE_NONE))
+		) {
+			throw new ConfigException('Invalid error mode for ' . __CLASS__ . ': ' . $this->errorMode);
+		}
+
+		if (empty($this->paramPrefix) && empty($this->paramSuffix)) {
+			throw new ConfigException('Both the parameter prefix and suffix are empty');
+		}
 	}
 
 	/**
 	 * Sets the default language.
 	 *
-	 * @param string $defaultLanguage    The default language.
+	 * @param string $defaultLanguage   The default language.
+	 *
+	 * @return void
 	 */
 	public function setDefaultLanguage($defaultLanguage) {
 		$this->defaultLanguage = $defaultLanguage;
@@ -85,7 +182,7 @@ class Translator {
 	/**
 	 * Returns the default language.
 	 *
-	 * @return mixed
+	 * @return string
 	 */
 	public function getDefaultLanguage() {
 		return $this->defaultLanguage;
@@ -96,60 +193,87 @@ class Translator {
 	 *
 	 * @param string $sourceClass   The source class (with the namespace).
 	 * @param string $string        The string to translate.
-	 * @param array  $params        Parameters for the translation.
+	 * @param array  $params        Associative array with parameters for the translation. The key is the param name.
 	 * @param string $language      The language for the translation. If not set, the default language will be used.
 	 *
 	 * @return string
+	 *
+	 * @throws \YapepBase\Exception\I18n\DictionaryNotFoundException    If the dictionary is not found in the storage.
+	 * @throws \YapepBase\Exception\I18n\TranslationNotFoundException   If the error mode is set to exception.
+	 * @throws \YapepBase\Exception\I18n\ParameterException             If there are problems with the parameters.
 	 */
 	public function translate($sourceClass, $string, array $params = array(), $language = null) {
 		if (empty($language)) {
-			$language = $this->defaultLanguage;
+			$language = $this->getDefaultLanguage();
 		}
 		$sourceKey = $this->getSourceKey($sourceClass, $language);
 		if (!isset($this->dictionaryCache[$sourceKey])) {
 			$data = $this->storage->get($sourceKey);
 			if (empty($data)) {
-				throw new Exception('Dictionary not found for source class "' . $sourceClass . '" and language "'
-					. $language . '"');
+				throw new DictionaryNotFoundException('Dictionary not found for source class "' . $sourceClass
+					. '" and language "' . $language . '"');
 			}
 			$this->dictionaryCache[$sourceKey] = $data;
 		}
-		if (!isset($this->dictionaryCache[$sourceKey][$string])) {
-			throw new ValueException('Translation not found for source class "' . $sourceClass . '", language "'
-				. $language . '" and string: "' . $string . '"');
+		if (isset($this->dictionaryCache[$sourceKey][$string])) {
+			$string = $this->dictionaryCache[$sourceKey][$string];
+		} else {
+			switch ($this->errorMode) {
+				case self::ERROR_MODE_NONE:
+					// Do nothing
+					break;
+
+				case self::ERROR_MODE_ERROR:
+					trigger_error('Translation not found for source class "' . $sourceClass . '", language "'
+						. $language . '" and string: "' . $string . '"', E_USER_WARNING);
+					break;
+
+				case self::ERROR_MODE_EXCEPTION:
+				default:
+					throw new TranslationNotFoundException('Translation not found for source class "' . $sourceClass
+					. '", language "' . $language . '" and string: "' . $string . '"');
+					break;
+			}
 		}
 		return $this->substituteParameters($string, $params);
 	}
 
 	/**
-	 * Alias to the translate() method.
+	 * Returns the key of the dictionary for the specified source class and language.
 	 *
-	 * @param string $sourceClass   The source class (with the namespace).
-	 * @param string $string        The string to translate.
-	 * @param array  $params        Parameters for the translation.
-	 * @param string $language      The language for the translation. If not set, the default language will be used.
+	 * @param string $sourceClass   The class name of the translation source.
+	 * @param string $language      The language.
 	 *
 	 * @return string
-	 *
-	 * @see self::translate()
 	 */
-	public function _($sourceClass, $string, array $params = array(), $language = null) {
-		return $this->translate($sourceClass, $string, $params, $language);
-	}
-
 	protected function getSourceKey($sourceClass, $language) {
 		return $language . '-' . str_replace(array('\\', '/'), '-', $sourceClass);
 	}
 
+	/**
+	 * Substitutes the parameter names with the values in the provided string
+	 *
+	 * @param string $string   The string to translate.
+	 * @param array  $params   Associative array with parameters for the translation. The key is the param name.
+	 *
+	 * @return string
+	 *
+	 * @throws \YapepBase\Exception\I18n\ParameterException
+	 */
 	protected function substituteParameters($string, array $params) {
 		foreach ($params as $paramName => $paramValue) {
 			$replacementCount = 0;
-			$string = str_replace('%' . $paramName . '%', $paramValue, $string, $replacementCount);
+			$string = str_replace($this->paramPrefix . $paramName . $this->paramSuffix, $paramValue, $string,
+				$replacementCount);
 			if ($this->strictParamChecking && $replacementCount == 0) {
 				throw new ParameterException('Parameter with name "' . $paramName . '" not found in provided string');
 			}
 		}
-		if ($this->strictParamChecking && preg_match('/%[-_a-zA-Z0-9]%/', $string)) {
+		if (
+			$this->strictParamChecking
+			&& preg_match('/' . preg_quote($this->paramPrefix, '/') . '[-_a-zA-Z0-9]+'
+				. preg_quote($this->paramSuffix, '/') . '/', $string)
+		) {
 			throw new ParameterException('Not all parameters are set for the translated string');
 		}
 		return $string;
