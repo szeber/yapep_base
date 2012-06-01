@@ -33,4 +33,6 @@ class MimeType {
 	const XML = 'application/xml';
 	/** Plain text content type */
 	const PLAINTEXT = 'text/plain';
+	/** Octet stream content type */
+	const OCTET_STREAM = 'application/octet-stream';
 }

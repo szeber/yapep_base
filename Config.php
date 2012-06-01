@@ -135,20 +135,14 @@ class Config {
 					$result[$key] = $value;
 				}
 			}
-			// If no default is set and te result is not found, trigger an E_USER_NOTICE
-			// This is for compatibility reasons, this will later change to an exception!
-			// TODO: Change the trigger_error to a ConfigException
 			if (empty($result) && is_null($default)) {
-				trigger_error('Configuration option not found. Key: ' . $name, E_USER_NOTICE);
+				throw new ConfigException('Configuration option not found. Key: ' . $name, E_USER_NOTICE);
 			}
 			return (empty($result) ? $default : $result);
 		}
 
-		// No matches, return the default or trigger an error if no default is set.
-		// This is for compatibility reasons, this will later change to an exception!
-		// TODO: Change the trigger_error to a ConfigException
 		if (empty($result) && is_null($default)) {
-			trigger_error('Configuration option not found. Key: ' . $name, E_USER_NOTICE);
+			throw new ConfigException('Configuration option not found. Key: ' . $name, E_USER_NOTICE);
 		}
 		return $default;
 	}

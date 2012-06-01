@@ -103,6 +103,7 @@ class DbFactory {
 				static::$paramPrefix = (string)$config->get('system.database.paramPrefix', '');
 			}
 			$data = $config->get('application.database.' . $connectionName . '.' . $connectionType . '.*', false);
+
 			if (empty($data) || !is_array($data)) {
 				throw new DatabaseException('Database connection configuration not found');
 			}
@@ -180,5 +181,14 @@ class DbFactory {
 			default:
 				throw new DatabaseException('Invalid database config');
 		}
+	}
+
+	/**
+	 * Clearing all the stored connections from the class.
+	 *
+	 * @return void
+	 */
+	public static function clearConnections() {
+		self::$connections = array();
 	}
 }
