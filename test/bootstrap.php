@@ -9,17 +9,20 @@
  */
 
 include_once(__DIR__ . '/../bootstrap.php');
+
+define('TEST_DIR', __DIR__);
+
 \YapepBase\Application::getInstance()->getErrorHandlerRegistry()->addErrorHandler(new \YapepBase\ErrorHandler\StrictErrorHandler());
 
+$autoloader = new \YapepBase\Autoloader\SimpleAutoloader();
+$autoloader->addClassPath(TEST_DIR);
 // Find vfsStream, and register autoloading for it, if available
 foreach(explode(\PATH_SEPARATOR, get_include_path()) as $path) {
 	if (file_exists($path . \DIRECTORY_SEPARATOR . 'vfsStream')) {
-		$autoloader = new \YapepBase\Autoloader\SimpleAutoloader();
-		$autoloader->setClassPath(array($path . \DIRECTORY_SEPARATOR . 'vfsStream'));
-		$autoloader->register();
-		unset($autoloader);
+		$autoloader->addClassPath($path . \DIRECTORY_SEPARATOR . 'vfsStream');
 		break;
 	}
 }
 
-unset($path);
+$autoloader->register();
+unset($autoloader, $path);

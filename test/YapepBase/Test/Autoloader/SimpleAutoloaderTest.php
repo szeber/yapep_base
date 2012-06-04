@@ -23,6 +23,7 @@ class SimpleAutoloaderTest extends \PHPUnit_Framework_TestCase {
 
 	public function testLoad() {
 		$this->object->addClassPath(BASE_DIR);
+		$this->object->addClassPath(TEST_DIR);
 		$this->assertTrue($this->object->load('\\YapepBase\\Test\\Mock\\Autoloader\\ClassMock'));
 		$this->assertTrue($this->object->load('\\YapepBase\\Test\\Mock\\Autoloader\\InterfaceMock'));
 		try {

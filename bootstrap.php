@@ -12,7 +12,7 @@ namespace YapepBase;
 
 if (!\defined('BASE_DIR')) {
 	/** The base directory */
-	define('BASE_DIR', realpath(dirname(dirname((__FILE__)))));
+	define('BASE_DIR', realpath(dirname((__FILE__))) . '/src');
 }
 
 /** Require the simple autoloader */
