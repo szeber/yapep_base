@@ -5,7 +5,10 @@ syntax: regexp
 ^\.project$
 syntax: regexp
 ^\.buildpath$
-syntax: regexp
-^\.idea$
+syntax: glob
+.idea
 syntax: regexp
 ^nbproject/
+syntax: glob
+vendor
+composer.lock
