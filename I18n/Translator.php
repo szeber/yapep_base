@@ -132,6 +132,11 @@ class Translator {
 	 * @throws \YapepBase\Exception\ConfigException   On configuration problems.
 	 */
 	public function __construct(IStorage $storage, $defaultLanguage, $configName) {
+		// Require a persistent storage
+		if (!$storage->isPersistent()) {
+			throw new ConfigException('Persistent storage is required for ' . __CLASS__);
+		}
+
 		$this->storage             = $storage;
 
 		$this->setConfig($configName);
