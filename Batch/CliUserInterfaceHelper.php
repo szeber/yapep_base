@@ -239,7 +239,7 @@ class CliUserInterfaceHelper {
 			if (in_array($longName, $this->longSwitches)) {
 				throw new Exception('Long switch already added: ' . $longName);
 			} else {
-				$this->longSwitches[] = $shortName;
+				$this->longSwitches[] = $longName;
 			}
 		}
 
