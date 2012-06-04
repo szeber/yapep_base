@@ -33,31 +33,45 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testSetRouter() {
-		$r = new \YapepBase\Test\Mock\Router\RouterMock();
-		$this->object->setRouter($r);
-		$this->assertEquals($r, $this->object->getRouter());
+		$router = new \YapepBase\Test\Mock\Router\RouterMock();
+		$this->object->setRouter($router);
+		$this->assertEquals($router, $this->object->getRouter());
 	}
 
 	public function testSetDiContainer() {
-		$c = new \YapepBase\DependencyInjection\SystemContainer();
-		$this->object->setDiContainer($c);
-		$this->assertEquals($c, $this->object->getDiContainer());
+		$container = new \YapepBase\DependencyInjection\SystemContainer();
+		$this->object->setDiContainer($container);
+		$this->assertEquals($container, $this->object->getDiContainer());
 	}
 
 	public function testSetRequest() {
-		$r = new Mock\Request\RequestMock('');
-		$this->object->setRequest($r);
-		$this->assertEquals($r, $this->object->getRequest());
+		$request = new Mock\Request\RequestMock('');
+		$this->object->setRequest($request);
+		$this->assertEquals($request, $this->object->getRequest());
 	}
 
 	public function testSetResponse() {
-		$r = new Mock\Response\ResponseMock();
-		$this->object->setResponse($r);
-		$this->assertEquals($r, $this->object->getResponse());
+		$response = new Mock\Response\ResponseMock();
+		$this->object->setResponse($response);
+		$this->assertEquals($response, $this->object->getResponse());
 	}
 
 	public function testGetErrorHandlerRegistry() {
-		$this->assertInstanceOf('\YapepBase\ErrorHandler\ErrorHandlerRegistry', $this->object->getErrorHandlerRegistry());
+		$this->assertInstanceOf('\YapepBase\ErrorHandler\ErrorHandlerRegistry',
+			$this->object->getErrorHandlerRegistry());
+	}
+
+	public function testGetI18nTranslator() {
+		try {
+			$this->object->getI18nTranslator();
+			$this->fail('No exception is thrown if getting a translator without setting it first');
+		} catch (\YapepBase\Exception\Exception $exception) {
+		}
+
+		$translator = new \YapepBase\I18n\Translator(new \YapepBase\Test\Mock\Storage\StorageMock(true, true), 'en',
+			'test');
+		$this->object->setI18nTranslator($translator);
+		$this->assertSame($translator, $this->object->getI18nTranslator(), 'Invalid translator is returned');
 	}
 
 	public function testRun() {

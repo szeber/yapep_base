@@ -25,6 +25,7 @@ use YapepBase\Request\HttpRequest;
 use YapepBase\Exception\ControllerException;
 use YapepBase\Event\EventHandlerRegistry;
 use YapepBase\Exception\RouterException;
+use YapepBase\I18n\Translator;
 
 /**
  * Application singleton class.
@@ -89,6 +90,13 @@ class Application {
 	 * @var \YapepBase\DependencyInjection\SystemContainer
 	 */
 	protected $diContainer;
+
+	/**
+	 * Stores the i18n translator instance
+	 *
+	 * @var \YapepBase\I18n\Translator
+	 */
+	protected $i18nTranslator;
 
 	/**
 	 * Singleton constructor
@@ -224,6 +232,31 @@ class Application {
 	 */
 	public function getErrorHandlerRegistry() {
 		return $this->errorHandlerRegistry;
+	}
+
+	/**
+	 * Returns the configured i18n translator instance, or throws an exception if none is configured.
+	 *
+	 * @return I18n\Translator   The instance.
+	 *
+	 * @throws Exception\Exception   If no translator is configured.
+	 */
+	public function getI18nTranslator() {
+		if (empty($this->i18nTranslator)) {
+			throw new Exception('No i18n translator is configured');
+		}
+		return $this->i18nTranslator;
+	}
+
+	/**
+	 * Sets the i18n translator instance to use.
+	 *
+	 * @param Translator $translator   The instance.
+	 *
+	 * @return void
+	 */
+	public function setI18nTranslator(Translator $translator) {
+		$this->i18nTranslator = $translator;
 	}
 
 	/**

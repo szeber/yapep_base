@@ -248,4 +248,17 @@ abstract class ViewAbstract {
 
 		return $this->storage->get($this->storageKey);
 	}
+
+	/**
+	 * Translates the specified string.
+	 *
+	 * @param string $string       The string.
+	 * @param array  $parameters   The parameters for the translation.
+	 * @param string $language     The language.
+	 *
+	 * @return string
+	 */
+	protected function _($string, $parameters = array(), $language = null) {
+		return Application::getInstance()->getI18nTranslator()->translate(__CLASS__, $string, $parameters, $language);
+	}
 }
