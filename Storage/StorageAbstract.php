@@ -15,7 +15,10 @@ use YapepBase\Exception\ConfigException;
 use YapepBase\Config;
 
 /**
- * StorageAbstract class
+ * Base class for the storage implementations.
+ *
+ * Configuration settings for the storage should be set in the format:
+ * <b>resource.storage.&lt;configName&gt;.&lt;optionName&gt;
  *
  * @package    YapepBase
  * @subpackage Storage
@@ -31,7 +34,7 @@ abstract class StorageAbstract implements IStorage {
 	 * @throws \YapepBase\Exception\StorageException   On storage errors.
 	 */
 	public function __construct($configName) {
-		$config = Config::getInstance()->get($configName, false);
+		$config = Config::getInstance()->get('resource.storage.' . $configName . '.*', false);
 		if (false === $config) {
 			throw new ConfigException('Configuration not found: ' . $configName);
 		}

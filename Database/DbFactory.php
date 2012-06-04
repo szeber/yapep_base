@@ -28,7 +28,7 @@ use YapepBase\Config;
  *     </ul>
  *
  * Configuration settings for the connections should be set in the format:
- * application.database.<connectionName>.<connectionType>.<optionName>
+ * <b>resource.database.&lt;connectionName&gt;.&lt;connectionType&gt;.&lt;optionName&gt;</b>
  *
  * Generic configuration:
  *     <ul>
@@ -102,7 +102,7 @@ class DbFactory {
 			if (is_null(static::$paramPrefix)) {
 				static::$paramPrefix = (string)$config->get('system.database.paramPrefix', '');
 			}
-			$data = $config->get('application.database.' . $connectionName . '.' . $connectionType . '.*', false);
+			$data = $config->get('resource.database.' . $connectionName . '.' . $connectionType . '.*', false);
 
 			if (empty($data) || !is_array($data)) {
 				throw new DatabaseException('Database connection configuration not found');

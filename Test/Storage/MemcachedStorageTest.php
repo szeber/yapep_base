@@ -37,15 +37,18 @@ class MemcachedStorageTest extends \PHPUnit_Framework_TestCase {
 		Application::getInstance()->setDiContainer($container);
 		$this->memcacheMock = Application::getInstance()->getDiContainer()->getMemcached();
 		Config::getInstance()->set(array(
-			'test.host' => 'localhost',
-			'test2.host' => 'localhost',
-			'test2.port' => 11222,
-			'test2.keyPrefix' => 'test.',
-			'test2.keySuffix' => '.test',
-			'test3.host' => 'localhost',
-			'test3.hashKey' => true,
-			'test3.keyPrefix' => 'test.',
-			'test4.port' => 11211,
+			'resource.storage.test.host' => 'localhost',
+
+			'resource.storage.test2.host' => 'localhost',
+			'resource.storage.test2.port' => 11222,
+			'resource.storage.test2.keyPrefix' => 'test.',
+			'resource.storage.test2.keySuffix' => '.test',
+
+			'resource.storage.test3.host' => 'localhost',
+			'resource.storage.test3.hashKey' => true,
+			'resource.storage.test3.keyPrefix' => 'test.',
+
+			'resource.storage.test4.port' => 11211,
 		));
 	}
 
@@ -59,20 +62,20 @@ class MemcachedStorageTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testConnection() {
-		$storage = new MemcachedStorage('test.*');
+		$storage = new MemcachedStorage('test');
 
 		$this->assertEquals(1, count($this->memcacheMock->serverList), 'The server count is not 1');
 		$this->assertEquals('localhost', $this->memcacheMock->serverList[0]['host'], 'Host mismatch');
 		$this->assertEquals(11211, $this->memcacheMock->serverList[0]['port'], 'Default port does not match');
 		$this->memcacheMock->serverList = array();
 
-		$storage = new MemcachedStorage('test2.*');
+		$storage = new MemcachedStorage('test2');
 		$this->assertEquals(1, count($this->memcacheMock->serverList), 'The server count is not 1');
 		$this->assertEquals(11222, $this->memcacheMock->serverList[0]['port'], 'Non-default port does not match');
 	}
 
 	public function testFunctionality() {
-		$storage = new MemcachedStorage('test.*');
+		$storage = new MemcachedStorage('test');
 		$this->assertEmpty($this->memcacheMock->data, 'Data is not empty after connecting');
 
 		$this->assertFalse($storage->get('test'), 'Not set value does not return false');
@@ -87,31 +90,31 @@ class MemcachedStorageTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testPrefixedStorage() {
-		$storage = new MemcachedStorage('test2.*');
+		$storage = new MemcachedStorage('test2');
 		$storage->set('test', 'testValue');
 		$this->assertTrue(isset($this->memcacheMock->data['test.test.test']), 'Prefixed storage fails');
 	}
 
 	public function testHashedStorage() {
-		$storage = new MemcachedStorage('test3.*');
+		$storage = new MemcachedStorage('test3');
 		$storage->set('test', 'testValue');
 		$this->assertTrue(isset($this->memcacheMock->data[md5('test.test')]), 'Hashed storage fails');
 	}
 
 	public function testStorageSettings() {
-		$storage = new MemcachedStorage('test.*');
+		$storage = new MemcachedStorage('test');
 		$this->assertTrue($storage->isTtlSupported(), 'TTL should be supported');
 		$this->assertFalse($storage->isPersistent(), 'Memcache should not be persistent');
 	}
 
 	public function testErrorHandling() {
 		try {
-			new MemcachedStorage('nonexistent.*');
+			new MemcachedStorage('nonexistent');
 			$this->fail('No ConfigException thrown for nonexistent config option');
 		} catch (ConfigException $exception) {}
 
 		try {
-			new MemcachedStorage('test4.*');
+			new MemcachedStorage('test4');
 			$this->fail('No ConfigException thrown for config without a host');
 		} catch (ConfigException $exception) {}
 	}

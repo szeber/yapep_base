@@ -18,6 +18,9 @@ use YapepBase\Log\Message\IMessage;
 /**
  * Abstract base class usable by loggers.
  *
+ * Configuration settings for the loggers should be set in the format:
+ * <b>resource.log.&lt;configName&gt;.&lt;optionName&gt;
+ *
  * @package    YapepBase
  * @subpackage Log
  */
@@ -39,9 +42,10 @@ abstract class LoggerAbstract implements ILogger {
 	 */
 	public function __construct($configName) {
 		$config = Config::getInstance();
-		$result = $config->get($configName, false);
+
+		$result = $config->get('resource.log.' . $configName . '.*', false);
 		if (false === $result) {
-			throw new ConfigException('Configuration not found: ' . $configName);
+			throw new ConfigException('Configuration not found for log resource: ' . $configName);
 		}
 		$this->configOptions = $result;
 		$this->verifyConfig($configName);

@@ -69,19 +69,19 @@ class MysqlTableTest extends \PHPUnit_Framework_TestCase {
 		parent::setUp();
 		$this->config = Config::getInstance();
 		$this->config->set(array(
-			'application.database.test.rw.backendType'     => 'mysql',
-			'application.database.test.rw.host'            => $rwHost,
-			'application.database.test.rw.user'            => $rwUser,
-			'application.database.test.rw.password'        => $rwPassword,
-			'application.database.test.rw.database'        => $rwDatabase,
-			'application.database.test.rw.charset'         => 'utf8',
+			'resource.database.test.rw.backendType'     => 'mysql',
+			'resource.database.test.rw.host'            => $rwHost,
+			'resource.database.test.rw.user'            => $rwUser,
+			'resource.database.test.rw.password'        => $rwPassword,
+			'resource.database.test.rw.database'        => $rwDatabase,
+			'resource.database.test.rw.charset'         => 'utf8',
 
-			'application.database.test.ro.backendType'     => 'mysql',
-			'application.database.test.ro.host'            => $roHost,
-			'application.database.test.ro.user'            => $roUser,
-			'application.database.test.ro.password'        => $roPassword,
-			'application.database.test.ro.database'        => $roDatabase,
-			'application.database.test.ro.charset'         => 'utf8',
+			'resource.database.test.ro.backendType'     => 'mysql',
+			'resource.database.test.ro.host'            => $roHost,
+			'resource.database.test.ro.user'            => $roUser,
+			'resource.database.test.ro.password'        => $roPassword,
+			'resource.database.test.ro.database'        => $roDatabase,
+			'resource.database.test.ro.charset'         => 'utf8',
 		));
 
 		$this->connection = DbFactory::getConnection('test', DbFactory::TYPE_READ_WRITE);

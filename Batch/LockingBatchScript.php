@@ -29,7 +29,7 @@ use YapepBase\Exception\ParameterException;
  * The following switches are defined and parsed by the class:
  * <ul>
  *     <li>--pid-path: The full path to the PID file storage directory. Optional, defaults to the value of the
- *                     config option "application.path.batchPid", or if not set to /var/run.</li>
+ *                     config option "system.path.batchPid", or if not set to /var/run.</li>
  *     <li>--pid-file: The name of the PID file without path. Optional, defaults to the name of the script with .pid
  *                     extension.</li>
  *     <li>--help: If set, the help page will be printed.</li>
@@ -43,7 +43,7 @@ use YapepBase\Exception\ParameterException;
  *
  * Configuration options:
  * <ul>
- *     <li>application.path.batchPid: The full path to the default PID storage directory.
+ *     <li>system.path.batchPid: The full path to the default PID storage directory.
  *                                    Optional, defaults to /var/run</li>
  * </ul>
  *
@@ -186,7 +186,7 @@ abstract class LockingBatchScript extends BatchScript {
 	protected function parseSwitches(array $switches) {
 		$config = Config::getInstance();
 
-		$this->pidPath = (empty($switches['pid-path']) ? $config->get('application.path.batchPid', '/var/run')
+		$this->pidPath = (empty($switches['pid-path']) ? $config->get('system.path.batchPid', '/var/run')
 			: $switches['pid-path']);
 		$this->pidFile = (empty($switches['pid-file'])
 			? preg_replace('/\.php$/', '', basename($_SERVER['argv'][0])) . '.pid'

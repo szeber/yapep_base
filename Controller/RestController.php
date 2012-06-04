@@ -20,7 +20,7 @@ use YapepBase\View\RestTemplate;
  *
  * Global configuration options:
  * <ul>
- *     <li>application.rest.xmlRootNode: The root node for XML output format.</li>
+ *     <li>system.rest.xmlRootNode: The root node for XML output format.</li>
  * </ul>
  *
  * @package    YapepBase
@@ -52,7 +52,7 @@ abstract class RestController extends HttpController {
 		$result = $this->$methodName();
 		if (is_array($result)) {
 			$view = new RestTemplate();
-			$view->setRootNode(Config::getInstance()->get('application.rest.xmlRootNode', 'rest'));
+			$view->setRootNode(Config::getInstance()->get('system.rest.xmlRootNode', 'rest'));
 			$view->setContent($result);
 			return $view;
 		} elseif (!is_string($result) && !($result instanceof RestTemplate)) {

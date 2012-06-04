@@ -27,17 +27,21 @@ class FileStorageTest extends \PHPUnit_Framework_TestCase {
 		\vfsStreamWrapper::register();
 		\vfsStreamWrapper::setRoot(new \vfsStreamDirectory('test'));
 		Config::getInstance()->set(array(
-			'test1.path'           => \vfsStream::url('test') . '/test1',
-			'test2.path'           => \vfsStream::url('test') . '/test2',
-			'test2.storePlainText' => true,
-			'test2.fileMode'       => 0666,
-			'test3.path'           => \vfsStream::url('test') . '/test3',
-			'test3.filePrefix'      => 'test.',
-			'test3.fileSuffix'      => '.test',
-			'test4.path'           => \vfsStream::url('test') . '/test4',
-			'test4.filePrefix'      => 'test.',
-			'test4.hashKey'        => true,
-			'test5.none'           => '',
+			'resource.storage.test1.path'            => \vfsStream::url('test') . '/test1',
+			'resource.storage.test2.path'            => \vfsStream::url('test') . '/test2',
+
+			'resource.storage.test2.storePlainText'  => true,
+			'resource.storage.test2.fileMode'        => 0666,
+
+			'resource.storage.test3.path'            => \vfsStream::url('test') . '/test3',
+			'resource.storage.test3.filePrefix'      => 'test.',
+			'resource.storage.test3.fileSuffix'      => '.test',
+
+			'resource.storage.test4.path'            => \vfsStream::url('test') . '/test4',
+			'resource.storage.test4.filePrefix'      => 'test.',
+			'resource.storage.test4.hashKey'         => true,
+
+			'resource.storage.test5.none'            => '',
 		   ));
 	}
 
@@ -47,7 +51,7 @@ class FileStorageTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testSerialized() {
-		$storage = new FileStorage('test1.*');
+		$storage = new FileStorage('test1');
 		$this->assertFalse(\vfsStreamWrapper::getRoot()->hasChild('test1/test'), 'Test data exists after directory creation');
 
 		$this->assertFalse($storage->get('test'), 'Not set value does not return false');
@@ -66,7 +70,7 @@ class FileStorageTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testPlain() {
-		$storage = new FileStorage('test2.*');
+		$storage = new FileStorage('test2');
 		$this->assertFalse(\vfsStreamWrapper::getRoot()->hasChild('test2/test'), 'Test data exists after directory creation');
 
 		$this->assertFalse($storage->get('test'), 'Not set value does not return false');
@@ -103,7 +107,7 @@ class FileStorageTest extends \PHPUnit_Framework_TestCase {
 
 		\vfsStreamWrapper::setRoot($rootDir);
 
-		$storage = new FileStorage('test1.*');
+		$storage = new FileStorage('test1');
 
 		$this->assertTrue($storageDir->hasChild('test'), 'Expired test data does not exist before getting');
 		$this->assertFalse($storage->get('test'), 'Getting expired data does not return FALSE');
@@ -111,71 +115,78 @@ class FileStorageTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testPrefixedStorage() {
-		$storage = new FileStorage('test3.*');
+		$storage = new FileStorage('test3');
 		$storage->set('test', 'testValue');
 		$this->assertTrue(\vfsStreamWrapper::getRoot()->hasChild('test3/test.test.test'), 'Prefixed storage fails');
 	}
 
 	public function testHashedStorage() {
-		$storage = new FileStorage('test4.*');
+		$storage = new FileStorage('test4');
 		$storage->set('test', 'testValue');
 		$this->assertTrue(\vfsStreamWrapper::getRoot()->hasChild('test4/' . md5('test.test')), 'Hashed storage fails');
 	}
 
 	public function testStorageSettings() {
-		$storage = new FileStorage('test1.*');
+		$storage = new FileStorage('test1');
 		$this->assertTrue($storage->isPersistent(), 'File storage is always persistent.');
 		$this->assertTrue($storage->isTtlSupported(), 'File storage should support TTL if not storing in plaintext');
-		$storage = new FileStorage('test2.*');
+		$storage = new FileStorage('test2');
 		$this->assertFalse($storage->isTtlSupported(), 'File storage should not support TTL if storing in plaintext');
 	}
 
 	public function testErrorHandling() {
 		try {
-			new FileStorage('nonexistent.*');
+			new FileStorage('nonexistent');
 			$this->fail('No ConfigException thrown for nonexistent config option');
-		} catch (ConfigException $exception) {}
+		} catch (ConfigException $exception) {
+		}
 
 		try {
-			new FileStorage('test5.*');
+			new FileStorage('test5');
 			$this->fail('No ConfigException thrown for config without a path');
-		} catch (ConfigException $exception) {}
+		} catch (ConfigException $exception) {
+		}
 
 		try {
-			$storage = new FileStorage('test2.*');
+			$storage = new FileStorage('test2');
 			$storage->set('test', 'testValue', 100);
 			$this->fail('No ParameterException thrown when using TTL with plain text storage');
-		} catch(ParameterException $exception) {}
+		} catch (ParameterException $exception) {
+		}
 
 		try {
-			$storage = new FileStorage('test1.*');
+			$storage = new FileStorage('test1');
 			$storage->set('test/test', 'testValue', 100);
 			$this->fail('No StorageException thrown when using invalid characters in the key');
-		} catch(StorageException $exception) {}
+		} catch (StorageException $exception) {
+		}
 	}
 
 	public function testPermissionErrorHandling() {
 		\vfsStreamWrapper::setRoot(new \vfsStreamDirectory('test', 0000));
 		try {
-			new FileStorage('test1.*');
+			new FileStorage('test1');
 			$this->fail('No StorageException thrown for non-writable root dir, with nonexisting storage dir');
-		} catch(StorageException $exception) {}
+		} catch (StorageException $exception) {
+		}
 
 		$rootDir = new \vfsStreamDirectory('test');
 		$rootDir->addChild(new \vfsStreamDirectory('test1', 0000));
 		\vfsStreamWrapper::setRoot($rootDir);
 		try {
-			new FileStorage('test1.*');
+			new FileStorage('test1');
 			$this->fail('No StorageException thrown for non-writable storage dir');
-		} catch(StorageException $exception) {}
+		} catch (StorageException $exception) {
+		}
 
 		$rootDir = new \vfsStreamDirectory('test');
 		$rootDir->addChild(new \vfsStreamFile('test1'));
 		\vfsStreamWrapper::setRoot($rootDir);
 		try {
-			new FileStorage('test1.*');
+			new FileStorage('test1');
 			$this->fail('No StorageException thrown for non-directory storage dir');
-		} catch(StorageException $exception) {}
+		} catch (StorageException $exception) {
+		}
 	}
 
 	public function testDeserializationErrorHandling() {
@@ -190,12 +201,13 @@ class FileStorageTest extends \PHPUnit_Framework_TestCase {
 
 		\vfsStreamWrapper::setRoot($rootDir);
 
-		$storage = new FileStorage('test1.*');
+		$storage = new FileStorage('test1');
 
 		try {
 			$storage->get('test');
 			$this->fail('No StorageException thrown for invalid serialized data');
-		} catch(StorageException $exception) {}
+		} catch(StorageException $exception) {
+		}
 	}
 
 	public function testSavePermissionErrorHandling() {
@@ -210,19 +222,21 @@ class FileStorageTest extends \PHPUnit_Framework_TestCase {
 
 		\vfsStreamWrapper::setRoot($rootDir);
 
-		$storage = new FileStorage('test2.*');
+		$storage = new FileStorage('test2');
 
 		$storageDir->chmod(0000);
 
 		try {
 			$storage->set('test', 'testValue');
 			$this->fail('No StorageException thrown for unsuccessful file save');
-		} catch(StorageException $exception) {}
+		} catch (StorageException $exception) {
+		}
 
 		try {
 			$storage->delete('test2');
 			$this->fail('No StorageException thrown for unsuccessful file deletion');
-		} catch(StorageException $exception) {}
+		} catch (StorageException $exception) {
+		}
 	}
 
 	public function testReadPermissionErrorHandling() {
@@ -237,12 +251,13 @@ class FileStorageTest extends \PHPUnit_Framework_TestCase {
 
 		\vfsStreamWrapper::setRoot($rootDir);
 
-		$storage = new FileStorage('test2.*');
+		$storage = new FileStorage('test2');
 
 		try {
 			$storage->get('test');
 			$this->fail('No StorageException thrown for unreadable file');
-		} catch(StorageException $exception) {}
+		} catch (StorageException $exception) {
+		}
 	}
 }
 
