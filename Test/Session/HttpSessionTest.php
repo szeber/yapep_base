@@ -35,10 +35,15 @@ class HttpSessionTest extends \PHPUnit_Framework_TestCase {
 	public function setUp() {
 		parent::setUp();
 		Config::getInstance()->set(array(
-			'test.session.namespace' => 'test',
-			'test.session.cookieName' => 'testSession',
-			'test.session.cookieDomain' => 'testdomain',
-			'test.session.cookiePath' => '/test',
+			'resource.session.test.namespace'    => 'test',
+			'resource.session.test.cookieName'   => 'testSession',
+			'resource.session.test.cookieDomain' => 'testdomain',
+			'resource.session.test.cookiePath'   => '/test',
+
+			'resource.missingNamespace.cookieName'  => 'testSession',
+
+			'resource.missingCookieName.namespace'  => 'test2',
+
 		));
 	}
 
@@ -57,7 +62,7 @@ class HttpSessionTest extends \PHPUnit_Framework_TestCase {
 	 *
 	 * @param string                                      $sessionId
 	 * @param array                                       $sessionData
-	 * @param \YapepBase\Test\Mock\Response\OuptputMock   $output
+	 * @param \YapepBase\Test\Mock\Response\OutputMock    $output
 	 * @param \YapepBase\Response\HttpResponse            $response
 	 * @param \YapepBase\Test\Mock\Storage\StorageMock    $storage
 	 *
@@ -69,7 +74,7 @@ class HttpSessionTest extends \PHPUnit_Framework_TestCase {
 		$request = new HttpRequest(array(), array(), $cookie, array('REQUEST_URI' => '/'), array(), array());
 		$output = new OutputMock();
 		$response = new HttpResponse($output);
-		return new HttpSession('test.session.*', $storage, $request, $response, false);
+		return new HttpSession('test', $storage, $request, $response, false);
 	}
 
 	public function testArrayAccess() {
@@ -125,7 +130,7 @@ class HttpSessionTest extends \PHPUnit_Framework_TestCase {
 		$output = new OutputMock();
 		$response = new HttpResponse($output);
 
-		$session = new HttpSession('test.session.*', $storage, $request, $response, false);
+		$session = new HttpSession('test', $storage, $request, $response, false);
 
 		$session->handleEvent(new Event(Event::TYPE_APPSTART));
 
@@ -138,7 +143,7 @@ class HttpSessionTest extends \PHPUnit_Framework_TestCase {
 		$request = new HttpRequest(array(), array(), array(), array('REQUEST_URI' => '/'), array(), array());
 		$response = new HttpResponse($output);
 		$eventHandlerRegistry = Application::getInstance()->getDiContainer()->getEventHandlerRegistry();
-		$session = new HttpSession('test.session.*', $storage, $request, $response, true);
+		$session = new HttpSession('test', $storage, $request, $response, true);
 
 		$this->assertTrue(in_array($session, $eventHandlerRegistry->getEventHandlers(Event::TYPE_APPSTART), true),
 			'Autoregistration failed for APPSTART event');
@@ -173,52 +178,48 @@ class HttpSessionTest extends \PHPUnit_Framework_TestCase {
 		$responseMock = new ResponseMock();
 
 		try {
-			new HttpSession('test.session.*', $nonTtlStorage, $request, $response);
+			new HttpSession('test', $nonTtlStorage, $request, $response);
 			$this->fail('Non TTL supporting storage does not cause an exception');
-		} catch(Exception $e) {}
+		} catch (Exception $e) {
+		}
 
 		try {
-			new HttpSession('test.nonexistingSession', $storage, $request, $response);
+			new HttpSession('nonExisting', $storage, $request, $response);
 			$this->fail('Non existing config does not cause an exception');
-		} catch (ConfigException $exception) {}
+		} catch (ConfigException $exception) {
+		}
 
 		try {
-			new HttpSession('test.session.namespace', $storage, $request, $response);
-			$this->fail('Non array config option does not cause an exception');
-		} catch (ConfigException $exception) {}
-
-		Config::getInstance()->set(array(
-			'test.session2.namespace' => 'test',
-		));
-		try {
-			new HttpSession('test.session2.*', $storage, $request, $response);
+			new HttpSession('missingCookieName', $storage, $request, $response);
 			$this->fail('No config exception thrown for missing required cookie name');
-		} catch (ConfigException $exception) {}
+		} catch (ConfigException $exception) {
+		}
 
-		Config::getInstance()->set(array(
-			'test.session3.cookieName' => 'testSession',
-		));
 		try {
-			new HttpSession('test.session3.*', $storage, $request, $response);
+			new HttpSession('missingNamespace', $storage, $request, $response);
 			$this->fail('No config exception thrown for missing required namespace');
-		} catch (ConfigException $exception) {}
+		} catch (ConfigException $exception) {
+		}
 
 		try {
-			new HttpSession('test.session.*', $storage, $requestMock, $response);
+			new HttpSession('test', $storage, $requestMock, $response);
 			$this->fail('No exception thrown for non HttpRequest request instance');
-		} catch (Exception $exception) {}
+		} catch (Exception $exception) {
+		}
 
 
 		try {
-			new HttpSession('test.session.*', $storage, $request, $responseMock);
+			new HttpSession('test', $storage, $request, $responseMock);
 			$this->fail('No exception thrown for non HttpResponse response instance');
-		} catch (Exception $exception) {}
+		} catch (Exception $exception) {
+		}
 
 		try {
-			$session = new HttpSession('test.session.*', $storage, $request, $response);
+			$session = new HttpSession('test', $storage, $request, $response);
 			$session->handleEvent(new Event(Event::TYPE_APPFINISH));
 			$this->fail('No exception thrown when trying to save a not yet loaded session');
-		} catch(Exception $e) {}
+		} catch (Exception $e) {
+		}
 
 	}
 

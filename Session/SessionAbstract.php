@@ -23,6 +23,16 @@ use YapepBase\Config;
 /**
  * Base class for session handlers.
  *
+ * Configuration settings for the sessions should be set in the format:
+ * <b>resource.database.&lt;configName&gt;.&lt;optionName&gt;
+ *
+ * Configuration options:
+ * <ul>
+ *     <li>namespace: The namespace used for the session. This namespace is used to register to the session
+ *                    registry, and also used as part of the key used during the storage of the session data.</li>
+ *     <li>lifetime:  The lifetime of the sesssion in seconds. Optional.</li>
+ * </ul>
+ *
  * @package    YapepBase
  * @subpackage Session
  */
@@ -90,13 +100,6 @@ abstract class SessionAbstract implements ISession {
 	/**
 	 * Constructor
 	 *
-	 * Configuration options:
-	 * <ul>
-	 *     <li>namespace: The namespace used for the session. This namespace is used to register to the session
-	 *                    registry, and also used as part of the key used during the storage of the session data.</li>
-	 *     <li>lifetime:  The lifetime of the sesssion in seconds. Optional.</li>
-	 * </ul>
-	 *
 	 * @param string                        $configName     Name of the session config.
 	 * @param \YapepBase\Storage\IStorage   $storage        The storage object.
 	 * @param \YapepBase\Request\IRequest   $request        The request object.
@@ -117,15 +120,15 @@ abstract class SessionAbstract implements ISession {
 		$this->request  = $request;
 		$this->response = $response;
 
-		$config = Config::getInstance()->get($configName, false);
+		$config = Config::getInstance()->get('resource.session.' . $configName . '.*', false);
 		if (empty($config)) {
-			throw new ConfigException('Configuration not found for session handler');
+			throw new ConfigException('Configuration not found for session handler: ' . $configName);
 		}
 		if (!is_array($config)) {
-			throw new ConfigException('Invalid configuration for session handler');
+			throw new ConfigException('Invalid configuration for session handler: ' . $configName);
 		}
 		if (!isset($config['namespace'])) {
-			throw new ConfigException('No namespace has been set for the session handler');
+			throw new ConfigException('No namespace has been set for the session handler: ' . $configName);
 		}
 		$this->namespace = $config['namespace'];
 		$this->lifetime = (isset($config['lifetime']) ? (int)$config['lifetime'] : self::DEFAULT_LIFETIME);

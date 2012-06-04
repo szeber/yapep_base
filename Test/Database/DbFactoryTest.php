@@ -23,8 +23,8 @@ class DbFactoryTest extends \PHPUnit_Framework_TestCase {
 		parent::setUp();
 		$this->config = Config::getInstance();
 		$this->config->set(array(
-			'application.database.test.rw.backendType' => DbFactory::BACKEND_TYPE_SQLITE,
-			'application.database.test.rw.path'        => ':memory:',
+			'resource.database.test.rw.backendType' => DbFactory::BACKEND_TYPE_SQLITE,
+			'resource.database.test.rw.path'        => ':memory:',
 
 		));
 	}
@@ -68,8 +68,8 @@ class DbFactoryTest extends \PHPUnit_Framework_TestCase {
 		$this->setExpectedException('\YapepBase\Exception\DatabaseException', 'Invalid database config');
 
 		$this->config->set(array(
-			'application.database.test2.rw.backendType' => DbFactory::BACKEND_TYPE_SQLITE,
-			'application.database.test2.rw.pah'        => ':memory:',
+			'resource.database.test2.rw.backendType' => DbFactory::BACKEND_TYPE_SQLITE,
+			'resource.database.test2.rw.pah'        => ':memory:',
 		));
 
 		DbFactory::getConnection('test2', DbFactory::TYPE_READ_WRITE);
@@ -82,7 +82,7 @@ class DbFactoryTest extends \PHPUnit_Framework_TestCase {
 		$this->setExpectedException('\YapepBase\Exception\DatabaseException', 'Invalid database config');
 
 		$this->config->set(array(
-			'application.database.test2.rw.path'        => ':memory:',
+			'resource.database.test2.rw.path'        => ':memory:',
 		));
 
 		DbFactory::getConnection('test2', DbFactory::TYPE_READ_WRITE);
@@ -95,7 +95,7 @@ class DbFactoryTest extends \PHPUnit_Framework_TestCase {
 		$this->setExpectedException('\YapepBase\Exception\DatabaseException', 'Invalid database config');
 
 		$this->config->set(array(
-			'application.database.test2.rw.backendType' => 'invalid',
+			'resource.database.test2.rw.backendType' => 'invalid',
 		));
 
 		DbFactory::getConnection('test2', DbFactory::TYPE_READ_WRITE);

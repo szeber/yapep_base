@@ -30,8 +30,8 @@ class ConfigRouterTest extends ArrayRouterTest {
 	 */
 	protected function setUp() {
 		parent::setUp();
-		Config::getInstance()->set('test.routes', $this->routes);
-		Config::getInstance()->set('test.badRoutes', 'test');
+		Config::getInstance()->set('resource.routing.routes', $this->routes);
+		Config::getInstance()->set('resource.routing.badRoutes', 'test');
 	}
 
 	/**
@@ -52,7 +52,7 @@ class ConfigRouterTest extends ArrayRouterTest {
 	 * @return \YapepBase\Router\ConfigRouter
 	 */
 	protected function getRouter(
-		$target = '', $method = IRequest::METHOD_HTTP_GET, &$request = null, $configName = 'test.routes'
+		$target = '', $method = IRequest::METHOD_HTTP_GET, &$request = null, $configName = 'routes'
 	) {
 		$request = new RequestMock(preg_replace('/^\s*\[[^]]*\]/', '', $target), $method);
 		return new ConfigRouter($request, $configName);
@@ -65,6 +65,6 @@ class ConfigRouterTest extends ArrayRouterTest {
 		$this->setExpectedException('\YapepBase\Exception\RouterException', '', RouterException::ERR_ROUTE_CONFIG);
 
 		$request = null;
-		$this->getRouter('', IRequest::METHOD_HTTP_GET, $request, 'test.badRoutes');
+		$this->getRouter('', IRequest::METHOD_HTTP_GET, $request, 'badRoutes');
 	}
  }

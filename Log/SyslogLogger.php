@@ -23,9 +23,6 @@ use YapepBase\Exception\ConfigException;
  *         <li>facility: The facility to use for logging {@uses \YapepBase\SyslogLogger\SyslogLogger::LOG_*}</li>
  *         <li>includeSapiName: If TRUE, the SAPI's name will be appended to the applicationIdent. Optional.</li>
  *         <li>addPid: If TRUE, the current PID will be logged too. Optional.</li>
- *         <li>printError: If TRUE, the log message will also be printed to STDERR. Optional.</li>
- *         <li>console: If TRUE, the message will be written to the sytem console,
- *             if there is an error while sending. Optional</li>
  *     </ul>
  *
  * @package    YapepBase

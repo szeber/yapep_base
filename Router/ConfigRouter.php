@@ -20,6 +20,9 @@ use YapepBase\Request\IRequest;
  * Routes a request based on an array stored in a config variable.
  * The config variable's structure should match the config for an ArrayRouter {@see \YapepBase\Router\ArrayRouter}.
  *
+ * Configuration variable's name should be set in the format:
+ * <b>resource.storage.&lt;configName&gt;
+ *
  * @package    YapepBase
  * @subpackage Router
  */
@@ -34,9 +37,10 @@ class ConfigRouter extends ArrayRouter {
 	 * @throws RouterException   On error
 	 */
 	public function __construct(IRequest $request, $configName) {
-		$routes = Config::getInstance()->get($configName, false);
+		$routes = Config::getInstance()->get('resource.routing.' . $configName, false);
 		if (!is_array($routes)) {
-			throw new RouterException('No route config found', RouterException::ERR_ROUTE_CONFIG);
+			throw new RouterException('No route config found for name: ' . $configName,
+				RouterException::ERR_ROUTE_CONFIG);
 		}
 		parent::__construct($request, $routes);
 	}
