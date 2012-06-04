@@ -33,7 +33,5 @@ if (file_exists(VENDOR_DIR . '/composer/autoload_namespaces.php')) {
 	}
 }
 $autoloader->register();
-		var_dump('here');
-
 
 unset($autoloader);
