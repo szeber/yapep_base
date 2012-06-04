@@ -1,0 +1,13 @@
+{
+    "name": "szeber/yapep_base",
+    "description": "YAPEP Base framework",
+    "require": {
+        "pimple/pimple": "1.0.0"
+    },
+    "authors": [
+        {
+            "name": "Zsolt Szeberenyi",
+            "email": "szeber@yapep.org"
+        }
+    ]
+}

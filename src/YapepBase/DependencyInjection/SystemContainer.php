@@ -21,7 +21,6 @@ use YapepBase\Event\EventHandlerRegistry;
 use YapepBase\Response\IResponse;
 use YapepBase\Request\IRequest;
 use YapepBase\ErrorHandler\ErrorHandlerRegistry;
-use YapepBase\Lib\Pimple\Pimple;
 use YapepBase\Log\Message\ErrorMessage;
 use YapepBase\Debugger\IDebugger;
 use YapepBase\View\ViewDo;
@@ -34,7 +33,7 @@ use YapepBase\Mime\MimeType;
  * @package    YapepBase
  * @subpackage DependencyInjection
  */
-class SystemContainer extends Pimple {
+class SystemContainer extends \Pimple {
 
 	// Container keys
 	/** Error log message key. */
