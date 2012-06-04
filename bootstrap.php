@@ -20,15 +20,18 @@ if (!\defined('VENDOR_DIR')) {
 	define('VENDOR_DIR', dirname(BASE_DIR) . '/vendor');
 }
 
-/** Require the vendor autoloader */
-require_once VENDOR_DIR . '/autoload.php';
-
 /** Require the simple autoloader */
 require_once BASE_DIR . '/YapepBase/Autoloader/AutoloaderBase.php';
 require_once BASE_DIR . '/YapepBase/Autoloader/SimpleAutoloader.php';
 require_once BASE_DIR . '/YapepBase/Autoloader/AutoloaderRegistry.php';
 $autoloader = new \YapepBase\Autoloader\SimpleAutoloader();
 $autoloader->setClassPath(array(BASE_DIR));
+if (file_exists(VENDOR_DIR . '/composer/autoload_namespaces.php')) {
+	$vendorClasspaths = require_once VENDOR_DIR . '/composer/autoload_namespaces.php';
+	if (!empty($vendorClasspaths) && is_array($vendorClasspaths)) {
+		$autoloader->addClassPath(array_values($vendorClasspaths));
+	}
+}
 $autoloader->register();
 
 

@@ -41,14 +41,18 @@ abstract class AutoloaderBase {
 	}
 
 	/**
-	 * Add a single directory to the list of dirctories to be tried on class loading.
+	 * Add a single directory or an array of directories to the list of dirctories to be tried on class loading.
 	 *
-	 * @param string $directory   The directory.
+	 * @param string|array $directory   The directory, or array of directories.
 	 *
 	 * @return AutoloaderBase
 	 */
 	public function addClassPath($directory) {
-		$this->classpath[] = $directory;
+		if (is_array($directory)) {
+			$this->classpath = array_merge($this->classpath, $directory);
+		} else {
+			$this->classpath[] = $directory;
+		}
 	}
 
 	/**
