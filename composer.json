@@ -4,7 +4,10 @@
     "require": {
         "pimple/pimple": "1.0.0"
     },
-    "authors": [
+	"autoload": {
+		"psr-0": { "YapepBase": "src/YapepBase" }
+	},
+	"authors": [
         {
             "name": "Zsolt Szeberenyi",
             "email": "szeber@yapep.org"
