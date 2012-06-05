@@ -8,11 +8,11 @@
  * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
-
 namespace YapepBase\DependencyInjection;
 
 
 use YapepBase\Debugger\IDebugger;
+use YapepBase\DependencyInjection\Container;
 use YapepBase\ErrorHandler\ErrorHandlerRegistry;
 use YapepBase\Event\EventHandlerRegistry;
 use YapepBase\Exception\ViewException;
@@ -28,15 +28,13 @@ use YapepBase\Session\SessionRegistry;
 use YapepBase\Storage\IStorage;
 use YapepBase\View\ViewDo;
 
-
 /**
  * Generic DI container implementation used in the framework.
  *
  * @package    YapepBase
  * @subpackage DependencyInjection
  */
-class SystemContainer extends Pimple {
-	// Container keys
+class SystemContainer extends Container {
 	/** Error log message key. */
 	const KEY_ERROR_LOG_MESSAGE = 'errorLogMessage';
 	/** Error handler registry key. */
@@ -438,7 +436,7 @@ class SystemContainer extends Pimple {
 	 * @param string $name   The name of the DAO class to return.
 	 *                       (Without the namespace and Dao suffix)
 	 *
-	 * @return \FstCommon\Dao\AbstractDao
+	 * @return \YapepBase\Dao\AbstractDao
 	 *
 	 * @throws \YapepBase\Exception\DiException If the DAO was not found
 	 */
