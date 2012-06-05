@@ -144,7 +144,6 @@ class SystemContainer extends \Pimple {
 		});
 
 		$this->searchNamespaces[self::NAMESPACE_SEARCH_BO] = array();
-		$this->searchNamespaces[self::NAMESPACE_SEARCH_DO] = array();
 		$this->searchNamespaces[self::NAMESPACE_SEARCH_DAO] = array();
 	}
 
