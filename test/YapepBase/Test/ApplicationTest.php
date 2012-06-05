@@ -54,11 +54,6 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals($response, $this->object->getResponse());
 	}
 
-	public function testGetErrorHandlerRegistry() {
-		$this->assertInstanceOf('\YapepBase\ErrorHandler\ErrorHandlerRegistry',
-			$this->object->getErrorHandlerRegistry());
-	}
-
 	public function testGetI18nTranslator() {
 		try {
 			$this->object->getI18nTranslator();

@@ -226,15 +226,6 @@ class Application {
 	}
 
 	/**
-	 * Returns the errorhandler container instance
-	 *
-	 * @return \YapepBase\ErrorHandler\ErrorHandlerRegistry
-	 */
-	public function getErrorHandlerRegistry() {
-		return $this->errorHandlerRegistry;
-	}
-
-	/**
 	 * Returns the configured i18n translator instance, or throws an exception if none is configured.
 	 *
 	 * @return \YapepBase\I18n\ITranslator   The instance.

@@ -42,7 +42,7 @@ abstract class BatchScript {
 		$application = Application::getInstance();
 		$eventHandlerRegistry = $application->getDiContainer()->getEventHandlerRegistry();
 		try {
-			$container = Application::getInstance()->getDiContainer();
+			$container = $application->getDiContainer();
 			$container[SystemContainer::KEY_VIEW_DO] = $container->share(function($container) {
 				return new ViewDo(MimeType::PLAINTEXT);
 			});
@@ -51,7 +51,7 @@ abstract class BatchScript {
 			$instance = new static();
 			$instance->runScript();
 		} catch (\Exception $exception) {
-			Application::getInstance()->getErrorHandlerRegistry()->handleException($exception);
+			$application->getDiContainer()->getErrorHandlerRegistry()->handleException($exception);
 		}
 		$eventHandlerRegistry->raise(new Event(Event::TYPE_APPFINISH));
 	}

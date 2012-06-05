@@ -113,9 +113,9 @@ class SystemContainer extends Container {
 		$this[self::KEY_ERROR_LOG_MESSAGE] = function($container) {
 			return new ErrorMessage();
 		};
-		$this[self::KEY_ERROR_HANDLER_REGISTRY] = function($container) {
+		$this[self::KEY_ERROR_HANDLER_REGISTRY] = $this->share(function($container) {
 			return new ErrorHandlerRegistry();
-		};
+		});
 		$this[self::KEY_EVENT_HANDLER_REGISTRY] = $this->share(function($container) {
 			return new EventHandlerRegistry();
 		});

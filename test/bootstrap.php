@@ -12,7 +12,8 @@ include_once(__DIR__ . '/../bootstrap.php');
 
 define('TEST_DIR', __DIR__);
 
-\YapepBase\Application::getInstance()->getErrorHandlerRegistry()->addErrorHandler(new \YapepBase\ErrorHandler\StrictErrorHandler());
+\YapepBase\Application::getInstance()->getDiContainer()->getErrorHandlerRegistry()
+	->addErrorHandler(new \YapepBase\ErrorHandler\StrictErrorHandler());
 
 $autoloader = new \YapepBase\Autoloader\SimpleAutoloader();
 $autoloader->addClassPath(TEST_DIR);
