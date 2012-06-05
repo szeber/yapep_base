@@ -62,7 +62,7 @@ use YapepBase\Exception\I18n\TranslationNotFoundException;
  * @package    YapepBase
  * @subpackage I18n
  */
-class Translator {
+class Translator implements ITranslator {
 
 	/** In case of non-fatal translation errors an exception will be thrown. */
 	const ERROR_MODE_EXCEPTION = 'exception';
@@ -140,11 +140,11 @@ class Translator {
 		$this->storage             = $storage;
 
 		$this->setConfig($configName);
-		$this->setDefaultLanguage($defaultLanguage);
+		$this->defaultLanguage = $defaultLanguage;
 	}
 
 	/**
-	 * Sets up the
+	 * Sets up the object from the configuration.
 	 *
 	 * @param string $configName   Name of the I18n configuration.
 	 *
@@ -174,26 +174,6 @@ class Translator {
 	}
 
 	/**
-	 * Sets the default language.
-	 *
-	 * @param string $defaultLanguage   The default language.
-	 *
-	 * @return void
-	 */
-	public function setDefaultLanguage($defaultLanguage) {
-		$this->defaultLanguage = $defaultLanguage;
-	}
-
-	/**
-	 * Returns the default language.
-	 *
-	 * @return string
-	 */
-	public function getDefaultLanguage() {
-		return $this->defaultLanguage;
-	}
-
-	/**
 	 * Translates the string.
 	 *
 	 * @param string $sourceClass   The source class (with the namespace).
@@ -209,7 +189,7 @@ class Translator {
 	 */
 	public function translate($sourceClass, $string, array $params = array(), $language = null) {
 		if (empty($language)) {
-			$language = $this->getDefaultLanguage();
+			$language = $this->defaultLanguage;
 		}
 		$sourceKey = $this->getSourceKey($sourceClass, $language);
 		if (!isset($this->dictionaryCache[$sourceKey])) {

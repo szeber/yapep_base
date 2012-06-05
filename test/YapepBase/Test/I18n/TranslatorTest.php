@@ -94,19 +94,6 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * Tests the language setting functionality
-	 *
-	 * @return void
-	 */
-	public function testLanguageSetting() {
-		$translator = new Translator($this->storageMock, 'en', 'default');
-		$this->assertSame('en', $translator->getDefaultLanguage());
-
-		$translator->setDefaultLanguage('de');
-		$this->assertSame('de', $translator->getDefaultLanguage());
-	}
-
-	/**
 	 * Tests the translation functionality
 	 *
 	 * @return void
