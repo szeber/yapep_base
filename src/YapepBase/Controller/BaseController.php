@@ -164,7 +164,7 @@ abstract class BaseController implements IController {
 	 *
 	 * @throws \Exception   If the key already exists.
 	 */
-	public function setToView($nameOrData, $value = null) {
+	protected function setToView($nameOrData, $value = null) {
 		Application::getInstance()->getDiContainer()->getViewDo()->set($nameOrData, $value);
 	}
 
@@ -178,7 +178,8 @@ abstract class BaseController implements IController {
 	 * @return string
 	 */
 	protected function _($string, $parameters = array(), $language = null) {
-		return Application::getInstance()->getI18nTranslator()->translate(__CLASS__, $string, $parameters, $language);
+		return Application::getInstance()->getI18nTranslator()->translate(get_class($this), $string, $parameters,
+			$language);
 	}
 
 }

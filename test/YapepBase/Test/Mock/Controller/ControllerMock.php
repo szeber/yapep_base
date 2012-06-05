@@ -33,8 +33,16 @@ class ControllerMock extends \YapepBase\Controller\BaseController {
 		$this->action = $action;
 	}
 
-	public function doRedirect($controller = 'Mock', $action = 'RedirectTarget') {
-		$this->internalRedirect($controller, $action);
+	public function internalRedirect($controllerName, $action) {
+		parent::internalRedirect($controllerName, $action);
+	}
+
+	public function setToView($nameOrData, $value = null) {
+		parent::setToView($nameOrData, $value);
+	}
+
+	public function _($string, $parameters = array(), $language = null) {
+		return parent::_($string, $parameters, $language);
 	}
 
 	public function doRedirectTarget() {
