@@ -7,7 +7,7 @@
 	    "pimple/pimple": "1.0.0"
     },
 	"autoload": {
-		"psr-0": { "YapepBase": "src/YapepBase" }
+		"psr-0": { "YapepBase": "src/" }
 	},
 	"authors": [
         {
