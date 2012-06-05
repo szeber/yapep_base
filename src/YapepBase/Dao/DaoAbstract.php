@@ -16,7 +16,7 @@ namespace YapepBase\Dao;
  * @package    YapepBase
  * @subpackage Dao
  */
-abstract class AbstractDao {
+abstract class DaoAbstract {
 	/** Interval unit for day. */
 	const INTERVAL_UNIT_DAY = 'day';
 	/** Interval unit for month. */
