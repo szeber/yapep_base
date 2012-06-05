@@ -23,35 +23,27 @@ use YapepBase\Event\IEventHandler;
 class EventHandlerMock implements IEventHandler{
 
 	/**
-	 * Stores the handled event
+	 * Stores the handled events
 	 *
-	 * @var \YapepBase\Event\Event
+	 * @var array
 	 */
-	protected $lastHandledEvent;
-
-	/**
-	 * Stores the number of event handlings.
-	 *
-	 * @var unknown_type
-	 */
-	protected $handleCounts = 0;
+	public $handledEvents = array();
 
 	/**
 	 * (non-PHPdoc)
 	 * @see YapepBase\Event.IEventHandler::handleEvent()
 	 */
 	public function handleEvent(Event $event) {
-		$this->lastHandledEvent = $event;
-		$this->handleCounts++;
+		$this->handledEvents[] = $event;
 	}
 
 	/**
-	 * Returns the last handled event
+	 * Returns the last handled event or FALSE if there are no handled events.
 	 *
-	 * @return \YapepBase\Event\Event
+	 * @return \YapepBase\Event\Event|bool
 	 */
 	public function getLastHandledEvent() {
-		return $this->lastHandledEvent;
+		return end($this->handledEvents);
 	}
 
 	/**
@@ -60,6 +52,6 @@ class EventHandlerMock implements IEventHandler{
 	 * @return int
 	 */
 	public function getHandleCounts() {
-		return $this->handleCounts;
+		return count($this->handledEvents);
 	}
 }

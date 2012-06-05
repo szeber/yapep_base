@@ -66,10 +66,15 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase {
 		} catch (\YapepBase\Exception\Exception $exception) {
 		}
 
-		$translator = new \YapepBase\I18n\Translator(new \YapepBase\Test\Mock\Storage\StorageMock(true, true), 'en',
-			'test');
+		$translator = new \YapepBase\Test\Mock\I18n\TranslatorMock();
 		$this->object->setI18nTranslator($translator);
 		$this->assertSame($translator, $this->object->getI18nTranslator(), 'Invalid translator is returned');
+		$this->object->clearI18nTranslator();
+		try {
+			$this->object->getI18nTranslator();
+			$this->fail('No exception is thrown if getting a translator after clearing it');
+		} catch (\YapepBase\Exception\Exception $exception) {
+		}
 	}
 
 	public function testRun() {

@@ -6,6 +6,7 @@ use YapepBase\Exception\RedirectException;
 
 use YapepBase\DependencyInjection\SystemContainer;
 use YapepBase\Application;
+use YapepBase\Test\Mock\Controller\MockController;
 
 class BaseControllerTest extends \PHPUnit_Framework_TestCase {
 
@@ -13,16 +14,29 @@ class BaseControllerTest extends \PHPUnit_Framework_TestCase {
 
 	protected function setUp() {
 		parent::setUp();
-		$this->originalDiContainer = Application::getInstance()->getDiContainer();
+		$application               = Application::getInstance();
+		$this->originalDiContainer = $application->getDiContainer();
 		$diContainer = new SystemContainer();
 		$diContainer->addSearchNamespace(SystemContainer::NAMESPACE_SEARCH_CONTROLLER,
 			'\YapepBase\Test\Mock\Controller');
-		Application::getInstance()->setDiContainer($diContainer);
+		$application->setDiContainer($diContainer);
+		$application->setI18nTranslator(new \YapepBase\Test\Mock\I18n\TranslatorMock(
+			function($sourceClass, $string, $params, $language) {
+				return json_encode(array(
+					'class'    => $sourceClass,
+					'string'   => $string,
+					'params'   => $params,
+					'language' => $language,
+				));
+			}
+		));
 	}
 
 	protected function tearDown() {
 		parent::tearDown();
-		Application::getInstance()->setDiContainer($this->originalDiContainer);
+		$application = Application::getInstance();
+		$application->setDiContainer($this->originalDiContainer);
+		$application->clearI18nTranslator();
 	}
 
 	public function testRun() {
@@ -65,8 +79,11 @@ class BaseControllerTest extends \PHPUnit_Framework_TestCase {
 		$controller->run('test');
 		$this->assertEquals('view test string', $response->getRenderedBody());
 
+		$controller->setAction(function(MockController $controller) {
+			$controller->internalRedirect('Mock', 'RedirectTarget');
+		});
 		try {
-			$controller->run('redirect');
+			$controller->run('test');
 			$this->fail('No redirectException is thrown');
 		} catch (RedirectException $exception) {
 		}
@@ -82,10 +99,22 @@ class BaseControllerTest extends \PHPUnit_Framework_TestCase {
 
 	public function testSetToView() {
 		$controller = $this->getController();
-		$controller->setAction(function(BaseController $instance) {
+		$controller->setAction(function(MockController $instance) {
 			$instance->setToView('test', 'test value');
 		});
 		$controller->run('test');
 		$this->assertEquals('test value', Application::getInstance()->getDiContainer()->getViewDo()->get('test'));
+	}
+
+	public function testTranslation() {
+		$controller = $this->getController();
+		$expectedResult = array(
+			'class' => 'YapepBase\Test\Mock\Controller\MockController',
+			'string' => 'test',
+			'params' => array('testParam' => 'testValue'),
+			'language' => 'en',
+		);
+		$this->assertSame($expectedResult, json_decode($controller->_('test', array('testParam' => 'testValue'), 'en'),
+			true), 'The translator method does not return the expected result');
 	}
 }
