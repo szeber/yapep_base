@@ -8,7 +8,7 @@
  * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
-namespace FstCommon\Dao;
+namespace YapepBase\Dao;
 
 /**
  * Base abstract DAO which should be extended by every DAO class.
