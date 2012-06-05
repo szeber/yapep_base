@@ -52,8 +52,8 @@ abstract class MysqlTable extends DbTable {
 	/**
 	 * Creates a param list what can be used in prepared statements for inserting rows.
 	 *
-	 * @param array  $data        The data what will be used in the query (Can be a record or a collection of records).
-	 * @param array  $paramList   The list of the params(what can be concatenated to the query) will be populated here
+	 * @param array $data        The data what will be used in the query (Can be a record or a collection of records).
+	 * @param array $paramList   The list of the params(what can be concatenated to the query) will be populated here
 	 *                            (outgoing param).
 	 *
 	 * @return array   An associative array where the keys are
@@ -90,8 +90,8 @@ abstract class MysqlTable extends DbTable {
 	/**
 	 * Creates a param list what can be used in prepared statements for updating rows.
 	 *
-	 * @param array  $data        The data what will be used in the query.
-	 * @param array  $paramList   The list of the params(what can be concatenated to the query) will be populated here
+	 * @param array $data        The data what will be used in the query.
+	 * @param array $paramList   The list of the params(what can be concatenated to the query) will be populated here
 	 *                            (outgoing param).
 	 *
 	 * @return array   An associative array where the keys are
@@ -116,8 +116,8 @@ abstract class MysqlTable extends DbTable {
 	/**
 	 * Creates a param list what can be used in the WHERE block of a prepared statement.
 	 *
-	 * @param array  $data        The data what will be used in the query.
-	 * @param array  $paramList   The list of the params(what can be concatenated to the query) will be populated here
+	 * @param array $data        The data what will be used in the query.
+	 * @param array $paramList   The list of the params(what can be concatenated to the query) will be populated here
 	 *                            (outgoing param).
 	 *
 	 * @return array   An associative array where the keys are
@@ -227,7 +227,7 @@ abstract class MysqlTable extends DbTable {
 			UPDATE
 				' . $this->quoteEntity($this->tableName) . '
 			SET
-				' . implode(', ',  $paramListUpdate) . '
+				' . implode(', ', $paramListUpdate) . '
 			WHERE
 				' . (empty($conditions)
 					? 'TRUE'

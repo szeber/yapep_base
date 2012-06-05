@@ -168,7 +168,8 @@ abstract class DbTable {
 	 *
 	 * @param array $insertData      The record what should be inserted. The keys are the name of the fields,
 	 *                               the values are the values of the fields.
-	 * @param array $updateData      In case of integrity constraint violation, this array will be used to update the row.
+	 * @param array $updateData      In case of integrity constraint violation,
+	 *                               this array will be used to update the row.
 	 * @param int   &$lastInsertId   Automaticly generated id of the inserted row(If there's any in the table).
 	 *                               If TRUE, the value will be populated here (Outgoing parameter).
 	 *
@@ -252,11 +253,11 @@ abstract class DbTable {
 	}
 
 	/**
-	 * Visszaadja a felteteleknek megfelelo rekordokat lapozhato modon lekerdezve. Csak egyenloseg alapjan keres.
+	 * Returns the rows what meets the given conditions for pagination. Only search by equality.
 	 *
-	 * @param array  $conditions     The conditions, the keys are the fields and the values are the values of the fields.
+	 * @param array  $conditions     The conditions, the keys are the fields and the values are the values.
 	 * @param string $orderBy        The name of thee field, what should be used for ordering the result.
-	 * @param string $direction      The direction of the order ({@link DbTable::ORDER_ASC}, {@link DbTable::ORDER_DESC}).
+	 * @param string $direction      The direction of the order ({@link DbTable::ORDER_*}).
 	 * @param int    $pageNumber     The number of the requested page (indexed from 1).
 	 * @param int    $itemsPerPage   How many rows should be returned at a time.
 	 * @param bool   &$itemCount     If its TRUE than the count of rows met the given conditions will be populated.
