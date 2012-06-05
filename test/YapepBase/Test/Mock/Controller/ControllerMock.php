@@ -5,7 +5,7 @@ namespace YapepBase\Test\Mock\Controller;
 /**
  * @codeCoverageIgnore
  */
-class MockController extends \YapepBase\Controller\BaseController {
+class ControllerMock extends \YapepBase\Controller\BaseController {
 
 	/**
 	 * Set to true on every action run.

@@ -6,7 +6,7 @@ use YapepBase\Application;
 use YapepBase\Exception\RedirectException;
 use YapepBase\Test\Mock\Response\OutputMock;
 use YapepBase\Exception\ControllerException;
-use YapepBase\Test\Mock\Controller\HttpMockController;
+use YapepBase\Test\Mock\Controller\HttpControllerMock;
 use YapepBase\Request\HttpRequest;
 use YapepBase\Test\Mock\Response\ResponseMock;
 use YapepBase\Response\HttpResponse;
@@ -22,7 +22,7 @@ class HttpControllerTest extends \PHPUnit_Framework_TestCase {
 		try {
 			$request = new RequestMock('');
 			$response = new HttpResponse();
-			$o = new HttpMockController($request, $response);
+			$o = new HttpControllerMock($request, $response);
 			$this->fail('Passing a non-HTTP request to the HttpController should result in a ControllerException');
 		} catch (ControllerException $e) {
 			$this->assertEquals(ControllerException::ERR_INCOMPATIBLE_REQUEST, $e->getCode());
@@ -31,7 +31,7 @@ class HttpControllerTest extends \PHPUnit_Framework_TestCase {
 		try {
 			$request = new HttpRequest(array(), array(), array(), array('REQUEST_URI' => '/'), array(), array());
 			$response = new ResponseMock();
-			$o = new HttpMockController($request, $response);
+			$o = new HttpControllerMock($request, $response);
 			$this->fail('Passing a non-HTTP request to the HttpController should result in a ControllerException');
 		} catch (ControllerException $e) {
 			$this->assertEquals(ControllerException::ERR_INCOMPATIBLE_RESPONSE, $e->getCode());
@@ -39,14 +39,14 @@ class HttpControllerTest extends \PHPUnit_Framework_TestCase {
 
 		$request = new HttpRequest(array(), array(), array(), array('REQUEST_URI' => '/'), array(), array());
 		$response = new HttpResponse(new OutputMock());
-		$o = new HttpMockController($request, $response);
+		$o = new HttpControllerMock($request, $response);
 	}
 
 	function testRedirect() {
 		$request = new HttpRequest(array(), array(), array(), array('REQUEST_URI' => '/'), array(), array());
 		$out = new OutputMock();
 		$response = new HttpResponse($out);
-		$o = new HttpMockController($request, $response);
+		$o = new HttpControllerMock($request, $response);
 
 		try {
 			$o->testRedirect();
@@ -66,7 +66,7 @@ class HttpControllerTest extends \PHPUnit_Framework_TestCase {
 		$request = new HttpRequest(array(), array(), array(), array('REQUEST_URI' => '/'), array(), array());
 		$out = new OutputMock();
 		$response = new HttpResponse($out);
-		$o = new HttpMockController($request, $response);
+		$o = new HttpControllerMock($request, $response);
 
 		try {
 			$o->testRedirectToRoute();

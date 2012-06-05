@@ -7,7 +7,7 @@ use \YapepBase\View\Template;
 /**
  * @codeCoverageIgnore
  */
-class MockTemplate extends \YapepBase\View\TemplateAbstract {
+class TemplateMock extends \YapepBase\View\TemplateAbstract {
 	protected $required = array('var1');
 	protected $var1;
 	protected $var2;

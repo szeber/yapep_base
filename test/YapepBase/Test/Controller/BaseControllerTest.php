@@ -77,7 +77,7 @@ class BaseControllerTest extends \PHPUnit_Framework_TestCase {
 		$request      = new \YapepBase\Test\Mock\Request\RequestMock('http://example.com/');
 		$output       = new \YapepBase\Test\Mock\Response\OutputMock();
 		$response     = new \YapepBase\Response\HttpResponse($output);
-		return new \YapepBase\Test\Mock\Controller\MockController($request, $response);
+		return new \YapepBase\Test\Mock\Controller\ControllerMock($request, $response);
 	}
 
 	public function testSetToView() {
