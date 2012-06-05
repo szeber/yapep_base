@@ -260,6 +260,15 @@ class Application {
 	}
 
 	/**
+	 * Removes the configured translator instance.
+	 *
+	 * @return void
+	 */
+	public function clearI18nTranslator() {
+		$this->i18nTranslator = null;
+	}
+
+	/**
 	 * Runs the request on the application
 	 *
 	 * @return void

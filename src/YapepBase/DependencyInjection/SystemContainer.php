@@ -35,7 +35,7 @@ use YapepBase\View\ViewDo;
  * @package    YapepBase
  * @subpackage DependencyInjection
  */
-class SystemContainer extends \Pimple {
+class SystemContainer extends Pimple {
 	// Container keys
 	/** Error log message key. */
 	const KEY_ERROR_LOG_MESSAGE = 'errorLogMessage';
