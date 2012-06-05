@@ -432,7 +432,7 @@ class CliUserInterfaceHelper {
 	 *
 	 * @return string
 	 */
-	protected function getGetoptShortList() {
+	public function getGetoptShortList() {
 		$switches = '';
 		foreach ($this->switches as $switchData) {
 			if (!empty($switchData['shortName'])) {
@@ -450,7 +450,7 @@ class CliUserInterfaceHelper {
 	 *
 	 * @return string
 	 */
-	protected function getGetoptLongList() {
+	public function getGetoptLongList() {
 		$switches = array();
 		foreach ($this->switches as $switch) {
 			if (!empty($switch['longName'])) {
@@ -471,6 +471,8 @@ class CliUserInterfaceHelper {
 	 * {@see http://php.net/getopt}
 	 *
 	 * @return array
+	 *
+	 * @codeCoverageIgnore   The getopt function can not be tested
 	 */
 	public function getParsedArgs() {
 		return getopt($this->getGetoptShortList(), $this->getGetoptLongList());
