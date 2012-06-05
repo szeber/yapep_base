@@ -421,7 +421,7 @@ class SystemContainer extends Container {
 	 * @param string $name   The name of the BO class to return.
 	 *                       (Without the namespace and Bo suffix)
 	 *
-	 * @return \YapepBase\BusinessObject\BoAbstract
+	 * @return \YapepBase\BusinessObject\AbstractBo
 	 *
 	 * @throws \YapepBase\Exception\DiException If the BO was not found
 	 */
@@ -436,7 +436,7 @@ class SystemContainer extends Container {
 	 * @param string $name   The name of the DAO class to return.
 	 *                       (Without the namespace and Dao suffix)
 	 *
-	 * @return \YapepBase\Dao\DaoAbstract
+	 * @return \YapepBase\Dao\AbstractDao
 	 *
 	 * @throws \YapepBase\Exception\DiException If the DAO was not found
 	 */

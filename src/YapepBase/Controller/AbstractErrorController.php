@@ -18,7 +18,7 @@ use YapepBase\Exception\ControllerException;
  * @package    YapepBase
  * @subpackage Controller
  */
-abstract class ErrorControllerAbstract extends HttpController {
+abstract class AbstractErrorController extends HttpController {
 
 	/**
 	 * Runs on page not found (404) errors

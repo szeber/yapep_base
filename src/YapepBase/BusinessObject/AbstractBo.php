@@ -16,7 +16,7 @@ use YapepBase\Exception\ParameterException;
 use YapepBase\Storage\IStorage;
 
 /**
- * BoAbstract class which should be extended by every Bo classes.
+ * AbstractBo class which should be extended by every Bo classes.
  *
  * Must have global config options affecting this class:
  * <ul>
@@ -26,7 +26,7 @@ use YapepBase\Storage\IStorage;
  * @package    YapepBase
  * @subpackage BusinessObject
  */
-abstract class BoAbstract {
+abstract class AbstractBo {
 
 	/** Cache key prefix for storing keys. */
 	const CACHE_KEY_FOR_KEYS_SUFFIX = 'bo.keys';
