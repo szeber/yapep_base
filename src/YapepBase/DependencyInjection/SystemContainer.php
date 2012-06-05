@@ -4,27 +4,29 @@
  *
  * @package      YapepBase
  * @subpackage   DependencyInjection
- * @author       Zsolt Szeberenyi <szeber@yapep.org>
  * @copyright    2011 The YAPEP Project All rights reserved.
  * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
 
 namespace YapepBase\DependencyInjection;
+
+
+use YapepBase\Debugger\IDebugger;
+use YapepBase\ErrorHandler\ErrorHandlerRegistry;
+use YapepBase\Event\EventHandlerRegistry;
 use YapepBase\Exception\ViewException;
 use YapepBase\Exception\ControllerException;
 use YapepBase\Exception\DiException;
 use YapepBase\Exception\Exception;
-use YapepBase\Session\SessionRegistry;
 use YapepBase\Log\LoggerRegistry;
-use YapepBase\Event\EventHandlerRegistry;
-use YapepBase\Response\IResponse;
-use YapepBase\Request\IRequest;
-use YapepBase\ErrorHandler\ErrorHandlerRegistry;
 use YapepBase\Log\Message\ErrorMessage;
-use YapepBase\Debugger\IDebugger;
-use YapepBase\View\ViewDo;
 use YapepBase\Mime\MimeType;
+use YapepBase\Request\IRequest;
+use YapepBase\Response\IResponse;
+use YapepBase\Session\SessionRegistry;
+use YapepBase\Storage\IStorage;
+use YapepBase\View\ViewDo;
 
 
 /**
@@ -34,7 +36,6 @@ use YapepBase\Mime\MimeType;
  * @subpackage DependencyInjection
  */
 class SystemContainer extends \Pimple {
-
 	// Container keys
 	/** Error log message key. */
 	const KEY_ERROR_LOG_MESSAGE = 'errorLogMessage';
@@ -55,10 +56,40 @@ class SystemContainer extends \Pimple {
 	/** Key containing the ViewDo. */
 	const KEY_VIEW_DO = 'viewDo';
 
-	/** Name of the namespace which holds the templates. */
-	const NAMESPACE_SEARCH_TEMPLATE = 'template';
-	/** Name of the namespace which holds the controllers. */
+	/**
+	 * Name of the namespace which holds the controllers.
+	 *
+	 * Responsible for handling the request, sanitize the input parameters
+	 * and to collect the data needed to the response.
+	 */
 	const NAMESPACE_SEARCH_CONTROLLER = 'controller';
+
+	/**
+	 * Name of the namespace which holds the Business Objects.
+	 *
+	 * BO layer is responsible to communicate between the Controller and DAO.
+	 * It should handle almost all kind of data manipulation, and data caching related to the application.
+	 */
+	const NAMESPACE_SEARCH_BO = 'bo';
+
+	/**
+	 * Name of the namespace which holds the Dao-s.
+	 *
+	 * Data Access Object, only responsible for reaching, modifying data (mostly Database)
+	 */
+	const NAMESPACE_SEARCH_DAO = 'dao';
+
+	/**
+	 * Name of the namespace which holds the templates.
+	 *
+	 * Only the view related logic can be implemented here.
+	 */
+	const NAMESPACE_SEARCH_TEMPLATE = 'template';
+
+	/**
+	 * @var IStorage   The storage used for caching data between the database and the application.
+	 */
+	protected $storageMiddleware;
 
 	/**
 	 * DebugConsole object.
@@ -111,6 +142,10 @@ class SystemContainer extends \Pimple {
 		$this[self::KEY_VIEW_DO] = $this->share(function($container) {
 			return new ViewDo(MimeType::HTML);
 		});
+
+		$this->searchNamespaces[self::NAMESPACE_SEARCH_BO] = array();
+		$this->searchNamespaces[self::NAMESPACE_SEARCH_DO] = array();
+		$this->searchNamespaces[self::NAMESPACE_SEARCH_DAO] = array();
 	}
 
 	/**
@@ -381,5 +416,58 @@ class SystemContainer extends \Pimple {
 			return false;
 		}
 		return $this->debugger;
+	}
+
+	/**
+	 * Returns a BO by it's name
+	 *
+	 * @param string $name   The name of the BO class to return.
+	 *                       (Without the namespace and Bo suffix)
+	 *
+	 * @return \YapepBase\BusinessObject\AbstractBo
+	 *
+	 * @throws \YapepBase\Exception\DiException If the BO was not found
+	 */
+	public function getBo($name) {
+		$fullClassName = $this->searchForClass(self::NAMESPACE_SEARCH_BO, $name . 'Bo');
+		return new $fullClassName();
+	}
+
+	/**
+	 * Returns a DAO by it's name
+	 *
+	 * @param string $name   The name of the DAO class to return.
+	 *                       (Without the namespace and Dao suffix)
+	 *
+	 * @return \FstCommon\Dao\AbstractDao
+	 *
+	 * @throws \YapepBase\Exception\DiException If the DAO was not found
+	 */
+	public function getDao($name) {
+		$fullClassName = $this->searchForClass(self::NAMESPACE_SEARCH_DAO, $name . 'Dao');
+		return new $fullClassName();
+	}
+
+	/**
+	 * Stores the given storage handler.
+	 *
+	 * @param IStorage $storage   The storage handler.
+	 *
+	 * @return void
+	 */
+	public function setMiddlewareStorage(IStorage $storage) {
+		$this->storageMiddleware = $storage;
+	}
+
+	/**
+	 * Returns the storage handler.
+	 *
+	 * @return bool|IStorage   The storage handler.
+	 */
+	public function getMiddlewareStorage() {
+		if (empty($this->storageMiddleware)) {
+			return false;
+		}
+		return $this->storageMiddleware;
 	}
 }
