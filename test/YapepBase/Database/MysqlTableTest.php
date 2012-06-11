@@ -60,11 +60,19 @@ class MysqlTableTest extends \PHPUnit_Framework_TestCase {
 		$rwUser     = getenv('YAPEPBASE_TEST_MYSQL_RW_USER');
 		$rwPassword = getenv('YAPEPBASE_TEST_MYSQL_RW_PASSWORD');
 		$rwDatabase = getenv('YAPEPBASE_TEST_MYSQL_RW_DATABASE');
+		$rwPort     = ((int)getenv('YAPEPBASE_TEST_MYSQL_RW_PORT') > 0
+			? (int)getenv('YAPEPBASE_TEST_MYSQL_RW_PORT')
+			: 3306
+		);
 
 		$roHost     = getenv('YAPEPBASE_TEST_MYSQL_RO_HOST');
 		$roUser     = getenv('YAPEPBASE_TEST_MYSQL_RO_USER');
 		$roPassword = getenv('YAPEPBASE_TEST_MYSQL_RO_PASSWORD');
 		$roDatabase = getenv('YAPEPBASE_TEST_MYSQL_RO_DATABASE');
+		$roPort     = ((int)getenv('YAPEPBASE_TEST_MYSQL_RO_PORT') > 0
+			? (int)getenv('YAPEPBASE_TEST_MYSQL_RO_PORT')
+			: 3306
+		);
 
 		parent::setUp();
 		$this->config = Config::getInstance();
@@ -75,6 +83,7 @@ class MysqlTableTest extends \PHPUnit_Framework_TestCase {
 			'resource.database.test.rw.password'        => $rwPassword,
 			'resource.database.test.rw.database'        => $rwDatabase,
 			'resource.database.test.rw.charset'         => 'utf8',
+			'resource.database.test.rw.port'            => $rwPort,
 
 			'resource.database.test.ro.backendType'     => 'mysql',
 			'resource.database.test.ro.host'            => $roHost,
@@ -82,6 +91,7 @@ class MysqlTableTest extends \PHPUnit_Framework_TestCase {
 			'resource.database.test.ro.password'        => $roPassword,
 			'resource.database.test.ro.database'        => $roDatabase,
 			'resource.database.test.ro.charset'         => 'utf8',
+			'resource.database.test.ro.port'            => $roPort,
 		));
 
 		$this->connection = DbFactory::getConnection('test', DbFactory::TYPE_READ_WRITE);

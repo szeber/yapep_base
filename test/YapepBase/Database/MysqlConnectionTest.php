@@ -46,22 +46,10 @@ class MysqlConnectionTest extends \PHPUnit_Framework_TestCase {
 			return;
 		}
 
-		$rwHost     = getenv('YAPEPBASE_TEST_MYSQL_RW_HOST');
-		$rwUser     = getenv('YAPEPBASE_TEST_MYSQL_RW_USER');
-		$rwPassword = getenv('YAPEPBASE_TEST_MYSQL_RW_PASSWORD');
-		$rwDatabase = getenv('YAPEPBASE_TEST_MYSQL_RW_DATABASE');
-
-		$config = array(
-			'host'            => $rwHost,
-			'user'            => $rwUser,
-			'password'        => $rwPassword,
-			'database'        => $rwDatabase,
-			'charset'         => 'utf8',
-		);
-
-		$this->connection = new MysqlConnection($config, 'test', '_');
+		$this->connection = $this->getConnection();
 
 		$this->connection->query('DROP TABLE IF EXISTS test');
+		$this->connection->query('DROP TABLE IF EXISTS test2');
 		$createTestTable = '
 			CREATE TABLE test (
 				id          BIGINT(20)   UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -77,6 +65,33 @@ class MysqlConnectionTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * Creates a new MysqlConnection
+	 *
+	 * @param array $extraOptions   An array containing any extra configuration options.
+	 *
+	 * @return \YapepBase\Database\MysqlConnection
+	 */
+	protected function getConnection(array $extraOptions = array()) {
+		$rwHost     = getenv('YAPEPBASE_TEST_MYSQL_RW_HOST');
+		$rwUser     = getenv('YAPEPBASE_TEST_MYSQL_RW_USER');
+		$rwPassword = getenv('YAPEPBASE_TEST_MYSQL_RW_PASSWORD');
+		$rwDatabase = getenv('YAPEPBASE_TEST_MYSQL_RW_DATABASE');
+		$rwPort     = (int)getenv('YAPEPBASE_TEST_MYSQL_RW_PORT');
+		$rwPort     = (empty($rwPort) ? 3306 : $rwPort);
+
+		$config = array(
+			'host'            => $rwHost,
+			'user'            => $rwUser,
+			'password'        => $rwPassword,
+			'database'        => $rwDatabase,
+			'charset'         => 'utf8',
+			'port'            => $rwPort,
+		);
+
+		return new MysqlConnection(array_merge($config, $extraOptions), 'test', '_');
+	}
+
+	/**
 	 * Cleans up the environment after running a test.
 	 */
 	protected function tearDown() {
@@ -85,6 +100,7 @@ class MysqlConnectionTest extends \PHPUnit_Framework_TestCase {
 		}
 
 		$this->connection->query('DROP TABLE IF EXISTS test');
+		$this->connection->query('DROP TABLE IF EXISTS test2');
 
 		parent::tearDown();
 	}
@@ -299,4 +315,32 @@ class MysqlConnectionTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals('\'o\\\'neill\'', $this->connection->quote('o\'neill'),
 			'Error quoting string with quote mark');
 	}
+
+	/**
+	 * Tests connections with several connection options
+	 *
+	 * @return void
+	 */
+	public function testConnectionOptions() {
+		$connection = $this->getConnection(array('useTraditionalStrictMode' => true));
+		$this->assertNotEmpty($connection->query('SELECT @@SESSION.sql_mode')->fetchColumn(),
+			'The session sql mode is empty on the traditional mode connection');
+
+		$connection = $this->getConnection(array('timezone' =>'Europe/Budapest'));
+		$this->assertEquals('Europe/Budapest', $connection->query('SELECT @@SESSION.time_zone')->fetchColumn(),
+			'The time zone has not been set');
+
+		$connection = $this->getConnection(array('timezone' =>'Europe/Budapest'));
+		$this->assertEquals('Europe/Budapest', $connection->query('SELECT @@SESSION.time_zone')->fetchColumn(),
+			'The time zone has not been set');
+
+		$connection = $this->getConnection(array(
+			'options' => array(
+				\PDO::MYSQL_ATTR_INIT_COMMAND => 'SET time_zone=\'Europe/Budapest\'',
+			)
+		));
+		$this->assertEquals('Europe/Budapest', $connection->query('SELECT @@SESSION.time_zone')->fetchColumn(),
+			'The init command was not run');
+	}
+
 }

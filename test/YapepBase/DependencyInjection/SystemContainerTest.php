@@ -56,4 +56,28 @@ class SystemContainerTest extends \PHPUnit_Framework_TestCase {
 		$sc->addSearchNamespace(SystemContainer::NAMESPACE_SEARCH_TEMPLATE, '\YapepBase\Mock\View');
 		$this->assertInstanceOf('\YapepBase\View\TemplateAbstract', $sc->getTemplate('Mock'));
 	}
+
+	public function testBo() {
+
+	}
+
+	public function testDao() {
+
+	}
+
+	public function testMiddlewareStorage() {
+
+	}
+
+	public function testDefaultErrorController() {
+
+	}
+
+	public function testLoggerRegistry() {
+
+	}
+
+	public function testDebugger() {
+
+	}
 }
