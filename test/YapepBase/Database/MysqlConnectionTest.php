@@ -332,7 +332,7 @@ class MysqlConnectionTest extends \PHPUnit_Framework_TestCase {
 
 		$connection = $this->getConnection(array(
 			'options' => array(
-				\PDO::MYSQL_ATTR_INIT_COMMAND => 'SET time_zone=\'UTC\'',
+				\PDO::MYSQL_ATTR_INIT_COMMAND => 'SET time_zone=\'UTC\';',
 			)
 		));
 		$this->assertEquals('UTC', $connection->query('SELECT @@SESSION.time_zone')->fetchColumn(),
