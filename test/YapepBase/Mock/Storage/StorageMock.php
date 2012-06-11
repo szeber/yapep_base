@@ -25,7 +25,7 @@ class StorageMock implements IStorage {
 
 	protected $ttlSupport;
 	protected $persistent;
-	protected $data;
+	public $data;
 
 	public function __construct($ttlSupport, $persistent, array $data = array()) {
 		$this->ttlSupport = $ttlSupport;

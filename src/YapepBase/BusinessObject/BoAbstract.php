@@ -106,14 +106,14 @@ abstract class BoAbstract {
 	 * @throws \YapepBase\Exception\StorageException     On error.
 	 * @throws \YapepBase\Exception\ParameterException   If TTL is set and not supported by the backend.
 	 */
-	public function setToStorage($key, $data, $ttl = 0) {
+	protected function setToStorage($key, $data, $ttl = 0) {
 		if (empty($key)) {
 			throw new ParameterException();
 		}
 
-		$key = $this->getKeyPrefix() . $key;
+		$storageKey = $this->getKeyPrefix() . $key;
 
-		$this->getStorage()->set($key, $data, $ttl);
+		$this->getStorage()->set($storageKey, $data, $ttl);
 
 		$this->addKey($key);
 	}
@@ -136,7 +136,10 @@ abstract class BoAbstract {
 
 		// If the given key is empty we have to purge everything
 		if (empty($key)) {
-			$keysToPurge = $keysStored;
+			$keyPrefix = $this->getKeyPrefix();
+			foreach ($keysStored as $storedKey) {
+				$keysToPurge[] = $keyPrefix . $storedKey;
+			}
 			$keysStored = array();
 		}
 		// If it ends with an asterix, purge all the keys beginning with the name
