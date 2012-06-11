@@ -57,27 +57,70 @@ class SystemContainerTest extends \PHPUnit_Framework_TestCase {
 		$this->assertInstanceOf('\YapepBase\View\TemplateAbstract', $sc->getTemplate('Mock'));
 	}
 
-	public function testBo() {
-
+	public function testGetBo() {
+		$sc = new SystemContainer();
+		try {
+			$sc->getBo('Mock');
+			$this->fail('Getting a BO with an empty search array should result a DiException');
+		} catch (\YapepBase\Exception\DiException $e) {
+			$this->assertEquals(\YapepBase\Exception\DiException::ERR_NAMESPACE_SEARCH_CLASS_NOT_FOUND, $e->getCode());
+		}
+		$sc->addSearchNamespace(SystemContainer::NAMESPACE_SEARCH_BO, '\YapepBase\Mock\BusinessObject');
+		$this->assertInstanceOf('\YapepBase\BusinessObject\BoAbstract', $sc->getBo('Mock'));
 	}
 
 	public function testDao() {
-
+		$sc = new SystemContainer();
+		try {
+			$sc->getDao('Mock');
+			$this->fail('Getting a DAO with an empty search array should result a DiException');
+		} catch (\YapepBase\Exception\DiException $e) {
+			$this->assertEquals(\YapepBase\Exception\DiException::ERR_NAMESPACE_SEARCH_CLASS_NOT_FOUND, $e->getCode());
+		}
+		$sc->addSearchNamespace(SystemContainer::NAMESPACE_SEARCH_DAO, '\YapepBase\Mock\Dao');
+		$this->assertInstanceOf('\YapepBase\Dao\DaoAbstract', $sc->getDao('Mock'));
 	}
 
 	public function testMiddlewareStorage() {
+		$sc = new SystemContainer();
+		try {
+			$sc->getMiddlewareStorage();
+			$this->fail('Getting a middleware storage without setting one first should result in a DiExceptiom');
+		} catch (\YapepBase\Exception\DiException $e) {
+			$this->assertEquals(\YapepBase\Exception\DiException::ERR_INSTANCE_NOT_SET, $e->getCode());
+		}
 
+		$storage = new \YapepBase\Mock\Storage\StorageMock(true, true);
+		$sc->setMiddlewareStorage($storage);
+
+		$this->assertSame($storage, $sc->getMiddlewareStorage(),
+			'The retrieved middleware storage is not the one that has been set.');
 	}
 
 	public function testDefaultErrorController() {
+		$sc = new SystemContainer();
+		$controller = $sc->getDefaultErrorController(
+			new \YapepBase\Request\HttpRequest(array(), array(), array(), array('REQUEST_URI' => '/'), array(),
+				array(), array()),
+			new \YapepBase\Response\HttpResponse(new \YapepBase\Mock\Response\OutputMock()));
 
+		$this->assertInstanceOf('\YapepBase\Controller\DefaultErrorController', $controller,
+			'The retrieved error controller is of invalid type');
 	}
 
 	public function testLoggerRegistry() {
-
+		$sc = new SystemContainer();
+		$this->assertInstanceOf('\YapepBase\Log\LoggerRegistry', $sc->getLoggerRegistry(),
+			'The retrieved logger registry is of the wrong type');
 	}
 
 	public function testDebugger() {
+		$sc = new SystemContainer();
+		$this->assertFalse($sc->getDebugger(), 'The getDebugger method should return FALSE if no debugger is set');
 
+		$debugger = new \YapepBase\Mock\Debugger\DebuggerMock();
+		$sc->setDebugger($debugger);
+
+		$this->assertSame($debugger, $sc->getDebugger(), 'The retrieved debugger is not the same instance');
 	}
 }
