@@ -94,13 +94,14 @@ class BatchScriptTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEmpty($this->errorHandler->handledErrors, 'The error handler contains errors before the test');
 
 		$eventHandler = $this->eventHandler;
-		BatchScriptMock::$executeClosure = function() use ($eventHandler) {
-			BatchScriptMock::$closureData = $eventHandler->handledEvents;
+		$script = new BatchScriptMock();
+		$script->executeClosure = function() use ($script, $eventHandler) {
+			$script->closureData = $eventHandler->handledEvents;
 		};
 
-		BatchScriptMock::run();
+		$script->run();
 
-		$this->assertEquals(1, count(BatchScriptMock::$closureData),
+		$this->assertEquals(1, count($script->closureData),
 			'Not 1 event has been triggered before the execute method is called');
 
 		$this->assertEquals(2, count($this->eventHandler->handledEvents),
@@ -117,11 +118,12 @@ class BatchScriptTest extends \PHPUnit_Framework_TestCase {
 	 * @return void
 	 */
 	public function testExceptionHandling() {
-		BatchScriptMock::$executeClosure = function() {
+		$script = new BatchScriptMock();
+		$script->executeClosure = function() {
 			throw new \YapepBase\Exception\Exception('test');
 		};
 
-		BatchScriptMock::run();
+		$script->run();
 
 		$this->assertEquals(2, count($this->eventHandler->handledEvents),
 			'Not 2 events have been triggered after completing the error run');
@@ -137,11 +139,8 @@ class BatchScriptTest extends \PHPUnit_Framework_TestCase {
 	 * @return void
 	 */
 	public function testViewDoHandling() {
-		BatchScriptMock::$executeClosure = function(BatchScriptMock $instance) {
-			$instance->setToView('test', 'testValue');
-		};
-
-		BatchScriptMock::run();
+		$script = new BatchScriptMock();
+		$script->setToView('test', 'testValue');
 
 		$this->assertSame('testValue', Application::getInstance()->getDiContainer()->getViewDo()->get('test'),
 			'The data stored in the view DO does not match.');

@@ -8,9 +8,6 @@
  * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
-// Set the ticks, so we can handle signals
-declare(ticks = 1);
-
 namespace YapepBase\Batch;
 
 use YapepBase\Config;
@@ -51,31 +48,6 @@ use YapepBase\Exception\ParameterException;
  * @subpackage Batch
  */
 abstract class LockingBatchScript extends BatchScript {
-
-	/** Help usage. */
-	const HELP_USAGE = 'help';
-
-	/**
-	 * The CliUserInterfaceHelper instance.
-	 *
-	 * @var CliUserInterfaceHelper
-	 */
-	protected $cliHelper;
-
-	/**
-	 * The index for the help usage.
-	 *
-	 * @var int
-	 */
-	protected $usageIndexes = array();
-
-	/**
-	 * The currently used usage.
-	 *
-	 * @var string
-	 */
-	protected $currentUsage;
-
 	/**
 	 * The full path of the PID file.
 	 *
@@ -98,58 +70,49 @@ abstract class LockingBatchScript extends BatchScript {
 	protected $lockFileDescriptor;
 
 	/**
-	 * Handle signals in the signal handler.
+	 * Called before the run process.
 	 *
-	 * @var bool
+	 * Please be cautious! In case of overriding, don't forget to call this method first.
+	 *
+	 * @return void
+	 *
+	 * @throws \YapepBase\Exception\Exception   On errors.
 	 */
-	protected $handleSignals = false;
+	protected function runBefore() {
+		parent::runBefore();
+		if (!$this->acquireLock()) {
+			throw new Exception('Acquire lock failed!');
+		}
+	}
 
 	/**
-	 * Constructor.
+	 * Called after the run process.
+	 *
+	 * Please be cautious! In case of overriding, don't forget to call this method in the end.
+	 *
+	 * @return void
 	 */
-	public function __construct() {
-		$this->cliHelper = new CliUserInterfaceHelper($this->getScriptDescription());
-		$this->setSignalHandler();
-
-		if (function_exists('pcntl_signal')) {
-			pcntl_signal(SIGTERM, array(&$this, 'handleSignal'), true);
-			pcntl_signal(SIGHUP, array(&$this, 'handleSignal'), true);
-			pcntl_signal(SIGINT, array(&$this, 'handleSignal'), true);
-		}
+	protected function runAfter() {
+		$this->releaseLock();
+		parent::runAfter();
 	}
 
 	/**
 	 * Starts script execution.
 	 *
 	 * @return void
-	 *
-	 * @throws \Exception   on errors
 	 */
-	protected function runScript() {
-		$this->prepareSwitches();
+	public function run() {
 		try {
-			$this->parseSwitches($this->cliHelper->getParsedArgs());
-		} catch (\Exception $exception) {
-			$this->cliHelper->setErrorMessage($exception->getMessage());
-			echo $this->cliHelper->getUsageOutput(false);
-			// Re-throw the exception
+			parent::run();
+		}
+		catch (\Exception $exception) {
+			$this->removeSignalHandler();
+			$this->releaseLock();
+			// Re-throw the exception;
 			throw $exception;
 		}
-		if ($this->acquireLock()) {
-			try {
-				if ($this->currentUsage == self::HELP_USAGE) {
-					echo $this->cliHelper->getUsageOutput(true);
-				} else {
-					parent::runScript();
-				}
-			} catch (\Exception $exception) {
-				$this->removeSignalHandler();
-				$this->releaseLock();
-				// Re-throw the exception;
-				throw $exception;
-			}
-		}
-		$this->removeSignalHandler();
+
 		$this->releaseLock();
 	}
 
@@ -159,11 +122,7 @@ abstract class LockingBatchScript extends BatchScript {
 	 * @return void
 	 */
 	protected function prepareSwitches() {
-		$this->usageIndexes[self::HELP_USAGE] = $this->cliHelper->addUsage('Help');
-
-		$this->cliHelper->addSwitch('e', null, 'Name of the execution environment', null, false, 'environment', false);
-
-		$this->cliHelper->addSwitch(null, 'help', 'Shows the help', $this->usageIndexes[self::HELP_USAGE]);
+		parent::prepareSwitches();
 
 		$this->cliHelper->addSwitch(null, 'pid-path', 'The full path to the PID file storage directory.
 			Optional, defaults to the value of the config option "application.batch.pid", or if not set to /var/run.',
@@ -184,6 +143,8 @@ abstract class LockingBatchScript extends BatchScript {
 	 * @throws \YapepBase\Exception\ParameterException   If there are errors regarding the PID file
 	 */
 	protected function parseSwitches(array $switches) {
+		parent::parseSwitches($switches);
+
 		$config = Config::getInstance();
 
 		$this->pidPath = (empty($switches['pid-path']) ? $config->get('system.path.batchPid', '/var/run')
@@ -203,10 +164,6 @@ abstract class LockingBatchScript extends BatchScript {
 		) {
 			throw new ParameterException('The pid file is not writable: ' . $this->getFullPidFile());
 		}
-
-		if (isset($switches['help'])) {
-			$this->currentUsage = self::HELP_USAGE;
-		}
 	}
 
 	/**
@@ -221,19 +178,18 @@ abstract class LockingBatchScript extends BatchScript {
 	/**
 	 * Acquires the lock on the PID file and inserts the PID.
 	 *
-	 * @return boolean
+	 * @throws \YapepBase\Exception\Exception   If something went wrong.
+	 *
+	 * @return bool
 	 */
 	protected function acquireLock() {
 		$pidFile = $this->getFullPidFile();
 		if (!$fp = fopen($pidFile, 'a+')) {
-			//We can't open the PID file
-			//@codeCoverageIgnoreStart
-			trigger_error('Can\'t open PID file: ' . $pidFile, E_USER_WARNING);
-			return false;
-			//@codeCoverageIgnoreEnd
+			// We can't open the PID file
+			throw new Exception('Can\'t open PID file: ' . $pidFile);
 		}
 		if (!flock($fp, LOCK_EX | LOCK_NB)) {
-			//File is locked by an other instance, skip this run.
+			// File is locked by an other instance, skip this run.
 			fclose($fp);
 			return false;
 		}
@@ -259,62 +215,5 @@ abstract class LockingBatchScript extends BatchScript {
 			fclose($fp);
 		}
 	}
-
-	/**
-	 * Sets the signal handlers
-	 *
-	 * @return void
-	 */
-	protected function setSignalHandler() {
-		$this->handleSignals = true;
-	}
-
-	/**
-	 * Removes the signal handlers
-	 *
-	 * @return void
-	 */
-	protected function removeSignalHandler() {
-		$this->handleSignals = false;
-	}
-
-	/**
-	 * Signal handler
-	 *
-	 * @param int $signo   The signal number.
-	 *
-	 * @return void
-	 *
-	 * @codeCoverageIgnore
-	 */
-	final public function handleSignal($signo) {
-		if ($this->handleSignals) {
-			switch ($signo) {
-				case SIGTERM:
-				case SIGHUP:
-				case SIGINT:
-					$this->abort();
-					break;
-			}
-		}
-	}
-
-	/**
-	 * This function is called, if the process receives an interrupt, term signal, etc. It can be used to clean up
-	 * stuff. Note, that this function is not guaranteed to run or it may run after execution.
-	 *
-	 * @return void
-	 */
-	abstract protected function abort();
-
-	/**
-	 * Returns the script's decription.
-	 *
-	 * This method should return a the description for the script. It will be used as the script description in the
-	 * help.
-	 *
-	 * @return string
-	 */
-	abstract protected function getScriptDescription();
 
 }
