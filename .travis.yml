@@ -11,6 +11,7 @@ before_install:
     - ln -s yapep_base ../YapepBase
 before_script:
     - mysql -u root -e 'create database yapepbase_test; grant all on yapepbase_test.* to yapepbase_rw identified by "test"; grant select on yapepbase_test.* to yapepbase_ro identified by "test";'
+    - mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
     - YAPEPBASE_TEST_MYSQL_RW_HOST=localhost; export YAPEPBASE_TEST_MYSQL_RW_HOST
     - YAPEPBASE_TEST_MYSQL_RW_USER=yapepbase_rw; export YAPEPBASE_TEST_MYSQL_RW_USER
     - YAPEPBASE_TEST_MYSQL_RW_PASSWORD=test; export YAPEPBASE_TEST_MYSQL_RW_PASSWORD
