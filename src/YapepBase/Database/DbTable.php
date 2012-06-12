@@ -294,8 +294,8 @@ abstract class DbTable {
 	 * @param string $orderBy      The name of thee field, what should be used for ordering the result.
 	 * @param string $direction    The direction of the order ({@link DbTable::ORDER_ASC}, {@link DbTable::ORDER_DESC}).
 	 *
-	 * @return array   An associativ array represents a record in the table,
-	 *                 or FALSE if there wasn't any row what met the conditions.
+	 * @return array|bool   An associativ array represents a record in the table,
+	 *                      or FALSE if there wasn't any row what met the conditions.
 	 *
 	 * @throws \YapepBase\Exception\ParameterException   If the given direction is unproper.
 	 * @throws \YapepBase\Exception\DatabaseException   On execution errors.
