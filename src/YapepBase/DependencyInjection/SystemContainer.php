@@ -460,10 +460,12 @@ class SystemContainer extends Container {
 	 * Returns the storage handler.
 	 *
 	 * @return bool|IStorage   The storage handler.
+	 *
+	 * @throws \YapepBase\Exception\DiException   If no middleware storage is set.
 	 */
 	public function getMiddlewareStorage() {
 		if (empty($this->storageMiddleware)) {
-			return false;
+			throw new DiException('Middleware storage instance is not set', DiException::ERR_INSTANCE_NOT_SET);
 		}
 		return $this->storageMiddleware;
 	}

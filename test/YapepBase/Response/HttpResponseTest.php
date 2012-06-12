@@ -43,8 +43,6 @@ class HttpResponseTest extends \PHPUnit_Framework_TestCase {
 	public function testBodyStoringAndRendering() {
 
 		Config::getInstance()->clear();
-		Config::getInstance()->set('system.response.gzip', false);
-
 		$this->response->setRenderedBody('test body 1');
 		$this->assertEquals('test body 1', $this->response->getRenderedBody(),
 			'HttpResponse does not correctly store or render a plain text body.');

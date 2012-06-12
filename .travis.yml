@@ -9,4 +9,15 @@ before_install:
     - echo "extension=memcache.so" >> `php --ini | grep "Loaded Configuration" | sed -e "s|.*:\s*||"`
     - rm -rf memcache-2.2.6
     - ln -s yapep_base ../YapepBase
+before_script:
+    - mysql -u root -e 'create database yapepbase_test; grant all on yapepbase_test.* to yapepbase_rw identified by "test"; grant select on yapepbase_test.* to yapepbase_ro identified by "test";'
+    - mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
+    - YAPEPBASE_TEST_MYSQL_RW_HOST=localhost; export YAPEPBASE_TEST_MYSQL_RW_HOST
+    - YAPEPBASE_TEST_MYSQL_RW_USER=yapepbase_rw; export YAPEPBASE_TEST_MYSQL_RW_USER
+    - YAPEPBASE_TEST_MYSQL_RW_PASSWORD=test; export YAPEPBASE_TEST_MYSQL_RW_PASSWORD
+    - YAPEPBASE_TEST_MYSQL_RW_DATABASE=yapepbase_test; export YAPEPBASE_TEST_MYSQL_RW_DATABASE
+    - YAPEPBASE_TEST_MYSQL_RO_HOST=localhost; export YAPEPBASE_TEST_MYSQL_RO_HOST
+    - YAPEPBASE_TEST_MYSQL_RO_USER=yapepbase_ro; export YAPEPBASE_TEST_MYSQL_RO_USER
+    - YAPEPBASE_TEST_MYSQL_RO_PASSWORD=test; export YAPEPBASE_TEST_MYSQL_RO_PASSWORD
+    - YAPEPBASE_TEST_MYSQL_RO_DATABASE=yapepbase_test; export YAPEPBASE_TEST_MYSQL_RO_DATABASE
 script: phpunit test

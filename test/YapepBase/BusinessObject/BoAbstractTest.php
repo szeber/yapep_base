@@ -14,7 +14,7 @@ use YapepBase\Application;
 use YapepBase\Config;
 use YapepBase\DependencyInjection\SystemContainer;
 use YapepBase\Mock\Storage\StorageMock;
-use YapepBase\Mock\BusinessObject\BoMock;
+use YapepBase\Mock\BusinessObject\MockBo;
 use YapepBase\Exception\ParameterException;
 
 /**
@@ -73,7 +73,7 @@ class BoAbstractTest extends \PHPUnit_Framework_TestCase {
 	 * @return void
 	 */
 	public function testCaching() {
-		$bo = new BoMock();
+		$bo = new MockBo();
 		$this->assertTrue(empty($this->storage->data), 'The data in the storage is not empty prior to testing');
 		$this->assertSame($this->storage, $bo->getStorage(),
 			'The retrieved middleware storage is not the one set in the DI container');
@@ -101,7 +101,7 @@ class BoAbstractTest extends \PHPUnit_Framework_TestCase {
 	 * @return void
 	 */
 	public function testDeletion() {
-		$bo = new BoMock();
+		$bo = new MockBo();
 
 		$testData = array(
 			'testKey' => 'testVal',
@@ -135,7 +135,7 @@ class BoAbstractTest extends \PHPUnit_Framework_TestCase {
 	 *@return void
 	 */
 	public function testErrorHandling() {
-		$bo = new BoMock();
+		$bo = new MockBo();
 
 		try {
 			$bo->getFromStorage('');

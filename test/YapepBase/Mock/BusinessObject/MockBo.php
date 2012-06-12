@@ -18,7 +18,7 @@ use YapepBase\BusinessObject\BoAbstract;
  * @package    YapepBase
  * @subpackage Mock\BusinessObject
  */
-class BoMock extends BoAbstract {
+class MockBo extends BoAbstract {
 
 	public function getStorage() {
 		return parent::getStorage();

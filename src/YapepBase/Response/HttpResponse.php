@@ -25,7 +25,6 @@ use YapepBase\View\ViewAbstract;
  *     <ul>
  *         <li>system.defaultCharset:                 Sets the default charset for the response.
  *                                                    Only used for HTML content types.</li>
- *         <li>system.response.gzip:                  If set to TRUE, enables GZIP compression.</li>
  *         <li>system.response.defaultCookieDomain:   The default domain for the cookies.</li>
  *     </ul>
  *
