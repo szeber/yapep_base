@@ -21,7 +21,7 @@ use YapepBase\Request\IRequest;
  * The config variable's structure should match the config for an ArrayRouter {@see \YapepBase\Router\ArrayRouter}.
  *
  * Configuration variable's name should be set in the format:
- * <b>resource.storage.&lt;configName&gt;
+ * <b>resource.routing.&lt;configName&gt;
  *
  * @package    YapepBase
  * @subpackage Router
