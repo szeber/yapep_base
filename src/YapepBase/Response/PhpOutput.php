@@ -11,14 +11,23 @@
 
 namespace YapepBase\Response;
 
+use YapepBase\Config;
+
 /**
  * This class uses standard PHP functions to return content to the browser.
+ *
+ * Configuration options:
+ *
+ * <ul>
+ *     <li>system.output.gzip: If set to TRUE the output will be sent gzipped or deflated if the client supports it</li>
+ * </ul>
  *
  * @package      YapepBase
  * @subpackage   Response
  * @codeCoverageIgnore
  */
 class PhpOutput implements IOutput {
+
 	/**
 	 * setHeader() is used to send a raw HTTP setHeader. See the » HTTP/1.1 specification for more information on HTTP
 	 * headers.
@@ -93,8 +102,14 @@ class PhpOutput implements IOutput {
 	 * @return void
 	 */
 	public function out() {
+		if (Config::getInstance()->get('system.output.gzip', false)) {
+			ob_start('ob_gzhandler');
+		} else {
+			ob_start();
+		}
 		foreach (func_get_args() as $string) {
 			echo $string;
 		}
+		ob_end_flush();
 	}
 }
