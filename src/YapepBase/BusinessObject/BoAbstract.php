@@ -65,6 +65,8 @@ abstract class BoAbstract {
 	 * Adds the given key to the stored list.
 	 *
 	 * @param string $key   The key.
+	 *
+	 * @return void
 	 */
 	private function addKey($key) {
 		$keys = $this->getStorage()->get($this->getKeyForKeys());

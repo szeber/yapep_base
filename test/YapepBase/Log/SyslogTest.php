@@ -24,6 +24,8 @@ class SyslogTest extends \PHPUnit_Framework_TestCase {
 
 			'resource.log.noFacility.applicationIdent' => 'testApp',
 
+			'system.application.name' => 'testApp'
+
 		));
 	}
 
@@ -38,13 +40,13 @@ class SyslogTest extends \PHPUnit_Framework_TestCase {
 		$this->assertTrue($mock->isOpen);
 
 		$msg = new Message\ErrorMessage();
-		$msg->set('Test message', 'test', 'test', \YapepBase\Syslog\Syslog::LOG_NOTICE);
+		$msg->set('Test message', 'testType', 'testId', \YapepBase\Syslog\Syslog::LOG_NOTICE);
 		$syslog->log($msg);
 
 		$this->assertEquals(array(
 			array(
 				'priority' => \YapepBase\Syslog\Syslog::LOG_NOTICE + \YapepBase\Syslog\Syslog::LOG_USER,
-				'message' => '[phpErrorLog]|test|test|Test message',
+				'message' => '[error]|error_id=testId|type=testType|app=testApp|tag=error|message=Test message',
 				'ident' => 'testApp',
 				'date' => null
 			)
@@ -60,13 +62,13 @@ class SyslogTest extends \PHPUnit_Framework_TestCase {
 		$mock = new \YapepBase\Mock\Syslog\SyslogConnectionMock();
 		$syslog = new SyslogLogger('pidSapi', $mock);
 		$msg = new Message\ErrorMessage();
-		$msg->set('Test message', 'test', 'test', \YapepBase\Syslog\Syslog::LOG_NOTICE);
+		$msg->set('Test message', 'testType', 'testId', \YapepBase\Syslog\Syslog::LOG_NOTICE);
 		$syslog->log($msg);
 
 		$this->assertEquals(array(
 			array(
 				'priority' => \YapepBase\Syslog\Syslog::LOG_NOTICE + \YapepBase\Syslog\Syslog::LOG_USER,
-				'message' => '[phpErrorLog]|test|test|Test message',
+				'message' => '[error]|error_id=testId|type=testType|app=testApp|tag=error|message=Test message',
 				'ident' => 'testApp-' . PHP_SAPI . '[pid]',
 				'date' => null
 			)

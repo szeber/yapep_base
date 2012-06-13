@@ -100,17 +100,18 @@ class SyslogLogger extends LoggerAbstract {
 	 */
 	protected function getLogMessage(IMessage $message) {
 		$fields = $message->getFields();
+
 		$logMessage = '[' . $message->getTag() . ']|';
 
-		if (is_array($fields) && !empty($fields)) {
-			$logMessage .= implode('|', $fields) . '|';
+		foreach ($fields as $key => $value) {
+			$logMessage .= $key . '=' . $value . '|';
 		}
 
 		// We have to remove the line breaks, because syslog will create new log entry after every linebreak.
-		$message = str_replace(PHP_EOL, '', $logMessage . $message->getMessage());
+		$message = str_replace(PHP_EOL, '', $logMessage . 'tag=' . $message->getTag()
+			. '|message=' . $message->getMessage());
 
 		return $message;
-
 	}
 
 	/**

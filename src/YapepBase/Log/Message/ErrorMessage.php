@@ -11,6 +11,7 @@
 
 
 namespace YapepBase\Log\Message;
+use YapepBase\Config;
 
 /**
  * PhpErrorMessage class.
@@ -28,7 +29,7 @@ class ErrorMessage extends MessageAbstract {
 	 * @return string
 	 */
 	public function getTag() {
-		return 'phpErrorLog';
+		return 'error';
 	}
 
 	/**
@@ -39,11 +40,16 @@ class ErrorMessage extends MessageAbstract {
 	 * @param string $errorId        The ID of the error.
 	 * @param int    $priority       The severity of the error {@uses LOG_*}
 	 *
-	 * @return void
+	 * @link Config <b>application.name</b> key
 	 */
 	public function set($errorMessage, $errorType, $errorId, $priority) {
 		$this->message = $errorMessage;
-		$this->fields = array($errorType, $errorId);
+		$this->fields = array(
+			'error_id' => $errorId,
+			'type'     => $errorType,
+			'app'      => Config::getInstance()->get('system.application.name', ''),
+		);
+
 		$this->priority = $priority;
 	}
 }
