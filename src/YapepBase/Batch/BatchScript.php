@@ -22,7 +22,7 @@ use YapepBase\View\ViewDo;
 /**
  * Base class for batch scripts.
  *
- * Handles envent dispatching for application start and finish, and handles unhandled exceptions.
+ * Handles event dispatching for application start and finish, and handles unhandled exceptions.
  *
  * @package    YapepBase
  * @subpackage Batch

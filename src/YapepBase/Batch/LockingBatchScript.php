@@ -32,7 +32,7 @@ use YapepBase\Exception\ParameterException;
  *     <li>--help: If set, the help page will be printed.</li>
  * </ul>
  *
- * The following switches are defuned, but not parsed by the class:
+ * The following switches are defined, but not parsed by the class:
  * <ul>
  *     <li>-e: Name of the execution environment. It should be used by the bootstrap. Whether it's required is
  *             dependant on the script's bootstrap.</li>
