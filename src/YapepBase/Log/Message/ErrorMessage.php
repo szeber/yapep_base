@@ -40,6 +40,8 @@ class ErrorMessage extends MessageAbstract {
 	 * @param string $errorId        The ID of the error.
 	 * @param int    $priority       The severity of the error {@uses LOG_*}
 	 *
+	 * @return void
+	 *
 	 * @link Config <b>application.name</b> key
 	 */
 	public function set($errorMessage, $errorType, $errorId, $priority) {
