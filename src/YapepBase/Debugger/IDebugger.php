@@ -24,8 +24,17 @@ interface IDebugger {
 	const QUERY_TYPE_DB = 'db';
 	/** Type of the query: Cache */
 	const QUERY_TYPE_CACHE = 'cache';
-	/** Type of the query: curl */
+	/** Type of the query: CURL */
 	const QUERY_TYPE_CURL = 'curl';
+
+	/** Type of the counter: Database */
+	const COUNTER_TYPE_DB = 'db';
+	/** Type of the counter: Cache */
+	const COUNTER_TYPE_CACHE = 'cache';
+	/** Type of the counter: CURL */
+	const COUNTER_TYPE_CURL = 'curl';
+	/** Type of the counter: Error */
+	const COUNTER_TYPE_ERROR = 'error';
 
 	/**
 	 * Stores a timing with the given name.
@@ -93,11 +102,4 @@ interface IDebugger {
 	 * @return void
 	 */
 	public function logQueryExecutionTime($type, $queryId, $executionTime, $params = null);
-
-	/**
-	 * Displays the interface of the Debugger (if it has one).
-	 *
-	 * @return void
-	 */
-	public function display();
 }
