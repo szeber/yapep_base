@@ -104,6 +104,8 @@ class SystemContainer extends Container {
 	protected $searchNamespaces = array(
 		self::NAMESPACE_SEARCH_TEMPLATE => array(),
 		self::NAMESPACE_SEARCH_CONTROLLER => array(),
+		self::NAMESPACE_SEARCH_BO => array(),
+		self::NAMESPACE_SEARCH_DAO => array(),
 	);
 
 	/**
