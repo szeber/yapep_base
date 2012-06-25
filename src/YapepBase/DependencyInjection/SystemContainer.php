@@ -363,38 +363,6 @@ class SystemContainer extends Container {
 	}
 
 	/**
-	 * Set a list of namespace roots to search for controllers in.
-	 *
-	 * @param array $namespaces   A list of namespace roots to search for the controller in.
-	 *
-	 * @return void
-	 *
-	 * @deprecated   Use setSearchNamespaces() instead
-	 *
-	 * @codeCoverageIgnore
-	 */
-	public function setControllerSearchNamespaces(array $namespaces = array()) {
-		trigger_error(__METHOD__ . ' called, use ' . __CLASS__ . '::setSearchNamespaces instead', E_USER_DEPRECATED);
-		$this->setSearchNamespaces(self::NAMESPACE_SEARCH_CONTROLLER, $namespaces);
-	}
-
-	/**
-	 * Adds a namespace to the namespace roots to search for controllers in.
-	 *
-	 * @param string $namespace   A single namespace to add to the search list
-	 *
-	 * @return void
-	 *
-	 * @deprecated   Use addSearchNamespace() instead
-	 *
-	 * @codeCoverageIgnore
-	 */
-	public function addControllerSearchNamespace($namespace) {
-		trigger_error(__METHOD__ . ' called, use ' . __CLASS__ . '::addSearchNamespace instead', E_USER_DEPRECATED);
-		$this->addSearchNamespace(self::NAMESPACE_SEARCH_CONTROLLER, $namespace);
-	}
-
-	/**
 	 * Stores the given debugger.
 	 *
 	 * @param \YapepBase\Debugger\IDebugger $debugger   The debugger object.

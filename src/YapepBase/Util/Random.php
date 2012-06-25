@@ -132,41 +132,4 @@ class Random {
 		}
 		return $string;
 	}
-
-	/**
-	 * Generate a pseudo-random number between $min and $max. If possible, this function will use mt_rand() for
-	 * random number generation. Otherwise it will fall back to rand(), which uses the libc random number generator.
-	 *
-	 * @param float  $min      Minimum value.
-	 * @param float  $max      Maximum value.
-	 * @param string $method   Random generator method to use. If not available, fallback to auto.
-	 *
-	 * @return float
-	 *
-	 * @deprecated please use the getPseudoNumber method instead
-	 */
-	public static function pseudoNumber($min = 0, $max = 1, $method = self::NUMBER_METHOD_AUTO) {
-		trigger_error('\YapepBase\Util\Random::pseudoNumber() is deprecated. Please use getPseudoNumber() instead.',
-			E_USER_DEPRECATED);
-		return self::getPseudoNumber($min, $max, $method);
-	}
-
-	/**
-	 * Generate a pseudo-random string in the given length. This string is NOT suitable for cryptographic purposes!
-	 *
-	 * @param integer $length   The length.
-	 * @param string  $method   The method to use for random string generation. Falls back to default if the
-	 *                          method is not available.
-	 *
-	 * @return string
-	 *
-	 * @deprecated please use the getPseudoString method instead
-	 *
-	 * @throws \YapepBase\Exception\Exception   If the method is invalid
-	 */
-	public static function pseudoString($length = 23, $method = self::STRING_METHOD_AUTO) {
-		trigger_error('\YapepBase\Util\Random::pseudoString() is deprecated. Please use getPseudoString() instead.',
-			E_USER_DEPRECATED);
-		return self::getPseudoString($length, $method);
-	}
 }

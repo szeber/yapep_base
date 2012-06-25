@@ -14,6 +14,9 @@ namespace YapepBase\Response;
 /**
  * Classes implementing this interface handle the raw output to the browser,
  * etc. It has been implemented to separate the PHP-dependant code parts.
+ *
+ * @package      YapepBase
+ * @subpackage   Response
  */
 interface IOutput {
 
