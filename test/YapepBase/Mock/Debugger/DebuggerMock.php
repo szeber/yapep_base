@@ -108,4 +108,14 @@ class DebuggerMock implements IDebugger {
 		// TODO: Implement display() method.
 	}
 
+	/**
+	 * Handles the shut down event.
+	 *
+	 * This method should called in case of shutdown(for example fatal error).
+	 *
+	 * @return mixed
+	 */
+	public function handleShutdown() {
+		// TODO: Implement handleShutdown method [emul]
+	}
 }

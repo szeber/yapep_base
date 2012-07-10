@@ -106,4 +106,11 @@ class SessionMock implements ISession {
 	public function getId() {
 	}
 
+	/**
+	 * Returns only the data from the session.
+	 *
+	 * @return array
+	 */
+	public function getData() {
+	}
 }
