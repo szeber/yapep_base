@@ -387,4 +387,12 @@ abstract class SessionAbstract implements ISession {
 		}
 	}
 
+	/**
+	 * Returns only the data from the session.
+	 *
+	 * @return array
+	 */
+	public function getData() {
+		return $this->data;
+	}
 }

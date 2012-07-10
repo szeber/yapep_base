@@ -14,7 +14,9 @@ namespace YapepBase\DependencyInjection;
 use YapepBase\Debugger\IDebugger;
 use YapepBase\DependencyInjection\Container;
 use YapepBase\ErrorHandler\ErrorHandlerRegistry;
+use YapepBase\Event\Event;
 use YapepBase\Event\EventHandlerRegistry;
+use YapepBase\Event\IEventHandler;
 use YapepBase\Exception\ViewException;
 use YapepBase\Exception\ControllerException;
 use YapepBase\Exception\DiException;
@@ -371,6 +373,9 @@ class SystemContainer extends Container {
 	 */
 	public function setDebugger(IDebugger $debugger) {
 		$this->debugger = $debugger;
+		if ($debugger instanceof IEventHandler) {
+			$this->getEventHandlerRegistry()->registerEventHandler(Event::TYPE_APPFINISH, $debugger);
+		}
 	}
 
 	/**

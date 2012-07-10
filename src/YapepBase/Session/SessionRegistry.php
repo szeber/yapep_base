@@ -54,4 +54,20 @@ class SessionRegistry {
 	public function register(ISession $session) {
 		$this->namespaces[$session->getNamespace()] = $session;
 	}
+
+	/**
+	 * Returns all of the stored data from the sessions grouped by the namespaces.
+	 *
+	 * @return array   An associative array where the keys are the names of the namespace,
+	 *                 and the values are the stored data from the session.
+	 */
+	public function getAllData() {
+		$result = array();
+
+		/** @var \YapepBase\Session\ISession $data   The stored session. */
+		foreach ($this->namespaces as $namespace => $data) {
+			$result[$namespace] = $data->getData();
+		}
+		return $result;
+	}
 }

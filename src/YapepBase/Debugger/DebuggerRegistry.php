@@ -11,6 +11,7 @@
 namespace YapepBase\Debugger;
 
 
+use YapepBase\Application;
 use YapepBase\Event\IEventHandler;
 use YapepBase\Event\Event;
 
@@ -360,7 +361,6 @@ class DebuggerRegistry implements IDebugger, IEventHandler {
 		if ($this->isRendered || empty($this->renderers)) {
 			return;
 		}
-
 		$this->isRendered = true;
 
 		$endTime = microtime(true);
@@ -376,8 +376,24 @@ class DebuggerRegistry implements IDebugger, IEventHandler {
 
 		/** @var \YapepBase\Debugger\IDebuggerRenderer $renderer */
 		foreach ($this->renderers as $renderer) {
-			$renderer->render($this->startTime, $runTime, $currentMemory, $peakMemory, $times, $this->memoryUsages,
-				$this->messages, $this->errors, $this->queries, $this->queryTimes);
+			$renderer->render(
+				$this->startTime,
+				$runTime,
+				$currentMemory,
+				$peakMemory,
+				$times,
+				$this->memoryUsages,
+				$this->messages,
+				$this->errors,
+				$this->queries,
+				$this->queryTimes,
+				$this->counters,
+				$_SERVER,
+				$_POST,
+				$_GET,
+				$_COOKIE,
+				Application::getInstance()->getDiContainer()->getSessionRegistry()->getAllData()
+			);
 		}
 	}
 

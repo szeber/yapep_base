@@ -10,6 +10,7 @@
 
 namespace YapepBase\Debugger;
 
+
 use YapepBase\Application;
 use YapepBase\Response\HttpResponse;
 use YapepBase\Mime\MimeType;

@@ -61,4 +61,11 @@ interface ISession extends \ArrayAccess, IEventHandler {
 	 */
 	public function getId();
 
+	/**
+	 * Returns only the data from the session.
+	 *
+	 * @return array
+	 */
+	public function getData();
+
 }
