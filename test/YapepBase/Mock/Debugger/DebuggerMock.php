@@ -49,8 +49,8 @@ class DebuggerMock implements IDebugger {
 	 *
 	 * @return void
 	 */
-	public function logInfo($message) {
-		// TODO: Implement logInfo() method.
+	public function logMessage($message) {
+		// TODO: Implement logMessage() method.
 	}
 
 	/**

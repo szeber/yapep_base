@@ -24,7 +24,7 @@ use YapepBase\Config;
  * Base class for session handlers.
  *
  * Configuration settings for the sessions should be set in the format:
- * <b>resource.database.&lt;configName&gt;.&lt;optionName&gt;
+ * <b>resource.session.&lt;configName&gt;.&lt;optionName&gt;
  *
  * Configuration options:
  * <ul>

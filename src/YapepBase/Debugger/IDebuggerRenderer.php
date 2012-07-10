@@ -91,9 +91,30 @@ interface IDebuggerRenderer {
 	 * @param array $queries         Array with all queries that have run (including timing information if available).
 	 * @param array $queryTimes      Array with the timing totals for each query type.
 	 * @param array $counters        Array with the location counters.
+	 * @param array $serverParams    Params of the $_SERVER superglobal.
+	 * @param array $postParams      Params what received through post method.
+	 * @param array $getParams       Params what received through get method.
+	 * @param array $cookieParams    Params what received through cookies.
+	 * @param array $sessionParams   Data what stored in the session.
 	 *
 	 * @return void
 	 */
-	public function render($startTime, $runTime, $currentMemory, $peakMemory, array $times, array $memoryUsages,
-		array $info, array $errors, array $queries, array $queryTimes, array $counters);
+	public function render(
+		$startTime,
+		$runTime,
+		$currentMemory,
+		$peakMemory,
+		array $times,
+		array $memoryUsages,
+		array $info,
+		array $errors,
+		array $queries,
+		array $queryTimes,
+		array $counters,
+		array $serverParams,
+		array $postParams,
+		array $getParams,
+		array $cookieParams,
+		array $sessionParams
+	);
 }

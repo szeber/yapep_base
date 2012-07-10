@@ -61,7 +61,7 @@ interface IDebugger {
 	 *
 	 * @return void
 	 */
-	public function logInfo($message);
+	public function logMessage($message);
 
 	/**
 	 * Logs and error.
@@ -102,4 +102,13 @@ interface IDebugger {
 	 * @return void
 	 */
 	public function logQueryExecutionTime($type, $queryId, $executionTime, $params = null);
+
+	/**
+	 * Handles the shut down event.
+	 *
+	 * This method should called in case of shutdown(for example fatal error).
+	 *
+	 * @return mixed
+	 */
+	public function handleShutdown();
 }

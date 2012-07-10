@@ -119,7 +119,12 @@ abstract class DbConnection {
 
 			// If we have a debugger, we have to log the query
 			if ($debugger !== false) {
-				$queryId = $debugger->logQuery(IDebugger::QUERY_TYPE_DB, $query, $params);
+				// We have to quote the parameters to make the displayed query usable
+				$paramsQuoted = array();
+				foreach ($params as $paramName => $paramValue) {
+					$paramsQuoted[$paramName] = $this->quote($paramValue);
+				}
+				$queryId = $debugger->logQuery(IDebugger::QUERY_TYPE_DB, $query, $paramsQuoted);
 				$startTime = microtime(true);
 			}
 

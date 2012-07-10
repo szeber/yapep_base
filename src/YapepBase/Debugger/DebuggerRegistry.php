@@ -10,6 +10,7 @@
 
 namespace YapepBase\Debugger;
 
+
 use YapepBase\Event\IEventHandler;
 use YapepBase\Event\Event;
 
@@ -22,6 +23,20 @@ use YapepBase\Event\Event;
  * @subpackage Debugger
  */
 class DebuggerRegistry implements IDebugger, IEventHandler {
+
+	/**
+	 * The HTTP Url of the stored log files.
+	 *
+	 * @var string
+	 */
+	protected $urlToLogFiles;
+
+	/**
+	 * This will be replaced with the errorId in the given HTTP Url for log files.
+	 *
+	 * @var string
+	 */
+	protected $urlParamName;
 
 	/**
 	 * The exact time of the debug console initialized(UNIX timestamp with microseconds).
@@ -49,7 +64,7 @@ class DebuggerRegistry implements IDebugger, IEventHandler {
 	 *
 	 * @var array
 	 */
-	protected $info = array();
+	protected $messages = array();
 
 	/**
 	 * The logged errors.
@@ -108,8 +123,14 @@ class DebuggerRegistry implements IDebugger, IEventHandler {
 
 	/**
 	 * Constructor.
+	 *
+	 * @param string $urlToLogFiles   The URL to the stored error log files (if there are any)
+	 * @param string $urlParamName    The name of tha parameter what should be replaced with the errorId.
 	 */
-	public function __construct() {
+	public function __construct($urlToLogFiles = null, $urlParamName = null) {
+		$this->urlToLogFiles = $urlToLogFiles;
+		$this->urlParamName = $urlParamName;
+
 		$this->startTime = microtime(true);
 	}
 
@@ -150,14 +171,29 @@ class DebuggerRegistry implements IDebugger, IEventHandler {
 	 *
 	 * @return void
 	 */
-	public function logInfo($message) {
+	public function logMessage($message) {
 		$trace = debug_backtrace(false);
 
-		$this->info[] = array(
+		$this->messages[] = array(
 			'message' => $message,
 			'file'    => $trace[0]['file'],
 			'line'    => $trace[0]['line'],
 		);
+	}
+
+	/**
+	 * Returns the full url of the error log file.
+	 *
+	 * @param string $errorId   The id of the error.
+	 *
+	 * @return string
+	 */
+	protected function getErrorLogUrl($errorId) {
+		if (empty($this->urlToLogFiles) || empty($this->urlParamName)) {
+			return '';
+		}
+
+		return str_replace($this->urlParamName, $errorId, $this->urlToLogFiles);
 	}
 
 	/**
@@ -196,6 +232,7 @@ class DebuggerRegistry implements IDebugger, IEventHandler {
 			'trace'   => $trace,
 			'id'      => $id,
 			'source'  => $this->getSource($file, $line),
+			'logFile' => $this->getErrorLogUrl($id)
 		);
 
 		$locationId = $file . ' @ ' . $line;
@@ -340,7 +377,7 @@ class DebuggerRegistry implements IDebugger, IEventHandler {
 		/** @var \YapepBase\Debugger\IDebuggerRenderer $renderer */
 		foreach ($this->renderers as $renderer) {
 			$renderer->render($this->startTime, $runTime, $currentMemory, $peakMemory, $times, $this->memoryUsages,
-				$this->info, $this->errors, $this->queries, $this->queryTimes);
+				$this->messages, $this->errors, $this->queries, $this->queryTimes);
 		}
 	}
 
@@ -365,4 +402,14 @@ class DebuggerRegistry implements IDebugger, IEventHandler {
 		return $result;
 	}
 
+	/**
+	 * Handles the shut down event.
+	 *
+	 * This method should called in case of shutdown(for example fatal error).
+	 *
+	 * @return mixed
+	 */
+	public function handleShutdown() {
+		$this->render();
+	}
 }
