@@ -11,10 +11,14 @@
 namespace YapepBase\View\Template;
 
 
+use Exception;
+
+use YapepBase\Application;
 use YapepBase\Debugger\IDebugger;
+use YapepBase\ErrorHandler\ErrorHandlerHelper;
+use YapepBase\Helper\FileHelper;
 use YapepBase\View\TemplateAbstract;
 use YapepBase\View\ViewDo;
-use YapepBase\Application;
 
 /**
  * Template for the console debugger's output
@@ -147,12 +151,15 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 	) {
 		$this->setViewDo($viewDo);
 
+		foreach ($this->get($_errors) as $error) {
+			$this->setError($error['code'], $error['message'], $error['file'], $error['line'], $error['context']);
+		}
+
 		$this->runTime       = $this->get($_runTime);
 		$this->peakMemory    = $this->get($_peakMemory);
 		$this->times         = $this->get($_times);
 		$this->memoryUsages  = $this->get($_memoryUsages);
 		$this->messages      = $this->get($_messages);
-		$this->errors        = $this->get($_errors);
 		$this->queries       = $this->get($_queries);
 		$this->queryTimes    = $this->get($_queryTimes);
 		$this->counters      = $this->get($_counters);
@@ -185,7 +192,7 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 			if (is_int($paramLabel)) {
 				$firstParamPosition = strpos($query, '?');
 				if ($firstParamPosition !== false) {
-					$query = substr_replace($query, $value, $firstParamPosition, 1);
+					$query = substr_replace($query, $paramValue, $firstParamPosition, 1);
 				}
 			}
 			else {
@@ -194,6 +201,90 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 		}
 
 		return $query;
+	}
+
+
+	/**
+	 * Naploz egy hibat es annak jellemzoit.
+	 *
+	 * @param int    $code      A hibakod.
+	 * @param string $message   A hiba szovege.
+	 * @param string $file      A file neve, amelyben a hiba jelentkezett. Ha ures sztring, akkor a logError()
+	 *                          metodus meghivasanak helyet naplozzuk.
+	 * @param int    $line      A hibat tartalmazo sor szama. Ha <var>0</var>, akkor a logError()
+	 *                          metodus meghivasanak helyet naplozzuk.
+	 * @param array  $context   Azon valtozok, amelyek a hiba keletkezesekor elerhetok voltak az adott kontextusban.
+	 *
+	 * @return void
+	 */
+	public function setError($code, $message, $file = '', $line = 0, array $context = array()) {
+		static $errorHandlerHelper;
+
+		if (empty($errorHandlerHelper)) {
+			$errorHandlerHelper = new ErrorHandlerHelper;
+		}
+		$trace = array();
+		if (empty($file) || $line === 0) {
+			$trace = debug_backtrace(false);
+			$file = $trace['file'];
+			$line = $trace['line'];
+		}
+
+		$index = count($this->errors);
+		$message = '[' . $errorHandlerHelper->getPhpErrorLevelDescription($code) . '] '.$message;
+		$source = FileHelper::getEnvironment($file, $line, 5);
+		$firstLine = key($source);
+
+		$errorHtml = '
+			<div class="yapep-debug-error-item">
+				<p class="yapep-debug-clickable" onclick="Yapep.toggle(\'error-' . $index . '\'); return false;">
+					' . $message . '<br/>
+					in <var>' . $file . '</var>, <u>line ' . $line . '</u>
+				</p>
+				<div class="yapep-debug-container" id="yapep-debug-error-' . $index . '">
+					<h3>Source code</h3>
+					<ol start="' . $firstLine . '" class="yapep-debug-code">
+		';
+		foreach ($source as $lineNumber => $codeLine) {
+			if ($codeLine === '') {
+				$codeLine = ' ';
+			}
+			$codeLine = str_replace('&lt;?php&nbsp;', '', highlight_string('<?php '.$codeLine, true));
+			if ($line > $lineNumber) {
+				foreach ($context + $trace as $varName => $value) {
+					if (is_scalar($value) || is_array($value)) {
+						$tooltip = gettype($value) . ': ' . print_r($value, true);
+					}
+					elseif ($value instanceof Exception) {
+						$tooltip = get_class($value) . ': ' . $value->getMessage();
+					}
+					elseif (is_object($value) && method_exists($value, '__toString')) {
+						$tooltip = get_class($value) . ': ' . $value->__toString();
+					}
+					else {
+						$tooltip = strtoupper(gettype($value));
+					}
+
+					$codeLine = preg_replace('#(?<!::)\$' . $varName . '\b#',
+						'<var title="' . htmlspecialchars($tooltip) . '">' . '$' . $varName . '</var>', $codeLine);
+				}
+			}
+			$errorHtml .= '<li class="'.($lineNumber % 2 ? 'odd ' : '')
+				. ($lineNumber == $line ? 'yapep-debug-code-highlight' : '') . '">' . $codeLine . '</li>';
+		}
+		$errorHtml .= '</ol>';
+
+		if ($code === ErrorHandlerHelper::E_EXCEPTION) {
+			$errorHtml .= '<h3>Debug trace</h3>'
+				. '<pre id="yapep-debug-error-trace-' . $index . '">'
+				. highlight_string(print_r($context['trace'], true), true)
+				. '</pre>';
+		}
+
+		$errorHtml .= '</div>';
+		$errorHtml .= '</div>';
+
+		$this->errors[] = $errorHtml;
 	}
 
 	/**

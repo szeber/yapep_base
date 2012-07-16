@@ -113,5 +113,4 @@ class ConsoleDebuggerRenderer implements IDebuggerRenderer {
 
 		$template->render();
 	}
-
 }
