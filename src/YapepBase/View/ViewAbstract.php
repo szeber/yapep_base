@@ -77,8 +77,10 @@ abstract class ViewAbstract {
 	protected function render() {
 		try {
 			$this->renderContent();
-		} catch (\Exception $exception) {
-			trigger_error('Unhandled exception of type ' . get_class($exception) . ' occured while rendering template',
+		}
+		catch (\Exception $exception) {
+			trigger_error('Unhandled exception occured while rendering template: '
+					. $exception->getMessage() . ' in ' . $exception->getFile() .  ', line: ' . $exception->getLine(),
 				E_USER_ERROR);
 		}
 	}
