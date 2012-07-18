@@ -780,8 +780,8 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 				<p class="yapep-debug-clickable" onclick="Yapep.toggle('CACHE<?= $index ?>'); return false;">
 					<b><?=$query['query']?></b> ->
 					<b><?= (isset($query['runtime']) ? sprintf('%.4f', $query['runtime']) : '') ?></b> sec in  ||
-					<var><?= $query['location']['file'] ?></var>,
-					<u>line <?= $query['location']['line'] ?></u>
+					<var><?= $query['file'] ?></var>,
+					<u>line <?= $query['line'] ?></u>
 				</p>
 				<ol class="yapep-debug-code yapep-debug-copyable" title="Double-click to copy content" id="yapep-debug-CACHE<?= $index ?>" ondblclick="Yapep.copyToClipboard(this); return false;">
 				<?php
@@ -831,8 +831,8 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 				<p class="yapep-debug-clickable" onclick="Yapep.toggle('CURL<?= $index ?>'); return false;">
 					<b><?=$query['url']?></b> -&gt;
 					<b><?= (isset($query['runtime']) ? sprintf('%.4f', $query['runtime']) : '') ?></b> sec in  ||
-					<var><?= $query['location']['file'] ?></var>,
-					<u>line <?= $query['location']['line'] ?></u>
+					<var><?= $query['file'] ?></var>,
+					<u>line <?= $query['line'] ?></u>
 				</p>
 				<ol class="yapep-debug-code yapep-debug-copyable" title="Double-click to copy content" id="yapep-debug-CURL<?= $index ?>" ondblclick="Yapep.copyToClipboard(this); return false;">
 				<?php
