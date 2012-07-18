@@ -151,6 +151,7 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 	) {
 		$this->setViewDo($viewDo);
 
+		$this->errors = array();
 		foreach ($this->get($_errors) as $error) {
 			$this->setError($error['code'], $error['message'], $error['file'], $error['line'], $error['context']);
 		}
@@ -205,15 +206,13 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 
 
 	/**
-	 * Naploz egy hibat es annak jellemzoit.
+	 * Creates a displayable HTML from the given error, and stores it.
 	 *
-	 * @param int    $code      A hibakod.
-	 * @param string $message   A hiba szovege.
-	 * @param string $file      A file neve, amelyben a hiba jelentkezett. Ha ures sztring, akkor a logError()
-	 *                          metodus meghivasanak helyet naplozzuk.
-	 * @param int    $line      A hibat tartalmazo sor szama. Ha <var>0</var>, akkor a logError()
-	 *                          metodus meghivasanak helyet naplozzuk.
-	 * @param array  $context   Azon valtozok, amelyek a hiba keletkezesekor elerhetok voltak az adott kontextusban.
+	 * @param int    $code      The error code.
+	 * @param string $message   The message of the error.
+	 * @param string $file      The name of the file where the error triggered.
+	 * @param int    $line      The number of the line where the error triggered.
+	 * @param array  $context   The context of the error (Variables in the scope).
 	 *
 	 * @return void
 	 */
@@ -735,8 +734,8 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 			<div class="yapep-debug-error-item yapep-debug-collapse-all">
 				<p class="yapep-debug-clickable" onclick="Yapep.toggle('SQL<?= $index ?>'); return false;">
 					<?= (isset($query['runtime']) ? sprintf('%.4f', $query['runtime']) : '') ?> sec in
-					<var><?= $query['location']['file'] ?></var>,
-					<u>line <?= $query['location']['line'] ?></u>
+					<var><?= $query['file'] ?></var>,
+					<u>line <?= $query['line'] ?></u>
 				</p>
 					<ol class="yapep-debug-code yapep-debug-copyable" title="Double-click to copy content" id="yapep-debug-SQL<?= $index ?>" ondblclick="Yapep.copyToClipboard(this); return false;">
 					<?php foreach (explode("\n", $queryCleared) as $index => $line): ?>

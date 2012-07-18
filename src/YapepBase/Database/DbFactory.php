@@ -112,8 +112,7 @@ class DbFactory {
 				throw new DatabaseException('Invalid database config: ' . $connectionName);
 			}
 
-			static::$connections[$connectionName][$connectionType] = static::makeConnection($data, $connectionName,
-				$connectionType);
+			static::$connections[$connectionName][$connectionType] = static::makeConnection($data, $connectionName);
 			if (self::TYPE_READ_WRITE == $connectionType
 				|| isset(static::$connections[$connectionName][self::TYPE_READ_ONLY])
 			) {
@@ -170,13 +169,12 @@ class DbFactory {
 	 *
 	 * @param array  $configuration    The configuration data.
 	 * @param string $connectionName   The name of the connection.
-	 * @param string $connectionType   The type of the connection. {@uses self::TYPE_*}
 	 *
 	 * @return DbConnection   The connection instance.
 	 *
 	 * @throws DatabaseException   On configuration or connection errors.
 	 */
-	protected static function makeConnection(array $configuration, $connectionName, $connectionType) {
+	protected static function makeConnection(array $configuration, $connectionName) {
 		switch ($configuration['backendType']) {
 			case self::BACKEND_TYPE_MYSQL:
 				return new MysqlConnection($configuration, $connectionName, static::$paramPrefix);
