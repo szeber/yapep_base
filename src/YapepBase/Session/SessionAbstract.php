@@ -248,7 +248,7 @@ abstract class SessionAbstract implements ISession {
 	}
 
 	/**
-	 * Saves the session. If it has not been loaded yet, it loads it first.
+	 * Saves the session.
 	 *
 	 * @return void
 	 *
