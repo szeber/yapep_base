@@ -56,7 +56,7 @@ class DbFactoryTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testBadConnectionName() {
 		$this->setExpectedException('\YapepBase\Exception\DatabaseException',
-			'Database connection configuration not found');
+			'Database connection configuration "test2" not found');
 
 		DbFactory::getConnection('test2', DbFactory::TYPE_READ_WRITE);
 	}

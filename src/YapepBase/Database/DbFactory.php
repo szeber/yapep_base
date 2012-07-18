@@ -105,9 +105,13 @@ class DbFactory {
 			$data = $config->get('resource.database.' . $connectionName . '.' . $connectionType . '.*', false);
 
 			if (empty($data) || !is_array($data)) {
-				throw new DatabaseException('Database connection configuration not found');
+				throw new DatabaseException('Database connection configuration "' . $connectionName . '" not found');
 			}
-			static::validateConnectionConfig($data);
+
+			if (!static::validateConnectionConfig($data)) {
+				throw new DatabaseException('Invalid database config: ' . $connectionName);
+			}
+
 			static::$connections[$connectionName][$connectionType] = static::makeConnection($data, $connectionName,
 				$connectionType);
 			if (self::TYPE_READ_WRITE == $connectionType
@@ -125,16 +129,16 @@ class DbFactory {
 	 *
 	 * @param array $configuration   The config to validate.
 	 *
-	 * @return void
-	 *
-	 * @throws DatabaseException   On configuration errors.
+	 * @return bool   TRUE if the given configuration is valid, FALSE otherwise.
 	 */
 	protected static function validateConnectionConfig(array $configuration) {
 		if (!isset($configuration['backendType'])) {
-			throw new DatabaseException('Invalid database config');
+			return false;
 		}
+
 		switch ($configuration['backendType']) {
 			case self::BACKEND_TYPE_MYSQL:
+				// We need all these information to connect to a MySQL server
 				if (
 					empty($configuration['host'])
 					|| empty($configuration['user'])
@@ -142,19 +146,23 @@ class DbFactory {
 					|| empty($configuration['charset'])
 					|| empty($configuration['database'])
 				) {
-					throw new DatabaseException('Invalid database config');
+					return false;
 				}
 				break;
 
 			case self::BACKEND_TYPE_SQLITE:
+				// We need only the path to connect to an SQLite
 				if (empty($configuration['path'])) {
-					throw new DatabaseException('Invalid database config');
+					return false;
 				}
 				break;
 
+			// We have an unknown backend type
 			default:
-				throw new DatabaseException('Invalid database config');
+				return false;
 		}
+
+		return true;
 	}
 
 	/**
@@ -179,7 +187,7 @@ class DbFactory {
 				break;
 
 			default:
-				throw new DatabaseException('Invalid database config');
+				throw new DatabaseException('Invalid database config: ' . $connectionName);
 		}
 	}
 
