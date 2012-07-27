@@ -79,4 +79,39 @@ abstract class ComponentAbstract extends BlockAbstract {
 	public function checkIsArray($key) {
 		return parent::checkIsArray($this->getKey($key));
 	}
+
+	/**
+	 * Returns the the value registered to the given key from the "scope" of the caller class.
+	 *
+	 * @param string $key   The name of the key.
+	 * @param bool   $raw   if TRUE it will return the raw (unescaped) data.
+	 *
+	 * @return mixed   The data stored with the given key.
+	 */
+	public function getFromOrigin($key, $raw = false) {
+		return parent::get($key, $raw);
+	}
+
+	/**
+	 * Checks the given key if it has a value in the "scope" of the caller class.
+	 *
+	 * @param string $key          The name of the key.
+	 * @param bool   $checkIsSet   If TRUE it checks the existense of the key.
+	 *
+	 * @return bool   FALSE if it has a value/exist, TRUE if not.
+	 */
+	public function checkIsEmptyFromOrigin($key, $checkIsSet = false) {
+		return parent::checkIsEmpty($key, $checkIsSet);
+	}
+
+	/**
+	 * Checks if the value is an array in the "scope" of the caller class.
+	 *
+	 * @param string $key   The name of the key.
+	 *
+	 * @return bool   TRUE if its an array, FALSE if not.
+	 */
+	public function checkIsArrayFromOrigin($key) {
+		return parent::checkIsArray($key);
+	}
 }
