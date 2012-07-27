@@ -10,7 +10,7 @@
 
 namespace YapepBase\View;
 
-use YapepBase\View\ViewAbstract;
+use YapepBase\View\BlockAbstract;
 
 /**
  * ComponentAbstract class, should be extended by every Component.
@@ -18,7 +18,7 @@ use YapepBase\View\ViewAbstract;
  * @package    YapepBase
  * @subpackage View
  */
-abstract class ComponentAbstract extends ViewAbstract {
+abstract class ComponentAbstract extends BlockAbstract {
 
 	/**
 	 * Returns the key can be used to store and retrieve the data.
