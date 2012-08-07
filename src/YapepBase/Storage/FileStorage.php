@@ -98,7 +98,8 @@ class FileStorage extends StorageAbstract {
 	 */
 	protected function setupConfig(array $config) {
 		if (empty($config['path'])) {
-			throw new ConfigException('Path is not set for FileStorage config');
+			throw new ConfigException('Path is not set for FileStorage config ('
+				. $this->currentConfigurationName . ')');
 		}
 		$this->path = $config['path'];
 		if (!in_array(substr($this->path, -1, 1), array('/', '\\'))) {
@@ -112,14 +113,14 @@ class FileStorage extends StorageAbstract {
 
 		if (!file_exists($this->path)) {
 			if (!mkdir($this->path, ($this->fileMode | 0111), true)) {
-				throw new StorageException('Can not create directory for FileStorage');
+				throw new StorageException('Can not create directory for FileStorage: ' . $this->path);
 			}
 		} elseif (!is_dir(rtrim($this->path, '/'))) {
-			throw new StorageException('Path is not a directory for FileStorage');
+			throw new StorageException('Path is not a directory for FileStorage: ' . $this->path);
 		}
 
 		if (!is_writable($this->path)) {
-			throw new StorageException('Path is not writable for FileStorage');
+			throw new StorageException('Path is not writable for FileStorage: ' . $this->path);
 		}
 	}
 
@@ -138,7 +139,7 @@ class FileStorage extends StorageAbstract {
 			$fileName = md5($fileName);
 		}
 		if (!preg_match('/^[-_.a-zA-Z0-9]+$/', $fileName)) {
-			throw new StorageException('Invalid filename');
+			throw new StorageException('Invalid filename: ' . $fileName);
 		}
 		return $this->path . $fileName;
 	}
@@ -159,7 +160,7 @@ class FileStorage extends StorageAbstract {
 		$fileName = $this->makeFullPath($key);
 		// save error handled via exception
 		if (false === @file_put_contents($fileName, $this->prepareData($key, $data, $ttl))) {
-			throw new StorageException('Unable to write data to FileStorage');
+			throw new StorageException('Unable to write data to FileStorage (file: ' . $fileName . ' )');
 		}
 		// Disable potential warnings if unit testing with vfsStream
 		@\chmod($fileName, $this->fileMode);
@@ -174,11 +175,11 @@ class FileStorage extends StorageAbstract {
 	 *
 	 * @return string
 	 *
-	 * @throws \YapepBase\Exception\ParameterException   If TTL is not suppored by the backend.
+	 * @throws \YapepBase\Exception\ParameterException   If TTL is not supported by the backend.
 	 */
 	protected function prepareData($key, $data, $ttl = 0) {
 		if ($ttl != 0 && $this->storePlainText) {
-			throw new ParameterException('TTL option is set for FileSorage with storePlainText config option.');
+			throw new ParameterException('TTL option is set for FileStorage with storePlainText config option.');
 		}
 		if ($this->storePlainText) {
 			return (string)$data;
@@ -224,7 +225,7 @@ class FileStorage extends StorageAbstract {
 		$fileName = $this->makeFullPath($key);
 		if (file_exists($fileName)) {
 			if (!is_readable($fileName) || false === ($contents = file_get_contents($fileName))) {
-				throw new StorageException('Unable to read file');
+				throw new StorageException('Unable to read file: ' . $fileName);
 			}
 			$data = $this->readData($contents);
 			if (false === $data) {
@@ -248,7 +249,7 @@ class FileStorage extends StorageAbstract {
 		$fileName = $this->makeFullPath($key);
 		if (file_exists($fileName)) {
 			if (!unlink($fileName)) {
-				throw new StorageException('Unable to delete file');
+				throw new StorageException('Unable to delete file: ' . $fileName);
 			}
 		}
 	}

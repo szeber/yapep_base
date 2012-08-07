@@ -26,6 +26,13 @@ use YapepBase\Config;
 abstract class StorageAbstract implements IStorage {
 
 	/**
+	 * Holds the name of the currently used configuration.
+	 *
+	 * @var string
+	 */
+	protected $currentConfigurationName;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param string $configName   The name of the configuration to use.
@@ -34,6 +41,8 @@ abstract class StorageAbstract implements IStorage {
 	 * @throws \YapepBase\Exception\StorageException   On storage errors.
 	 */
 	public function __construct($configName) {
+		$this->currentConfigurationName = $configName;
+
 		$config = Config::getInstance()->get('resource.storage.' . $configName . '.*', false);
 		if (false === $config) {
 			throw new ConfigException('Configuration not found: ' . $configName);
