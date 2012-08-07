@@ -592,7 +592,7 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 			</li>
 			<li>
 				<span class="yapep-debug-clickable yapep-debug-time" onclick="Yapep.toggle('panel-time')">
-					<?= $this->runTime ?> ms
+					<?= number_format($this->runTime * 1000, 2) ?> ms
 				</span>
 			</li>
 			<li>
