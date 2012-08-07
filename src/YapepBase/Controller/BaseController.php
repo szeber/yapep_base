@@ -49,6 +49,7 @@ abstract class BaseController implements IController {
 	public function __construct(IRequest $request, IResponse $response) {
 		$this->request = $request;
 		$this->response = $response;
+		Application::getInstance()->getDiContainer()->getViewDo()->clear();
 	}
 
 	/**
