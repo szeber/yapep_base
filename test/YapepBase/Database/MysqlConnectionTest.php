@@ -326,9 +326,17 @@ class MysqlConnectionTest extends \PHPUnit_Framework_TestCase {
 		$this->assertNotEmpty($connection->query('SELECT @@SESSION.sql_mode')->fetchColumn(),
 			'The session sql mode is empty on the traditional mode connection');
 
-		$connection = $this->getConnection(array('timezone' =>'UTC'));
-		$this->assertEquals('UTC', $connection->query('SELECT @@SESSION.time_zone')->fetchColumn(),
-			'The time zone has not been set');
+		$connection = $this->getConnection(array('timezone' => 'UTC'));
+		$result = $connection->query('SELECT @@SESSION.time_zone')->fetchColumn();
+		if ('SYSTEM' === $result) {
+			// If the system's timezone is UTC, SYSTEM will get returned, so test with another zone. If it changes to
+			// that, the test should be considered successful.
+			$connection = $this->getConnection(array('timezone' => '+12:00'));
+			$result = $connection->query('SELECT @@SESSION.time_zone')->fetchColumn();
+			$this->assertEquals('+12:00', $result, 'The time zone has not been set');
+		} else {
+			$this->assertEquals('UTC', $result, 'The time zone has not been set');
+		}
 	}
 
 }
