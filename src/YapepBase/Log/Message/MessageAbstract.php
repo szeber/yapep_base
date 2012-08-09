@@ -4,7 +4,6 @@
  *
  * @package      YapepBase
  * @subpackage   Log/Message
- * @author       Zsolt Szeberenyi <szeber@yapep.org>
  * @copyright    2011 The YAPEP Project All rights reserved.
  * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
  */
@@ -22,8 +21,6 @@ abstract class MessageAbstract implements IMessage {
 
 	/**
 	 * The fields of the log message.
-	 *
-	 * Must be a numerically indexed array with the fields added in the order they should be logged.
 	 *
 	 * @var array
 	 */
@@ -50,7 +47,6 @@ abstract class MessageAbstract implements IMessage {
 	 */
 	public function getFields() {
 		return $this->fields;
-
 	}
 
 	/**
