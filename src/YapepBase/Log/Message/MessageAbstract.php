@@ -8,8 +8,8 @@
  * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
-
 namespace YapepBase\Log\Message;
+
 
 /**
  * Log message base class
