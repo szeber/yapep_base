@@ -176,7 +176,7 @@ class MemcachedStorage extends StorageAbstract {
 		$result = $this->memcache->get($this->makeKey($key));
 		if (false === $result) {
 			$code = $this->memcache->getResultCode();
-			if (\Memcached::RES_NOTFOUND !== $code) {
+			if (\Memcached::RES_NOTFOUND !== $code && \Memcached::RES_SUCCESS !== $code) {
 				throw new StorageException('Unable to get value in memcache. Error: '
 					. $this->memcache->getResultMessage(), $this->memcache->getResultCode());
 			}
