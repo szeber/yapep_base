@@ -28,8 +28,8 @@ class MockBo extends BoAbstract {
 		return parent::getFromStorage($key);
 	}
 
-	public function setToStorage($key, $data, $ttl = 0) {
-		parent::setToStorage($key, $data, $ttl);
+	public function setToStorage($key, $data, $ttl = 0, $forceEmptyStorage = false) {
+		parent::setToStorage($key, $data, $ttl, $forceEmptyStorage);
 	}
 
 	public function deleteFromStorage($key = '') {

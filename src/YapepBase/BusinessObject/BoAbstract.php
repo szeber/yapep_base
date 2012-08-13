@@ -96,11 +96,13 @@ abstract class BoAbstract {
 	}
 
 	/**
-	 * Stores data under the specified key
+	 * Stores data under the specified key.
 	 *
-	 * @param string $key    The key to be used to store the data.
-	 * @param mixed  $data   The data to store.
-	 * @param int    $ttl    The expiration time of the data in seconds if supported by the backend.
+	 * @param string $key                 The key to be used to store the data.
+	 * @param mixed  $data                The data to store. By default the empty values won't be stored
+	 *                                    (NULL, 0, '', '0', false).
+	 * @param int    $ttl                 The expiration time of the data in seconds if supported by the backend.
+	 * @param bool   $forceEmptyStorage   If  TRUE, the method will store empty values as well (except for FALSE).
 	 *
 	 * @return void
 	 *
@@ -108,9 +110,18 @@ abstract class BoAbstract {
 	 * @throws \YapepBase\Exception\StorageException     On error.
 	 * @throws \YapepBase\Exception\ParameterException   If TTL is set and not supported by the backend.
 	 */
-	protected function setToStorage($key, $data, $ttl = 0) {
+	protected function setToStorage($key, $data, $ttl = 0, $forceEmptyStorage = false) {
 		if (empty($key)) {
 			throw new ParameterException();
+		}
+
+		if (
+			// If we're not forced to store empty values, and the given values is emptys
+			(!$forceEmptyStorage && empty($data))
+			// If we're forced to store empty values, we still wont store FALSE
+			|| ($forceEmptyStorage && $data === false)
+		) {
+			return;
 		}
 
 		$storageKey = $this->getKeyPrefix() . $key;

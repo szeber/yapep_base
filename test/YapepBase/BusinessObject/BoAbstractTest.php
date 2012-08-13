@@ -96,6 +96,41 @@ class BoAbstractTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * Tests the caching of empty values.
+	 *
+	 * @return void
+	 */
+	public function testCachingEmptyValues() {
+		$bo = new MockBo();
+
+		$bo->setToStorage('test', null);
+		$this->assertFalse($bo->getFromStorage('test'), 'Null should not be stored');
+
+		$bo->setToStorage('test', 0);
+		$this->assertFalse($bo->getFromStorage('test'), '0 should not be stored');
+
+		$bo->setToStorage('test', '0');
+		$this->assertFalse($bo->getFromStorage('test'), '\'0\' should not be stored');
+
+		$bo->setToStorage('test', false);
+		$this->assertFalse($bo->getFromStorage('test'), 'false should not be stored');
+
+		// Testing the same with forcing the Bo to store empty values
+		$bo->setToStorage('test', null, 0, true);
+		$this->assertEquals(null, $bo->getFromStorage('test'), 'Null should not be stored');
+
+		$bo->setToStorage('test', 0, 0, true);
+		$this->assertEquals(0, $bo->getFromStorage('test'), '0 should not be stored');
+
+		$bo->setToStorage('test', '0', 0, true);
+		$this->assertEquals('0', $bo->getFromStorage('test'), '\'0\' should not be stored');
+
+		// Be cautious when modifying this, because it depends on the last stored value
+		$bo->setToStorage('test', false, 0, true);
+		$this->assertEquals('0', $bo->getFromStorage('test'), 'false should not be stored');
+	}
+
+	/**
 	 * Tests the deletion options
 	 *
 	 * @return void
