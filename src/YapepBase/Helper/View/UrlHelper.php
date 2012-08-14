@@ -80,13 +80,11 @@ class UrlHelper extends HelperAbstract {
 	 * @return bool
 	 */
 	public static function checkIsCurrentUri($controller, $action) {
-		/** @var \YapepBase\Request\HttpRequest $request  */
-		$request = Application::getInstance()->getRequest();
+		// Get the current controller and action
+		$currentController = null;
+		$currentAction = null;
+		Application::getInstance()->getRouter()->getRoute($currentController, $currentAction);
 
-		$currentUri = $request->getTarget();
-		$uriParams = $request->getAllUri();
-		$givenUri = self::getRouteTarget($controller, $action, $uriParams);
-
-		return $givenUri == $currentUri;
+		return $currentController == $controller && $currentAction == $action;
 	}
 }
