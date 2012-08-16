@@ -4,7 +4,6 @@
  *
  * @package      YapepBase
  * @subpackage   Router
- * @author       Zsolt Szeberenyi <szeber@yapep.org>
  * @copyright    2011 The YAPEP Project All rights reserved.
  * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
  */
@@ -147,7 +146,7 @@ class ArrayRouter implements IRouter {
 		}
 
 		// There was no valid route
-		throw new RouterException('No route found for path', RouterException::ERR_NO_ROUTE_FOUND);
+		throw new RouterException('No route found for path: ' . $target, RouterException::ERR_NO_ROUTE_FOUND);
 	}
 
 	/**
@@ -164,7 +163,7 @@ class ArrayRouter implements IRouter {
 		if (
 			!preg_match_all('/\{([-_.a-zA-Z0-9]+):([-_.a-zA-Z0-9]+)(\(([^}]*)\))?\}/', $path, $matches, PREG_SET_ORDER)
 		) {
-			throw new RouterException('Invalid param syntax in route', RouterException::ERR_SYNTAX_PARAM);
+			throw new RouterException('Invalid param syntax in route: ' . $path, RouterException::ERR_SYNTAX_PARAM);
 		}
 
 		$pathRegex = '/^' . preg_quote($path, '/') . '$/';
@@ -185,7 +184,7 @@ class ArrayRouter implements IRouter {
 
 				case 'regex':
 					if (empty($match[3])) {
-						throw new RouterException('Regex param type without pattern',
+						throw new RouterException('Regex param type without pattern: ' . $path,
 							RouterException::ERR_SYNTAX_PARAM);
 					}
 					$pattern = $match[3];
@@ -193,7 +192,7 @@ class ArrayRouter implements IRouter {
 
 				case 'enum':
 					if (empty($match[3])) {
-						throw new RouterException('Enum param type without values',
+						throw new RouterException('Enum param type without values: ' . $path,
 							RouterException::ERR_SYNTAX_PARAM);
 					}
 					$pattern = $match[3];
@@ -208,7 +207,7 @@ class ArrayRouter implements IRouter {
 			$pathRegex = str_replace(preg_quote($match[0], '/'), '(?P<' . preg_quote($match[1], '/') . '>' . $pattern
 				. ')', $pathRegex, $count);
 			if (1 != $count) {
-				throw new RouterException('Duplicate route param name', RouterException::ERR_SYNTAX_PARAM);
+				throw new RouterException('Duplicate route param name: ' . $path, RouterException::ERR_SYNTAX_PARAM);
 			}
 		}
 		return $pathRegex;
@@ -237,7 +236,10 @@ class ArrayRouter implements IRouter {
 				$target = preg_replace('/\{' . preg_quote($key, '/') . ':[^}]+\}/', $value, $target);
 			}
 			if (strstr($target, '{')) {
-				throw new RouterException('Missing route params.', RouterException::ERR_MISSING_PARAM);
+				throw new RouterException(
+					'Missing route paramsfor controller and action: ' . $controller . '/' . $action,
+					RouterException::ERR_MISSING_PARAM
+				);
 			}
 		}
 		if ('/' != substr($target, 0, 1)) {

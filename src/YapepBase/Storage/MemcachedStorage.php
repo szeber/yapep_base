@@ -4,7 +4,6 @@
  *
  * @package      YapepBase
  * @subpackage   Storage
- * @author       Zsolt Szeberenyi <szeber@yapep.org>
  * @copyright    2011 The YAPEP Project All rights reserved.
  * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
  */
@@ -90,7 +89,7 @@ class MemcachedStorage extends StorageAbstract {
 	 */
 	protected function setupConfig(array $config) {
 		if (empty($config['host'])) {
-			throw new ConfigException('Host is not set for MemcachedStorage');
+			throw new ConfigException('Host is not set for MemcachedStorage: ' . $this->currentConfigurationName);
 		}
 		$this->host = $config['host'];
 		$this->port = (isset($config['port']) ? (int)$config['port'] : 11211);

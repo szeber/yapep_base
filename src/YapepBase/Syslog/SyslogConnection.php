@@ -4,12 +4,14 @@
  *
  * @package      YapepBase
  * @subpackage   Syslog
- * @author       Janos Pasztor <j.pasztor@ixolit.com>
  * @copyright    2011 The YAPEP Project All rights reserved.
  * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
 namespace YapepBase\Syslog;
+
+
+use YapepBase\Exception\ParameterException;
 use YapepBase\Exception\SyslogException;
 
 /**
@@ -183,7 +185,7 @@ abstract class SyslogConnection implements ISyslogConnection {
 			$this->facility = $facility;
 			return $this;
 		} else {
-			throw new \YapepBase\Exception\ParameterException('Invalid facility: ' . $facility
+			throw new ParameterException('Invalid facility: ' . $facility
 				. ' (facilities must be dividable by 8 and between 0 and 184)');
 		}
 	}

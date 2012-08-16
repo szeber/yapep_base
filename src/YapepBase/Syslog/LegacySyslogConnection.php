@@ -4,13 +4,15 @@
  *
  * @package      YapepBase
  * @subpackage   Syslog
- * @author       Janos Pasztor <j.pasztor@ixolit.com>
  * @copyright    2011 The YAPEP Project All rights reserved.
  * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
 namespace YapepBase\Syslog;
+
+
 use YapepBase\Exception\SyslogException;
+use YapepBase\Exception\NotImplementedException;
 
 /**
  * This class uses the native PHP syslog calls.
@@ -33,8 +35,7 @@ class LegacySyslogConnection extends SyslogConnection {
 	 * @throws \YapepBase\Exception\NotImplementedException because PHP's syslog functions do not accept a log socket.
 	 */
 	public function setPath($path = '/dev/log') {
-		throw new \YapepBase\Exception\NotImplementedException('The PHP syslog functions can only use the default '
-			. 'log socket.');
+		throw new NotImplementedException('The PHP syslog functions can only use the default log socket.');
 	}
 
 	/**
@@ -75,8 +76,7 @@ class LegacySyslogConnection extends SyslogConnection {
 		$this->validatePriority($priority);
 		$this->validateIdent($ident);
 		if (!\is_null($date)) {
-			throw new \YapepBase\Exception\NotImplementedException('PHP\'s internal syslog functions don\'t support ' .
-				'passing the date');
+			throw new NotImplementedException('PHP\'s internal syslog functions don\'t support passing the date');
 		}
 		if (!is_string($ident)) {
 			$ident = $this->ident;

@@ -98,13 +98,14 @@ abstract class BaseController implements IController {
 	public function run($action) {
 		$methodName = $this->getActionPrefix() . $action;
 		if (!method_exists($this, $methodName)) {
-			throw new ControllerException('Action ' . $methodName . ' does not exist',
+			throw new ControllerException('Action ' . $methodName . ' does not exist in ' . get_class($this),
 				ControllerException::ERR_ACTION_NOT_FOUND);
 		}
 		$this->before();
 		$result = $this->runAction($methodName);
 		if (!empty($result) && !is_string($result) && !($result instanceof ViewAbstract)) {
-			throw new ControllerException('Result of the action is not an instance of ViewAbstract or string',
+			throw new ControllerException('Result of the action (' . get_class($this) . '/' . $action
+					.  ') is not an instance of ViewAbstract or string',
 				ControllerException::ERR_INVALID_ACTION_RESULT);
 		}
 		if (!empty($result)) {

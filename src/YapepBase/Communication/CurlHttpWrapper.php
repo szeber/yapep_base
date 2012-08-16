@@ -190,7 +190,7 @@ class CurlHttpWrapper {
 		$result = curl_exec($this->curl);
 		if (false === $result) {
 			$this->error = curl_error($this->curl);
-			throw new \YapepBase\Exception\Exception(curl_error($this->curl));
+			throw new \YapepBase\Exception\Exception('Curl Error:' . curl_error($this->curl));
 		}
 
 		$info = curl_getinfo($this->curl);

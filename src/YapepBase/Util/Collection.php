@@ -4,12 +4,14 @@
  *
  * @package      YapepBase
  * @subpackage   Util
- * @author       Janos Pasztor <net@janoszen.hu>
  * @copyright    2011 The YAPEP Project All rights reserved.
  * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
 namespace YapepBase\Util;
+
+
+use YapepBase\Exception\ValueException;
 
 /**
  * This is a generic Collection (array) class, which can be used as an object
@@ -32,7 +34,7 @@ class Collection extends ArrayObject {
 	 */
 	final protected function keyCheck($offset) {
 		if (!\is_int($offset)) {
-			throw new \YapepBase\Exception\ValueException($offset, 'integer');
+			throw new ValueException($offset, 'integer');
 		}
 	}
 }

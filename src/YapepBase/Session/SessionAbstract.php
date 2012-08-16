@@ -4,7 +4,6 @@
  *
  * @package      YapepBase
  * @subpackage   Session
- * @author       Zsolt Szeberenyi <szeber@yapep.org>
  * @copyright    2011 The YAPEP Project All rights reserved.
  * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
  */
@@ -104,13 +103,13 @@ abstract class SessionAbstract implements ISession {
 	 * @param \YapepBase\Storage\IStorage   $storage        The storage object.
 	 * @param \YapepBase\Request\IRequest   $request        The request object.
 	 * @param \YapepBase\Response\IResponse $response       The response object.
-	 * @param bool                          $autoregister   If TRUE, it will automatically register as an event handler.
+	 * @param bool                          $autoRegister   If TRUE, it will automatically register as an event handler.
 	 *
 	 * @throws \YapepBase\Exception\ConfigException   On configuration problems
 	 * @throws \YapepBase\Exception\Exception         On other problems
 	 */
 	public function __construct(
-		$configName, IStorage $storage, IRequest $request, IResponse $response, $autoregister = true
+		$configName, IStorage $storage, IRequest $request, IResponse $response, $autoRegister = true
 	) {
 		if (!$storage->isTtlSupported()) {
 			throw new Exception('Storage without TTL support passed to session handler.');
@@ -135,7 +134,7 @@ abstract class SessionAbstract implements ISession {
 
 		$this->validateConfig($config);
 
-		if ($autoregister) {
+		if ($autoRegister) {
 			$this->registerEventHandler();
 		}
 

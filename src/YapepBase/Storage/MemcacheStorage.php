@@ -4,7 +4,6 @@
  *
  * @package      YapepBase
  * @subpackage   Storage
- * @author       Zsolt Szeberenyi <szeber@yapep.org>
  * @copyright    2011 The YAPEP Project All rights reserved.
  * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
  */
@@ -92,7 +91,7 @@ class MemcacheStorage extends StorageAbstract {
 	 */
 	protected function setupConfig(array $config) {
 		if (empty($config['host'])) {
-			throw new ConfigException('Host is not set for MemcacheStorage');
+			throw new ConfigException('Host is not set for MemcacheStorage: ' . $this->currentConfigurationName);
 		}
 		$this->host = $config['host'];
 		$this->port = (isset($config['port']) ? (int)$config['port'] : 11211);
@@ -102,7 +101,8 @@ class MemcacheStorage extends StorageAbstract {
 
 		$this->memcache = Application::getInstance()->getDiContainer()->getMemcache();
 		if (!$this->memcache->connect($this->host, $this->port)) {
-			throw new StorageException('MemcacheStorage is unable to connect to server');
+			throw new StorageException('MemcacheStorage is unable to connect to server: '
+				. $this->host . ':' . $this->port);
 		}
 	}
 
