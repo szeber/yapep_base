@@ -74,6 +74,10 @@ class UrlHelper extends HelperAbstract {
 	/**
 	 * Checks if the given uri is the same as the actual.
 	 *
+	 * <b>Warning:</b> If you wan't to use this method on an ErrorPage it can throw an Exception,
+	 * because by default the error pages don't have to be set in the routing table.
+	 * So to avoid this, you just have to add your error pages into your routing table.
+	 *
 	 * @param string $controller   Name of the controller
 	 * @param string $action       Name of the action
 	 *
