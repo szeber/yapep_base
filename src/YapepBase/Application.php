@@ -42,6 +42,9 @@ use YapepBase\I18n\ITranslator;
  */
 class Application {
 
+	/** The name of the default Error Controller. */
+	const DEFAULT_ERROR_CONTROLLER_NAME = 'Error';
+
 	/**
 	 * Singleton instance
 	 *
@@ -97,6 +100,20 @@ class Application {
 	 * @var \YapepBase\I18n\ITranslator
 	 */
 	protected $i18nTranslator;
+
+	/**
+	 * Stores the name of the currently dispatched Controller.
+	 *
+	 * @var string
+	 */
+	protected $dispatchedController;
+
+	/**
+	 * Stores the name of the currently dispatched Action.
+	 *
+	 * @var string
+	 */
+	protected $dispatchedAction;
 
 	/**
 	 * Singleton constructor
@@ -260,6 +277,19 @@ class Application {
 	}
 
 	/**
+	 * Returns the name of the currently dispatched Controller and Action.
+	 *
+	 * @param string $controllerName   The name of the Controller will be populated here (Outgoing parameter).
+	 * @param string $actionName       The name of the Action will be populated here (Outgoing parameter).
+	 *
+	 * @return void
+	 */
+	public function getDispatchedAction(&$controllerName, &$actionName) {
+		$controllerName = $this->dispatchedController;
+		$actionName = $this->dispatchedAction;
+	}
+
+	/**
 	 * Runs the request on the application
 	 *
 	 * @return void
@@ -272,6 +302,9 @@ class Application {
 			$action = null;
 			try {
 				$this->router->getRoute($controllerName, $action);
+
+				$this->dispatchedController = $controllerName;
+				$this->dispatchedAction = $action;
 			} catch (RouterException $exception) {
 				if ($exception->getCode() == RouterException::ERR_NO_ROUTE_FOUND) {
 					// The route was not found, generate a 404 HttpException
@@ -282,6 +315,7 @@ class Application {
 					throw $exception;
 				}
 			}
+
 			$controller = $this->getDiContainer()->getController($controllerName, $this->request, $this->response);
 			$controller->run($action);
 			$this->response->send();
@@ -329,13 +363,26 @@ class Application {
 	 * @return void
 	 */
 	protected function runErrorAction($errorCode) {
-		$controllerName = $this->config->get('system.errorController', 'Error');
+		$controllerName = $this->config->get('system.errorController', self::DEFAULT_ERROR_CONTROLLER_NAME);
+
 		try {
-			$controller = $this->diContainer->getController($controllerName, $this->request, $this->response);
-		} catch (ControllerException $exception) {
-			// No such controller, fall back to built in default
-			$controller = $this->diContainer->getDefaultErrorController($this->request, $this->response);
+			try {
+				$controller = $this->diContainer->getController($controllerName, $this->request, $this->response);
+			} catch (ControllerException $exception) {
+				// No such controller, fall back to built in default
+				$controller = $this->diContainer->getDefaultErrorController($this->request, $this->response);
+				$controllerName = self::DEFAULT_ERROR_CONTROLLER_NAME;
+			}
+		} catch (\Exception $e) {
+			$this->dispatchedController = $controllerName;
+			$this->dispatchedAction = 500;
+
+			throw $e;
 		}
+
+		$this->dispatchedController = $controllerName;
+		$this->dispatchedAction = $errorCode;
+
 		$controller->run($errorCode);
 		$this->response->send();
 	}

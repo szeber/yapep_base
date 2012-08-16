@@ -85,7 +85,7 @@ class ArrayRouter implements IRouter {
 	/**
 	 * Returns a controller and an action for the request's target.
 	 *
-	 * @param string $controller   $he controller class name. (Outgoing parameter)
+	 * @param string $controller   The controller class name. (Outgoing parameter)
 	 * @param string $action       The action name in the controller class. (Outgoing parameter)
 	 *
 	 * @return string   The controller and action separated by a '/' character.

@@ -12,3 +12,4 @@ syntax: regexp
 syntax: glob
 vendor
 composer.lock
+.DS_Store
