@@ -85,7 +85,7 @@ class BaseFilterDo {
 	 */
 	public function setOrder($order) {
 		if (!in_array($order, $this->usableFields)) {
-			throw new ParameterException();
+			throw new ParameterException('Invalid field for ordering: ' . $order);
 		}
 		$this->order = $order;
 	}
