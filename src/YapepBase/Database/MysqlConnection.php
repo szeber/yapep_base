@@ -39,19 +39,11 @@ class MysqlConnection extends DbConnection {
 			: array()
 		);
 
-		if (!isset($options[PDO::MYSQL_ATTR_INIT_COMMAND])) {
-			$options[PDO::MYSQL_ATTR_INIT_COMMAND] = '';
-		} elseif (';' != substr(trim($options[PDO::MYSQL_ATTR_INIT_COMMAND]), -1, 1)) {
-			$options[PDO::MYSQL_ATTR_INIT_COMMAND] .= ';';
-		}
-
-		$options[PDO::MYSQL_ATTR_INIT_COMMAND] .= 'SET NAMES ' . (
-			empty($configuration['charset'])
-				? 'utf8'
-				: $configuration['charset']
-		) . ';';
-
 		$this->connection = new PDO($dsn, $configuration['user'], $configuration['password'], $options);
+
+		$this->query('SET NAMES ' . (empty($configuration['charset'])
+			? 'utf8'
+			: $configuration['charset']));
 
 		if (isset($configuration['useTraditionalStrictMode']) && $configuration['useTraditionalStrictMode']) {
 			$this->query('SET @@SESSION.sql_mode = \'TRADITIONAL\'; ');
