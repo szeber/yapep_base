@@ -28,7 +28,7 @@ class BaseFilterDo {
 
 	/** @var string   The name of the field for ordering the result. */
 	protected $order;
-	/** @var int   The direction of the ordering. */
+	/** @var string   The direction of the ordering. */
 	protected $orderDirection;
 
 	/**
