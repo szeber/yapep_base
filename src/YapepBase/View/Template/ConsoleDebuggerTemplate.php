@@ -127,6 +127,13 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 	protected $sessionParams;
 
 	/**
+	 * Stores the total query times per connection.
+	 *
+	 * @var array
+	 */
+	protected $queryTimeTotals;
+
+	/**
 	 * Constructor
 	 *
 	 * @param ViewDo $viewDo           The ViewDo instance to use.
@@ -169,6 +176,22 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 		$this->getParams     = $this->get($_getParams);
 		$this->cookieParams  = $this->get($_cookieParams);
 		$this->sessionParams = $this->get($_sessionParams);
+
+		$this->queryTimeTotals = array();
+
+		foreach ($this->queries as $type => $typeQueries) {
+			$this->queryTimeTotals[$type] = array();
+			foreach($typeQueries as $query) {
+				if (!isset($this->queryTimeTotals[$type][$query['connectionName']])) {
+					$this->queryTimeTotals[$type][$query['connectionName']] = 0;
+				}
+				if (!empty($query['runTime'])) {
+					$this->queryTimeTotals[$type][$query['connectionName']] += $query['runTime'];
+				}
+			}
+		}
+
+		var_dump($this->queryTimeTotals);
 	}
 
 	/**
@@ -724,6 +747,17 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 					</table>
 				</div>
 			</div>
+			<div class="yapep-debug-error-item">
+				<h3 class="yapep-debug-clickable" onclick="Yapep.toggle('DBCONNECTIONSUMMARY'); return false;">Connection summary</h3>
+				<div class="yapep-debug-panel-inner-summary" id="yapep-debug-DBCONNECTIONSUMMARY">
+					<table>
+						<tr><th>Connection</th><th>Total time</th><th>Visible</th></tr>
+						<?php foreach($this->queryTimeTotals[IDebugger::QUERY_TYPE_DB] as $name => $time): ?>
+						<tr><td><label for="yapep-debug-db-connection-toggle-<?=$name?>"><?=$name?></label></td><td><?= sprintf('%.4f', $time) ?></td><td><input type="checkbox" id="yapep-debug-db-connection-toggle-<?= $name ?>" checked="checked" onchange="Yapep.toggleClassByCheckboxStatus(this)" rel="yapep-debug-db-connection-<?= $name ?>"/> </td></tr>
+						<?php endforeach; ?>
+					</table>
+				</div>
+			</div>
 			<?php endif;?>
 
 			<p class="yapep-debug-clickable yapep-debug-collapse-all" onclick="Yapep.collapseAll(event); return false;">Collapse all</p>
@@ -731,11 +765,12 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 			foreach ($this->queries[IDebugger::QUERY_TYPE_DB] as $index => $query):
 				$queryCleared = $this->formatSqlQuery($query['query'], $query['params']);
 		?>
-			<div class="yapep-debug-error-item yapep-debug-collapse-all">
+			<div class="yapep-debug-error-item yapep-debug-collapse-all yapep-debug-db-connection-<?= $query['connectionName'] ?>">
 				<p class="yapep-debug-clickable" onclick="Yapep.toggle('SQL<?= $index ?>'); return false;">
-					<?= (isset($query['runtime']) ? sprintf('%.4f', $query['runtime']) : '') ?> sec in
+					<?= (isset($query['runTime']) ? sprintf('%.4f', $query['runTime']) : '') ?> sec in
 					<var><?= $query['file'] ?></var>,
 					<u>line <?= $query['line'] ?></u>
+					connection: <strong><?= $query['connectionName'] ?></strong>
 				</p>
 					<ol class="yapep-debug-code yapep-debug-copyable" title="Double-click to copy content" id="yapep-debug-SQL<?= $index ?>" ondblclick="Yapep.copyToClipboard(this); return false;">
 					<?php foreach (explode("\n", $queryCleared) as $index => $line): ?>
@@ -772,16 +807,28 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 					</table>
 				</div>
 			</div>
-		<?php endif;?>
+			<div class="yapep-debug-error-item">
+				<h3 class="yapep-debug-clickable" onclick="Yapep.toggle('CACHECONNECTIONSUMMARY'); return false;">Connection summary</h3>
+				<div class="yapep-debug-panel-inner-summary" id="yapep-debug-CACHECONNECTIONSUMMARY">
+					<table>
+						<tr><th>Connection</th><th>Total time</th><th>Visible</th></tr>
+						<?php foreach($this->queryTimeTotals[IDebugger::QUERY_TYPE_CACHE] as $name => $time): ?>
+						<tr><td><label for="yapep-debug-cache-connection-toggle-<?=$name?>"><?=$name?></label></td><td><?= sprintf('%.4f', $time) ?></td><td><input type="checkbox" id="yapep-debug-cache-connection-toggle-<?= $name ?>" checked="checked" onchange="Yapep.toggleClassByCheckboxStatus(this)" rel="yapep-debug-cache-connection-<?= $name ?>"/> </td></tr>
+						<?php endforeach; ?>
+					</table>
+				</div>
+			</div>
+			<?php endif;?>
 
 			<p class="yapep-debug-clickable yapep-debug-collapse-all" onclick="Yapep.collapseAll(event); return false;">Collapse all</p>
 		<?php foreach ($this->queries[IDebugger::QUERY_TYPE_CACHE] as $index => $query): ?>
-			<div class="yapep-debug-error-item">
+			<div class="yapep-debug-error-item yapep-debug-cache-connection-<?= $query['connectionName'] ?>">
 				<p class="yapep-debug-clickable" onclick="Yapep.toggle('CACHE<?= $index ?>'); return false;">
 					<b><?=$query['query']?></b> ->
-					<b><?= (isset($query['runtime']) ? sprintf('%.4f', $query['runtime']) : '') ?></b> sec in  ||
+					<b><?= (isset($query['runTime']) ? sprintf('%.4f', $query['runTime']) : '') ?></b> sec in  ||
 					<var><?= $query['file'] ?></var>,
 					<u>line <?= $query['line'] ?></u>
+					connection: <strong><?= $query['connectionName'] ?></strong>
 				</p>
 				<ol class="yapep-debug-code yapep-debug-copyable" title="Double-click to copy content" id="yapep-debug-CACHE<?= $index ?>" ondblclick="Yapep.copyToClipboard(this); return false;">
 				<?php
@@ -823,16 +870,28 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 					</table>
 				</div>
 			</div>
-		<?php endif;?>
+			<div class="yapep-debug-error-item">
+				<h3 class="yapep-debug-clickable" onclick="Yapep.toggle('CURLCONNECTIONSUMMARY'); return false;">Connection summary</h3>
+				<div class="yapep-debug-panel-inner-summary" id="yapep-debug-CURLCONNECTIONSUMMARY">
+					<table>
+						<tr><th>Connection</th><th>Total time</th><th>Visible</th></tr>
+						<?php foreach($this->queryTimeTotals[IDebugger::COUNTER_TYPE_CURL] as $name => $time): ?>
+						<tr><td><label for="yapep-debug-curl-connection-toggle-<?=$name?>"><?=$name?></label></td><td><?= sprintf('%.4f', $time) ?></td><td><input type="checkbox" id="yapep-debug-curl-connection-toggle-<?= $name ?>" checked="checked" onchange="Yapep.toggleClassByCheckboxStatus(this)" rel="yapep-debug-curl-connection-<?= $name ?>"/> </td></tr>
+						<?php endforeach; ?>
+					</table>
+				</div>
+			</div>
+			<?php endif;?>
 
 			<p class="yapep-debug-clickable yapep-debug-collapse-all" onclick="Yapep.collapseAll(event); return false;">Collapse all</p>
 		<?php foreach ($this->queries[IDebugger::QUERY_TYPE_CURL] as $index => $query): ?>
-			<div class="yapep-debug-error-item">
+			<div class="yapep-debug-error-item yapep-debug-curl-connection-<?= $query['connectionName'] ?>"">
 				<p class="yapep-debug-clickable" onclick="Yapep.toggle('CURL<?= $index ?>'); return false;">
 					<b><?=$query['url']?></b> -&gt;
-					<b><?= (isset($query['runtime']) ? sprintf('%.4f', $query['runtime']) : '') ?></b> sec in  ||
+					<b><?= (isset($query['runTime']) ? sprintf('%.4f', $query['runTime']) : '') ?></b> sec in  ||
 					<var><?= $query['file'] ?></var>,
 					<u>line <?= $query['line'] ?></u>
+					connection: <strong><?= $query['connectionName'] ?></strong>
 				</p>
 				<ol class="yapep-debug-code yapep-debug-copyable" title="Double-click to copy content" id="yapep-debug-CURL<?= $index ?>" ondblclick="Yapep.copyToClipboard(this); return false;">
 				<?php
@@ -957,6 +1016,25 @@ var Yapep = {
 			}
 		}
 		return null;
+	},
+	toggleClassByCheckboxStatus: function(checkboxElement) {
+		var nodes = this.getElementsByClassName(checkboxElement.getAttribute('rel',	false));
+		var displayValue = (checkboxElement.checked ? 'block' : 'none');
+		for (var i in nodes) {
+			nodes[i].style.display = displayValue;
+		}
+
+	},
+	getElementsByClassName: function(className) {
+		var retnode = [];
+		var myclass = new RegExp('\\b'+className+'\\b');
+		var elem = document.getElementsByTagName('*');
+		for (var i = 0; i < elem.length; i++) {
+			var classes = elem[i].className;
+			if (myclass.test(classes))
+				retnode.push(elem[i]);
+		}
+		return retnode;
 	},
 	collapseAll: function(event) {
 		var sourceEl = event.target;

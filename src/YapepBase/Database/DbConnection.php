@@ -123,7 +123,8 @@ abstract class DbConnection {
 				foreach ($params as $paramName => $paramValue) {
 					$paramsQuoted[$paramName] = $this->quote($paramValue);
 				}
-				$queryId = $debugger->logQuery(IDebugger::QUERY_TYPE_DB, $query, $paramsQuoted);
+				$queryId = $debugger->logQuery(IDebugger::QUERY_TYPE_DB,
+					$this->getBackendType() . '.' . $this->connectionName, $query, $paramsQuoted);
 				$startTime = microtime(true);
 			}
 
@@ -325,4 +326,11 @@ abstract class DbConnection {
 		return preg_replace('/([_%' . preg_quote($escapeCharacter, '/') . '])/',
 			addcslashes($escapeCharacter, '$\\') . '$1', $string);
 	}
+
+	/**
+	 * Returns the backend type for the given conneciton {@uses DbFactory::BACKEND_TYPE_*}
+	 *
+	 * @return string
+	 */
+	abstract protected function getBackendType();
 }

@@ -37,5 +37,13 @@ class SqliteConnection extends DbConnection {
 		$this->connection = new PDO($dsn, null, null, $options);
 	}
 
+	/**
+	 * Returns the backend type for the given conneciton {@uses DbFactory::BACKEND_TYPE_*}
+	 *
+	 * @return string
+	 */
+	protected function getBackendType() {
+		return DbFactory::BACKEND_TYPE_SQLITE;
+	}
 
 }

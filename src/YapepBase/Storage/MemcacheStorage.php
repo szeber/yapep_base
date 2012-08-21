@@ -138,7 +138,8 @@ class MemcacheStorage extends StorageAbstract {
 
 		// If we have a debugger, we have to log the query
 		if ($debugger !== false) {
-			$queryId = $debugger->logQuery(IDebugger::QUERY_TYPE_CACHE, 'set ' . $key . ' for ' . $ttl, $data);
+			$queryId = $debugger->logQuery(IDebugger::QUERY_TYPE_CACHE, 'memcache.' . $this->currentConfigurationName,
+				'set ' . $key . ' for ' . $ttl, $data);
 			$startTime = microtime(true);
 		}
 
@@ -164,7 +165,8 @@ class MemcacheStorage extends StorageAbstract {
 
 		// If we have a debugger, we have to log the query
 		if ($debugger !== false) {
-			$queryId = $debugger->logQuery(IDebugger::QUERY_TYPE_CACHE, 'get ' . $key);
+			$queryId = $debugger->logQuery(IDebugger::QUERY_TYPE_CACHE, 'memcache.' . $this->currentConfigurationName,
+				'get ' . $key);
 			$startTime = microtime(true);
 		}
 
@@ -193,7 +195,8 @@ class MemcacheStorage extends StorageAbstract {
 
 		// If we have a debugger, we have to log the query
 		if ($debugger !== false) {
-			$queryId = $debugger->logQuery(IDebugger::QUERY_TYPE_CACHE, 'delete ' . $key);
+			$queryId = $debugger->logQuery(IDebugger::QUERY_TYPE_CACHE, 'memcache.' . $this->currentConfigurationName,
+				'delete ' . $key);
 			$startTime = microtime(true);
 		}
 

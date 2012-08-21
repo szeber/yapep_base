@@ -82,13 +82,14 @@ interface IDebugger {
 	/**
 	 * Logs the given query.
 	 *
-	 * @param string $type     The type of the query {@uses IDebugger::QUERY_TYPE_*}.
-	 * @param string $query    The query string.
-	 * @param mixed  $params   The params used by the query.
+	 * @param string $type             The type of the query {@uses IDebugger::QUERY_TYPE_*}.
+	 * @param string $connectionName   Connection identification string with backend type.
+	 * @param string $query            The query string.
+	 * @param mixed  $params           The params used by the query.
 	 *
 	 * @return int   The id of the query, which can be used to measure the execution time of it.
 	 */
-	public function logQuery($type, $query, $params = null);
+	public function logQuery($type, $connectionName, $query, $params = null);
 
 	/**
 	 * Logs the timing of the given query.
