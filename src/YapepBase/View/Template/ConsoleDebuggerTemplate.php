@@ -190,8 +190,6 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 				}
 			}
 		}
-
-		var_dump($this->queryTimeTotals);
 	}
 
 	/**
