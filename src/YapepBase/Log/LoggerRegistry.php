@@ -9,6 +9,9 @@
  */
 
 namespace YapepBase\Log;
+
+
+use YapepBase\Exception\Log\LoggerNotFoundException;
 use YapepBase\Log\Message\IMessage;
 
 /**
@@ -68,9 +71,16 @@ class LoggerRegistry implements ILogger {
 	 * @param \YapepBase\Log\Message\IMessage $message   The message to log.
 	 *
 	 * @return void
+	 *
+	 * @throws \YapepBase\Exception\Log\LoggerNotFoundException   If there are no registered Loggers in the registry.
 	 */
 	public function log(IMessage $message) {
 		if (!$message->checkIsEmpty()) {
+
+			if (empty($this->loggers)) {
+				throw new LoggerNotFoundException('There are no registered Loggers!');
+			}
+
 			foreach ($this->loggers as $logger) {
 				/** @var ILogger $logger */
 				$logger->log($message);
