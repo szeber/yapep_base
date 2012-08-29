@@ -115,13 +115,11 @@ abstract class BatchScript {
 	 */
 	protected function runBefore() {
 		$application = Application::getInstance();
-		$eventHandlerRegistry = $application->getDiContainer()->getEventHandlerRegistry();
 		$container = $application->getDiContainer();
 		$container[SystemContainer::KEY_VIEW_DO] = $container->share(function($container) {
 			return new ViewDo(MimeType::PLAINTEXT);
 		});
 
-		$eventHandlerRegistry->raise(new Event(Event::TYPE_APPSTART));
 	}
 
 	/**
@@ -132,9 +130,7 @@ abstract class BatchScript {
 	 * @return void
 	 */
 	protected function runAfter() {
-		$application = Application::getInstance();
-		$eventHandlerRegistry = $application->getDiContainer()->getEventHandlerRegistry();
-		$eventHandlerRegistry->raise(new Event(Event::TYPE_APPFINISH));
+		// noop
 	}
 
 	/**
@@ -145,7 +141,8 @@ abstract class BatchScript {
 	 * @throws \Exception   On errors
 	 */
 	public function run() {
-		$this->runBefore();
+		$eventHandlerRegistry = Application::getInstance()->getDiContainer()->getEventHandlerRegistry();
+		$eventHandlerRegistry->raise(new Event(Event::TYPE_APPSTART));
 
 		$this->prepareSwitches();
 		try {
@@ -159,6 +156,7 @@ abstract class BatchScript {
 			throw $exception;
 		}
 
+		$this->runBefore();
 		try {
 			if ($this->currentUsage == self::HELP_USAGE) {
 				echo $this->cliHelper->getUsageOutput(true);
@@ -174,6 +172,7 @@ abstract class BatchScript {
 		$this->removeSignalHandler();
 
 		$this->runAfter();
+		$eventHandlerRegistry->raise(new Event(Event::TYPE_APPFINISH));
 	}
 
 	/**
