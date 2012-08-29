@@ -32,12 +32,6 @@ use YapepBase\Exception\ParameterException;
  *     <li>--help: If set, the help page will be printed.</li>
  * </ul>
  *
- * The following switches are defined, but not parsed by the class:
- * <ul>
- *     <li>-e: Name of the execution environment. It should be used by the bootstrap. Whether it's required is
- *             dependant on the script's bootstrap.</li>
- * </ul>
- *
  * Configuration options:
  * <ul>
  *     <li>system.path.batchPid: The full path to the default PID storage directory.

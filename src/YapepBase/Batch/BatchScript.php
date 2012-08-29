@@ -184,8 +184,6 @@ abstract class BatchScript {
 	protected function prepareSwitches() {
 		$this->usageIndexes[self::HELP_USAGE] = $this->cliHelper->addUsage('Help');
 
-		$this->cliHelper->addSwitch('e', null, 'Name of the execution environment', null, false, 'environment', false);
-
 		$this->cliHelper->addSwitch(null, 'help', 'Shows the help', $this->usageIndexes[self::HELP_USAGE]);
 	}
 
@@ -256,6 +254,4 @@ abstract class BatchScript {
 	protected function setToView($nameOrData, $value = null) {
 		Application::getInstance()->getDiContainer()->getViewDo()->set($nameOrData, $value);
 	}
-
-
 }
