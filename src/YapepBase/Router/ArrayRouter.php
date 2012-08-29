@@ -101,52 +101,76 @@ class ArrayRouter implements IRouter {
 		}
 
 		foreach ($this->routes as $controllerAction => $path) {
-			if ('[' == substr($path, 0, 1)) {
-				// This path is restricted to a method
-				list($pathMethod, $path) = explode(']', substr($path, 1), 2);
-				if ($method != $pathMethod) {
-					// The method does not match, continue with the next path
-					continue;
-				}
-			}
-
-			$path = trim($path);
-
-			if ('/' != substr($path, 0, 1)) {
-				// If the path doesn't start with a '/', add one
-				$path = '/' . $path;
-			}
-
-			if (false !== ($firstParamPos = strpos($path, '{'))) {
-				// This path has params
-				if (substr($path, 0, $firstParamPos) != substr($target, 0, $firstParamPos)) {
-					// The static part of the path doesn't match, continue with the next path
-					continue;
-				}
-				$regex = $this->getRegexForPath($path);
-				$params = array();
-				if (!preg_match($regex, $target, $params)) {
-					// The target doesn't match the path
-					continue;
-				}
-				foreach ($params as $name => $value) {
-					if (is_numeric($name)) {
-						continue;
-					}
-					$this->request->setParam($name, $value);
-				}
+			if ($this->testIfPathMatchesTarget($path, $method, $target)) {
 				list($controller, $action) = explode('/', $controllerAction, 2);
 				return $controllerAction;
-			} else {
-				if ($path == $target) {
-					list($controller, $action) = explode('/', $controllerAction, 2);
-					return $controllerAction;
-				}
 			}
 		}
 
 		// There was no valid route
 		throw new RouterException('No route found for path: ' . $target, RouterException::ERR_NO_ROUTE_FOUND);
+	}
+
+	/**
+	 * Returns TRUE if the specified path matches the target, FALSE otherwise.
+	 *
+	 * @param string|array $path     The path to test. May be an array, if the action matches contains multiple targets.
+	 * @param string       $method   The method.
+	 * @param string       $target   The target.
+	 *
+	 * @return bool
+	 */
+	protected function testIfPathMatchesTarget($path, $method, $target) {
+		// If the path is an array, check all values in it.
+		if (is_array($path)) {
+			foreach ($path as $value) {
+				if ($this->testIfPathMatchesTarget($value, $method, $target)) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		if ('[' == substr($path, 0, 1)) {
+			// This path is restricted to a method
+			list($pathMethod, $path) = explode(']', substr($path, 1), 2);
+			if ($method != $pathMethod) {
+				// The method does not match, continue with the next path
+				return false;
+			}
+		}
+
+		$path = trim($path);
+
+		if ('/' != substr($path, 0, 1)) {
+			// If the path doesn't start with a '/', add one
+			$path = '/' . $path;
+		}
+
+		if (false !== ($firstParamPos = strpos($path, '{'))) {
+			// This path has params
+			if (substr($path, 0, $firstParamPos) != substr($target, 0, $firstParamPos)) {
+				// The static part of the path doesn't match, continue with the next path
+				return false;
+			}
+			$regex = $this->getRegexForPath($path);
+			$params = array();
+			if (!preg_match($regex, $target, $params)) {
+				// The target doesn't match the path
+				return false;
+			}
+			foreach ($params as $name => $value) {
+				if (is_numeric($name)) {
+					continue;
+				}
+				$this->request->setParam($name, $value);
+			}
+			return true;
+		} else {
+			if ($path == $target) {
+				return true;
+			}
+		}
 	}
 
 	/**
@@ -222,7 +246,7 @@ class ArrayRouter implements IRouter {
 	 *
 	 * @return string   The target.
 	 *
-	 * @throws RouterException   On errors. (Includig if the route is not found)
+	 * @throws RouterException   On errors. (Including if the route is not found)
 	 */
 	public function getTargetForControllerAction($controller, $action, $params = array()) {
 		$key = $controller . '/' . $action;
@@ -230,21 +254,52 @@ class ArrayRouter implements IRouter {
 			throw new RouterException('No route found for controller and action: ' . $controller . '/' . $action,
 				RouterException::ERR_NO_ROUTE_FOUND);
 		}
-		$target = preg_replace('/^\s*\[[^\]]+\]\s*/', '', $this->routes[$key]);
-		if (strstr($this->routes[$key], '{')) {
-			foreach ($params as $key => $value) {
-				$target = preg_replace('/\{' . preg_quote($key, '/') . ':[^}]+\}/', $value, $target);
+
+		$target = false;
+		if (is_array($this->routes[$key])) {
+			foreach ($this->routes[$key] as $route) {
+				$target = $this->getParameterizedRoute($route, $params);
+				if (false !== $target) {
+					break;
+				}
 			}
-			if (strstr($target, '{')) {
-				throw new RouterException(
-					'Missing route paramsfor controller and action: ' . $controller . '/' . $action,
-					RouterException::ERR_MISSING_PARAM
-				);
-			}
+		} else {
+			$target = $this->getParameterizedRoute($this->routes[$key], $params);
 		}
+
+		if (false === $target) {
+			throw new RouterException(
+				'No exact route match for controller and action: ' . $controller . '/' . $action . ' with params: '
+					. implode(', ', array_keys($params)), RouterException::ERR_MISSING_PARAM
+			);
+		}
+
 		if ('/' != substr($target, 0, 1)) {
 			$target = '/' . $target;
 		}
 		return $target;
+	}
+
+	/**
+	 * Returns the route with the parameters, or FALSE if a param is missing, or not all params are used.
+	 *
+	 * @param string $route    The route.
+	 * @param array  $params   The route parameters.
+	 *
+	 * @return bool|mixed
+	 */
+	public function getParameterizedRoute($route, array $params) {
+		$route = preg_replace('/^\s*\[[^\]]+\]\s*/', '', $route);
+		if (strstr($route, '{')) {
+			foreach ($params as $key => $value) {
+				$route = preg_replace('/\{' . preg_quote($key, '/') . ':[^}]+\}/', $value, $route);
+			}
+			if (strstr($route, '{')) {
+				return false;
+			}
+		} elseif (!empty($params)) {
+			return false;
+		}
+		return $route;
 	}
 }

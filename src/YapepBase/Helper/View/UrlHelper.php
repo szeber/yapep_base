@@ -71,7 +71,31 @@ class UrlHelper extends HelperAbstract {
 	}
 
 	/**
-	 * Checks if the given uri is the same as the actual.
+	 * Checks if the given controller, action and URI params are the same as the current target.
+	 *
+	 * <b>Warning:</b> This method checks the originally requested URI, so it will not work on error pages.<br>
+	 * <b>Warning:</b> This method can throw an Exception, if the provided controller is the errorcontroller,
+	 * because by default the error pages don't have to be set in the routing table.
+	 *
+	 * @param string $controller   Name of the controller.
+	 * @param string $action       Name of the action.
+	 * @param array  $params       The URI parameters.
+	 *
+	 * @return bool
+	 */
+	public static function checkIsCurrentUri($controller, $action, array $params) {
+		$application = Application::getInstance();
+		/** @var \YapepBase\Request\HttpRequest $request  */
+		$request = $application->getRequest();
+		$router = $application->getRouter();
+
+		$uri = $request->getTarget();
+
+		return $uri == $router->getTargetForControllerAction($controller, $action, $params);
+	}
+
+	/**
+	 * Checks if the given controller and action is the same as the actual.
 	 *
 	 * <b>Warning:</b> If you wan't to use this method on an ErrorPage it can throw an Exception,
 	 * because by default the error pages don't have to be set in the routing table.
@@ -82,7 +106,7 @@ class UrlHelper extends HelperAbstract {
 	 *
 	 * @return bool
 	 */
-	public static function checkIsCurrentUri($controller, $action) {
+	public static function checkIsCurrentControllerAction($controller, $action) {
 		// Get the current controller and action
 		$currentController = null;
 		$currentAction = null;
