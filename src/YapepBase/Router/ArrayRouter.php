@@ -13,9 +13,8 @@ use YapepBase\Exception\RouterException;
 use YapepBase\Request\IRequest;
 
 /**
- * ArrayRouter class
- *
  * Routes a request based on the specified associative array.
+ *
  * The array's keys are in the Controller/Action format. The controller name should not include the namespace, and the
  * Action's name should not include the controller specific action prefix.
  * The array's values are the routes in the following format: [METHOD]URI
@@ -39,28 +38,42 @@ use YapepBase\Request\IRequest;
 class ArrayRouter implements IRouter {
 
 	/**
-	 * The request instance
+	 * The request instance.
 	 *
 	 * @var \YapepBase\Request\IRequest
 	 */
 	protected $request;
 
 	/**
-	 * The available routes
+	 * The available routes.
 	 *
 	 * @var array
 	 */
 	protected $routes;
 
 	/**
+	 * The reverse router.
+	 *
+	 * @var IReverseRouter
+	 */
+	protected $reverseRouter;
+
+	/**
 	 * Constructor
 	 *
-	 * @param \YapepBase\Request\IRequest $request   The request instance
-	 * @param array                       $routes    The list of available routes
+	 * @param \YapepBase\Request\IRequest      $request         The request instance
+	 * @param array                            $routes          The list of available routes
+	 * @param \YapepBase\Router\IReverseRouter $reverseRouter   The reverse router to use. If not set, it will use
+	 *                                                          an ArrayReverseRouter.
 	 */
-	public function __construct(IRequest $request, array $routes) {
-		$this->request = $request;
-		$this->routes = $routes;
+	public function __construct(IRequest $request, array $routes, IReverseRouter $reverseRouter = null) {
+		if (is_null($reverseRouter)) {
+			$reverseRouter = new ArrayReverseRouter($routes);
+		}
+
+		$this->request       = $request;
+		$this->routes        = $routes;
+		$this->reverseRouter = $reverseRouter;
 	}
 
 	/**
@@ -249,57 +262,6 @@ class ArrayRouter implements IRouter {
 	 * @throws RouterException   On errors. (Including if the route is not found)
 	 */
 	public function getTargetForControllerAction($controller, $action, $params = array()) {
-		$key = $controller . '/' . $action;
-		if (!isset($this->routes[$key])) {
-			throw new RouterException('No route found for controller and action: ' . $controller . '/' . $action,
-				RouterException::ERR_NO_ROUTE_FOUND);
-		}
-
-		$target = false;
-		if (is_array($this->routes[$key])) {
-			foreach ($this->routes[$key] as $route) {
-				$target = $this->getParameterizedRoute($route, $params);
-				if (false !== $target) {
-					break;
-				}
-			}
-		} else {
-			$target = $this->getParameterizedRoute($this->routes[$key], $params);
-		}
-
-		if (false === $target) {
-			throw new RouterException(
-				'No exact route match for controller and action: ' . $controller . '/' . $action . ' with params: '
-					. implode(', ', array_keys($params)), RouterException::ERR_MISSING_PARAM
-			);
-		}
-
-		if ('/' != substr($target, 0, 1)) {
-			$target = '/' . $target;
-		}
-		return $target;
-	}
-
-	/**
-	 * Returns the route with the parameters, or FALSE if a param is missing, or not all params are used.
-	 *
-	 * @param string $route    The route.
-	 * @param array  $params   The route parameters.
-	 *
-	 * @return bool|mixed
-	 */
-	public function getParameterizedRoute($route, array $params) {
-		$route = preg_replace('/^\s*\[[^\]]+\]\s*/', '', $route);
-		if (strstr($route, '{')) {
-			foreach ($params as $key => $value) {
-				$route = preg_replace('/\{' . preg_quote($key, '/') . ':[^}]+\}/', $value, $route);
-			}
-			if (strstr($route, '{')) {
-				return false;
-			}
-		} elseif (!empty($params)) {
-			return false;
-		}
-		return $route;
+		return $this->reverseRouter->getTargetForControllerAction($controller, $action, $params);
 	}
 }
