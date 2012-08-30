@@ -16,7 +16,7 @@ use YapepBase\Request\IRequest;
  * Routes a request based on the specified associative array.
  *
  * {@inheritDoc}
- * 
+ *
  * @package    YapepBase
  * @subpackage Router
  */
