@@ -15,23 +15,8 @@ use YapepBase\Request\IRequest;
 /**
  * Routes a request based on the specified associative array.
  *
- * The array's keys are in the Controller/Action format. The controller name should not include the namespace, and the
- * Action's name should not include the controller specific action prefix.
- * The array's values are the routes in the following format: [METHOD]URI
- * The method is optional (if present, the brackets are required). The URI may contain parameters in the format:
- * {paramName:paramType(options)}
- * The valid paramTypes are:
- *     <ul>
- *         <li>num: Any number. No options are allowed.</li>
- *         <li>alpha: Any alphabetic character. No options are allowed.</li>
- *         <li>alnum: Any alphanumeric character. No options are allowed.</li>
- *         <li>enum: Enumeration of the values in the options. The enumeration values should be separated by
- *                   the '|' character in the options string. Any '/' characters should be escaped.</li>
- *         <li>regex: Regular expression. The pattern should be included in the options string. The pattern should
- *                    not contain delimiters, and should be escaped for a '/' delimiter. It may not contain '{' or '}'
- *                    characters.</li>
- *     </ul>
- *
+ * {@inheritDoc}
+ * 
  * @package    YapepBase
  * @subpackage Router
  */
