@@ -145,6 +145,11 @@ abstract class BoAbstract {
 		// Get the stored keys
 		$keysStored = $this->getStorage()->get($this->getKeyForKeys());
 
+		// In case we have not stored any data yet, we do not need to delete anything
+		if (empty($keysStored)) {
+			return;
+		}
+
 		$keysToPurge = array();
 
 		// If the given key is empty we have to purge everything
