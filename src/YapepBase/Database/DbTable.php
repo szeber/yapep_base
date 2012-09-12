@@ -229,6 +229,7 @@ abstract class DbTable {
 	 * Returns the rows what meets the given conditions. Only search by equality.
 	 *
 	 * @param array  $conditions   The conditions, the keys are the fields and the values are the values of the fields.
+	 *                             The value can be an array as well, where you can list the possible values for a field
 	 * @param string $orderBy      The name of thee field, what should be used for ordering the result.
 	 * @param string $direction    The direction of the order ({@link DbTable::ORDER_ASC}, {@link DbTable::ORDER_DESC}).
 	 * @param int    $limit        Maximum how many rows should be returned.
@@ -246,9 +247,9 @@ abstract class DbTable {
 		$params = array();
 		return $this->getDbConnection(
 			DbFactory::TYPE_READ_ONLY)->query(
-				$this->getQueryIdComment(__METHOD__) . "\n"
-					.  $this->buildSelectQuery($conditions, $orderBy, $direction, $params, $limit),
-				$params
+			$this->getQueryIdComment(__METHOD__) . "\n"
+				.  $this->buildSelectQuery($conditions, $orderBy, $direction, $params, $limit),
+			$params
 		)->fetchAll();
 	}
 
@@ -269,7 +270,7 @@ abstract class DbTable {
 	 * @throws \YapepBase\Exception\DatabaseException    On execution errors.
 	 */
 	public function selectPaged(array $conditions, $orderBy, $direction, $pageNumber, $itemsPerPage,
-		&$itemCount = false) {
+								&$itemCount = false) {
 
 		if (empty($orderBy)) {
 			throw new ParameterException('It is not wise to paginate without an order!');
@@ -295,7 +296,7 @@ abstract class DbTable {
 	 * @param string $direction    The direction of the order ({@link DbTable::ORDER_ASC}, {@link DbTable::ORDER_DESC}).
 	 *
 	 * @return array|bool   An associativ array represents a record in the table,
-	 *                      or FALSE if there wasn't any row what met the conditions.
+	 *                      or FALSE if there was not any row what met the conditions.
 	 *
 	 * @throws \YapepBase\Exception\ParameterException   If the given direction is unproper.
 	 * @throws \YapepBase\Exception\DatabaseException   On execution errors.
