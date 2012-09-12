@@ -128,21 +128,34 @@ abstract class MysqlTable extends DbTable {
 		$result = array();
 
 		foreach ($data as $key => $value) {
-			$paramName = $keyPrefix . '_' . $key;
-			// If the value is null we have to use the IS NULL expression
-			if ($value === null) {
-				$operator = 'IS';
-			}
-			else {
-				$operator = '=';
-			}
-			$paramList[] = $this->quoteEntity($key)
-				. ' ' . $operator . ' '
-				. ':'
-				. $this->getDbConnection(DbFactory::TYPE_READ_ONLY)->getParamPrefix()
-				. $paramName;
+			// The value is an array so it is a list of possible values
+			if (is_array($value)) {
+				$possibleParamNames = array();
+				foreach ($value as $index => $possibleValue) {
+					$paramName = $keyPrefix . '_' . $key . '_' . $index;
 
-			$result[$paramName] = $value;
+					$result[$paramName] = $possibleValue;
+					$possibleParamNames[] = ':' . $this->getDbConnection(DbFactory::TYPE_READ_ONLY)->getParamPrefix()
+						. $paramName;
+				}
+				$paramList[] = $this->quoteEntity($key) . ' IN (' . implode(', ', $possibleParamNames) . ')';
+
+			} else {
+				$paramName = $keyPrefix . '_' . $key;
+				// If the value is null we have to use the IS NULL expression
+				if ($value === null) {
+					$operator = 'IS';
+				} else {
+					$operator = '=';
+				}
+				$paramList[] = $this->quoteEntity($key)
+					. ' ' . $operator . ' '
+					. ':'
+					. $this->getDbConnection(DbFactory::TYPE_READ_ONLY)->getParamPrefix()
+					. $paramName;
+
+				$result[$paramName] = $value;
+			}
 		}
 
 		return $result;
@@ -230,10 +243,10 @@ abstract class MysqlTable extends DbTable {
 				' . implode(', ', $paramListUpdate) . '
 			WHERE
 				' . (empty($conditions)
-					? 'TRUE'
-					: implode(' AND ', $paramListCondition)
-				)
-		;
+			? 'TRUE'
+			: implode(' AND ', $paramListCondition)
+		)
+			;
 	}
 
 	/**
@@ -253,10 +266,10 @@ abstract class MysqlTable extends DbTable {
 				' . $this->quoteEntity($this->tableName) . '
 			WHERE
 				' . (empty($conditions)
-					? 'TRUE'
-					: implode(' AND ', $paramList)
-				)
-		;
+			? 'TRUE'
+			: implode(' AND ', $paramList)
+		)
+			;
 	}
 
 	/**
@@ -282,9 +295,9 @@ abstract class MysqlTable extends DbTable {
 				' . $this->quoteEntity($this->tableName) . '
 			WHERE
 				' . (empty($conditions)
-					? 'TRUE'
-					: implode(' AND ', $paramList)
-				)
+			? 'TRUE'
+			: implode(' AND ', $paramList)
+		)
 		;
 
 		if (!empty($orderBy)) {
