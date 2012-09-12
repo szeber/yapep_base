@@ -35,12 +35,32 @@ abstract class BoAbstract {
 	const CACHE_KEY_FOR_KEYS_TTL = 86400;
 
 	/**
+	 * Prefix for the cache keys.
+	 *
+	 * @var string
+	 */
+	private $keyPrefix;
+
+	/**
+	 * Constructor.
+	 *
+	 * @param string $keyPrefix   The prefix for the cache keys of the bo instance. If not set, one will be generated
+	 *                            based on the configuration and the classname.
+	 */
+	public function __construct($keyPrefix = null) {
+		if (empty($keyPrefix)) {
+			$keyPrefix = Config::getInstance()->get('system.project.name') . '.' . get_class($this);
+		}
+		$this->keyPrefix = $keyPrefix;
+	}
+
+	/**
 	 * Returns the prefix of the key which should be used for caching in the BO.
 	 *
 	 * @return string
 	 */
 	protected function getKeyPrefix() {
-		return Config::getInstance()->get('system.project.name') . '.' . get_class($this) . '.';
+		return $this->keyPrefix . '.';
 	}
 
 	/**
@@ -48,7 +68,7 @@ abstract class BoAbstract {
 	 *
 	 * @return string
 	 */
-	private function getKeyForKeys() {
+	protected function getKeyForKeys() {
 		return $this->getKeyPrefix() . self::CACHE_KEY_FOR_KEYS_SUFFIX;
 	}
 

@@ -20,6 +20,10 @@ use YapepBase\BusinessObject\BoAbstract;
  */
 class MockBo extends BoAbstract {
 
+	protected function getKeyForKeys() {
+		return parent::getKeyForKeys();
+	}
+
 	public function getStorage() {
 		return parent::getStorage();
 	}
