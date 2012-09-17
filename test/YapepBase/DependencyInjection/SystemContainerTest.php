@@ -77,10 +77,27 @@ class SystemContainerTest extends \PHPUnit_Framework_TestCase {
 		$this->assertInstanceOf('\YapepBase\BusinessObject\BoAbstract', $sc->getBo('Mock'));
 	}
 
-	public function testDao() {
+	public function testGetDao() {
 		$sc = new SystemContainer();
 		try {
 			$sc->getDao('Mock');
+			$this->fail('Getting a Validator with an empty search array should result a DiException');
+		} catch (\YapepBase\Exception\DiException $e) {
+			$this->assertEquals(\YapepBase\Exception\DiException::ERR_NAMESPACE_SEARCH_CLASS_NOT_FOUND, $e->getCode());
+		}
+		$sc->addSearchNamespace(SystemContainer::NAMESPACE_SEARCH_VALIDATOR, '\YapepBase\Mock\Validator');
+		$this->assertInstanceOf('\YapepBase\Validator\ValidatorAbstract', $sc->getValidator('Mock'));
+	}
+
+	/**
+	 * Tests the getValidator() method.
+	 *
+	 * @return void
+	 */
+	public function testGetValidator() {
+		$sc = new SystemContainer();
+		try {
+			$sc->getValidator('Mock');
 			$this->fail('Getting a DAO with an empty search array should result a DiException');
 		} catch (\YapepBase\Exception\DiException $e) {
 			$this->assertEquals(\YapepBase\Exception\DiException::ERR_NAMESPACE_SEARCH_CLASS_NOT_FOUND, $e->getCode());

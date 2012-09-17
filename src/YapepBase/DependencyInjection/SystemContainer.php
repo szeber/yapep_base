@@ -80,6 +80,13 @@ class SystemContainer extends Container {
 	const NAMESPACE_SEARCH_DAO = 'dao';
 
 	/**
+	 * Name of the namespace which holds the Validators.
+	 *
+	 * Validator object, holds validator methods.
+	 */
+	const NAMESPACE_SEARCH_VALIDATOR = 'validator';
+
+	/**
 	 * Name of the namespace which holds the templates.
 	 *
 	 * Only the view related logic can be implemented here.
@@ -104,10 +111,11 @@ class SystemContainer extends Container {
 	 * @var array
 	 */
 	protected $searchNamespaces = array(
-		self::NAMESPACE_SEARCH_TEMPLATE => array(),
+		self::NAMESPACE_SEARCH_TEMPLATE   => array(),
 		self::NAMESPACE_SEARCH_CONTROLLER => array(),
-		self::NAMESPACE_SEARCH_BO => array(),
-		self::NAMESPACE_SEARCH_DAO => array(),
+		self::NAMESPACE_SEARCH_BO         => array(),
+		self::NAMESPACE_SEARCH_DAO        => array(),
+		self::NAMESPACE_SEARCH_VALIDATOR  => array(),
 	);
 
 	/**
@@ -147,6 +155,7 @@ class SystemContainer extends Container {
 
 		$this->searchNamespaces[self::NAMESPACE_SEARCH_BO] = array();
 		$this->searchNamespaces[self::NAMESPACE_SEARCH_DAO] = array();
+		$this->searchNamespaces[self::NAMESPACE_SEARCH_VALIDATOR] = array();
 	}
 
 	/**
@@ -398,7 +407,7 @@ class SystemContainer extends Container {
 	 *
 	 * @return \YapepBase\BusinessObject\BoAbstract
 	 *
-	 * @throws \YapepBase\Exception\DiException If the BO was not found
+	 * @throws \YapepBase\Exception\DiException   If the BO was not found
 	 */
 	public function getBo($name) {
 		$fullClassName = $this->searchForClass(self::NAMESPACE_SEARCH_BO, $name . 'Bo');
@@ -413,10 +422,25 @@ class SystemContainer extends Container {
 	 *
 	 * @return \YapepBase\Dao\DaoAbstract
 	 *
-	 * @throws \YapepBase\Exception\DiException If the DAO was not found
+	 * @throws \YapepBase\Exception\DiException   If the DAO was not found
 	 */
 	public function getDao($name) {
 		$fullClassName = $this->searchForClass(self::NAMESPACE_SEARCH_DAO, $name . 'Dao');
+		return new $fullClassName();
+	}
+
+	/**
+	 * Returns a Validator by it's name
+	 *
+	 * @param string $name   The name of the Validator class to return.
+	 *                       (Without the namespace and Validator suffix)
+	 *
+	 * @return \YapepBase\Validator\ValidatorAbstract
+	 *
+	 * @throws \YapepBase\Exception\DiException   If the Validator was not found
+	 */
+	public function getValidator($name) {
+		$fullClassName = $this->searchForClass(self::NAMESPACE_SEARCH_VALIDATOR, $name . 'Validator');
 		return new $fullClassName();
 	}
 
