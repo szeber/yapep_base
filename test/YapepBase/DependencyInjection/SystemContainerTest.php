@@ -2,9 +2,17 @@
 
 namespace YapepBase\DependencyInjection;
 
+use YapepBase\Config;
 use YapepBase\DependencyInjection\SystemContainer;
 
 class SystemContainerTest extends \PHPUnit_Framework_TestCase {
+
+	protected function setUp() {
+		parent::setUp();
+		// TODO Make this setting global. For this, there should be a base class for all tests [szeber]
+		Config::getInstance()->set('system.project.name', 'test');
+	}
+
 	public function testConstructor() {
 		$sc = new SystemContainer();
 		$this->assertInstanceOf('\YapepBase\ErrorHandler\ErrorHandlerRegistry', $sc->getErrorHandlerRegistry());
