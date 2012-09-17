@@ -93,9 +93,9 @@ class ValidatorAbstractTest extends \PHPUnit_Framework_TestCase {
 		foreach ($testCases as $testCase) {
 			try {
 				call_user_func_array($testCase['method'], $testCase['params']);
-				if (isset($testCase['errorCode'])) {
-					$this->fail('The method should thrown and Exception when an invalid parameter passed!');
-				}
+
+				$this->assertFalse(isset($testCase['errorCode']),
+					'The method should thrown and Exception when an invalid parameter passed!');
 			}
 			catch (ValidatorException $e) {
 				if (isset($testCase['errorCode'])) {
@@ -106,9 +106,8 @@ class ValidatorAbstractTest extends \PHPUnit_Framework_TestCase {
 				}
 			}
 			catch (\Exception $e) {
-				if (!($e instanceof PHPUnit_Framework_AssertionFailedError)) {
-					$this->fail('The method should throw a ValidatorException!');
-				}
+				$this->assertFalse($e instanceof PHPUnit_Framework_AssertionFailedError,
+					'The method should throw a ValidatorException!');
 			}
 		}
 	}
