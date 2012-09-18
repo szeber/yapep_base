@@ -289,6 +289,19 @@ class Application {
 	}
 
 	/**
+	 * Sets the name of the currently dispatched Controller and Action.
+	 *
+	 * @param string $controllerName   Name of the controller.
+	 * @param string $actionName       Name of the action.
+	 *
+	 * @return void
+	 */
+	public function setDispatchedAction($controllerName, $actionName) {
+		$this->dispatchedController = $controllerName;
+		$this->dispatchedAction = $actionName;
+	}
+
+	/**
 	 * Runs the request on the application
 	 *
 	 * @return void

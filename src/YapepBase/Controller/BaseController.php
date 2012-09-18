@@ -150,6 +150,7 @@ abstract class BaseController implements IController {
 	 * @throws \Exception                                 On non-framework related errors.
 	 */
 	protected function internalRedirect($controllerName, $action) {
+		Application::getInstance()->setDispatchedAction($controllerName, $action);
 		$controller = Application::getInstance()->getDiContainer()->getController($controllerName, $this->request,
 			$this->response);
 		$controller->run($action);
