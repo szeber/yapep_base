@@ -13,7 +13,7 @@ namespace YapepBase\Exception\Validator;
 /**
  * Base Exception class for validations.
  *
- * @package    PornHd
+ * @package    YapepBase
  * @subpackage Exception\Validator
  */
 class Exception extends \YapepBase\Exception\Exception {
