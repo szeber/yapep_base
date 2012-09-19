@@ -1,18 +1,58 @@
 <?php
+/**
+ * This file is part of YAPEPBase.
+ *
+ * @package      YapepBase
+ * @subpackage   Mock\View
+ * @copyright    2011 The YAPEP Project All rights reserved.
+ * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
+ */
 
 namespace YapepBase\Mock\View;
 
-use \YapepBase\View\BlockAbstract;
 
 /**
- * Mock for a Block.
- * @codeCoverageIgnore
+ * BlockAbstract class, should be extended by every Block.
+ *
+ * @package    YapepBase
+ * @subpackage Mock\View
  */
-class MockBlock extends BlockAbstract {
+class MockBlock extends \YapepBase\View\BlockAbstract {
+
 	/**
-	 * Render the fake content
+	 * The content to render.
+	 *
+	 * @var string
 	 */
-	protected function renderContent() {
-		echo 'Block: ' . $this->getTemplateOutput();
+	protected $content;
+
+	/**
+	 * Sets the content to render.
+	 *
+	 * @param string $content   The content.
+	 *
+	 * @return void
+	 */
+	public function setContent($content) {
+		$this->content = $content;
 	}
+
+	/**
+	 * Returns the content.
+	 *
+	 * @return string
+	 */
+	public function getContent() {
+		return $this->content;
+	}
+
+	/**
+	 * Does the actual rendering.
+	 *
+	 * @return void
+	 */
+	public function renderContent() {
+		echo $this->content;
+	}
+
 }

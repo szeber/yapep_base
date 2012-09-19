@@ -11,14 +11,59 @@
 namespace YapepBase\ErrorHandler;
 
 /**
- * This error handler converts all warnings, notices to ErrorException.
+ * This error handler converts the desired errors to ErrorException
  *
  * @package      YapepBase
  * @subpackage   ErrorHandler
- *
- * @deprecated   This class will be removed, and replaced by the ExceptionCreatorErrorHandler
  */
-class StrictErrorHandler implements IErrorHandler {
+class ExceptionCreatorErrorHandler implements IErrorHandler {
+
+	/**
+	 * The errorLevels to convert to Exception.
+	 *
+	 * @var int
+	 */
+	protected $errorLevels;
+
+	/**
+	 * Holds the current set error reporting level.
+	 *
+	 * @var int
+	 */
+	protected $errorReporting;
+
+	/**
+	 * Constructor
+	 *
+	 * @param int $errorLevels   Bitmask for the errorlevels what should be converted to Exceptions.
+	 */
+	public function __construct($errorLevels = null) {
+		$this->errorReporting = error_reporting();
+
+		$defaultErrorLevels =
+			(
+				E_ERROR
+				| E_WARNING
+				| E_PARSE
+				| E_NOTICE
+				| E_CORE_ERROR
+				| E_CORE_WARNING
+				| E_COMPILE_ERROR
+				| E_COMPILE_WARNING
+				| E_USER_ERROR
+				| E_USER_WARNING
+				| E_USER_NOTICE
+				| E_STRICT
+				| E_RECOVERABLE_ERROR
+				| E_DEPRECATED
+				| E_USER_DEPRECATED
+			)
+			& $this->errorReporting;
+
+		$this->errorLevels = is_null($errorLevels)
+			? $defaultErrorLevels
+			: $defaultErrorLevels & $errorLevels;
+	}
 
 	/**
 	 * Handles a PHP error
@@ -36,13 +81,16 @@ class StrictErrorHandler implements IErrorHandler {
 	 * @throws \ErrorException
 	 */
 	public function handleError($errorLevel, $message, $file, $line, $context, $errorId, array $backTrace = array()) {
-		switch ($errorLevel) {
-			case E_WARNING:
-			case E_NOTICE:
-				throw new \ErrorException($message, 0, $errorLevel, $file, $line);
-				break;
-
+		// If the error was suppressed by the @ operator
+		if (error_reporting() === 0) {
+			return;
 		}
+
+		if (($this->errorLevels & $errorLevel) === 0) {
+			return;
+		}
+
+		throw new \ErrorException($message, 0, $errorLevel, $file, $line);
 	}
 
 	/**
@@ -56,7 +104,7 @@ class StrictErrorHandler implements IErrorHandler {
 	 * @codeCoverageIgnore
 	 */
 	public function handleException(\Exception $exception, $errorId) {
-		//noop();
+		// The method does not have to do anything
 	}
 
 	/**
@@ -73,6 +121,6 @@ class StrictErrorHandler implements IErrorHandler {
 	 * @codeCoverageIgnore
 	 */
 	public function handleShutdown($errorLevel, $message, $file, $line, $errorId) {
-		//noop();
+		// We can't do anything here
 	}
 }

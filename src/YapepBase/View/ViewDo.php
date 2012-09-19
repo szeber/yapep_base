@@ -69,7 +69,7 @@ class ViewDo {
 
 		$keyParts = explode('.', $key);
 
-		// Storing a copy by refence which will be used
+		// Storing a copy by reference which will be used
 		if ($raw) {
 			$target = &$this->dataRaw;
 		}

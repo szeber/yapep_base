@@ -3,6 +3,7 @@
 namespace YapepBase;
 
 use YapepBase\DependencyInjection\SystemContainer;
+use YapepBase\Mock\ApplicationMock;
 
 /**
  * Test class for Application.
@@ -28,6 +29,9 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase {
 
 	protected function tearDown() {
 		\YapepBase\Application::setInstance($this->oldApp);
+	}
+
+	public function testTest() {
 	}
 
 	public function testSetRouter() {

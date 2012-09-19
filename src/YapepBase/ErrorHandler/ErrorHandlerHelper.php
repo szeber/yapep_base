@@ -115,7 +115,6 @@ class ErrorHandlerHelper {
 
 			case E_USER_ERROR:
 				$description = self::E_USER_ERROR_DESCRIPTION;
-				$isFatal = true;
 				break;
 
 			case E_USER_WARNING:

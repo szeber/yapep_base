@@ -16,7 +16,7 @@ use YapepBase\Exception\Validator\Exception as ValidatorException;
 use YapepBase\Mock\Validator\MockValidator;
 
 /**
- * Test case for testing the BoAbstract class
+ * Test case for testing the ValidatorAbstract class
  *
  * @package    YapepBase
  * @subpackage Validator

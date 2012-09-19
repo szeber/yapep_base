@@ -14,7 +14,6 @@ namespace YapepBase\View;
 use YapepBase\Application;
 use YapepBase\Config;
 use YapepBase\Exception\Exception;
-use YapepBase\Exception\ViewException;
 use YapepBase\Mime\MimeType;
 use YapepBase\Storage\IStorage;
 use YapepBase\View\ViewDo;
@@ -117,7 +116,7 @@ abstract class ViewAbstract {
 	}
 
 	/**
-	 * Displays th given block
+	 * Displays the given block
 	 *
 	 * @param \YapepBase\View\BlockAbstract $block   The block.
 	 *
