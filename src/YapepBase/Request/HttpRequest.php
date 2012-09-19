@@ -11,6 +11,7 @@
 
 namespace YapepBase\Request;
 use YapepBase\UtilityFunctions;
+use YapepBase\DataObject\UploadedFileDo;
 
 /**
  * Request class for HTTP requests.
@@ -19,7 +20,6 @@ use YapepBase\UtilityFunctions;
  *
  * @package    YapepBase
  * @subpackage Request
- * @todo $_FILES handling
  */
 class HttpRequest implements IRequest {
 
@@ -196,6 +196,31 @@ class HttpRequest implements IRequest {
 	 */
 	public function hasCookie($name) {
 		return $this->has($name, 'C');
+	}
+
+	/**
+	 * Returns the UploadedFileDo representing the specified uploaded file or FALSE if it's not uploaded.
+	 *
+	 * @param string $name   Name of the upload.
+	 *
+	 * @return bool|\YapepBase\DataObject\UploadedFileDo
+	 */
+	public function getFile($name) {
+		if (isset($this->files[$name])) {
+			return new UploadedFileDo($this->files[$name]);
+		}
+		return false;
+	}
+
+	/**
+	 * Returns TRUE if the specified upload is in the request.
+	 *
+	 * @param string $name   Name of the upload.
+	 *
+	 * @return bool
+	 */
+	public function hasFile($name) {
+		return isset($this->files[$name]);
 	}
 
 	/**
