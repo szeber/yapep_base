@@ -105,7 +105,7 @@ abstract class DbTable {
 	 *
 	 * @throws \YapepBase\Exception\ParameterException   If the field is not defined or no enum values are set for it.
 	 */
-	protected function getEnumValues($field) {
+	public function getEnumValues($field) {
 		if (!isset($this->enumValues[$field])) {
 			throw new ParameterException('No enum values are defined for field ' . $field);
 		}
