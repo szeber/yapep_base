@@ -50,6 +50,13 @@ abstract class DbTable {
 	protected $defaultDbConnectionName;
 
 	/**
+	 * Associative array containing all possible values for the enum fields.
+	 *
+	 * @var array
+	 */
+	protected $enumValues = array();
+
+	/**
 	 * Constructor
 	 *
 	 * @param DbConnection $dbConnection   The connection what should be used by the class.
@@ -87,6 +94,22 @@ abstract class DbTable {
 		else {
 			return DbFactory::getConnection($this->defaultDbConnectionName, $type);
 		}
+	}
+
+	/**
+	 * Returns the possible ENUM values for the specified field in the table.
+	 *
+	 * @param string $field   Name of the field. {@uses self::FIELD_*}
+	 *
+	 * @return array
+	 *
+	 * @throws \YapepBase\Exception\ParameterException   If the field is not defined or no enum values are set for it.
+	 */
+	protected function getEnumValues($field) {
+		if (!isset($this->enumValues[$field])) {
+			throw new ParameterException('No enum values are defined for field ' . $field);
+		}
+		return $this->enumValues[$field];
 	}
 
 	/**
@@ -166,12 +189,12 @@ abstract class DbTable {
 	/**
 	 * Inserts a record in to th table
 	 *
-	 * @param array $insertData      The record what should be inserted. The keys are the name of the fields,
-	 *                               the values are the values of the fields.
-	 * @param array $updateData      In case of integrity constraint violation,
-	 *                               this array will be used to update the row.
-	 * @param int   &$lastInsertId   Automaticly generated id of the inserted row(If there's any in the table).
-	 *                               If TRUE, the value will be populated here (Outgoing parameter).
+	 * @param array    $insertData     The record what should be inserted. The keys are the name of the fields,
+	 *                                 the values are the values of the fields.
+	 * @param array    $updateData     In case of integrity constraint violation,
+	 *                                 this array will be used to update the row.
+	 * @param int|bool $lastInsertId   Automaticly generated id of the inserted row(If there's any in the table).
+	 *                                 If TRUE, the value will be populated here (Outgoing parameter).
 	 *
 	 * @return void
 	 *
