@@ -11,6 +11,7 @@
 namespace YapepBase\BusinessObject;
 
 use YapepBase\Application;
+use YapepBase\Database\DbConnection;
 use YapepBase\Config;
 use YapepBase\Exception\ParameterException;
 use YapepBase\Storage\IStorage;
@@ -210,5 +211,20 @@ abstract class BoAbstract {
 		}
 		// Writing back the remaining keys
 		$this->getStorage()->set($this->getKeyForKeys(), $keysStored, self::CACHE_KEY_FOR_KEYS_TTL);
+	}
+
+	/**
+	 * Returns a DbTable by it's database namespace and name. Optionally passes it the connection to use.
+	 *
+	 * Db tables must be in a <daoNamespace>\Table\<databaseNamespace>\<name>Table namespace structure.
+	 *
+	 * @param string                           $databaseNamespace   Namespace of the database.
+	 * @param string                           $name                Name of the table class.
+	 * @param \YapepBase\Database\DbConnection $connection          The connection to use.
+	 *
+	 * @return \YapepBase\Database\DbTable
+	 */
+	public function getTable($databaseNamespace, $name, DbConnection $connection = null) {
+		return Application::getInstance()->getDiContainer()->getDbTable($databaseNamespace, $name, $connection);
 	}
 }
