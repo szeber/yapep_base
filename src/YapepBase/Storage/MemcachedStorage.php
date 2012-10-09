@@ -9,6 +9,8 @@
  */
 
 namespace YapepBase\Storage;
+
+
 use YapepBase\Exception\StorageException;
 use YapepBase\Exception\ConfigException;
 use YapepBase\Application;
@@ -33,7 +35,7 @@ use YapepBase\Debugger\IDebugger;
  * @subpackage Storage
  * @todo locking
  */
-class MemcachedStorage extends StorageAbstract {
+class MemcachedStorage extends StorageAbstract implements IIncrementable {
 
 	/**
 	 * The memcache connection instance
@@ -216,6 +218,18 @@ class MemcachedStorage extends StorageAbstract {
 		if ($debugger !== false) {
 			$debugger->logQueryExecutionTime(IDebugger::QUERY_TYPE_CACHE, $queryId, microtime(true) - $startTime);
 		}
+	}
+
+	/**
+	 * Increments (or decreases) the value of the key with the given offset.
+	 *
+	 * @param string $key      The key of the item to increment.
+	 * @param int    $offset   The amount by which to increment the item's value.
+	 *
+	 * @return int   The changed value.
+	 */
+	public function increment($key, $offset) {
+		return $this->memcache->increment($key, $offset);
 	}
 
 	/**
