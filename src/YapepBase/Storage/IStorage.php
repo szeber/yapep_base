@@ -10,7 +10,8 @@
 
 
 namespace YapepBase\Storage;
-use YapepBase\Exception\ConfigException;
+
+
 use YapepBase\Exception\StorageException;
 
 /**

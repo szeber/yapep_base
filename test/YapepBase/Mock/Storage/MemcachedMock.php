@@ -16,6 +16,8 @@ namespace YapepBase\Mock\Storage;
  * @package    YapepBase
  * @subpackage Test\Mock\Storage
  * @codeCoverageIgnore
+ *
+ * @todo Rewrite this whole class! At least it should extend the MemcachedStorage or implement the IStorage [emul]
  */
 class MemcachedMock {
 

@@ -120,5 +120,3 @@ class MemcachedStorageTest extends \PHPUnit_Framework_TestCase {
 	}
 
 }
-
-?>
