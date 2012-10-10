@@ -229,7 +229,7 @@ class MemcachedStorage extends StorageAbstract implements IIncrementable {
 	 * @return int   The changed value.
 	 */
 	public function increment($key, $offset) {
-		return $this->memcache->increment($key, $offset);
+		return $this->memcache->increment($this->makeKey($key), $offset);
 	}
 
 	/**
