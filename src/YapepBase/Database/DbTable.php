@@ -82,7 +82,7 @@ abstract class DbTable {
 	/**
 	 * Returns the connection for the given type of query.
 	 *
-	 * @param int $type   The type of the query. Can be reading ({@link DbFactory::TYPE_READ_ONLY}),
+	 * @param string $type   The type of the query. Can be reading ({@link DbFactory::TYPE_READ_ONLY}),
 	 *                    writing ({@DbFactory Db::TYPE_READ_WRITE}).
 	 *
 	 * @return DbConnection
@@ -336,4 +336,28 @@ abstract class DbTable {
 			$params
 		)->fetch();
 	}
+
+	/**
+	 * Returns the specified unix timestamp as a date-time string usable by the current db connection type.
+	 *
+	 * @param int $timestamp   The date to format. If NULL, the current date is returned.
+	 *
+	 * @return string
+	 */
+	public function getDateTime($timestamp = null) {
+		$this->getDbConnection(DbFactory::TYPE_READ_ONLY)->getDateTimeFromUnixTime($timestamp);
+	}
+
+	/**
+	 * Returns the specified unix timestamp as a date string usable by the current db connection type.
+	 *
+	 * @param int $timestamp   The date to format. If NULL, the current date is returned.
+	 *
+	 * @return string
+	 */
+	public function getDate($timestamp = null) {
+		$this->getDbConnection(DbFactory::TYPE_READ_ONLY)->getDateFromUnixTime($timestamp);
+	}
+
+
 }

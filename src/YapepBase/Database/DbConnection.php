@@ -14,7 +14,6 @@ namespace YapepBase\Database;
 use YapepBase\Exception\DatabaseException;
 use \PDO;
 use \PDOException;
-use \PDOStatement;
 use YapepBase\Application;
 use YapepBase\Debugger\IDebugger;
 
@@ -325,6 +324,28 @@ abstract class DbConnection {
 	public function escapeWildcards($string, $escapeCharacter = '\\') {
 		return preg_replace('/([_%' . preg_quote($escapeCharacter, '/') . '])/',
 			addcslashes($escapeCharacter, '$\\') . '$1', $string);
+	}
+
+	/**
+	 * Returns the specified unix timestamp as a date-time string usable by the current db connection type.
+	 *
+	 * @param int $timestamp   The date to format. If NULL, the current date is returned.
+	 *
+	 * @return string
+	 */
+	public function getDateTime($timestamp = null) {
+		return date('Y-m-d H:i:s', is_null($timestamp) ? time() : $timestamp);
+	}
+
+	/**
+	 * Returns the specified unix timestamp as a date string usable by the current db connection type.
+	 *
+	 * @param int $timestamp   The date to format. If NULL, the current date is returned.
+	 *
+	 * @return string
+	 */
+	public function getDate($timestamp = null) {
+		return date('Y-m-d', is_null($timestamp) ? time() : $timestamp);
 	}
 
 	/**
