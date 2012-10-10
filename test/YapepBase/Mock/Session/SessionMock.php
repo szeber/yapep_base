@@ -9,6 +9,7 @@
  */
 
 namespace YapepBase\Mock\Session;
+
 use YapepBase\Event\Event;
 use YapepBase\Session\ISession;
 
@@ -21,86 +22,146 @@ use YapepBase\Session\ISession;
  */
 class SessionMock implements ISession {
 
+	/**
+	 * The current namespace.
+	 *
+	 * @var string
+	 */
 	protected $namespace;
 
+	/**
+	 * The data stored in the session.
+	 *
+	 * @var array
+	 */
+	protected $data = array();
+
+	/**
+	 * Constructor.
+	 *
+	 * @param string $namespace   The namespace of the session.
+	 */
 	public function __construct($namespace) {
 		$this->namespace = $namespace;
 	}
 
 	/**
-	 * (non-PHPdoc)
-	 * @see YapepBase\Session.ISession::create()
+	 * Creates the session.
+	 *
+	 * @return void
 	 */
 	public function create() {
+		$this->data = array();
 	}
 
 	/**
-	 * (non-PHPdoc)
-	 * @see YapepBase\Session.ISession::destroy()
+	 * Destroys the session.
+	 *
+	 * @return void
 	 */
 	public function destroy() {
+		$this->data = array();
 	}
 
 	/**
-	 * (non-PHPdoc)
-	 * @see YapepBase\Session.ISession::getNamespace()
+	 * Returns the current namespace.
+	 *
+	 * @return string
 	 */
 	public function getNamespace() {
 		return $this->namespace;
 	}
 
 	/**
-	 * (non-PHPdoc)
-	 * @see YapepBase\Session.ISession::registerEventHandler()
+	 * Registers the instance as an event handler
+	 *
+	 * @return void
 	 */
 	public function registerEventHandler() {
 	}
 
 	/**
-	 * (non-PHPdoc)
-	 * @see YapepBase\Session.ISession::removeEventHandler()
+	 * Removes event handler registration
+	 *
+	 * @return void
 	 */
 	public function removeEventHandler() {
 	}
 
 	/**
-	 * (non-PHPdoc)
-	 * @see YapepBase\Event.IEventHandler::handleEvent()
+	 * Handles an event
+	 *
+	 * @param \YapepBase\Event\Event $event   The dispatched event.
+	 *
+	 * @return void
 	 */
 	public function handleEvent(Event $event) {
 	}
 
 	/**
-	 * (non-PHPdoc)
+	 * Checks whether a key is set in the session
+	 *
+	 * @param string $offset   The offset.
+	 *
+	 * @return bool
+	 *
 	 * @see ArrayAccess::offsetExists()
 	 */
 	public function offsetExists($offset) {
+		return isset($this->data[$offset]);
+
 	}
 
 	/**
-	 * (non-PHPdoc)
+	 * Returns a key from the session
+	 *
+	 * @param string $offset   The offset to return.
+	 *
+	 * @return mixed
+	 *
 	 * @see ArrayAccess::offsetGet()
 	 */
 	public function offsetGet($offset) {
+		if (isset($this->data[$offset])) {
+			return $this->data[$offset];
+		}
+		return null;
 	}
 
 	/**
-	 * (non-PHPdoc)
+	 * Sets a key in the session
+	 *
+	 * @param string $offset   The offset.
+	 * @param mixed  $value    The value.
+	 *
+	 * @return void
+	 *
 	 * @see ArrayAccess::offsetSet()
 	 */
 	public function offsetSet($offset, $value) {
+		$this->data[$offset] = $value;
+
 	}
 
 	/**
-	 * (non-PHPdoc)
+	 * Removes a key from the session
+	 *
+	 * @param string $offset   The offset.
+	 *
+	 * @return void
+	 *
 	 * @see ArrayAccess::offsetUnset()
 	 */
 	public function offsetUnset($offset) {
+		if (isset($this->data[$offset])) {
+			unset($this->data[$offset]);
+		}
 	}
 
 	/**
-	 * (non-PHPdoc)
-	 * @see ArrayAccess::offsetUnset()
+	 * Returns the sessionId.
+	 *
+	 * @return int
 	 */
 	public function getId() {
 	}
@@ -111,5 +172,6 @@ class SessionMock implements ISession {
 	 * @return array
 	 */
 	public function getData() {
+		return $this->data;
 	}
 }
