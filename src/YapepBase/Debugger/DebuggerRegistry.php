@@ -132,7 +132,7 @@ class DebuggerRegistry implements IDebugger, IEventHandler {
 		$this->urlToLogFiles = $urlToLogFiles;
 		$this->urlParamName = $urlParamName;
 
-		$this->startTime = microtime(true);
+		$this->startTime = isset($_SERVER['REQUEST_TIME_FLOAT']) ? $_SERVER['REQUEST_TIME_FLOAT'] : microtime(true);
 	}
 
 	/**
