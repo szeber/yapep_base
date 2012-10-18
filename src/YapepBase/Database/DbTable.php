@@ -345,7 +345,7 @@ abstract class DbTable {
 	 * @return string
 	 */
 	public function getDateTime($timestamp = null) {
-		$this->getDbConnection(DbFactory::TYPE_READ_ONLY)->getDateTime($timestamp);
+		return $this->getDbConnection(DbFactory::TYPE_READ_ONLY)->getDateTime($timestamp);
 	}
 
 	/**
@@ -356,8 +356,6 @@ abstract class DbTable {
 	 * @return string
 	 */
 	public function getDate($timestamp = null) {
-		$this->getDbConnection(DbFactory::TYPE_READ_ONLY)->getDate($timestamp);
+		return $this->getDbConnection(DbFactory::TYPE_READ_ONLY)->getDate($timestamp);
 	}
-
-
 }
