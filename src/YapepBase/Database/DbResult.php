@@ -152,4 +152,13 @@ class DbResult implements Iterator {
 		}
 		return $result;
 	}
+
+	/**
+	 * Returns the number of rows affected by the last INSERT, DELETE or UPDATE statement.
+	 *
+	 * @return int
+	 */
+	public function getAffectedRowCount() {
+		return $this->statement->rowCount();
+	}
 }

@@ -44,6 +44,15 @@ class DbResultTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals(array('data2', 'data4'), $result->fetchColumnAll(1));
 	}
 
+	/**
+	 * Tests the getAffectedRowCount() method.
+	 *
+	 * @return void
+	 */
+	public function testGetAffectedRowCount() {
+		$this->markTestIncomplete();
+	}
+
 	public function testArray() {
 		$data = array(
 			array('column1' => 'data1', 'column2' => 'data2'),
