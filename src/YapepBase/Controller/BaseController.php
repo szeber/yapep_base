@@ -75,6 +75,19 @@ abstract class BaseController implements IController {
 	}
 
 	/**
+	 * Runs before after the action but before the rendering.
+	 *
+	 * Can be useful to set collected data to the View.
+	 *
+	 * @return void
+	 *
+	 * @throws \YapepBase\Exception\ControllerException   On error.
+	 */
+	protected function runBeforeRender() {
+		// Empty default implementation. Should be implemented by descendant classes if needed
+	}
+
+	/**
 	 * Returns the controller specific prefix
 	 *
 	 * @return string
@@ -108,6 +121,10 @@ abstract class BaseController implements IController {
 					.  ') is not an instance of ViewAbstract or string',
 				ControllerException::ERR_INVALID_ACTION_RESULT);
 		}
+
+		// We called the run method, but we did not rendered the output yet
+		$this->runBeforeRender();
+
 		if (!empty($result)) {
 			if (is_string($result)) {
 				$this->response->setRenderedBody($result);

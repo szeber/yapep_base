@@ -34,7 +34,7 @@ class BaseFilterDo {
 	/**
 	 * Constructor.
 	 *
-	 * @param array $fields   The fields of the table(s) which can be used for filtering.
+	 * @param array $fields   The fields of the table(s) which can be used for filtering and ordering.
 	 */
 	public function __construct(array $fields) {
 		$this->usableFields = $fields;
