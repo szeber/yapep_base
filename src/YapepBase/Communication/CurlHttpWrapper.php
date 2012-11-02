@@ -67,6 +67,13 @@ class CurlHttpWrapper {
 	protected $url;
 
 	/**
+	 * The cookies that are going to be sent with the request.
+	 *
+	 * @var array
+	 */
+	protected $cookies = array();
+
+	/**
 	 * Constructor.
 	 *
 	 * @param string $method              The request method {@uses self::METHOD_*}.
@@ -182,11 +189,45 @@ class CurlHttpWrapper {
 	}
 
 	/**
+	 * Sets a single cookie.
+	 *
+	 * @param string $name    The cookie's name.
+	 * @param string $value   The cookie's value.
+	 *
+	 * @return void
+	 */
+	public function setCookie($name, $value) {
+		$this->cookies[$name] = $value;
+
+	}
+
+	/**
+	 * Sets cookies from an associative array.
+	 *
+	 * @param array $cookies   The cookies to set.
+	 *
+	 * @return void
+	 */
+	public function setCookies(array $cookies) {
+		$this->cookies = array_merge($this->cookies, $cookies);
+	}
+
+	/**
 	 * Sends the request.
 	 *
 	 * @return boolean   TRUE on success, FALSE on failure
+	 *
+	 * @throws \YapepBase\Exception\Exception   If there was an error.
 	 */
 	public function send() {
+		if (!empty($this->cookies)) {
+			$cookies = array();
+			foreach ($this->cookies as $name => $value) {
+				$cookies[] = $name . '=' . $value;
+			}
+			curl_setopt($this->curl, CURLOPT_COOKIE, implode('; ', $cookies));
+		}
+
 		$result = curl_exec($this->curl);
 		if (false === $result) {
 			$this->error = curl_error($this->curl);
