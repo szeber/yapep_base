@@ -48,8 +48,10 @@ class UrlHelper extends HelperAbstract {
 	/**
 	 * Returns the URL of the actual request.
 	 *
-	 * @param bool  $withParams    If TRUE the sent parameters will be incuded in the url.
+	 * @param bool  $withParams    If TRUE the sent parameters will be included in the url.
 	 * @param array $extraParams   List of extra GET parameters.
+	 *                                If a value to a key is set to NULL, that parameter
+	 *                                will be removed from the current URL.
 	 *
 	 * @return string   The generated URL.
 	 */
@@ -65,6 +67,12 @@ class UrlHelper extends HelperAbstract {
 		}
 
 		$params = array_merge($params, $extraParams);
+
+		foreach ($params as $key => $value) {
+			if ($value === null) {
+				unset($params[$key]);
+			}
+		}
 
 		$url = empty($params) ? $url : $url . '?' . http_build_query($params);
 		return $url;
