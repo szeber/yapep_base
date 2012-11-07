@@ -49,11 +49,11 @@ class UploadedFileDo {
 	protected $types;
 
 	/**
-	 * The upload error code.
+	 * The upload error codes.
 	 *
-	 * @var int
+	 * @var array
 	 */
-	protected $error;
+	protected $errors;
 
 	/**
 	 * Constructor
@@ -66,11 +66,12 @@ class UploadedFileDo {
 		if (!isset($data['name']) || empty($data['tmp_name']) || !isset($data['size']) || !isset($data['error'])) {
 			throw new ParameterException('Invalid array provided. Some required fields are missing');
 		}
+
 		$this->filenames      = array_values((array)$data['name']);
 		$this->sizes          = array_values((array)$data['size']);
 		$this->temporaryFiles = array_values((array)$data['tmp_name']);
 		$this->types          = isset($data['type']) ? array_values((array)$data['type']) : array();
-		$this->error          = (int)$data['error'];
+		$this->errors         = array_values((array)$data['error']);
 
 		$nameCount = count($this->filenames);
 		if ($nameCount != count($this->sizes) || $nameCount != count($this->types)) {
@@ -85,7 +86,7 @@ class UploadedFileDo {
 	 * @return int
 	 */
 	public function getFileCount() {
-		return count($this->data['name']);
+		return count($this->filenames);
 	}
 
 	/**
@@ -172,12 +173,32 @@ class UploadedFileDo {
 	}
 
 	/**
+	 * Returns the content of the uploaded file.
+	 *
+	 * @param int $index   The file index if an array of files are uploaded. Indexed from 0.
+	 *
+	 * @throws \YapepBase\Exception\ParameterException   If the index does not exist.
+	 *
+	 * @return string
+	 */
+	public function getFileContent($index = 0) {
+		return file_get_contents($this->getTemporaryFile($index));
+	}
+
+	/**
 	 * Returns the upload error code for this upload.
+	 *
+	 * @param int $index   The file index if an array of files are uploaded. Indexed from 0.
+	 *
+	 * @throws \YapepBase\Exception\ParameterException   If the index does not exist.
 	 *
 	 * @return int {@uses \UPLOAD_ERR_*}
 	 */
-	public function getError() {
-		return $this->error;
+	public function getError($index = 0) {
+		if (!isset($this->temporaryFiles[$index])) {
+			throw new ParameterException('Invalid index: ' . $index);
+		}
+		return $this->errors[$index];
 	}
 
 	/**
@@ -195,7 +216,11 @@ class UploadedFileDo {
 	 * @return bool
 	 */
 	public function hasError() {
-		return $this->error != UPLOAD_ERR_OK;
+		foreach ($this->errors as $errorCode) {
+			if ($errorCode !== UPLOAD_ERR_OK) {
+				return true;
+			}
+		}
+		return false;
 	}
-
 }
