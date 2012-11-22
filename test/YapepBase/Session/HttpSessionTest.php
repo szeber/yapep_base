@@ -219,7 +219,5 @@ class HttpSessionTest extends \PHPUnit_Framework_TestCase {
 			$this->fail('No exception thrown when trying to save a not yet loaded session');
 		} catch (Exception $e) {
 		}
-
 	}
-
 }

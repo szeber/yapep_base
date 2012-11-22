@@ -148,4 +148,23 @@ class SystemContainerTest extends \PHPUnit_Framework_TestCase {
 
 		$this->assertSame($debugger, $sc->getDebugger(), 'The retrieved debugger is not the same instance');
 	}
+
+	/**
+	 * Tests the getFileResourceHandler() method.
+	 *
+	 * @return void
+	 */
+	public function testGetFileResourceHandler() {
+		$systemContainer = new SystemContainer();
+		$systemContainer[SystemContainer::KEY_FILE_RESOURCE_HANDLER] = '\\YapepBase\\Mock\\File\\ResourceHandlerMock';
+
+		$path = 'test';
+		$accessType = 2;
+		/** @var \YapepBase\Mock\File\ResourceHandlerMock $resourceHandler  */
+		$resourceHandler = $systemContainer->getFileResourceHandler($path, $accessType);
+
+		$this->assertInstanceOf('\YapepBase\Mock\\File\ResourceHandlerMock', $resourceHandler);
+		$this->assertEquals($path, $resourceHandler->path);
+		$this->assertEquals($accessType, $resourceHandler->accessType);
+	}
 }

@@ -56,6 +56,8 @@ class SystemContainer extends Container {
 	const KEY_DEFAULT_ERROR_CONTROLLER_NAME = 'defaultErrorControllerName';
 	/** Key containing the ViewDo. */
 	const KEY_VIEW_DO = 'viewDo';
+	/** Key containing the file resource handler. */
+	const KEY_FILE_RESOURCE_HANDLER = 'fileResourceHandler';
 
 	/**
 	 * Name of the namespace which holds the controllers.
@@ -153,6 +155,8 @@ class SystemContainer extends Container {
 		$this[self::KEY_VIEW_DO] = $this->share(function($container) {
 			return new ViewDo(MimeType::HTML);
 		});
+
+		$this[self::KEY_FILE_RESOURCE_HANDLER] = '\\YapepBase\\File\\ResourceHandlerPhp';
 
 		$this->searchNamespaces[self::NAMESPACE_SEARCH_BO] = array();
 		$this->searchNamespaces[self::NAMESPACE_SEARCH_DAO] = array();
@@ -255,6 +259,19 @@ class SystemContainer extends Container {
 	 */
 	public function getViewDo() {
 		return $this[self::KEY_VIEW_DO];
+	}
+
+	/**
+	 * Returns a ResourceHandlerAbstract.
+	 *
+	 * @param string $path         Path to the file to open
+	 * @param int    $accessType   How to open the file. Bitmask created from the {@uses self::ACCESS_TYPE_*} constants.
+	 * @param bool   $isBinary     If set to TRUE the file will be opened in binary mode.
+	 *
+	 * @return \YapepBase\File\ResourceHandlerAbstract;
+	 */
+	public function getFileResourceHandler($path, $accessType, $isBinary = true) {
+		return new $this[self::KEY_FILE_RESOURCE_HANDLER]($path, $accessType, $isBinary);
 	}
 
 	/**

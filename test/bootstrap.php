@@ -7,6 +7,8 @@
  * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
+use YapepBase\Autoloader\SimpleAutoloader;
+
 include_once(__DIR__ . '/../bootstrap.php');
 
 define('TEST_DIR', __DIR__);
@@ -14,15 +16,18 @@ define('TEST_DIR', __DIR__);
 \YapepBase\Application::getInstance()->getDiContainer()->getErrorHandlerRegistry()
 	->addErrorHandler(new \YapepBase\ErrorHandler\ExceptionCreatorErrorHandler());
 
-$autoloader = new \YapepBase\Autoloader\SimpleAutoloader();
-$autoloader->addClassPath(TEST_DIR);
-// Find vfsStream, and register autoloading for it, if available
-foreach(explode(\PATH_SEPARATOR, get_include_path()) as $path) {
-	if (file_exists($path . \DIRECTORY_SEPARATOR . 'vfsStream')) {
-		$autoloader->addClassPath($path . \DIRECTORY_SEPARATOR . 'vfsStream');
-		break;
-	}
-}
 
+$autoloadDirs = require realpath(__DIR__ . '/../vendor/composer/autoload_namespaces.php');
+
+// Autoloader setup
+$autoloader = new SimpleAutoloader();
+if (defined('APP_ROOT')) {
+	$autoloader->addClassPath(APP_ROOT . '/class');
+}
+$autoloader->addClassPath(TEST_DIR);
+foreach ($autoloadDirs as $dir) {
+	$autoloader->addClassPath($dir);
+}
 $autoloader->register();
-unset($autoloader, $path);
+
+unset($autoloader);
