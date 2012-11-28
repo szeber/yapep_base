@@ -99,19 +99,14 @@ class CurlHttpWrapper {
 			case self::METHOD_GET:
 				$options[CURLOPT_HTTPGET] = true;
 				if (!empty($parameters)) {
-					$escapedParams = array();
-					foreach ($parameters as $key => $value) {
-						$escapedParams[] = urlencode($key) . '=' . urlencode($value);
-					}
+					$query = http_build_query($parameters);
 					$urlParts = parse_url($url);
 					if (false === $urlParts || empty($urlParts['scheme']) || empty($urlParts['host'])) {
+						// TODO Figure out why we are not just throwing an exception here [szeber]
 						trigger_error('Invalid URL: ' . $url, E_USER_ERROR);
-						die;
+						exit;
 					}
-					if (!empty($urlParts['query'])) {
-						$escapedParams = array_merge(explode('&', $urlParts['query']), $escapedParams);
-					}
-					$urlParts['query'] = implode('&', $escapedParams);
+					$urlParts['query'] = empty($urlParts['query']) ? $query : $query . '&' . $urlParts['query'];
 
 					// Rebuild the URL. If we have pecl_http with http_build_url use it,
 					// otherwise use the PHP implementation.
@@ -128,11 +123,7 @@ class CurlHttpWrapper {
 				if (empty($parameters)) {
 					trigger_error('HTTP POST request without parameters', E_USER_WARNING);
 				} else {
-					$escapedParams = array();
-					foreach ($parameters as $key => $value) {
-						$escapedParams[] = urlencode($key) . '=' . urlencode($value);
-					}
-					$options[CURLOPT_POSTFIELDS] = implode('&', $escapedParams);
+					$options[CURLOPT_POSTFIELDS] = http_build_query($parameters);
 				}
 				break;
 
