@@ -152,7 +152,7 @@ abstract class DbTable {
 	abstract protected function buildInsertQuery(array $data, array &$params, array $updateData = array());
 
 	/**
-	 * Generates the query needed to delete the deired records.
+	 * Generates the query needed to delete the desired records.
 	 *
 	 * @param array $data         The new data, the keys are the fields and the values are the values of the fields.
 	 * @param array $conditions   The conditions, the keys are the fields and the values are the values of the fields.
@@ -163,7 +163,7 @@ abstract class DbTable {
 	abstract protected function buildUpdateQuery(array $data, array $conditions, array &$params);
 
 	/**
-	 * Generates the query needed to delete the deired records.
+	 * Generates the query needed to delete the desired records.
 	 *
 	 * @param array $conditions   The conditions, the keys are the fields and the values are the values of the fields.
 	 * @param array $params       This will hold the params what can be passed to the query.(Outgoing Param)
@@ -193,7 +193,7 @@ abstract class DbTable {
 	 *                                 the values are the values of the fields.
 	 * @param array    $updateData     In case of integrity constraint violation,
 	 *                                 this array will be used to update the row.
-	 * @param int|bool $lastInsertId   Automaticly generated id of the inserted row(If there's any in the table).
+	 * @param int|bool $lastInsertId   Automatically generated id of the inserted row(If there's any in the table).
 	 *                                 If TRUE, the value will be populated here (Outgoing parameter).
 	 *
 	 * @return void
@@ -259,7 +259,7 @@ abstract class DbTable {
 	 *
 	 * @return array   An array containing the rows.
 	 *
-	 * @throws \YapepBase\Exception\ParameterException   If the given direction is unproper.
+	 * @throws \YapepBase\Exception\ParameterException   If the given direction is improper.
 	 * @throws \YapepBase\Exception\DatabaseException    On execution errors.
 	 */
 	public function select(array $conditions, $orderBy = null, $direction = null, $limit = null) {
@@ -285,11 +285,11 @@ abstract class DbTable {
 	 * @param int    $pageNumber     The number of the requested page (indexed from 1).
 	 * @param int    $itemsPerPage   How many rows should be returned at a time.
 	 * @param bool   &$itemCount     If its TRUE than the count of rows met the given conditions will be populated.
-	 *                               (Outgoing parameter)Az osszes (eredmeny) elem szama lapozas nelkul.
+	 *                               (Outgoing parameter).
 	 *
 	 * @return array   An array containing the rows.
 	 *
-	 * @throws \YapepBase\Exception\ParameterException   If no orderBy was given, or the given direction is unproper.
+	 * @throws \YapepBase\Exception\ParameterException   If no orderBy was given, or the given direction is improper.
 	 * @throws \YapepBase\Exception\DatabaseException    On execution errors.
 	 */
 	public function selectPaged(array $conditions, $orderBy, $direction, $pageNumber, $itemsPerPage,
@@ -318,10 +318,10 @@ abstract class DbTable {
 	 * @param string $orderBy      The name of thee field, what should be used for ordering the result.
 	 * @param string $direction    The direction of the order ({@link DbTable::ORDER_ASC}, {@link DbTable::ORDER_DESC}).
 	 *
-	 * @return array|bool   An associativ array represents a record in the table,
+	 * @return array|bool   An associative array represents a record in the table,
 	 *                      or FALSE if there was not any row what met the conditions.
 	 *
-	 * @throws \YapepBase\Exception\ParameterException   If the given direction is unproper.
+	 * @throws \YapepBase\Exception\ParameterException   If the given direction is improper.
 	 * @throws \YapepBase\Exception\DatabaseException   On execution errors.
 	 */
 	public function selectOne(array $conditions, $orderBy = null, $direction = null) {

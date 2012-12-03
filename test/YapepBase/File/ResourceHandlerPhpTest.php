@@ -33,6 +33,11 @@ class ResourceHandlerPhpTest extends  \PHPUnit_Framework_TestCase {
 	 */
 	protected $filePath;
 
+	/**
+	 * The content of the file.
+	 *
+	 * @var string
+	 */
 	protected $fileContent;
 
 	/**

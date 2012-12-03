@@ -12,7 +12,7 @@ namespace YapepBase\File;
 
 
 /**
- * Interface what should be implemented by every File wrapper class.
+ * Interface for basic file and directory handler methods.
  *
  * @package    YapepBase
  * @subpackage File
@@ -46,13 +46,14 @@ interface IFileHandler {
 	 *
 	 * @link http://php.net/manual/en/function.file-put-contents.php
 	 *
-	 * @param string $path      Path to the file.
-	 * @param mixed  $data      Can be either a string, an array or a stream resource.
-	 * @param int    $flags     Flags to modify the behaviour of the method.
+	 * @param string $path     Path to the file.
+	 * @param mixed  $data     Can be either a string, an array or a stream resource.
+	 * @param bool   $append   If TRUE, the given data will appended after the already existent data.
+	 * @param bool   $lock     If TRUE, the file will be locked at the writing.
 	 *
 	 * @return int|bool   The byte count of the written data, or FALSE on failure.
 	 */
-	public function write($path, $data, $flags = 0);
+	public function write($path, $data, $append = false, $lock = false);
 
 	/**
 	 * Changes the owner group and user of the file.
@@ -64,7 +65,9 @@ interface IFileHandler {
 	 * @param string|int $group   Name of the group, or the identifier.
 	 * @param string|int $user    Name of the user, or the identifier.
 	 *
-	 * @return bool   TRUE on success, FALSE on failure.
+	 * @throws \YapepBase\Exception\File\Exception   If it failed to set the owner.
+	 *
+	 * @return void
 	 */
 	public function changeOwner($path, $group = null, $user = null);
 
@@ -99,12 +102,13 @@ interface IFileHandler {
 	 *
 	 * @link http://php.net/manual/en/function.unlink.php
 	 *
-	 * @param string   $path      Path to the file.
-	 * @param resource $context   A valid context resource.
+	 * @param string $path   Path to the file.
+	 *
+	 * @throws \YapepBase\Exception\File\Exception   If the given path is not a valid file.
 	 *
 	 * @return bool   TRUE on success, FALSE on failure.
 	 */
-	public function remove($path, $context);
+	public function remove($path);
 
 	/**
 	 * Deletes a directory.
@@ -112,9 +116,12 @@ interface IFileHandler {
 	 * @param string $path          The directory to delete.
 	 * @param bool   $isRecursive   If TRUE the contents will be removed too.
 	 *
+	 * @throws \YapepBase\Exception\File\Exception   If the given path is not empty, and recursive mode is off.
+	 *                                                  Or if the given path is not a valid directory.
+	 *
 	 * @return bool   TRUE on success, FALSE on failure.
 	 */
-	public function removeDirectory($path, $isRecursive);
+	public function removeDirectory($path, $isRecursive = false);
 
 	/**
 	 * Moves the given file to the given destination.
@@ -125,6 +132,8 @@ interface IFileHandler {
 	 * @param string $sourcePath          Path of the file to move.
 	 * @param string $destinationPath     Destination of the moved file.
 	 * @param bool   $checkIfIsUploaded   If TRUE it will move the file only if the file was uploaded through HTTP.
+	 *
+	 * @throws \YapepBase\Exception\File\Exception   If the source file is not uploaded through HTTP and its checked.
 	 *
 	 * @return bool   TRUE on success, FALSE on failure.
 	 */
@@ -142,6 +151,13 @@ interface IFileHandler {
 	public function getParentDirectory($path);
 
 	/**
+	 * Returns the current working directory.
+	 *
+	 * @return string|bool   The full path of the current directory or FALSE on failure.
+	 */
+	public function getCurrentDirectory();
+
+	/**
 	 * Checks if the given directory or file exists.
 	 *
 	 * @link http://php.net/manual/en/function.file-exists.php
@@ -157,23 +173,42 @@ interface IFileHandler {
 	 *
 	 * @link http://php.net/manual/en/function.file-get-contents.php
 	 *
-	 * @param string $path             Path to the file to open
-	 * @param bool   $useIncludePath   If set to TRUE, it will search for the file in the include_path too.
-	 * @param int    $offset           Offset where the reading starts on the original stream.
-	 * @param int    $maxLength        Maximum length of data read.
+	 * @param string $path        Path to the file to open
+	 * @param int    $offset      Offset where the reading starts on the original stream.
+	 * @param int    $maxLength   Maximum length of data read.
+	 *
+	 * @throws \YapepBase\Exception\File\Exception       If the given path does not exist, or it is not a file.
+	 * @throws \YapepBase\Exception\ParameterException   If the given maxLength is less then 0.
 	 *
 	 * @return string|bool   The content of the file, or FALSE on failure.
 	 */
-	public function getAsString($path, $useIncludePath = false, $offset = -1, $maxLength = null);
+	public function getAsString($path, $offset = -1, $maxLength = null);
 
 	/**
 	 * Returns the list of files and directories at the given path.
 	 *
 	 * @param string $path   The directory that will be scanned.
 	 *
+	 * @throws \YapepBase\Exception\File\Exception   If the given path does not exist, or it is not a directory.
+	 *
 	 * @return array
 	 */
 	public function getList($path);
+
+	/**
+	 * Lists the content of the given directory by glob.
+	 *
+	 * @link http://php.net/manual/en/function.glob.php
+	 *
+	 * @param string $path      The path where the function should list.
+	 * @param string $pattern   The pattern to match.
+	 * @param int    $flags     Flags to modify the behaviour of the search {@uses GLOB_*}.
+	 *
+	 * @throws \YapepBase\Exception\File\Exception   If the given path does not exist, or it is not a directory.
+	 *
+	 * @return array|bool    The found path names, or FALSE on failure.
+	 */
+	public function getListByGlob($path, $pattern, $flags = null);
 
 	/**
 	 * Returns the file modification time.
@@ -181,6 +216,8 @@ interface IFileHandler {
 	 * @link http://php.net/manual/en/function.filemtime.php
 	 *
 	 * @param string $path   Path to the file or directory.
+	 *
+	 * @throws \YapepBase\Exception\File\Exception   If the given path does not exist.
 	 *
 	 * @return int|bool   A unix timestamp, or FALSE on failure.
 	 */
@@ -193,22 +230,12 @@ interface IFileHandler {
 	 *
 	 * @param string $path   Path to the file.
 	 *
+	 * @throws \YapepBase\Exception\File\Exception   If the given path does not exist.
+	 *
 	 * @return int|bool   The size of the file in bytes, or FALSE on failure.
 	 */
 	public function getSize($path);
 
-	/**
-	 * Lists the content of the given directory by glob.
-	 *
-	 * @link http://php.net/manual/en/function.glob.php
-	 *
-	 * @param string $path      The path where the function should list.
-	 * @param string $pattern   The pattern to match.
-	 * @param int    $flags     Flags to modify the behaviour of the search {@uses GLOB_*}.
-	 *
-	 * @return array|bool    The found path names, or FALSE on failure.
-	 */
-	public function getListByGlob($path, $pattern, $flags);
 
 	/**
 	 * Checks if the given path is a directory or not.

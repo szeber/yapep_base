@@ -11,9 +11,10 @@
 namespace YapepBase\File;
 
 
+use SplFileObject;
+
 use YapepBase\File\ResourceHandlerAbstract;
 use YapepBase\Exception\File\Exception;
-use SplFileObject;
 use YapepBase\Exception\ParameterException;
 
 /**
@@ -142,7 +143,7 @@ class ResourceHandlerPhp extends ResourceHandlerAbstract {
 	 *
 	 * @param int $accessType   The bitmask of the access type.
 	 *
-	 * @return string|bool   The mode can be used in an fopen().
+	 * @return string|bool   The mode can be used in an fopen() function call.
 	 */
 	protected function getModeFromAccessType($accessType) {
 		$usableModes = array(
