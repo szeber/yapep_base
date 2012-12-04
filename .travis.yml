@@ -20,4 +20,5 @@ before_script:
     - YAPEPBASE_TEST_MYSQL_RO_USER=yapepbase_ro; export YAPEPBASE_TEST_MYSQL_RO_USER
     - YAPEPBASE_TEST_MYSQL_RO_PASSWORD=test; export YAPEPBASE_TEST_MYSQL_RO_PASSWORD
     - YAPEPBASE_TEST_MYSQL_RO_DATABASE=yapepbase_test; export YAPEPBASE_TEST_MYSQL_RO_DATABASE
-script: phpunit test
+    - YAPEPBASE_TEST_TEMPPATH=/tmp/yapepbase_test/filehandling; export YAPEPBASE_TEST_TEMPPATH
+script: phpunit --verbose test
