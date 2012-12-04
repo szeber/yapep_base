@@ -9,6 +9,7 @@ before_install:
     - echo "extension=memcache.so" >> `php --ini | grep "Loaded Configuration" | sed -e "s|.*:\s*||"`
     - rm -rf memcache-2.2.6
     - ln -s yapep_base ../YapepBase
+    - composer install --dev
 before_script:
     - mysql -u root -e 'create database yapepbase_test; grant all on yapepbase_test.* to 'yapepbase_rw'@'localhost' identified by "test"; grant select on yapepbase_test.* to 'yapepbase_ro'@'localhost' identified by "test";'
     - YAPEPBASE_TEST_MYSQL_RW_HOST=localhost; export YAPEPBASE_TEST_MYSQL_RW_HOST
