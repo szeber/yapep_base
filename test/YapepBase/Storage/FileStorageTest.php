@@ -68,6 +68,12 @@ class FileStorageTest extends \PHPUnit_Framework_TestCase {
 
 		$this->assertFalse($storage->get('test'), 'Deletion failed');
 		$this->assertFalse(vfsStreamWrapper::getRoot()->hasChild('test1/test'), 'Test data file exists after deletion');
+
+		$storage->set('test2', 'testValue', 0);
+		$this->assertSame('testValue', $storage->get('test2'), 'Stored value does not match with 0 TTL');
+
+		$storage->delete('test2');
+
 	}
 
 	public function testPlain() {

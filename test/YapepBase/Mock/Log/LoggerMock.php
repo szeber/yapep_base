@@ -3,12 +3,13 @@
  * This file is part of YAPEPBase.
  *
  * @package      YapepBase
- * @subpackage   Test\Mock\Log
+ * @subpackage   Mock\Log
  * @copyright    2011 The YAPEP Project All rights reserved.
  * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
 namespace YapepBase\Mock\Log;
+
 
 use YapepBase\Log\ILogger;
 use YapepBase\Log\Message\IMessage;
@@ -17,7 +18,7 @@ use YapepBase\Log\Message\IMessage;
  * LoggerMock class
  *
  * @package    YapepBase
- * @subpackage Test\Mock\Log
+ * @subpackage Mock\Log
  * @codeCoverageIgnore
  */
 class LoggerMock implements ILogger {

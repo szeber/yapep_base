@@ -46,7 +46,7 @@ class SyslogTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals(array(
 			array(
 				'priority' => \YapepBase\Syslog\Syslog::LOG_NOTICE + \YapepBase\Syslog\Syslog::LOG_USER,
-				'message' => '[error]|error_id=testId|type=testType|app=testApp|tag=error|message=Test message',
+				'message' => '[error]|error_id=testId|type=testType|app=testApp|message=Test message',
 				'ident' => 'testApp',
 				'date' => null
 			)
@@ -68,7 +68,7 @@ class SyslogTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals(array(
 			array(
 				'priority' => \YapepBase\Syslog\Syslog::LOG_NOTICE + \YapepBase\Syslog\Syslog::LOG_USER,
-				'message' => '[error]|error_id=testId|type=testType|app=testApp|tag=error|message=Test message',
+				'message' => '[error]|error_id=testId|type=testType|app=testApp|message=Test message',
 				'ident' => 'testApp-' . PHP_SAPI . '[pid]',
 				'date' => null
 			)

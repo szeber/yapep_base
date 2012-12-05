@@ -41,7 +41,7 @@ class SyslogLogger extends LoggerAbstract {
 	 * @param string                              $configName   The name of the configuration to use.
 	 * @param \YapepBase\Syslog\ISyslogConnection $connection   The Syslog connection to use.
 	 *
-	 * @todo  2011-12-09  Janoszen  Move platform testing to a separate class.
+	 * @todo Remove the possibility to set config options. Use only the set connection [emul]
 	 */
 	public function __construct($configName, \YapepBase\Syslog\ISyslogConnection $connection = null) {
 		parent::__construct($configName);
@@ -58,6 +58,8 @@ class SyslogLogger extends LoggerAbstract {
 		if (isset($this->configOptions['includeSapiName']) && $this->configOptions['includeSapiName']) {
 			$ident .= '-' . PHP_SAPI;
 		}
+
+		// TODO: Can be dangerous as it can override an already set value [emul]
 		$this->connection->setIdent($ident);
 
 		$this->connection->setFacility($this->configOptions['facility']);
@@ -107,8 +109,7 @@ class SyslogLogger extends LoggerAbstract {
 		}
 
 		// We have to remove the line breaks, because syslog will create new log entry after every linebreak.
-		$message = str_replace(PHP_EOL, '', $logMessage . 'tag=' . $message->getTag()
-			. '|message=' . $message->getMessage());
+		$message = str_replace(PHP_EOL, '', $logMessage . 'message=' . $message->getMessage());
 
 		return $message;
 	}

@@ -500,7 +500,13 @@ class FileHandlerPhpTest extends  \PHPUnit_Framework_TestCase {
 		$directoryPath = vfsStream::url($directoryName);
 
 		$this->assertFalse($this->fileHandler->checkIsDirectory($filePath));
-		$this->assertFalse($this->fileHandler->checkIsDirectory($directoryPath . DIRECTORY_SEPARATOR . 'nonexistent'));
+		try {
+			$this->assertFalse($this->fileHandler->checkIsDirectory($directoryPath . DIRECTORY_SEPARATOR
+				. 'nonexistent'));
+			$this->fail('No exception is thrown for a missing directory');
+		} catch (\YapepBase\Exception\File\Exception $e) {
+			$this->assertContains('does not exist', $e->getMessage());
+		}
 		$this->assertTrue($this->fileHandler->checkIsDirectory($directoryPath));
 	}
 
@@ -520,7 +526,12 @@ class FileHandlerPhpTest extends  \PHPUnit_Framework_TestCase {
 		$directoryPath = vfsStream::url($directoryName);
 
 		$this->assertTrue($this->fileHandler->checkIsFile($filePath));
-		$this->assertFalse($this->fileHandler->checkIsFile($directoryPath . DIRECTORY_SEPARATOR . 'nonexistent'));
+		try {
+			$this->assertFalse($this->fileHandler->checkIsFile($directoryPath . DIRECTORY_SEPARATOR . 'nonexistent'));
+			$this->fail('No exception is thrown for a missing file');
+		} catch (\YapepBase\Exception\File\Exception $e) {
+			$this->assertContains('does not exist', $e->getMessage());
+		}
 		$this->assertFalse($this->fileHandler->checkIsFile($directoryPath));
 	}
 
