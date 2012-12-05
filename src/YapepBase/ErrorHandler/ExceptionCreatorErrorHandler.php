@@ -10,8 +10,11 @@
 
 namespace YapepBase\ErrorHandler;
 
+
 /**
  * This error handler converts the desired errors to ErrorException
+ *
+ * <b>Warning! If you use only this ErrorHandler, errors triggered during the autoload process will be suppressed </b>
  *
  * @package      YapepBase
  * @subpackage   ErrorHandler
@@ -35,7 +38,7 @@ class ExceptionCreatorErrorHandler implements IErrorHandler {
 	/**
 	 * Constructor
 	 *
-	 * @param int $errorLevels   Bitmask for the errorlevels what should be converted to Exceptions.
+	 * @param int $errorLevels   Bitmask for the error levels what should be converted to Exceptions.
 	 */
 	public function __construct($errorLevels = null) {
 		$this->errorReporting = error_reporting();
@@ -70,9 +73,9 @@ class ExceptionCreatorErrorHandler implements IErrorHandler {
 	 *
 	 * @param int    $errorLevel   The error code {@uses E_*}
 	 * @param string $message      The error message.
-	 * @param string $file         The file where the error occured.
-	 * @param int    $line         The line in the file where the error occured.
-	 * @param array  $context      The context of the error. (All variables that exist in the scope the error occured)
+	 * @param string $file         The file where the error occurred.
+	 * @param int    $line         The line in the file where the error occurred.
+	 * @param array  $context      The context of the error. (All variables that exist in the scope the error occurred)
 	 * @param string $errorId      The internal ID of the error.
 	 * @param array  $backTrace    The debug backtrace of the error.
 	 *
@@ -112,8 +115,8 @@ class ExceptionCreatorErrorHandler implements IErrorHandler {
 	 *
 	 * @param int    $errorLevel   The error code {@uses E_*}
 	 * @param string $message      The error message.
-	 * @param string $file         The file where the error occured.
-	 * @param int    $line         The line in the file where the error occured.
+	 * @param string $file         The file where the error occurred.
+	 * @param int    $line         The line in the file where the error occurred.
 	 * @param string $errorId      The internal ID of the error.
 	 *
 	 * @return void

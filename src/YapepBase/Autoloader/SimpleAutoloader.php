@@ -19,39 +19,53 @@ namespace YapepBase\Autoloader;
 class SimpleAutoloader extends AutoloaderBase {
 
 	/**
-	 * Gets possible file names for all directories to autoload.
+	 * Returns the possible full paths for the given class.
 	 *
-	 * @param string $className   Name of the class.
+	 * @param string $className   Namespace and name of the class.
 	 *
-	 * @return array
+	 * @return array   Contains all the paths where it is possible to find the class.
 	 */
-	protected function getFileNames($className) {
-		$namespacePath = \explode('\\', $className);
-		$classnamePath = \explode('_', \array_pop($namespacePath));
+	protected function getPaths($className) {
+		$namespacePath = explode('\\', $className);
+		$classNamePath = explode('_', array_pop($namespacePath));
+
+		$namespace = implode('\\', $namespacePath);
+
+		// If we have an exception for that namespace
+		if (array_key_exists($namespace, $this->classPathsWithNamespace)) {
+			return
+				$this->classPathsWithNamespace[$namespace]
+				. DIRECTORY_SEPARATOR
+				. implode(DIRECTORY_SEPARATOR, array_merge($namespacePath, $classNamePath)) . '.php';
+		}
+
 		$files = array();
-		$fileName = \implode(\DIRECTORY_SEPARATOR, \array_merge($namespacePath, $classnamePath)) . '.php';
-		foreach ($this->classpath as &$path) {
-			$files[] = $path . \DIRECTORY_SEPARATOR . $fileName;
+		$fileName = implode(DIRECTORY_SEPARATOR, array_merge($namespacePath, $classNamePath)) . '.php';
+		foreach ($this->classPaths as $path) {
+			$files[] = $path . DIRECTORY_SEPARATOR . $fileName;
 		}
 		return $files;
 	}
 
 	/**
-	 * Load a file which should contain a class.
+	 * Includes a file which should contain the class.
 	 *
 	 * @param string $fileName    Name of the file.
-	 * @param string $className   Name of the class.
+	 * @param string $className   Name of the class to search for in the file.
 	 *
-	 * @return bool    TRUE if loading was successful.
+	 * @return bool   TRUE if the file exists, and can be opened and contains the given class or interface.
 	 */
-	protected function loadFile($fileName, $className) {
+	protected function loadClass($fileName, $className) {
 		try {
-			if (\is_file($fileName) && \is_readable($fileName) && include_once $fileName) {
-				if (\class_exists($className, false) || \interface_exists($className, false)) {
+			if (is_file($fileName) && is_readable($fileName) && include_once $fileName) {
+				if (class_exists($className, false) || interface_exists($className, false)) {
 					return true;
 				}
 			}
+		// If we have an ErrorHandler what converts ErrorExceptions from error, we have to handle that somehow
+		// Because it will ruin the autoloader, and the actual error will be very hard to debug
 		} catch (\ErrorException $e) {
+			// TODO: Find a way to handle this situation [emul]
 		}
 		return false;
 	}
@@ -64,8 +78,8 @@ class SimpleAutoloader extends AutoloaderBase {
 	 * @return bool   TRUE if the class was loaded, FALSE if it can't be loaded.
 	 */
 	public function load($className) {
-		foreach ($this->getFileNames($className) as $fileName) {
-			if ($this->loadFile($fileName, $className)) {
+		foreach ($this->getPaths($className) as $fileName) {
+			if ($this->loadClass($fileName, $className)) {
 				return true;
 			}
 		}

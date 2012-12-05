@@ -2,15 +2,14 @@
 /**
  * This file is part of YAPEPBase.
  *
- * @package      YapepBase
- * @subpackage   Autoloader
- * @copyright    2011 The YAPEP Project All rights reserved.
- * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
+ * @package    YapepBase
+ * @subpackage Autoloader
+ * @copyright  2011 The YAPEP Project All rights reserved.
+ * @license    http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
-
 namespace YapepBase\Autoloader;
-use YapepBase\Exception\Exception;
+
 
 /**
  * Autoloader base abstract class
@@ -21,46 +20,40 @@ use YapepBase\Exception\Exception;
 abstract class AutoloaderBase {
 
 	/**
-	 * The classpaths to use
+	 * The class paths to use
 	 *
 	 * @var array
 	 */
-	protected $classpath = array();
+	protected $classPaths = array();
 
 	/**
-	 * Set an array of directories to be tried on class loading.
+	 * The class paths to use for given namespace prefixes.
 	 *
-	 * @param array $classpath   The classpath.
+	 * The key is tha namespace prefix, and the value is the path
+	 *
+	 * @var array
+	 */
+	protected $classPathsWithNamespace = array();
+
+	/**
+	 * Adds a path to use on class loading.
+	 *
+	 * @param string $path             The path to use.
+	 * @param string $forceNameSpace   A full namespace. If given all the classes in a namespace having
+	 *                                    this prefix will be searched at this path only.
 	 *
 	 * @return AutoloaderBase
 	 */
-	public function setClassPath(array $classpath) {
-		$this->classpath = $classpath;
-		return $this;
-	}
-
-	/**
-	 * Add a single directory or an array of directories to the list of dirctories to be tried on class loading.
-	 *
-	 * @param string|array $directory   The directory, or array of directories.
-	 *
-	 * @return AutoloaderBase
-	 */
-	public function addClassPath($directory) {
-		if (is_array($directory)) {
-			$this->classpath = array_merge($this->classpath, $directory);
-		} else {
-			$this->classpath[] = $directory;
+	public function addClassPath($path, $forceNameSpace = null) {
+		if (!is_null($forceNameSpace)) {
+			$forceNameSpace = ltrim('\\' , $forceNameSpace);
+			$this->classPathsWithNamespace[$forceNameSpace] = $path;
 		}
-	}
+		else {
+			$this->classPaths[] = $path;
+		}
 
-	/**
-	 * Returns all paths in the classpath
-	 *
-	 * @return array of string
-	 */
-	public function getClassPath() {
-		return $this->classpath;
+		return $this;
 	}
 
 	/**
@@ -71,24 +64,4 @@ abstract class AutoloaderBase {
 	 * @return bool   TRUE if the class was loaded, FALSE if it can't be loaded.
 	 */
 	abstract public function load($className);
-
-	/**
-	 * Registers the autoloader with AutoloaderRegistry. This is an alias for
-	 * \YapepBase\Autoloader\AutoloaderRegistry::getInstance()->register($autoloader);
-	 *
-	 * @return void
-	 */
-	public function register() {
-		AutoloaderRegistry::getInstance()->register($this);
-	}
-
-	/**
-	 * Unregisters the autoloader with AutoloaderRegistry. This is an alias for
-	 * \YapepBase\Autoloader\AutoloaderRegistry::getInstance()->unregister($autoloader);
-	 *
-	 * @return void
-	 */
-	public function unregister() {
-		AutoloaderRegistry::getInstance()->unregister($this);
-	}
 }
