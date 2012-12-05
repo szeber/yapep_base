@@ -370,14 +370,19 @@ class FileHandlerPhp implements IFileHandler {
 	/**
 	 * Checks if the given path is a directory or not.
 	 *
-	 * @link http://php.net/manual/en/function.is-dir.php
+	 * @param string $path
 	 *
 	 * @param string $path   The path to check.
 	 *
 	 * @return bool   TRUE if it is a directory, FALSE if not.
+	 *
+	 * @throws \YapepBase\Exception\File\Exception   If the path does not exits
 	 */
 	public function checkIsDirectory($path) {
-		return $this->checkIsPathExists($path) && is_dir($path);
+		if (!$this->checkIsPathExists($path)) {
+			throw new Exception('The given path does not exist: ' . $path);
+		}
+		return is_dir($path);
 	}
 
 	/**
@@ -388,9 +393,27 @@ class FileHandlerPhp implements IFileHandler {
 	 * @param string $path   The path to check.
 	 *
 	 * @return bool   TRUE if it is a file, FALSE if not.
+	 *
+	 * @throws \YapepBase\Exception\File\Exception   If the path does not exits
 	 */
 	public function checkIsFile($path) {
-		return $this->checkIsPathExists($path) && is_file($path);
+		if (!$this->checkIsPathExists($path)) {
+			throw new Exception('The given path does not exist: ' . $path);
+		}
+		return is_file($path);
+	}
+
+	/**
+	 * Checks if the given path is a symbolic link or not.
+	 *
+	 * @link http://php.net/manual/en/function.is-link.php
+	 *
+	 * @param string $path   The path to check.
+	 *
+	 * @return bool   TRUE if it is a file, FALSE if not.
+	 */
+	public function checkIsSymlink($path) {
+		return is_link($path);
 	}
 
 	/**
