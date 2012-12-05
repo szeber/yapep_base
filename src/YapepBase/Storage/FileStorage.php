@@ -184,7 +184,14 @@ class FileStorage extends StorageAbstract {
 			return (string)$data;
 		}
 		$time = time();
-		return serialize(array('createdAt' => $time, 'expiresAt' => $time + $ttl, 'data' => $data, 'key' => $key));
+
+		// 0 TTL means the data should not expire.
+		if (0 == $ttl) {
+			$expiresAt = 0;
+		} else {
+			$expiresAt = $time + $ttl;
+		}
+		return serialize(array('createdAt' => $time, 'expiresAt' => $expiresAt, 'data' => $data, 'key' => $key));
 	}
 
 	/**
@@ -205,7 +212,8 @@ class FileStorage extends StorageAbstract {
 		if (!is_array($data) || !isset($data['expiresAt']) || !isset($data['data'])) {
 			throw new StorageException('Unable to unserialize stored data');
 		}
-		if ($data['expiresAt'] < time()) {
+		// If the expiresAt is empty, the data does not expire.
+		if (!empty($data['expiresAt']) && $data['expiresAt'] < time()) {
 			return false;
 		}
 		return $data['data'];
