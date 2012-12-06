@@ -2,16 +2,18 @@
 /**
  * This file is part of YAPEPBase.
  *
- * @package      YapepBase
- * @subpackage   Request
- * @copyright    2011 The YAPEP Project All rights reserved.
- * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
+ * @package    YapepBase
+ * @subpackage Request
+ * @copyright  2011 The YAPEP Project All rights reserved.
+ * @license    http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
 
 namespace YapepBase\Request;
-use YapepBase\UtilityFunctions;
+
+
 use YapepBase\DataObject\UploadedFileDo;
+use YapepBase\Helper\TextHelper;
 
 /**
  * Request class for HTTP requests.
@@ -105,9 +107,9 @@ class HttpRequest implements IRequest {
 		}
 
 		if ($magicQuotesEnabled) {
-			$get = UtilityFunctions::recursiveStripSlashes($get);
-			$post = UtilityFunctions::recursiveStripSlashes($post);
-			$cookie = UtilityFunctions::recursiveStripSlashes($cookie);
+			$get = TextHelper::stripSlashes($get);
+			$post = TextHelper::stripSlashes($post);
+			$cookie = TextHelper::stripSlashes($cookie);
 		}
 
 		$this->getParams = $get;
