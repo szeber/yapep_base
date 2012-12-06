@@ -16,7 +16,7 @@ namespace YapepBase\Autoloader;
  * @package    YapepBase
  * @subpackage Autoloader
  */
-class SimpleAutoloader extends AutoloaderBase {
+class SimpleAutoloader extends AutoloaderAbstract {
 
 	/**
 	 * Returns the possible full paths for the given class.
@@ -44,6 +44,7 @@ class SimpleAutoloader extends AutoloaderBase {
 		foreach ($this->classPaths as $path) {
 			$files[] = $path . DIRECTORY_SEPARATOR . $fileName;
 		}
+
 		return $files;
 	}
 

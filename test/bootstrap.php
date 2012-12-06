@@ -8,6 +8,7 @@
  */
 
 use YapepBase\Autoloader\SimpleAutoloader;
+use YapepBase\Autoloader\AutoloaderRegistry;
 
 include_once(__DIR__ . '/../bootstrap.php');
 
@@ -15,7 +16,6 @@ define('TEST_DIR', __DIR__);
 
 \YapepBase\Application::getInstance()->getDiContainer()->getErrorHandlerRegistry()
 	->addErrorHandler(new \YapepBase\ErrorHandler\ExceptionCreatorErrorHandler());
-
 
 $autoloadDirs = require realpath(__DIR__ . '/../vendor/composer/autoload_namespaces.php');
 
@@ -28,6 +28,6 @@ $autoloader->addClassPath(TEST_DIR);
 foreach ($autoloadDirs as $dir) {
 	$autoloader->addClassPath($dir);
 }
-$autoloader->register();
+AutoloaderRegistry::getInstance()->addAutoloader($autoloader);
 
 unset($autoloader);

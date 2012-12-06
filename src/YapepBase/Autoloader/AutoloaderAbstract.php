@@ -17,7 +17,7 @@ namespace YapepBase\Autoloader;
  * @package    YapepBase
  * @subpackage Autoloader
  */
-abstract class AutoloaderBase {
+abstract class AutoloaderAbstract {
 
 	/**
 	 * The class paths to use
@@ -42,11 +42,13 @@ abstract class AutoloaderBase {
 	 * @param string $forceNameSpace   A full namespace. If given all the classes in a namespace having
 	 *                                    this prefix will be searched at this path only.
 	 *
-	 * @return AutoloaderBase
+	 * @return AutoloaderAbstract
 	 */
 	public function addClassPath($path, $forceNameSpace = null) {
+		$path = rtrim($path, DIRECTORY_SEPARATOR);
 		if (!is_null($forceNameSpace)) {
-			$forceNameSpace = ltrim('\\' , $forceNameSpace);
+
+			$forceNameSpace = ltrim($forceNameSpace, '\\');
 			$this->classPathsWithNamespace[$forceNameSpace] = $path;
 		}
 		else {
