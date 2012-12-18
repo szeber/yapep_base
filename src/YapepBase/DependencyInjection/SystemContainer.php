@@ -12,6 +12,7 @@ namespace YapepBase\DependencyInjection;
 
 
 use YapepBase\Debugger\IDebugger;
+use YapepBase\File\FileHandlerPhp;
 use YapepBase\Database\DbConnection;
 use YapepBase\DependencyInjection\Container;
 use YapepBase\ErrorHandler\ErrorHandlerRegistry;
@@ -58,6 +59,8 @@ class SystemContainer extends Container {
 	const KEY_VIEW_DO = 'viewDo';
 	/** Key containing the file resource handler. */
 	const KEY_FILE_RESOURCE_HANDLER = 'fileResourceHandler';
+	/** Key containing the file handler. */
+	const KEY_FILE_HANDLER = 'fileHandler';
 
 	/**
 	 * Name of the namespace which holds the controllers.
@@ -157,6 +160,10 @@ class SystemContainer extends Container {
 		});
 
 		$this[self::KEY_FILE_RESOURCE_HANDLER] = '\\YapepBase\\File\\ResourceHandlerPhp';
+
+		$this[self::KEY_FILE_HANDLER] = $this->share(function($container) {
+			return new FileHandlerPhp();
+		});
 
 		$this->searchNamespaces[self::NAMESPACE_SEARCH_BO] = array();
 		$this->searchNamespaces[self::NAMESPACE_SEARCH_DAO] = array();
@@ -268,10 +275,19 @@ class SystemContainer extends Container {
 	 * @param int    $accessType   How to open the file. Bitmask created from the {@uses self::ACCESS_TYPE_*} constants.
 	 * @param bool   $isBinary     If set to TRUE the file will be opened in binary mode.
 	 *
-	 * @return \YapepBase\File\ResourceHandlerAbstract;
+	 * @return \YapepBase\File\ResourceHandlerAbstract
 	 */
 	public function getFileResourceHandler($path, $accessType, $isBinary = true) {
 		return new $this[self::KEY_FILE_RESOURCE_HANDLER]($path, $accessType, $isBinary);
+	}
+
+	/**
+	 * Returns a IFileHandler.
+	 *
+	 * @return \YapepBase\File\IFileHandler
+	 */
+	public function getFileHandler() {
+		return $this[self::KEY_FILE_HANDLER];
 	}
 
 	/**
