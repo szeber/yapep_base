@@ -87,7 +87,7 @@ class ArrayRouter implements IRouter {
 	 *
 	 * @return string   The controller and action separated by a '/' character.
 	 *
-	 * @throws RouterException   On errors. (Includig if the route is not found)
+	 * @throws RouterException   On errors. (Including if the route is not found)
 	 */
 	public function getRoute(&$controller = null, &$action = null) {
 		$target = $this->getTarget();

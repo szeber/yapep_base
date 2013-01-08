@@ -36,22 +36,34 @@ use YapepBase\Exception\RouterException;
  * @package    YapepBase
  * @subpackage Router
  */
-class ArrayReverseRouter implements IReverseRouter {
+class LanguageArrayReverseRouter extends ArrayReverseRouter {
 
 	/**
-	 * The available routes
+	 * The default language.
 	 *
-	 * @var array
+	 * @var string
 	 */
-	protected $routes;
+	protected $defaultLanguage;
+
+	/**
+	 * The current language code.
+	 *
+	 * @var string
+	 */
+	protected $currentLanguage;
 
 	/**
 	 * Constructor
 	 *
-	 * @param array                       $routes    The list of available routes
+	 * @param array  $routes            The list of available routes
+	 * @param string $currentLanguage   The code of the current language.
+	 * @param string $defaultLanguage   The default language code to use.
 	 */
-	public function __construct(array $routes) {
-		$this->routes = $routes;
+	public function __construct(array $routes, $currentLanguage, $defaultLanguage) {
+		parent::__construct($routes);
+
+		$this->currentLanguage = $currentLanguage;
+		$this->defaultLanguage = $defaultLanguage;
 	}
 
 	/**
@@ -66,57 +78,11 @@ class ArrayReverseRouter implements IReverseRouter {
 	 * @throws RouterException   On errors. (Including if the route is not found)
 	 */
 	public function getTargetForControllerAction($controller, $action, $params = array()) {
-		$key = $controller . '/' . $action;
-		if (!isset($this->routes[$key])) {
-			throw new RouterException('No route found for controller and action: ' . $controller . '/' . $action,
-				RouterException::ERR_NO_ROUTE_FOUND);
-		}
+		// We only put the language in the URI if it is not the default
+		$languagePrefix = $this->currentLanguage == $this->defaultLanguage
+			? ''
+			: '/' . $this->currentLanguage;
 
-		$target = false;
-		if (is_array($this->routes[$key])) {
-			foreach ($this->routes[$key] as $route) {
-				$target = $this->getParameterizedRoute($route, $params);
-				if (false !== $target) {
-					break;
-				}
-			}
-		} else {
-			$target = $this->getParameterizedRoute($this->routes[$key], $params);
-		}
-
-		if (false === $target) {
-			throw new RouterException(
-				'No exact route match for controller and action: ' . $controller . '/' . $action . ' with params: '
-					. implode(', ', array_keys($params)), RouterException::ERR_MISSING_PARAM
-			);
-		}
-
-		if ('/' != substr($target, 0, 1)) {
-			$target = '/' . $target;
-		}
-		return $target;
-	}
-
-	/**
-	 * Returns the route with the parameters, or FALSE if a param is missing, or not all params are used.
-	 *
-	 * @param string $route    The route.
-	 * @param array  $params   The route parameters.
-	 *
-	 * @return bool|mixed
-	 */
-	protected function getParameterizedRoute($route, array $params) {
-		$route = preg_replace('/^\s*\[[^\]]+\]\s*/', '', $route);
-		if (strstr($route, '{')) {
-			foreach ($params as $key => $value) {
-				$route = preg_replace('/\{' . preg_quote($key, '/') . ':[^}]+\}/', $value, $route);
-			}
-			if (strstr($route, '{')) {
-				return false;
-			}
-		} elseif (!empty($params)) {
-			return false;
-		}
-		return $route;
+		return $languagePrefix . parent::getTargetForControllerAction($controller, $action, $params);
 	}
 }
