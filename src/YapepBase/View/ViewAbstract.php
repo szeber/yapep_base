@@ -260,6 +260,7 @@ abstract class ViewAbstract {
 	 * @return string
 	 */
 	protected function _($string, $parameters = array(), $language = null) {
-		return Application::getInstance()->getI18nTranslator()->translate(__CLASS__, $string, $parameters, $language);
+		return Application::getInstance()->getI18nTranslator()->translate(get_class($this), $string, $parameters,
+			$language);
 	}
 }
