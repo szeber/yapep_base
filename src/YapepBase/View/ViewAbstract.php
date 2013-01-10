@@ -74,14 +74,7 @@ abstract class ViewAbstract {
 	 * @return void
 	 */
 	protected function render() {
-		try {
-			$this->renderContent();
-		}
-		catch (\Exception $exception) {
-			trigger_error('Unhandled exception occured while rendering template: '
-					. $exception->getMessage() . ' in ' . $exception->getFile() .  ', line: ' . $exception->getLine(),
-				E_USER_ERROR);
-		}
+		$this->renderContent();
 	}
 
 	/**
@@ -95,11 +88,23 @@ abstract class ViewAbstract {
 		$result = $this->getFromStorage();
 
 		if ($result === false) {
+			$result = '';
 			ob_start();
-			$this->render();
-			$result = ob_get_clean();
+			try {
+				$this->render();
+				$result = ob_get_clean();
 
-			$this->setToStorage($result);
+				// If an exception occurs, we don't want to cache the output.
+				$this->setToStorage($result);
+			}
+			catch (\Exception $exception) {
+				// All exceptions most be caught as PHP does not allow the __toString methods to throw exceptions
+				trigger_error('Unhandled exception of type ' . get_class($exception)
+						. ' occured while rendering template: ' . $exception->getMessage() . ' in '
+						. $exception->getFile() .  ', line: ' . $exception->getLine(),
+					E_USER_ERROR);
+				$result .= ob_get_clean();
+			}
 		}
 		return $result;
 	}

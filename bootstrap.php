@@ -24,3 +24,4 @@ $autoloader->addClassPath(BASE_DIR);
 \YapepBase\Autoloader\AutoloaderRegistry::getInstance()->addAutoloader($autoloader);
 
 unset($autoloader);
+
