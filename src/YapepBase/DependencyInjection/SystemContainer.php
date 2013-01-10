@@ -12,6 +12,7 @@ namespace YapepBase\DependencyInjection;
 
 
 use YapepBase\Debugger\IDebugger;
+use YapepBase\File\FileHandlerPhp;
 use YapepBase\Database\DbConnection;
 use YapepBase\DependencyInjection\Container;
 use YapepBase\ErrorHandler\ErrorHandlerRegistry;

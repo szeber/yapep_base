@@ -2,13 +2,16 @@
 /**
  * This file is part of YAPEPBase.
  *
- * @package      YapepBase
- * @subpackage   Autoloader
- * @copyright    2011 The YAPEP Project All rights reserved.
- * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
+ * @package    YapepBase
+ * @subpackage Autoloader
+ * @copyright  2011 The YAPEP Project All rights reserved.
+ * @license    http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
 namespace YapepBase\Autoloader;
+
+
+use YapepBase\Autoloader\AutoloaderAbstract;
 
 /**
  * Handles adding and removing autoloaders to/from the application.
@@ -19,25 +22,18 @@ namespace YapepBase\Autoloader;
 class AutoloaderRegistry {
 
 	/**
-	 * Registry used to store the autoloaders
-	 *
-	 * @var \SplObjectStorage
-	 */
-	protected $registry;
-
-	/**
-	 * Automatically register/unregister with SPL.
-	 *
-	 * @var bool default true
-	 */
-	protected $autoregister = true;
-
-	/**
 	 * The autoloader instance for singleton-like operation.
 	 *
 	 * @var \YapepBase\Autoloader\AutoloaderRegistry
 	 */
 	protected static $instance;
+
+	/**
+	 * Stores the registered autoloader objects.
+	 *
+	 * @var array
+	 */
+	protected $registeredAutoloaders = array();
 
 	/**
 	 * Singleton instance getter.
@@ -48,49 +44,53 @@ class AutoloaderRegistry {
 	 */
 	public static function getInstance() {
 		if (!self::$instance) {
-			self::$instance = new self();
+			self::$instance = new static();
 		}
 		return self::$instance;
 	}
 
 	/**
-	 * Initialize object storage.
+	 * Constructor.
 	 */
-	public function __construct() {
-		$this->registry = new \SplObjectStorage();
+	protected function __construct() {
+		spl_autoload_register(array($this, 'load'));
 	}
 
 	/**
-	 * Sets or clears the flag to automatically register with SPL
-	 *
-	 * @param bool $autoregister   The flag value to set.
-	 *
-	 * @return void
+	 * Clone method.
 	 */
-	public function setAutoregister($autoregister) {
-		$this->autoregister = (bool)$autoregister;
+	protected function __clone() {
 	}
 
 	/**
-	 * Registers this registry with SPL.
+	 * Adds a new autoloader object to the end of the list.
+	 *
+	 * @param \YapepBase\Autoloader\AutoloaderAbstract $autoloader   The autoloader object to register.
 	 *
 	 * @return void
-	 *
-	 * @codeCoverageIgnore
 	 */
-	public function registerWithSpl() {
-		\spl_autoload_register(array($this, 'load'));
+	public function addAutoloader(AutoloaderAbstract $autoloader) {
+		$this->registeredAutoloaders[] = $autoloader;
 	}
 
 	/**
-	 * Unregisters this registry with SPL
+	 * Adds a new autoloader object to the beginning of the list.
+	 *
+	 * @param \YapepBase\Autoloader\AutoloaderAbstract $autoloader   The autoloader object to register.
 	 *
 	 * @return void
-	 *
-	 * @codeCoverageIgnore
 	 */
-	public function unregisterFromSpl() {
-		\spl_autoload_unregister(array($this, 'load'));
+	public function prependAutoloader(AutoloaderAbstract $autoloader) {
+		array_unshift($this->registeredAutoloaders, $autoloader);
+	}
+
+	/**
+	 * Clears all the registered autoloaders.
+	 *
+	 * @return void
+	 */
+	public function clear() {
+		$this->registeredAutoloaders = array();
 	}
 
 	/**
@@ -98,60 +98,15 @@ class AutoloaderRegistry {
 	 *
 	 * @param string $className   Name of the class.
 	 *
-	 * @return bool
+	 * @return bool   TRUE if the load was successful, FALSE on failure.
 	 */
 	public function load($className) {
-		foreach ($this->registry as $autoloader) {
-			/** @var \YapepBase\Autoloader\AutoloaderBase $autoloader */
+		foreach ($this->registeredAutoloaders as $autoloader) {
+			/** @var \YapepBase\Autoloader\AutoloaderAbstract $autoloader */
 			if ($autoloader->load($className)) {
 				return true;
 			}
 		}
 		return false;
-	}
-	/**
-	 * Register an autoloader with the registry
-	 *
-	 * @param \YapepBase\Autoloader\AutoloaderBase $object         The autoloader instance to register.
-	 * @param bool                                 $autoRegister   Automatically register with SPL.
-	 *
-	 * @return void
-	 */
-	public function register(\YapepBase\Autoloader\AutoloaderBase $object, $autoRegister = null) {
-		if (($autoRegister || $this->autoregister) && !$this->registry->count()) {
-			$this->registerWithSpl();
-		}
-		$this->registry->attach($object);
-	}
-	/**
-	 * Unregister from registry.
-	 *
-	 * @param \YapepBase\Autoloader\AutoloaderBase $autoloader       The autoloader instance to remove.
-	 * @param bool                                 $autounregister   Automatically unregister from SPL if
-	 *                                                               no more autoloaders are left.
-	 *
-	 * @return void
-	 */
-	public function unregister($autoloader, $autounregister = null) {
-		$this->registry->detach($autoloader);
-		if (($autounregister || $this->autoregister) && !$this->registry->count()) {
-			$this->unregisterFromSpl();
-		}
-	}
-	/**
-	 * Remove all autoloaders by class name.
-	 *
-	 * @param string $autoloaderClass   The class of the autoloaders to remove.
-	 * @param bool   $autounregister    Automatically unregister from SPL if no more autoloaders are left.
-	 *
-	 * @return void
-	 */
-	public function unregisterByClass($autoloaderClass, $autounregister = null) {
-		$autoloaderClass = ltrim($autoloaderClass, '\\');
-		foreach ($this->registry as $autoloader) {
-			if (\get_class($autoloader) == $autoloaderClass) {
-				$this->unregister($autoloader, $autounregister);
-			}
-		}
 	}
 }
