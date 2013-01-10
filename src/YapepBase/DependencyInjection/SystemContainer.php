@@ -23,6 +23,7 @@ use YapepBase\Exception\ViewException;
 use YapepBase\Exception\ControllerException;
 use YapepBase\Exception\DiException;
 use YapepBase\Exception\Exception;
+use YapepBase\File\FileHandlerPhp;
 use YapepBase\Log\LoggerRegistry;
 use YapepBase\Log\Message\ErrorMessage;
 use YapepBase\Mime\MimeType;
