@@ -208,7 +208,11 @@ class HttpRequest implements IRequest {
 	 * @return bool|\YapepBase\DataObject\UploadedFileDo
 	 */
 	public function getFile($name) {
-		if (isset($this->files[$name])) {
+		if (
+			isset($this->files[$name])
+			&& isset($this->files[$name]['error'])
+			&& UPLOAD_ERR_NO_FILE != $this->files[$name]['error']
+		) {
 			return new UploadedFileDo($this->files[$name]);
 		}
 		return false;
@@ -216,6 +220,8 @@ class HttpRequest implements IRequest {
 
 	/**
 	 * Returns TRUE if the specified upload is in the request.
+	 *
+	 * This method will return TRUE, if the specified upload is in the request, but there was no uploaded file sent.
 	 *
 	 * @param string $name   Name of the upload.
 	 *
