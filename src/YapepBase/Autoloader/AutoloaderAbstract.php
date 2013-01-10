@@ -14,6 +14,9 @@ namespace YapepBase\Autoloader;
 /**
  * Autoloader base abstract class
  *
+ * Be careful when you are extending this class, as probably at that point you wont have an autoloader,
+ * so you have to take care of file include yourself.
+ *
  * @package    YapepBase
  * @subpackage Autoloader
  */

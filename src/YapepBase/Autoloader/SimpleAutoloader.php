@@ -10,6 +10,9 @@
 
 namespace YapepBase\Autoloader;
 
+// We need this here, as at this point probably we don't have a working autoloader yet
+require_once 'AutoloaderAbstract.php';
+
 /**
  * SimpleAutoloader class
  *
