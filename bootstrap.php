@@ -23,3 +23,4 @@ $autoloader->setClassPath(array(BASE_DIR));
 $autoloader->register();
 
 unset($autoloader);
+
