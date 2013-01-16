@@ -109,7 +109,11 @@ class ArrayReverseRouter implements IReverseRouter {
 		$route = preg_replace('/^\s*\[[^\]]+\]\s*/', '', $route);
 		if (strstr($route, '{')) {
 			foreach ($params as $key => $value) {
-				$route = preg_replace('/\{' . preg_quote($key, '/') . ':[^}]+\}/', $value, $route);
+				$count = 0;
+				$route = preg_replace('/\{' . preg_quote($key, '/') . ':[^}]+\}/', $value, $route, -1, $count);
+				if ($count < 1) {
+					return false;
+				}
 			}
 			if (strstr($route, '{')) {
 				return false;

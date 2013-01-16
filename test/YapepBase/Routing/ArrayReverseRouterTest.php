@@ -13,6 +13,7 @@ namespace YapepBase\Routing;
 
 
 use YapepBase\Router\ArrayReverseRouter;
+use YapepBase\Exception\RouterException;
 
 /**
  * Test class for ArrayReverseRouter
@@ -83,6 +84,61 @@ class ArrayReverseRouterTest extends \PHPUnit_Framework_TestCase {
 			$generatedUri = $reverseRouter->getTargetForControllerAction($controller, $action, $params);
 
 			$this->assertEquals($expectedResults[$controllerAction], $generatedUri);
+		}
+	}
+
+	/**
+	 * Tests if the reverse routing works correctly with multiple routes for the same controller and action.
+	 *
+	 * @return void
+	 */
+	public function testMultiRoute() {
+		// Make sure the routes are arranged in a way, where the ordering does not matter
+		$rules = array(
+			'Multiroute/Multiparam'  => array(
+				'/multiroute/multiparam/{param1:alnum}',
+				'/multiroute/multiparam/{param1:alnum}/{param2:alnum}/{param3:alnum}',
+				'/multiroute/multiparam',
+				'/multiroute/multiparam/{param1:alnum}/{param2:alnum}',
+			),
+		);
+
+		$reverseRouter = new ArrayReverseRouter($rules);
+
+		// Check if the not parameterised routing works
+		$this->assertEquals('/multiroute/multiparam',
+			$reverseRouter->getTargetForControllerAction('Multiroute', 'Multiparam'),
+			'Invalid result for non-parameterised route');
+
+		// Check if the route with 1 param works
+		$this->assertEquals('/multiroute/multiparam/test1',
+			$reverseRouter->getTargetForControllerAction('Multiroute', 'Multiparam', array('param1' => 'test1')),
+			'Invalid result for 1 param route');
+
+		// Check if the route with 2 param works
+		$this->assertEquals('/multiroute/multiparam/test1/test2',
+			$reverseRouter->getTargetForControllerAction('Multiroute', 'Multiparam', array(
+				'param1' => 'test1',
+				'param2' => 'test2'
+			)),
+			'Invalid result for 2 param route');
+
+		// Check if the route with 3 param works
+		$this->assertEquals('/multiroute/multiparam/test1/test2/test3',
+			$reverseRouter->getTargetForControllerAction('Multiroute', 'Multiparam', array(
+				'param1' => 'test1',
+				'param2' => 'test2',
+				'param3' => 'test3',
+			)),
+			'Invalid result for 3 param route');
+
+		// Check if a param with an invalid name correctly throws an error
+		try {
+			$reverseRouter->getTargetForControllerAction('Multiroute', 'Multiparam', array('param' => 'test1'));
+			$this->fail('No exception is thrown for a route with an invalid param');
+		} catch (RouterException $e) {
+			$this->assertContains('No exact route match for controller and action', $e->getMessage(),
+				'Invalid exception message');
 		}
 	}
 }
