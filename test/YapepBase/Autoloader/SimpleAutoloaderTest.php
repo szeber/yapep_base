@@ -46,9 +46,11 @@ class SimpleAutoloaderTest extends \PHPUnit_Framework_TestCase {
 	public function testGetPaths() {
 		$classPath1 = DIRECTORY_SEPARATOR . 'test' . DIRECTORY_SEPARATOR . 'path1';
 		$classPath2 = DIRECTORY_SEPARATOR . 'test' . DIRECTORY_SEPARATOR . 'path2' . DIRECTORY_SEPARATOR;
+		$classPath3 = DIRECTORY_SEPARATOR . 'test' . DIRECTORY_SEPARATOR . 'path3';
 
 		$this->simpleAutoloader->addClassPath($classPath1);
 		$this->simpleAutoloader->addClassPath($classPath2);
+		$this->simpleAutoloader->addClassPath($classPath3, '\Test\Namespaced');
 
 		$filePaths = $this->simpleAutoloader->getPaths('Test\TestClass');
 		$expectedResult = array(
@@ -59,6 +61,15 @@ class SimpleAutoloaderTest extends \PHPUnit_Framework_TestCase {
 		sort($expectedResult);
 
 		$this->assertEquals($expectedResult, $filePaths);
+
+		$filePaths = $this->simpleAutoloader->getPaths('Test\Namespaced\TestClass');
+		$expectedResult = array(
+			$classPath3 . DIRECTORY_SEPARATOR . 'Test' . DIRECTORY_SEPARATOR . 'Namespaced'
+				. DIRECTORY_SEPARATOR . 'TestClass.php',
+		);
+
+		$this->assertSame($expectedResult, $filePaths,
+			'In case of the namespaced loading only files from the given directory should be loaded');
 	}
 
 	/**

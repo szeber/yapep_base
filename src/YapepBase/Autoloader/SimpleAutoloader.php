@@ -36,10 +36,11 @@ class SimpleAutoloader extends AutoloaderAbstract {
 
 		// If we have an exception for that namespace
 		if (array_key_exists($namespace, $this->classPathsWithNamespace)) {
-			return
+			return array(
 				$this->classPathsWithNamespace[$namespace]
 				. DIRECTORY_SEPARATOR
-				. implode(DIRECTORY_SEPARATOR, array_merge($namespacePath, $classNamePath)) . '.php';
+				. implode(DIRECTORY_SEPARATOR, array_merge($namespacePath, $classNamePath)) . '.php'
+			);
 		}
 
 		$files = array();
