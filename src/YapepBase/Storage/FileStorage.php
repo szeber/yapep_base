@@ -33,6 +33,8 @@ use YapepBase\Config;
  *                             and will be created, this mode will be set for it. Optional, defaults to 0644.</li>
  *         <li>hashKey:        If TRUE, the key will be hashed before being used for the filename.
  *                             Optional, defaults to FALSE.</li>
+ *         <li>readOnly:       If TRUE, the storage instance will be read only, and any write attempts will
+ *                             throw an exception. Optional, defaults to FALSE</li>
  *     </ul>
  *
  * @package    YapepBase
@@ -86,6 +88,13 @@ class FileStorage extends StorageAbstract {
 	protected $hashKey;
 
 	/**
+	 * If TRUE, the storage will be read only.
+	 *
+	 * @var bool
+	 */
+	protected $readOnly = false;
+
+	/**
 	 * Sets up the backend.
 	 *
 	 * @param array $config   The configuration data for the backend.
@@ -109,6 +118,7 @@ class FileStorage extends StorageAbstract {
 		$this->fileSuffix = (isset($config['fileSuffix']) ? $config['fileSuffix'] : '');
 		$this->fileMode = (empty($config['fileMode']) ? 0644 : $config['fileMode']);
 		$this->hashKey = (isset($config['hashKey']) ? (bool)$config['hashKey'] : false);
+		$this->readOnly = (isset($config['readOnly']) ? (bool)$config['readOnly'] : false);
 
 		if (!file_exists($this->path)) {
 			if (!mkdir($this->path, ($this->fileMode | 0111), true)) {
@@ -118,7 +128,7 @@ class FileStorage extends StorageAbstract {
 			throw new StorageException('Path is not a directory for FileStorage: ' . $this->path);
 		}
 
-		if (!is_writable($this->path)) {
+		if (!$this->readOnly && !is_writable($this->path)) {
 			throw new StorageException('Path is not writable for FileStorage: ' . $this->path);
 		}
 	}
@@ -156,6 +166,9 @@ class FileStorage extends StorageAbstract {
 	 * @throws \YapepBase\Exception\ParameterException    If TTL is set and not supported by the backend.
 	 */
 	public function set($key, $data, $ttl = 0) {
+		if ($this->readOnly) {
+			throw new StorageException('Trying to write to a read only storage');
+		}
 		$fileName = $this->makeFullPath($key);
 		// save error handled via exception
 		if (false === @file_put_contents($fileName, $this->prepareData($key, $data, $ttl))) {
@@ -253,6 +266,9 @@ class FileStorage extends StorageAbstract {
 	 * @throws \YapepBase\Exception\StorageException      On error.
 	 */
 	public function delete($key) {
+		if ($this->readOnly) {
+			throw new StorageException('Trying to write to a read only storage');
+		}
 		$fileName = $this->makeFullPath($key);
 		if (file_exists($fileName)) {
 			if (!unlink($fileName)) {
@@ -282,4 +298,14 @@ class FileStorage extends StorageAbstract {
 		// If the storePlainText option is set to false, we support TTL functionality.
 		return !$this->storePlainText;
 	}
+
+	/**
+	 * Returns TRUE if the storage backend is read only, FALSE otherwise.
+	 *
+	 * @return bool
+	 */
+	public function isReadOnly() {
+		return $this->readOnly;
+	}
+
 }

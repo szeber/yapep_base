@@ -29,10 +29,11 @@ class FileStorageTest extends \PHPUnit_Framework_TestCase {
 		vfsStreamWrapper::setRoot(new vfsStreamDirectory('test'));
 		Config::getInstance()->set(array(
 			'resource.storage.test1.path'            => vfsStream::url('test') . '/test1',
-			'resource.storage.test2.path'            => vfsStream::url('test') . '/test2',
 
+			'resource.storage.test2.path'            => vfsStream::url('test') . '/test2',
 			'resource.storage.test2.storePlainText'  => true,
 			'resource.storage.test2.fileMode'        => 0666,
+			'resource.storage.test2.readOnly'        => false,
 
 			'resource.storage.test3.path'            => vfsStream::url('test') . '/test3',
 			'resource.storage.test3.filePrefix'      => 'test.',
@@ -43,7 +44,12 @@ class FileStorageTest extends \PHPUnit_Framework_TestCase {
 			'resource.storage.test4.hashKey'         => true,
 
 			'resource.storage.test5.none'            => '',
-		   ));
+
+			'resource.storage.test6.path'            => vfsStream::url('test') . '/test6',
+			'resource.storage.test6.storePlainText'  => true,
+			'resource.storage.test6.readOnly'        => true,
+
+		));
 	}
 
 	protected function tearDown() {
@@ -265,5 +271,48 @@ class FileStorageTest extends \PHPUnit_Framework_TestCase {
 			$this->fail('No StorageException thrown for unreadable file');
 		} catch (StorageException $exception) {
 		}
+	}
+
+	/**
+	 * Tests the read only setting for the storage
+	 *
+	 * @return void
+	 */
+	public function testReadOnly() {
+		$storageFile = new vfsStreamFile('test');
+		$storageFile->setContent('test');
+
+		$storageDir = new vfsStreamDirectory('test1');
+		$storageDir->addChild($storageFile);
+
+		$storageDir = new vfsStreamDirectory('test2');
+		$storageDir->addChild($storageFile);
+
+		$storageDir = new vfsStreamDirectory('test6');
+		$storageDir->addChild($storageFile);
+
+		$rootDir = new vfsStreamDirectory('test');
+		$rootDir->addChild($storageDir);
+
+		vfsStreamWrapper::setRoot($rootDir);
+
+		$defaultStorage = new FileStorage('test1');
+		$readWriteStorage = new FileStorage('test2');
+		$readOnlyStorage = new FileStorage('test6');
+
+		$this->assertFalse($defaultStorage->isReadOnly(),
+			'A storage should report it is not read only if no read only setting is defined');
+		$this->assertFalse($readWriteStorage->isReadOnly(), 'The read-write storage should report it is not read only');
+		$this->assertTrue($readOnlyStorage->isReadOnly(), 'The read only storage should report it is read only');
+
+		$data = $readOnlyStorage->get('test');
+		$this->assertNotEmpty($data, 'The retrieved data should not be empty');
+		try {
+			$readOnlyStorage->set('test', 'test2');
+			$this->fail('No StorageException thrown for trying to write to a read only storage');
+		} catch (StorageException $exception) {
+			$this->assertContains('read only storage', $exception->getMessage());
+		}
+		$this->assertSame($data, $readOnlyStorage->get('test'), 'The data should not be changed in the storage');
 	}
 }

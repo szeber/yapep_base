@@ -24,11 +24,13 @@ class StorageMock implements IStorage {
 
 	protected $ttlSupport;
 	protected $persistent;
+	protected $readOnly;
 	public $data;
 
-	public function __construct($ttlSupport, $persistent, array $data = array()) {
+	public function __construct($ttlSupport, $persistent, array $data = array(), $readOnly = false) {
 		$this->ttlSupport = $ttlSupport;
 		$this->persistent = $persistent;
+		$this->readOnly = $readOnly;
 		$this->data = $data;
 	}
 
@@ -82,6 +84,15 @@ class StorageMock implements IStorage {
 	 */
 	public function isTtlSupported() {
 		return $this->ttlSupport;
+	}
+
+	/**
+	 * Returns TRUE if the storage backend is read only, FALSE otherwise.
+	 *
+	 * @return bool
+	 */
+	public function isReadOnly() {
+		return $this->readOnly;
 	}
 
 }

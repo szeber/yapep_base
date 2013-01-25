@@ -35,6 +35,7 @@ class MemcacheStorageTest extends \PHPUnit_Framework_TestCase {
 		$this->memcacheMock = Application::getInstance()->getDiContainer()->getMemcache();
 		Config::getInstance()->set(array(
 			'resource.storage.test.host' => 'localhost',
+			'resource.storage.test.readOnly' => false,
 
 			'resource.storage.test2.host' => 'localhost',
 			'resource.storage.test2.port' => 11222,
@@ -45,7 +46,10 @@ class MemcacheStorageTest extends \PHPUnit_Framework_TestCase {
 			'resource.storage.test3.hashKey' => true,
 			'resource.storage.test3.keyPrefix' => 'test.',
 
-			'test4.port' => 11211,
+			'resource.storage.test4.port' => 11211,
+
+			'resource.storage.test5.host' => 'localhost',
+			'resource.storage.test5.readOnly' => true,
 		));
 	}
 
@@ -118,6 +122,30 @@ class MemcacheStorageTest extends \PHPUnit_Framework_TestCase {
 		} catch (StorageException $exception) {}
 	}
 
-}
+	/**
+	 * Tests the read only setting for the storage
+	 *
+	 * @return void
+	 */
+	public function testReadOnly() {
+		$defaultStorage = new MemcacheStorage('test2');
+		$readWriteStorage = new MemcacheStorage('test');
+		$readOnlyStorage = new MemcacheStorage('test5');
 
-?>
+		$this->assertFalse($defaultStorage->isReadOnly(),
+			'A storage should report it is not read only if no read only setting is defined');
+		$this->assertFalse($readWriteStorage->isReadOnly(), 'The read-write storage should report it is not read only');
+		$this->assertTrue($readOnlyStorage->isReadOnly(), 'The read only storage should report it is read only');
+		$this->memcacheMock->data['test'] = array('value' => 'test', 'ttl' => time() + 600);
+
+		$data = $readOnlyStorage->get('test');
+		$this->assertNotEmpty($data, 'The retrieved data should not be empty');
+		try {
+			$readOnlyStorage->set('test', 'test2');
+			$this->fail('No StorageException thrown for trying to write to a read only storage');
+		} catch (StorageException $exception) {
+			$this->assertContains('read only storage', $exception->getMessage());
+		}
+		$this->assertSame($data, $readOnlyStorage->get('test'), 'The data should not be changed in the storage');
+	}
+}

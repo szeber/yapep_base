@@ -29,6 +29,8 @@ use YapepBase\Debugger\IDebugger;
  *         <li>keyPrefix:      The keys will be prefixed with this string. Optional, defaults to empty string.</li>
  *         <li>keySuffix:      The keys will be suffixed with this string. Optional, defaults to empty string.</li>
  *         <li>hashKey:        If TRUE, the key will be hashed before being stored. Optional, defaults to FALSE.</li>
+ *         <li>readOnly:       If TRUE, the storage instance will be read only, and any write attempts will
+ *                             throw an exception. Optional, defaults to FALSE</li>
  *     </ul>
  *
  * @package    YapepBase
@@ -80,6 +82,13 @@ class MemcachedStorage extends StorageAbstract implements IIncrementable {
 	protected $hashKey;
 
 	/**
+	 * If TRUE, the storage will be read only.
+	 *
+	 * @var bool
+	 */
+	protected $readOnly = false;
+
+	/**
 	 * Sets up the backend.
 	 *
 	 * @param array $config   The configuration data for the backend.
@@ -98,6 +107,7 @@ class MemcachedStorage extends StorageAbstract implements IIncrementable {
 		$this->keyPrefix = (isset($config['keyPrefix']) ? $config['keyPrefix'] : '');
 		$this->keySuffix = (isset($config['keySuffix']) ? $config['keySuffix'] : '');
 		$this->hashKey = (isset($config['hashKey']) ? (bool)$config['hashKey'] : false);
+		$this->readOnly = (isset($config['readOnly']) ? (bool)$config['readOnly'] : false);
 
 		$this->memcache = Application::getInstance()->getDiContainer()->getMemcached();
 		$serverList = $this->memcache->getServerList();
@@ -134,6 +144,9 @@ class MemcachedStorage extends StorageAbstract implements IIncrementable {
 	 * @throws \YapepBase\Exception\ParameterException    If TTL is set and not supported by the backend.
 	 */
 	public function set($key, $data, $ttl = 0) {
+		if ($this->readOnly) {
+			throw new StorageException('Trying to write to a read only storage');
+		}
 		$debugger = Application::getInstance()->getDiContainer()->getDebugger();
 
 		// If we have a debugger, we have to log the query
@@ -203,6 +216,9 @@ class MemcachedStorage extends StorageAbstract implements IIncrementable {
 	 * @throws \YapepBase\Exception\StorageException      On error.
 	 */
 	public function delete($key) {
+		if ($this->readOnly) {
+			throw new StorageException('Trying to write to a read only storage');
+		}
 		$debugger = Application::getInstance()->getDiContainer()->getDebugger();
 
 		// If we have a debugger, we have to log the query
@@ -253,4 +269,14 @@ class MemcachedStorage extends StorageAbstract implements IIncrementable {
 		// Memcache has TTL support
 		return true;
 	}
+
+	/**
+	 * Returns TRUE if the storage backend is read only, FALSE otherwise.
+	 *
+	 * @return bool
+	 */
+	public function isReadOnly() {
+		return $this->readOnly;
+	}
+
 }

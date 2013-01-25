@@ -73,4 +73,11 @@ interface IStorage {
 	 * @return bool
 	 */
 	public function isTtlSupported();
+
+	/**
+	 * Returns TRUE if the storage backend is read only, FALSE otherwise.
+	 *
+	 * @return bool
+	 */
+	public function isReadOnly();
 }
