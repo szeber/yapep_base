@@ -125,7 +125,7 @@ class BaseFilterDo {
 	 *
 	 * @return string
 	 */
-	public function getOrderDirtection() {
+	public function getOrderDirection() {
 		return $this->orderDirection;
 	}
 
