@@ -8,25 +8,17 @@
  * @license    http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
+
 namespace YapepBase\View;
 
 
-use YapepBase\View\ViewAbstract;
-
 /**
- * BlockAbstract class, should be extended by every Block.
+ * Interface which tells you that the implementing class can have a layout.
  *
  * @package    YapepBase
  * @subpackage View
  */
-abstract class BlockAbstract extends ViewAbstract implements IHasLayout {
-
-	/**
-	 * Holds the layout.
-	 *
-	 * @var \YapepBase\View\LayoutAbstract
-	 */
-	protected $layout = null;
+interface IHasLayout {
 
 	/**
 	 * Sets the layout.
@@ -35,25 +27,19 @@ abstract class BlockAbstract extends ViewAbstract implements IHasLayout {
 	 *
 	 * @return void
 	 */
-	public function setLayout(LayoutAbstract $layout) {
-		$this->layout = $layout;
-	}
+	public function setLayout(LayoutAbstract $layout);
 
 	/**
 	 * Returns the current layout
 	 *
 	 * @return \YapepBase\View\LayoutAbstract
 	 */
-	public function getLayout() {
-		return $this->layout;
-	}
+	public function getLayout();
 
 	/**
 	 * Checks if the object has a layout set.
 	 *
 	 * @return bool   TRUE if it has, FALSE otherwise.
 	 */
-	public function checkHasLayout() {
-		return !is_null($this->layout);
-	}
+	public function checkHasLayout();
 }

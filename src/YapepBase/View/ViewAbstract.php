@@ -2,20 +2,20 @@
 /**
  * This file is part of YAPEPBase.
  *
- * @package      YapepBase
- * @subpackage   View
- * @copyright    2011 The YAPEP Project All rights reserved.
- * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
+ * @package    YapepBase
+ * @subpackage View
+ * @copyright  2011 The YAPEP Project All rights reserved.
+ * @license    http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
 
 namespace YapepBase\View;
 
+
 use YapepBase\Application;
-use YapepBase\Config;
 use YapepBase\Exception\Exception;
-use YapepBase\Mime\MimeType;
 use YapepBase\Storage\IStorage;
+use YapepBase\View\IHasLayout;
 use YapepBase\View\ViewDo;
 
 /**
@@ -128,6 +128,15 @@ abstract class ViewAbstract {
 	 * @return void
 	 */
 	protected function renderBlock(BlockAbstract $block) {
+		// The View Object can have a layout, so we give it to the block as well to provide access
+		if ($this instanceof IHasLayout && $this->checkHasLayout()) {
+			$block->setLayout($this->getLayout());
+		}
+		// The current View Object is a Layout, so we pass it to the block as well
+		elseif ($this instanceof LayoutAbstract) {
+			$block->setLayout($this);
+		}
+
 		echo (string)$block;
 	}
 

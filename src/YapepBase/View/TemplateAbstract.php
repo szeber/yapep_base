@@ -2,14 +2,15 @@
 /**
  * This file is part of YAPEPBase.
  *
- * @package      YapepBase
- * @subpackage   View
- * @copyright    2011 The YAPEP Project All rights reserved.
- * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
+ * @package    YapepBase
+ * @subpackage View
+ * @copyright  2011 The YAPEP Project All rights reserved.
+ * @license    http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
 
 namespace YapepBase\View;
+
 
 use YapepBase\View\ViewAbstract;
 use YapepBase\View\LayoutAbstract;
@@ -20,7 +21,7 @@ use YapepBase\View\LayoutAbstract;
  * @package    YapepBase
  * @subpackage View
  */
-abstract class TemplateAbstract extends ViewAbstract {
+abstract class TemplateAbstract extends ViewAbstract implements IHasLayout {
 	/**
 	 * Holds the layout.
 	 *
@@ -46,6 +47,15 @@ abstract class TemplateAbstract extends ViewAbstract {
 	 */
 	public function getLayout() {
 		return $this->layout;
+	}
+
+	/**
+	 * Checks if the object has a layout set.
+	 *
+	 * @return bool   TRUE if it has, FALSE otherwise.
+	 */
+	public function checkHasLayout() {
+		return !is_null($this->layout);
 	}
 
 	/**
