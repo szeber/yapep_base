@@ -174,12 +174,26 @@ abstract class LayoutAbstract extends ViewAbstract {
 	}
 
 	/**
+	 * Returns the current title.
+	 *
+	 * @param bool $isString   If TRUE a string title will be returned concatenated with the separator,
+	 *                         If FALSE, an array will be returned which holds all parts of the title in order.
+	 *
+	 * @return string|array
+	 */
+	public function getTitle($isString = false) {
+		return $isString
+			? implode($this->titleSeparator, $this->title)
+			: $this->title;
+	}
+
+	/**
 	 * Displays the title of the page in HTML format. (<var>title</var> tag).
 	 *
 	 * @return void
 	 */
 	protected function renderTitle() {
-		echo '<title>' . implode($this->titleSeparator, $this->title) . '</title>';
+		echo '<title>' . $this->getTitle(true) . '</title>';
 	}
 
 	/**
