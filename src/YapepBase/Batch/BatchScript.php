@@ -97,7 +97,7 @@ abstract class BatchScript {
 	abstract protected function abort();
 
 	/**
-	 * Returns the script's decription.
+	 * Returns the script's description.
 	 *
 	 * This method should return a the description for the script. It will be used as the script description in the
 	 * help.
@@ -222,22 +222,34 @@ abstract class BatchScript {
 	/**
 	 * Signal handler
 	 *
-	 * @param int $signo   The signal number.
+	 * @param int $signal   The signal number.
 	 *
 	 * @return void
 	 *
 	 * @codeCoverageIgnore
 	 */
-	final public function handleSignal($signo) {
+	final public function handleSignal($signal) {
 		if ($this->handleSignals) {
-			switch ($signo) {
+			switch ($signal) {
 				case SIGTERM:
 				case SIGHUP:
 				case SIGINT:
+					$this->runBeforeAbort();
 					$this->abort();
 					break;
 			}
 		}
+	}
+
+	/**
+	 * Runs before the abort() method called.
+	 *
+	 * Can be handy if you want to implement some logging.
+	 *
+	 * @return void
+	 */
+	protected function runBeforeAbort() {
+		// noop
 	}
 
 	/**
