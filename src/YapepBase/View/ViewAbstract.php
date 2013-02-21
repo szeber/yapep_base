@@ -84,27 +84,16 @@ abstract class ViewAbstract {
 	 *
 	 * @return string
 	 */
-	public function __toString() {
+	public function toString() {
 		$result = $this->getFromStorage();
 
 		if ($result === false) {
-			$result = '';
 			ob_start();
-			try {
-				$this->render();
-				$result = ob_get_clean();
+			$this->render();
+			$result = ob_get_clean();
 
-				// If an exception occurs, we don't want to cache the output.
-				$this->setToStorage($result);
-			}
-			catch (\Exception $exception) {
-				// All exceptions most be caught as PHP does not allow the __toString methods to throw exceptions
-				trigger_error('Unhandled exception of type ' . get_class($exception)
-						. ' occured while rendering template: ' . $exception->getMessage() . ' in '
-						. $exception->getFile() .  ', line: ' . $exception->getLine(),
-					E_USER_ERROR);
-				$result .= ob_get_clean();
-			}
+			// If an exception occurs, we don't want to cache the output.
+			$this->setToStorage($result);
 		}
 		return $result;
 	}
@@ -137,7 +126,7 @@ abstract class ViewAbstract {
 			$block->setLayout($this);
 		}
 
-		echo (string)$block;
+		echo $block->toString();
 	}
 
 	/**
