@@ -323,7 +323,7 @@ class HttpResponse implements IResponse {
 	 * @return string
 	 */
 	public function getRenderedBody() {
-		if (is_string($this->body)) {
+		if (empty($this->body) || is_string($this->body)) {
 			return (string)$this->body;
 		}
 		return $this->body->toString();
