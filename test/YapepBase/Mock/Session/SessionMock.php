@@ -174,4 +174,25 @@ class SessionMock implements ISession {
 	public function getData() {
 		return $this->data;
 	}
+
+	/**
+	 * Loads the session.
+	 *
+	 * If there is no session ID set, it creates a new session instead.
+	 *
+	 * @return void
+	 */
+	public function loadSession() {
+	}
+
+	/**
+	 * Saves the session.
+	 *
+	 * @return void
+	 *
+	 * @throws \YapepBase\Exception\Exception   If trying to save a not loaded session
+	 */
+	public function saveSession() {
+	}
+
 }
