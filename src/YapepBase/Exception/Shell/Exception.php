@@ -43,16 +43,17 @@ class Exception extends \YapepBase\Exception\Exception {
 	/**
 	 * Constructor
 	 *
-	 * @param string    $message      The message string.
-	 * @param int       $code         The exception code.
-	 * @param string    $output       The (partial) output of the command.
-	 * @param int       $statusCode   The status code for the command.
-	 * @param Exception $previous     The previous exception.
+	 * @param string     $message      The message string.
+	 * @param int        $code         The exception code.
+	 * @param string     $output       The (partial) output of the command.
+	 * @param int        $statusCode   The status code for the command.
+	 * @param \Exception $previous     The previous exception.
+	 * @param mixed      $data         Any debugging data.
 	 */
 	public function __construct(
-		$message = "", $code = 0, $output = null, $statusCode = null, Exception $previous = null
+		$message = "", $code = 0, $output = null, $statusCode = null, \Exception $previous = null, $data = null
 	) {
-		parent::__construct($message, $code, $previous);
+		parent::__construct($message, $code, $previous, $data);
 
 		$this->output     = $output;
 		$this->statusCode = $statusCode;
