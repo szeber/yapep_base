@@ -9,10 +9,6 @@
  */
 
 namespace YapepBase\Session;
-use YapepBase\Application;
-use YapepBase\Event\Event;
-use YapepBase\Mock\Storage\StorageMock;
-use YapepBase\Config;
 
 /**
  * SimpleSessionTest class
