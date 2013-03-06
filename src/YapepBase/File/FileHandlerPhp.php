@@ -450,7 +450,7 @@ class FileHandlerPhp implements IFileHandler {
 	 */
 	public function checkIsDirectory($path) {
 		if (!$this->checkIsPathExists($path)) {
-			throw new NotFoundException('The given path does not exist: ' . $path);
+			throw new NotFoundException($path, 'The given path does not exist: ' . $path);
 		}
 		return is_dir($path);
 	}
@@ -468,7 +468,7 @@ class FileHandlerPhp implements IFileHandler {
 	 */
 	public function checkIsFile($path) {
 		if (!$this->checkIsPathExists($path)) {
-			throw new NotFoundException('The given path does not exist: ' . $path);
+			throw new NotFoundException($path, 'The given path does not exist: ' . $path);
 		}
 		return is_file($path);
 	}
@@ -486,7 +486,7 @@ class FileHandlerPhp implements IFileHandler {
 	 */
 	public function checkIsSymlink($path) {
 		if (!$this->checkIsPathExists($path)) {
-			throw new NotFoundException('The given path does not exist: ' . $path);
+			throw new NotFoundException($path, 'The given path does not exist: ' . $path);
 		}
 		return is_link($path);
 	}

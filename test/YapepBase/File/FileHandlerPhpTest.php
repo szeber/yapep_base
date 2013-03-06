@@ -12,7 +12,6 @@ namespace YapepBase\File;
 
 
 use org\bovigo\vfs\vfsStream;
-use Exception;
 use org\bovigo\vfs\vfsStreamFile;
 use org\bovigo\vfs\vfsStreamDirectory;
 use org\bovigo\vfs\vfsStreamWrapper;
@@ -501,10 +500,11 @@ class FileHandlerPhpTest extends  \PHPUnit_Framework_TestCase {
 
 		$this->assertFalse($this->fileHandler->checkIsDirectory($filePath));
 		try {
-			$this->assertFalse($this->fileHandler->checkIsDirectory($directoryPath . DIRECTORY_SEPARATOR
-				. 'nonexistent'));
+			$this->fileHandler->checkIsDirectory($directoryPath . DIRECTORY_SEPARATOR . 'nonexistent');
 			$this->fail('No exception is thrown for a missing directory');
-		} catch (\YapepBase\Exception\File\Exception $e) {
+		} catch (\YapepBase\Exception\File\NotFoundException $e) {
+			$this->assertEquals($directoryPath . DIRECTORY_SEPARATOR . 'nonexistent', $e->getFilename(),
+				'The NotFoundException contains an invalid filename');
 			$this->assertContains('does not exist', $e->getMessage());
 		}
 		$this->assertTrue($this->fileHandler->checkIsDirectory($directoryPath));
@@ -527,9 +527,11 @@ class FileHandlerPhpTest extends  \PHPUnit_Framework_TestCase {
 
 		$this->assertTrue($this->fileHandler->checkIsFile($filePath));
 		try {
-			$this->assertFalse($this->fileHandler->checkIsFile($directoryPath . DIRECTORY_SEPARATOR . 'nonexistent'));
+			$this->fileHandler->checkIsFile($directoryPath . DIRECTORY_SEPARATOR . 'nonexistent');
 			$this->fail('No exception is thrown for a missing file');
-		} catch (\YapepBase\Exception\File\Exception $e) {
+		} catch (\YapepBase\Exception\File\NotFoundException $e) {
+			$this->assertEquals($directoryPath . DIRECTORY_SEPARATOR . 'nonexistent', $e->getFilename(),
+				'The NotFoundException contains an invalid filename');
 			$this->assertContains('does not exist', $e->getMessage());
 		}
 		$this->assertFalse($this->fileHandler->checkIsFile($directoryPath));

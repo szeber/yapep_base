@@ -24,21 +24,21 @@ class NotFoundException extends Exception {
 	 *
 	 * @var string
 	 */
-	protected $fileName;
+	protected $filename;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param string     $fileName   Name and path of the file that was not found.
+	 * @param string     $filename   Name and path of the file that was not found.
 	 * @param string     $message    The message for the exception.
 	 * @param int        $code       Code for the exception.
 	 * @param \Exception $previous   The previous exception.
 	 * @param mixed      $data       Any debugging data.
 	 */
-	public function __construct($fileName, $message = "", $code = 0, \Exception $previous = null, $data = null) {
+	public function __construct($filename, $message = "", $code = 0, \Exception $previous = null, $data = null) {
 		parent::__construct($message, $code, $previous, $data);
 
-		$this->fileName = $fileName;
+		$this->filename = $filename;
 	}
 
 	/**
@@ -46,7 +46,7 @@ class NotFoundException extends Exception {
 	 *
 	 * @return string
 	 */
-	public function getFileName() {
-		return $this->fileName;
+	public function getFilename() {
+		return $this->filename;
 	}
 }
