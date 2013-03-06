@@ -91,5 +91,17 @@ class CommandExecutorTest extends \PHPUnit_Framework_TestCase {
 		$expectedOutput = escapeshellarg($expectedCommand) .' -v -v -v';
 
 		$this->assertSame($expectedOutput, $command->getCommand());
+
+		// Test with chained commands
+		$command1 = new CommandExecutor('test1');
+		$command2 = new CommandExecutor('test2');
+		$command3 = new CommandExecutor('test3');
+
+		$command1->setChainedCommand($command2, CommandExecutor::OPERATOR_PIPE);
+		$command2->setChainedCommand($command3, CommandExecutor::OPERATOR_BINARY_AND);
+
+		$expectedOutput = escapeshellarg('test1') . ' | ' . escapeshellarg('test2') . ' && ' . escapeshellarg('test3');
+
+		$this->assertSame($expectedOutput, $command1->getCommand(), 'The generated chained command is invalid');
 	}
 }

@@ -34,6 +34,13 @@ class CommandExecutor {
 	/** ID of the STDERR pipe */
 	const PIPE_STDERR = 2;
 
+	/** Pipe operator. The output of the left command will be sent as the input of the right command. */
+	const OPERATOR_PIPE = '|';
+	/** Binary AND operator. The right command will only run if the left command exited with a 0 status code. */
+	const OPERATOR_BINARY_AND = '&&';
+	/** Binary OR operator. The right command will only run if the left command exited with a non-0 status code. */
+	const OPERATOR_BINARY_OR = '||';
+
 	/**
 	 * The command to run.
 	 *
@@ -75,6 +82,20 @@ class CommandExecutor {
 	 * @var int
 	 */
 	protected $timeout;
+
+	/**
+	 * The chained command that will be run after this one.
+	 *
+	 * @var \YapepBase\Shell\CommandExecutor
+	 */
+	protected $chainedCommand;
+
+	/**
+	 * The operator for the chained command.
+	 *
+	 * @var string
+	 */
+	protected $chainedCommandOperator;
 
 	/**
 	 * Constructor.
@@ -174,6 +195,26 @@ class CommandExecutor {
 	}
 
 	/**
+	 * Sets a command that will be chained after the current command with the specified operator.
+	 *
+	 * @param CommandExecutor $command    The command to add.
+	 * @param string          $operator   The operator to separate the command with. {@uses self::OPERATOR_*}
+	 *
+	 * @return \YapepBase\Shell\CommandExecutor
+	 *
+	 * @throws \YapepBase\Exception\ParameterException   If the operator is invalid.
+	 */
+	public function setChainedCommand(CommandExecutor $command, $operator) {
+		if (!in_array($operator, array(self::OPERATOR_PIPE, self::OPERATOR_BINARY_AND, self::OPERATOR_BINARY_OR))) {
+			throw new ParameterException('Invalid operator: ' . $operator);
+		}
+
+		$this->chainedCommand = $command;
+		$this->chainedCommandOperator = $operator;
+		return $this;
+	}
+
+	/**
 	 * Returns the full command.
 	 *
 	 * @return string
@@ -190,6 +231,10 @@ class CommandExecutor {
 			else {
 				$command .= ' ' . escapeshellarg($param['value']);
 			}
+		}
+
+		if (!empty($this->chainedCommand)) {
+			$command .= ' ' . $this->chainedCommandOperator . ' ' . $this->chainedCommand->getCommand();
 		}
 
 		return $command;
