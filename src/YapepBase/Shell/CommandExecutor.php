@@ -19,13 +19,7 @@ use YapepBase\Exception\ParameterException;
  * @package    YapepBase
  * @subpackage Shell
  */
-class CommandExecutor {
-	/** Output mode: send command output straight to STDOUT */
-	const OUTPUT_STDOUT = 1;
-	/** Output mode: return the command's output as a variable */
-	const OUTPUT_VAR    = 2;
-	/** Output mode: pipe the command's output into a file */
-	const OUTPUT_FILE   = 4;
+class CommandExecutor implements ICommandExecutor {
 
 	/** ID of the STDIN pipe */
 	const PIPE_STDIN = 0;
@@ -33,13 +27,6 @@ class CommandExecutor {
 	const PIPE_STDOUT = 1;
 	/** ID of the STDERR pipe */
 	const PIPE_STDERR = 2;
-
-	/** Pipe operator. The output of the left command will be sent as the input of the right command. */
-	const OPERATOR_PIPE = '|';
-	/** Binary AND operator. The right command will only run if the left command exited with a 0 status code. */
-	const OPERATOR_BINARY_AND = '&&';
-	/** Binary OR operator. The right command will only run if the left command exited with a non-0 status code. */
-	const OPERATOR_BINARY_OR = '||';
 
 	/**
 	 * The command to run.
@@ -86,7 +73,7 @@ class CommandExecutor {
 	/**
 	 * The chained command that will be run after this one.
 	 *
-	 * @var \YapepBase\Shell\CommandExecutor
+	 * @var \YapepBase\Shell\ICommandExecutor
 	 */
 	protected $chainedCommand;
 
@@ -99,20 +86,31 @@ class CommandExecutor {
 
 	/**
 	 * Constructor.
-	 *
-	 * @param string $command   Name of the command to run.
 	 */
-	public function __construct($command) {
-		$this->command = $command;
+	public function __construct() {
 		$this->timeout = Config::getInstance()->get('system.shell.executedCommandTimeout', 0);
 	}
+
+	/**
+	 * Sets the command.
+	 *
+	 * @param string $command   The command to be executed.
+	 *
+	 * @return \YapepBase\Shell\ICommandExecutor   The current instance.
+	 */
+	public function setCommand($command) {
+		$this->command = $command;
+		return $this;
+	}
+
+
 
 	/**
 	 * Sets the timeout for the command.
 	 *
 	 * @param int $timeout   The timeout.
 	 *
-	 * @return \YapepBase\Shell\CommandExecutor
+	 * @return \YapepBase\Shell\ICommandExecutor   The current instance.
 	 */
 	public function setTimeout($timeout) {
 		$this->timeout = $timeout;
@@ -124,7 +122,7 @@ class CommandExecutor {
 	 *
 	 * @param string $separator   The separator.
 	 *
-	 * @return \YapepBase\Shell\CommandExecutor
+	 * @return \YapepBase\Shell\ICommandExecutor   The current instance.
 	 */
 	public function setSwitchValueSeparator($separator) {
 		$this->switchValueSeparator = $separator;
@@ -137,7 +135,7 @@ class CommandExecutor {
 	 * @param int    $mode      The output mode. {@uses self::OUTPUT_}
 	 * @param string $logFile   The log file's path and name in case of file output mode.
 	 *
-	 * @return \YapepBase\Shell\CommandExecutor
+	 * @return \YapepBase\Shell\ICommandExecutor   The current instance.
 	 *
 	 * @throws \YapepBase\Exception\ParameterException   If adding file output mode without specifying a file path.
 	 */
@@ -158,7 +156,7 @@ class CommandExecutor {
 	 * @param int    $mode      The output mode. {@uses self::OUTPUT_}
 	 * @param string $logFile   The log file's path and name in case of file output mode.
 	 *
-	 * @return \YapepBase\Shell\CommandExecutor
+	 * @return \YapepBase\Shell\ICommandExecutor   The current instance.
 	 *
 	 * @throws \YapepBase\Exception\ParameterException   If adding file output mode without specifying a file path.
 	 */
@@ -179,7 +177,7 @@ class CommandExecutor {
 	 * @param string|null $option   switch.
 	 * @param string|null $value    value.
 	 *
-	 * @return \YapepBase\Shell\CommandExecutor
+	 * @return \YapepBase\Shell\ICommandExecutor   The current instance.
 	 *
 	 * @throws \YapepBase\Exception\ParameterException   If trying to add an option with neither a name nor a value.
 	 */
@@ -197,14 +195,14 @@ class CommandExecutor {
 	/**
 	 * Sets a command that will be chained after the current command with the specified operator.
 	 *
-	 * @param CommandExecutor $command    The command to add.
-	 * @param string          $operator   The operator to separate the command with. {@uses self::OPERATOR_*}
+	 * @param ICommandExecutor $command    The command to add.
+	 * @param string           $operator   The operator to separate the command with. {@uses self::OPERATOR_*}
 	 *
-	 * @return \YapepBase\Shell\CommandExecutor
+	 * @return \YapepBase\Shell\ICommandExecutor   The current instance.
 	 *
 	 * @throws \YapepBase\Exception\ParameterException   If the operator is invalid.
 	 */
-	public function setChainedCommand(CommandExecutor $command, $operator) {
+	public function setChainedCommand(ICommandExecutor $command, $operator) {
 		if (!in_array($operator, array(self::OPERATOR_PIPE, self::OPERATOR_BINARY_AND, self::OPERATOR_BINARY_OR))) {
 			throw new ParameterException('Invalid operator: ' . $operator);
 		}

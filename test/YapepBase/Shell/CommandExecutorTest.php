@@ -31,7 +31,8 @@ class CommandExecutorTest extends \PHPUnit_Framework_TestCase {
 		);
 
 		// Test generating the command with the default separator
-		$command = new CommandExecutor($expectedCommand);
+		$command = new CommandExecutor();
+		$command->setCommand($expectedCommand);
 
 		foreach ($expectedParams as $name => $value) {
 			$command->addParam($name, $value);
@@ -43,7 +44,8 @@ class CommandExecutorTest extends \PHPUnit_Framework_TestCase {
 		$this->assertSame($expectedOutput, $command->getCommand());
 
 		// Test generating the command with an empty separator
-		$command = new CommandExecutor($expectedCommand);
+		$command = new CommandExecutor();
+		$command->setCommand($expectedCommand);
 
 		foreach ($expectedParams as $name => $value) {
 			$command->addParam($name, $value);
@@ -57,7 +59,8 @@ class CommandExecutorTest extends \PHPUnit_Framework_TestCase {
 		$this->assertSame($expectedOutput, $command->getCommand());
 
 		// Test generating the command with '=' as the separator
-		$command = new CommandExecutor($expectedCommand);
+		$command = new CommandExecutor();
+		$command->setCommand($expectedCommand);
 
 		foreach ($expectedParams as $name => $value) {
 			$command->addParam($name, $value);
@@ -71,7 +74,8 @@ class CommandExecutorTest extends \PHPUnit_Framework_TestCase {
 		$this->assertSame($expectedOutput, $command->getCommand());
 
 		// Test with multiple arguments
-		$command = new CommandExecutor($expectedCommand);
+		$command = new CommandExecutor();
+		$command->setCommand($expectedCommand);
 
 		$command->addParam(null, 'testArgument1');
 		$command->addParam(null, 'testArgument 2');
@@ -82,7 +86,8 @@ class CommandExecutorTest extends \PHPUnit_Framework_TestCase {
 		$this->assertSame($expectedOutput, $command->getCommand());
 
 		// Test with multiple instances of the same switch
-		$command = new CommandExecutor($expectedCommand);
+		$command = new CommandExecutor();
+		$command->setCommand($expectedCommand);
 
 		$command->addParam('-v');
 		$command->addParam('-v');
@@ -97,8 +102,9 @@ class CommandExecutorTest extends \PHPUnit_Framework_TestCase {
 		$command2 = new CommandExecutor('test2');
 		$command3 = new CommandExecutor('test3');
 
-		$command1->setChainedCommand($command2, CommandExecutor::OPERATOR_PIPE);
-		$command2->setChainedCommand($command3, CommandExecutor::OPERATOR_BINARY_AND);
+		$command1->setCommand('test1')->setChainedCommand($command2, CommandExecutor::OPERATOR_PIPE);
+		$command2->setCommand('test2')->setChainedCommand($command3, CommandExecutor::OPERATOR_BINARY_AND);
+		$command3->setCommand('test3');
 
 		$expectedOutput = escapeshellarg('test1') . ' | ' . escapeshellarg('test2') . ' && ' . escapeshellarg('test3');
 

@@ -29,6 +29,7 @@ use YapepBase\Mime\MimeType;
 use YapepBase\Request\IRequest;
 use YapepBase\Response\IResponse;
 use YapepBase\Session\SessionRegistry;
+use YapepBase\Shell\CommandExecutor;
 use YapepBase\Storage\IStorage;
 use YapepBase\View\ViewDo;
 
@@ -61,6 +62,8 @@ class SystemContainer extends Container {
 	const KEY_FILE_RESOURCE_HANDLER = 'fileResourceHandler';
 	/** Key containing the file handler. */
 	const KEY_FILE_HANDLER = 'fileHandler';
+	/** Key containing the command executor. */
+	const KEY_COMMAND_EXECUTOR = 'commandExecutor';
 
 	/**
 	 * Name of the namespace which holds the controllers.
@@ -163,6 +166,10 @@ class SystemContainer extends Container {
 
 		$this[self::KEY_FILE_HANDLER] = $this->share(function($container) {
 			return new FileHandlerPhp();
+		});
+
+		$this[self::KEY_COMMAND_EXECUTOR] = $this->share(function($container) {
+			return new CommandExecutor();
 		});
 
 		$this->searchNamespaces[self::NAMESPACE_SEARCH_BO] = array();
@@ -288,6 +295,19 @@ class SystemContainer extends Container {
 	 */
 	public function getFileHandler() {
 		return $this[self::KEY_FILE_HANDLER];
+	}
+
+	/**
+	 * Returns a CommandExecutor instance.
+	 *
+	 * @param string $command   The command to run.
+	 *
+	 * @return \YapepBase\Shell\ICommandExecutor
+	 */
+	public function getCommandExecutor($command) {
+		/** @var \YapepBase\Shell\ICommandExecutor $executor */
+		$executor = $this[self::KEY_COMMAND_EXECUTOR];
+		$executor->setCommand($command);
 	}
 
 	/**
