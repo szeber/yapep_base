@@ -12,6 +12,7 @@ namespace YapepBase\File;
 
 
 use YapepBase\Exception\File\Exception;
+use YapepBase\Exception\File\NotFoundException;
 use YapepBase\Exception\ParameterException;
 
 /**
@@ -31,10 +32,14 @@ class FileHandlerPhp implements IFileHandler {
 	 * @param int    $modificationTime   The modification time to set (timestamp).
 	 * @param int    $accessTime         The access time to set(timestamp).
 	 *
-	 * @return bool   TRUE on success, FALSE on failure.
+	 * @return void
+	 *
+	 * @throws \YapepBase\Exception\File\Exception   If the operation failed.
 	 */
 	public function touch($path, $modificationTime = null, $accessTime = null) {
-		return touch($path, $modificationTime, $accessTime);
+		if (!touch($path, $modificationTime, $accessTime)) {
+			throw new Exception('Touch failed for path: ' . $path);
+		}
 	}
 
 	/**
@@ -46,10 +51,14 @@ class FileHandlerPhp implements IFileHandler {
 	 * @param int    $mode          The mode (rights) of the created directory, use octal value.
 	 * @param bool   $isRecursive   If TRUE the whole structure will be created.
 	 *
-	 * @return bool   TRUE on success, FALSE on failure.
+	 * @return void
+	 *
+	 * @throws \YapepBase\Exception\File\Exception   If the operation failed.
 	 */
 	public function makeDirectory($path, $mode = 0755, $isRecursive = true) {
-		return mkdir($path, $mode, $isRecursive);
+		if (!mkdir($path, $mode, $isRecursive)) {
+			throw new Exception('Failed to create directory: ' . $path);
+		}
 	}
 
 	/**
@@ -62,7 +71,9 @@ class FileHandlerPhp implements IFileHandler {
 	 * @param bool   $append   If TRUE, the given data will appended after the already existent data.
 	 * @param bool   $lock     If TRUE, the file will be locked at the writing.
 	 *
-	 * @return int|bool   The byte count of the written data, or FALSE on failure.
+	 * @return int   The byte count of the written data.
+	 *
+	 * @throws \YapepBase\Exception\File\Exception   If the operation failed.
 	 */
 	public function write($path, $data, $append = false, $lock = false) {
 		$flag = 0;
@@ -73,7 +84,13 @@ class FileHandlerPhp implements IFileHandler {
 			$flag = $flag | LOCK_EX;
 		}
 
-		return file_put_contents($path, $data, $flag);
+		$result = file_put_contents($path, $data, $flag);
+
+		if (false === $result) {
+			throw new Exception('Failed to write data to file: ' . $path);
+		}
+
+		return $result;
 	}
 
 	/**
@@ -86,11 +103,15 @@ class FileHandlerPhp implements IFileHandler {
 	 * @param string|int $group   Name of the group, or the identifier.
 	 * @param string|int $user    Name of the user, or the identifier.
 	 *
-	 * @throws \YapepBase\Exception\File\Exception   If it failed to set the owner.
-	 *
 	 * @return void
+	 *
+	 * @throws \YapepBase\Exception\File\NotFoundException   If the file was not found.
+	 * @throws \YapepBase\Exception\File\Exception   If it failed to set the owner.
 	 */
 	public function changeOwner($path, $group = null, $user = null) {
+		if (!$this->checkIsPathExists($path)) {
+			throw new NotFoundException($path, 'Resource not found while changing owner: ' . $path);
+		}
 		if (!is_null($group) && !chgrp($path, $group)) {
 			throw new Exception('Failed to set the group "' . $group . '" of the resource: ' . $path);
 		}
@@ -107,10 +128,18 @@ class FileHandlerPhp implements IFileHandler {
 	 * @param string $path  Path to the file or directory.
 	 * @param int    $mode  The mode to set, use octal values.
 	 *
-	 * @return bool   TRUE on success, FALSE on failure.
+	 * @return void
+	 *
+	 * @throws \YapepBase\Exception\File\NotFoundException   If the file was not found.
+	 * @throws \YapepBase\Exception\File\Exception   If it failed to set the mode.
 	 */
 	public function changeMode($path, $mode) {
-		return chmod($path, $mode);
+		if (!$this->checkIsPathExists($path)) {
+			throw new NotFoundException($path, 'Resource not found while changing owner: ' . $path);
+		}
+		if (!chmod($path, $mode)) {
+			throw new Exception('Failed to set the mode "' . $mode . '" of the resource: ' . $path);
+		}
 	}
 
 	/**
@@ -123,10 +152,18 @@ class FileHandlerPhp implements IFileHandler {
 	 * @param string $source        Path to the source file.
 	 * @param string $destination   The destination path.
 	 *
-	 * @return bool   TRUE on success, FALSE on failure.
+	 * @return void
+	 *
+	 * @throws \YapepBase\Exception\File\NotFoundException   If the source file was not found.
+	 * @throws \YapepBase\Exception\File\Exception   If it failed to set the mode.
 	 */
 	public function copy($source, $destination) {
-		return copy($source, $destination);
+		if (!$this->checkIsPathExists($source)) {
+			throw new NotFoundException($source, 'Source file not found for copy: ' . $source);
+		}
+		if (!copy($source, $destination)) {
+			throw new Exception('Failed to copy file from ' . $source . ' to ' . $destination);
+		}
 	}
 
 	/**
@@ -136,19 +173,19 @@ class FileHandlerPhp implements IFileHandler {
 	 *
 	 * @param string $path   Path to the file.
 	 *
-	 * @throws \YapepBase\Exception\File\Exception   If the given path is not a valid file.
+	 * @return void
 	 *
-	 * @return bool   TRUE on success, FALSE on failure.
+	 * @throws \YapepBase\Exception\File\NotFoundException   If the given path is not a valid file.
+	 * @throws \YapepBase\Exception\File\Exception   If it failed to delete the file.
 	 */
 	public function remove($path) {
 		if (!$this->checkIsFile($path)) {
 			throw new Exception('The given path is not a valid file: ' . $path);
 		}
 
-		if ($this->checkIsPathExists($path)) {
-			return unlink($path);
+		if (!unlink($path)) {
+			throw new Exception('Failed to remove file: ' . $path);
 		}
-		return true;
 	}
 
 	/**
@@ -158,13 +195,13 @@ class FileHandlerPhp implements IFileHandler {
 	 * @param bool   $isRecursive   If TRUE the contents will be removed too.
 	 *
 	 * @throws \YapepBase\Exception\File\Exception   If the given path is not empty, and recursive mode is off.
-	 *                                                  Or if the given path is not a valid directory.
+	 *                                               Or if the given path is not a valid directory, or deletion failed.
 	 *
-	 * @return bool   TRUE on success, FALSE on failure.
+	 * @return void
 	 */
 	public function removeDirectory($path, $isRecursive = false) {
 		if (!$this->checkIsPathExists($path)) {
-			return true;
+			return;
 		}
 		if (!$this->checkIsDirectory($path)) {
 			throw new Exception('The given path is not a directory: ' . $path);
@@ -181,7 +218,7 @@ class FileHandlerPhp implements IFileHandler {
 			$fullPath = rtrim($path, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $subPath;
 
 			// We found a directory
-			if (is_dir($fullPath)) {
+			if ($this->checkIsDirectory($fullPath)) {
 				$this->removeDirectory($fullPath, true);
 			}
 			// We found a file
@@ -190,27 +227,37 @@ class FileHandlerPhp implements IFileHandler {
 			}
 		}
 
-		return rmdir($path);
+		if (!rmdir($path)) {
+			throw new Exception('Failed to delete directory: ' . $path);
+		}
 	}
 
 	/**
 	 * Moves the given file to the given destination.
 	 *
 	 * @link http://php.net/manual/en/function.rename.php
+	 * @link http://php.net/manual/en/function.move-uploaded-file.php
 	 *
 	 * @param string $sourcePath          Path of the file to move.
 	 * @param string $destinationPath     Destination of the moved file.
 	 * @param bool   $checkIfIsUploaded   If TRUE it will move the file only if the file was uploaded through HTTP.
 	 *
-	 * @throws \YapepBase\Exception\File\Exception   If the source file is not uploaded through HTTP and its checked.
+	 * @throws \YapepBase\Exception\File\NotFoundException   If the source file is not found.
+	 * @throws \YapepBase\Exception\File\Exception   If the source file is not uploaded through HTTP and its checked
+	 *                                               or the move failed.
 	 *
-	 * @return bool   TRUE on success, FALSE on failure.
+	 * @return void
 	 */
 	public function move($sourcePath, $destinationPath, $checkIfIsUploaded = false) {
+		if (!$this->checkIsPathExists($sourcePath)) {
+			throw new NotFoundException($sourcePath, 'The source file is not found for a file move: ' . $sourcePath);
+		}
 		if ($checkIfIsUploaded && !is_uploaded_file($sourcePath)) {
 			throw new Exception('The given file is not uploaded through HTTP: ' . $sourcePath);
 		}
-		return rename($sourcePath, $destinationPath);
+		if (!rename($sourcePath, $destinationPath)) {
+			throw new Exception('Failed to move file from ' . $sourcePath . ' to ' . $destinationPath);
+		}
 	}
 
 	/**
@@ -257,26 +304,33 @@ class FileHandlerPhp implements IFileHandler {
 	 * @param int    $offset      Offset where the reading starts on the original stream.
 	 * @param int    $maxLength   Maximum length of data read.
 	 *
-	 * @throws \YapepBase\Exception\File\Exception       If the given path does not exist, or it is not a file.
+	 * @throws \YapepBase\Exception\File\NotFoundException   If the given path does not exist.
+	 * @throws \YapepBase\Exception\File\Exception   If the given path is not a file or the read failed.
 	 * @throws \YapepBase\Exception\ParameterException   If the given maxLength is less then 0.
 	 *
-	 * @return string|bool   The content of the file, or FALSE on failure.
+	 * @return string   The content of the file, or FALSE on failure.
 	 */
 	public function getAsString($path, $offset = -1, $maxLength = null) {
 		if (!$this->checkIsFile($path)) {
-			throw new Exception('The given path does not exist, or it is not a file: ' . $path);
+			throw new Exception('The given path is not a file: ' . $path);
 		}
 		if (!is_null($maxLength) && $maxLength < 0) {
 			throw new ParameterException('The maximum length cannot be less then 0. ' . $maxLength . ' given');
 		}
 
-		// The file_get_contents's maxlen parameter does not have a default value ... (I love you PHP)
+		// The file_get_contents's maxlen parameter does not have a default value
 		if (is_null($maxLength)) {
-			return file_get_contents($path, null, null, $offset);
+			$result = file_get_contents($path, null, null, $offset);
 		}
 		else {
-			return file_get_contents($path, null, null, $offset, $maxLength);
+			$result = file_get_contents($path, null, null, $offset, $maxLength);
 		}
+
+		if (false === $result) {
+			throw new Exception('Failed to read file: ' . $path);
+		}
+
+		return $result;
 	}
 
 	/**
@@ -284,7 +338,8 @@ class FileHandlerPhp implements IFileHandler {
 	 *
 	 * @param string $path   The directory that will be scanned.
 	 *
-	 * @throws \YapepBase\Exception\File\Exception   If the given path does not exist, or it is not a directory.
+	 * @throws \YapepBase\Exception\File\NotFoundException   If the given path does not exist.
+	 * @throws \YapepBase\Exception\File\Exception   If the given path is not a directory.
 	 *
 	 * @return array
 	 */
@@ -314,13 +369,14 @@ class FileHandlerPhp implements IFileHandler {
 	 * @param string $pattern   The pattern to match.
 	 * @param int    $flags     Flags to modify the behaviour of the search {@uses GLOB_*}.
 	 *
-	 * @throws \YapepBase\Exception\File\Exception   If the given path does not exist, or it is not a directory.
+	 * @throws \YapepBase\Exception\File\NotFoundException   If the given path does not exist.
+	 * @throws \YapepBase\Exception\File\Exception   If the given path is not a directory.
 	 *
 	 * @return array|bool    The found path names, or FALSE on failure.
 	 */
 	public function getListByGlob($path, $pattern, $flags = null) {
 		if (!$this->checkIsDirectory($path)) {
-			throw new Exception('The given path does not exist, or it is not a directory: ' . $path);
+			throw new Exception('The given path is not a valid directory: ' . $path);
 		}
 
 		$currentDir = $this->getCurrentDirectory();
@@ -338,15 +394,22 @@ class FileHandlerPhp implements IFileHandler {
 	 *
 	 * @param string $path   Path to the file or directory.
 	 *
-	 * @throws \YapepBase\Exception\File\Exception   If the given path does not exist.
+	 * @throws \YapepBase\Exception\File\NotFoundException   If the given path does not exist.
+	 * @throws \YapepBase\Exception\File\Exception   If we failed to get the modification time.
 	 *
-	 * @return int|bool   A unix timestamp, or FALSE on failure.
+	 * @return int   A unix timestamp, or FALSE on failure.
 	 */
 	public function getModificationTime($path) {
 		if (!$this->checkIsPathExists($path)) {
-			throw new Exception('The given path does not exist: ' . $path);
+			throw new NotFoundException($path, 'The given path does not exist: ' . $path);
 		}
-		return filemtime($path);
+		$result = filemtime($path);
+
+		if (false === $result) {
+			throw new Exception('Failed to get modification time for file: ' . $path);
+		}
+
+		return $result;
 	}
 
 	/**
@@ -356,31 +419,38 @@ class FileHandlerPhp implements IFileHandler {
 	 *
 	 * @param string $path   Path to the file.
 	 *
-	 * @throws \YapepBase\Exception\File\Exception   If the given path does not exist.
+	 * @throws \YapepBase\Exception\File\NotFoundException   If the given path does not exist.
+	 * @throws \YapepBase\Exception\File\Exception   If we failed to get the file size.
 	 *
 	 * @return int|bool   The size of the file in bytes, or FALSE on failure.
 	 */
 	public function getSize($path) {
 		if (!$this->checkIsPathExists($path)) {
-			throw new Exception('The given path does not exist: ' . $path);
+			throw new NotFoundException($path, 'The given path does not exist: ' . $path);
 		}
-		return filesize($path);
+		$result =  filesize($path);
+
+		if (false === $result) {
+			throw new Exception('Failed to get the size of file: ' . $path);
+		}
+
+		return $result;
 	}
 
 	/**
 	 * Checks if the given path is a directory or not.
 	 *
-	 * @param string $path
+	 * @link http://php.net/manual/en/function.is-dir.php
 	 *
 	 * @param string $path   The path to check.
 	 *
 	 * @return bool   TRUE if it is a directory, FALSE if not.
 	 *
-	 * @throws \YapepBase\Exception\File\Exception   If the path does not exits
+	 * @throws \YapepBase\Exception\File\NotFoundException   If the path does not exist.
 	 */
 	public function checkIsDirectory($path) {
 		if (!$this->checkIsPathExists($path)) {
-			throw new Exception('The given path does not exist: ' . $path);
+			throw new NotFoundException('The given path does not exist: ' . $path);
 		}
 		return is_dir($path);
 	}
@@ -394,11 +464,11 @@ class FileHandlerPhp implements IFileHandler {
 	 *
 	 * @return bool   TRUE if it is a file, FALSE if not.
 	 *
-	 * @throws \YapepBase\Exception\File\Exception   If the path does not exits
+	 * @throws \YapepBase\Exception\File\NotFoundException   If the path does not exits
 	 */
 	public function checkIsFile($path) {
 		if (!$this->checkIsPathExists($path)) {
-			throw new Exception('The given path does not exist: ' . $path);
+			throw new NotFoundException('The given path does not exist: ' . $path);
 		}
 		return is_file($path);
 	}
@@ -411,8 +481,13 @@ class FileHandlerPhp implements IFileHandler {
 	 * @param string $path   The path to check.
 	 *
 	 * @return bool   TRUE if it is a file, FALSE if not.
+	 *
+	 * @throws \YapepBase\Exception\File\NotFoundException   If the path does not exits
 	 */
 	public function checkIsSymlink($path) {
+		if (!$this->checkIsPathExists($path)) {
+			throw new NotFoundException('The given path does not exist: ' . $path);
+		}
 		return is_link($path);
 	}
 

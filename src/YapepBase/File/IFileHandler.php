@@ -22,22 +22,30 @@ interface IFileHandler {
 	/**
 	 * Sets the access and modification time of a file or directory.
 	 *
+	 * @link http://php.net/manual/en/function.touch.php
+	 *
 	 * @param string $path               Tha path to the file or directory.
 	 * @param int    $modificationTime   The modification time to set (timestamp).
 	 * @param int    $accessTime         The access time to set(timestamp).
 	 *
-	 * @return bool   TRUE on success, FALSE on failure.
+	 * @return void
+	 *
+	 * @throws \YapepBase\Exception\File\Exception   If the operation failed.
 	 */
 	public function touch($path, $modificationTime = null, $accessTime = null);
 
 	/**
 	 * Makes a directory. Be aware that by default it is recursive.
 	 *
+	 * @link http://php.net/manual/en/function.mkdir.php
+	 *
 	 * @param string $path          The directory or structure(in case of recursive mode) to create.
 	 * @param int    $mode          The mode (rights) of the created directory, use octal value.
 	 * @param bool   $isRecursive   If TRUE the whole structure will be created.
 	 *
-	 * @return bool   TRUE on success, FALSE on failure.
+	 * @return void
+	 *
+	 * @throws \YapepBase\Exception\File\Exception   If the operation failed.
 	 */
 	public function makeDirectory($path, $mode = 0755, $isRecursive = true);
 
@@ -51,7 +59,9 @@ interface IFileHandler {
 	 * @param bool   $append   If TRUE, the given data will appended after the already existent data.
 	 * @param bool   $lock     If TRUE, the file will be locked at the writing.
 	 *
-	 * @return int|bool   The byte count of the written data, or FALSE on failure.
+	 * @return int   The byte count of the written data.
+	 *
+	 * @throws \YapepBase\Exception\File\Exception   If the operation failed.
 	 */
 	public function write($path, $data, $append = false, $lock = false);
 
@@ -65,9 +75,10 @@ interface IFileHandler {
 	 * @param string|int $group   Name of the group, or the identifier.
 	 * @param string|int $user    Name of the user, or the identifier.
 	 *
-	 * @throws \YapepBase\Exception\File\Exception   If it failed to set the owner.
-	 *
 	 * @return void
+	 *
+	 * @throws \YapepBase\Exception\File\NotFoundException   If the file was not found.
+	 * @throws \YapepBase\Exception\File\Exception   If it failed to set the owner.
 	 */
 	public function changeOwner($path, $group = null, $user = null);
 
@@ -79,7 +90,10 @@ interface IFileHandler {
 	 * @param string $path  Path to the file or directory.
 	 * @param int    $mode  The mode to set, use octal values.
 	 *
-	 * @return bool   TRUE on success, FALSE on failure.
+	 * @return void
+	 *
+	 * @throws \YapepBase\Exception\File\NotFoundException   If the file was not found.
+	 * @throws \YapepBase\Exception\File\Exception   If it failed to set the mode.
 	 */
 	public function changeMode($path, $mode);
 
@@ -93,7 +107,10 @@ interface IFileHandler {
 	 * @param string $source        Path to the source file.
 	 * @param string $destination   The destination path.
 	 *
-	 * @return bool   TRUE on success, FALSE on failure.
+	 * @return void
+	 *
+	 * @throws \YapepBase\Exception\File\NotFoundException   If the source file was not found.
+	 * @throws \YapepBase\Exception\File\Exception   If it failed to set the mode.
 	 */
 	public function copy($source, $destination);
 
@@ -104,9 +121,10 @@ interface IFileHandler {
 	 *
 	 * @param string $path   Path to the file.
 	 *
-	 * @throws \YapepBase\Exception\File\Exception   If the given path is not a valid file.
+	 * @return void
 	 *
-	 * @return bool   TRUE on success, FALSE on failure.
+	 * @throws \YapepBase\Exception\File\NotFoundException   If the given path is not a valid file.
+	 * @throws \YapepBase\Exception\File\Exception   If it failed to delete the file.
 	 */
 	public function remove($path);
 
@@ -117,9 +135,9 @@ interface IFileHandler {
 	 * @param bool   $isRecursive   If TRUE the contents will be removed too.
 	 *
 	 * @throws \YapepBase\Exception\File\Exception   If the given path is not empty, and recursive mode is off.
-	 *                                                  Or if the given path is not a valid directory.
+	 *                                               Or if the given path is not a valid directory, or deletion failed.
 	 *
-	 * @return bool   TRUE on success, FALSE on failure.
+	 * @return void
 	 */
 	public function removeDirectory($path, $isRecursive = false);
 
@@ -133,9 +151,11 @@ interface IFileHandler {
 	 * @param string $destinationPath     Destination of the moved file.
 	 * @param bool   $checkIfIsUploaded   If TRUE it will move the file only if the file was uploaded through HTTP.
 	 *
-	 * @throws \YapepBase\Exception\File\Exception   If the source file is not uploaded through HTTP and its checked.
+	 * @throws \YapepBase\Exception\File\NotFoundException   If the source file is not found.
+	 * @throws \YapepBase\Exception\File\Exception   If the source file is not uploaded through HTTP and its checked
+	 *                                               or the move failed.
 	 *
-	 * @return bool   TRUE on success, FALSE on failure.
+	 * @return void
 	 */
 	public function move($sourcePath, $destinationPath, $checkIfIsUploaded = false);
 
@@ -177,10 +197,11 @@ interface IFileHandler {
 	 * @param int    $offset      Offset where the reading starts on the original stream.
 	 * @param int    $maxLength   Maximum length of data read.
 	 *
-	 * @throws \YapepBase\Exception\File\Exception       If the given path does not exist, or it is not a file.
+	 * @throws \YapepBase\Exception\File\NotFoundException   If the given path does not exist.
+	 * @throws \YapepBase\Exception\File\Exception   If the given path is not a file or the read failed.
 	 * @throws \YapepBase\Exception\ParameterException   If the given maxLength is less then 0.
 	 *
-	 * @return string|bool   The content of the file, or FALSE on failure.
+	 * @return string   The content of the file, or FALSE on failure.
 	 */
 	public function getAsString($path, $offset = -1, $maxLength = null);
 
@@ -189,7 +210,8 @@ interface IFileHandler {
 	 *
 	 * @param string $path   The directory that will be scanned.
 	 *
-	 * @throws \YapepBase\Exception\File\Exception   If the given path does not exist, or it is not a directory.
+	 * @throws \YapepBase\Exception\File\NotFoundException   If the given path does not exist.
+	 * @throws \YapepBase\Exception\File\Exception   If the given path is not a directory.
 	 *
 	 * @return array
 	 */
@@ -204,7 +226,8 @@ interface IFileHandler {
 	 * @param string $pattern   The pattern to match.
 	 * @param int    $flags     Flags to modify the behaviour of the search {@uses GLOB_*}.
 	 *
-	 * @throws \YapepBase\Exception\File\Exception   If the given path does not exist, or it is not a directory.
+	 * @throws \YapepBase\Exception\File\NotFoundException   If the given path does not exist.
+	 * @throws \YapepBase\Exception\File\Exception   If the given path is not a directory.
 	 *
 	 * @return array|bool    The found path names, or FALSE on failure.
 	 */
@@ -217,9 +240,10 @@ interface IFileHandler {
 	 *
 	 * @param string $path   Path to the file or directory.
 	 *
-	 * @throws \YapepBase\Exception\File\Exception   If the given path does not exist.
+	 * @throws \YapepBase\Exception\File\NotFoundException   If the given path does not exist.
+	 * @throws \YapepBase\Exception\File\Exception   If we failed to get the modification time.
 	 *
-	 * @return int|bool   A unix timestamp, or FALSE on failure.
+	 * @return int   A unix timestamp, or FALSE on failure.
 	 */
 	public function getModificationTime($path);
 
@@ -230,7 +254,8 @@ interface IFileHandler {
 	 *
 	 * @param string $path   Path to the file.
 	 *
-	 * @throws \YapepBase\Exception\File\Exception   If the given path does not exist.
+	 * @throws \YapepBase\Exception\File\NotFoundException   If the given path does not exist.
+	 * @throws \YapepBase\Exception\File\Exception   If we failed to get the file size.
 	 *
 	 * @return int|bool   The size of the file in bytes, or FALSE on failure.
 	 */
@@ -246,7 +271,7 @@ interface IFileHandler {
 	 *
 	 * @return bool   TRUE if it is a directory, FALSE if not.
 	 *
-	 * @throws \YapepBase\Exception\File\Exception   If the path does not exits
+	 * @throws \YapepBase\Exception\File\NotFoundException   If the path does not exist.
 	 */
 	public function checkIsDirectory($path);
 
@@ -259,7 +284,7 @@ interface IFileHandler {
 	 *
 	 * @return bool   TRUE if it is a file, FALSE if not.
 	 *
-	 * @throws \YapepBase\Exception\File\Exception   If the path does not exits
+	 * @throws \YapepBase\Exception\File\NotFoundException   If the path does not exits
 	 */
 	public function checkIsFile($path);
 
@@ -271,6 +296,8 @@ interface IFileHandler {
 	 * @param string $path   The path to check.
 	 *
 	 * @return bool   TRUE if it is a file, FALSE if not.
+	 *
+	 * @throws \YapepBase\Exception\File\NotFoundException   If the path does not exits
 	 */
 	public function checkIsSymlink($path);
 
