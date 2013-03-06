@@ -37,4 +37,13 @@ class CommandOutput {
 		$this->output  = $output;
 		$this->code    = $code;
 	}
+
+	/**
+	 * Returns TRUE if the command was successful (returned a code of 0).
+	 *
+	 * @return bool
+	 */
+	public function isSuccessful() {
+		return $this->code == '0';
+	}
 }
