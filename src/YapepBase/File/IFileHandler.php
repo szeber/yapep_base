@@ -123,8 +123,9 @@ interface IFileHandler {
 	 *
 	 * @return void
 	 *
-	 * @throws \YapepBase\Exception\File\NotFoundException   If the given path is not a valid file.
-	 * @throws \YapepBase\Exception\File\Exception   If it failed to delete the file.
+	 * @throws \YapepBase\Exception\File\NotFoundException   If the given path is not found.
+	 * @throws \YapepBase\Exception\File\Exception   If it failed to delete the file or the given path
+	 *                                               is not a regular file.
 	 */
 	public function remove($path);
 

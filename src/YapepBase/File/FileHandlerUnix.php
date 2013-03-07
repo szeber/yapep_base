@@ -9,19 +9,20 @@
  */
 
 namespace YapepBase\File;
-
-
-use YapepBase\Exception\File\Exception;
+use YapepBase\Application;
 use YapepBase\Exception\File\NotFoundException;
 use YapepBase\Exception\ParameterException;
+use YapepBase\Shell\CommandExecutor;
+use YapepBase\Exception\File\Exception;
+use YapepBase\Shell\ICommandExecutor;
 
 /**
- * Simple wrapper class for basic filesystem manipulations via PHP function.
+ * File handler that uses unix commands
  *
  * @package    YapepBase
  * @subpackage File
  */
-class FileHandlerPhp implements IFileHandler {
+class FileHandlerUnix implements IFileHandler {
 
 	/**
 	 * Sets the access and modification time of a file or directory.
@@ -37,8 +38,24 @@ class FileHandlerPhp implements IFileHandler {
 	 * @throws \YapepBase\Exception\File\Exception   If the operation failed.
 	 */
 	public function touch($path, $modificationTime = null, $accessTime = null) {
-		if (!touch($path, $modificationTime, $accessTime)) {
-			throw new Exception('Touch failed for path: ' . $path);
+		$diContainer = Application::getInstance()->getDiContainer();
+		if (empty($modificationTime) && empty($accessTime)) {
+			$this->runCommandAndThrowExceptionIfFailed($diContainer->getCommandExecutor('touch')
+				->addParam(null, $path), 'Touch failed for path: ' . $path);
+		} else {
+			if (!empty($modificationTime)) {
+				$this->runCommandAndThrowExceptionIfFailed($diContainer->getCommandExecutor('touch')
+					->addParam('-m')
+					->addParam('-t', date('YmdHi.s', $modificationTime))
+					->addParam(null, $path), 'Touch failed for path (modification time): ' . $path);
+			}
+
+			if (!empty($accessTime)) {
+				$this->runCommandAndThrowExceptionIfFailed($diContainer->getCommandExecutor('touch')
+					->addParam('-a')
+					->addParam('-t', date('YmdHi.s', $accessTime))
+					->addParam(null, $path), 'Touch failed for path (access time): ' . $path);
+			}
 		}
 	}
 
@@ -56,9 +73,13 @@ class FileHandlerPhp implements IFileHandler {
 	 * @throws \YapepBase\Exception\File\Exception   If the operation failed.
 	 */
 	public function makeDirectory($path, $mode = 0755, $isRecursive = true) {
-		if (!mkdir($path, $mode, $isRecursive)) {
-			throw new Exception('Failed to create directory: ' . $path);
+		$command = Application::getInstance()->getDiContainer()->getCommandExecutor('mkdir')
+			->addParam('-m', str_pad(decoct($mode), 5, '0', STR_PAD_LEFT));
+		if ($isRecursive) {
+			$command->addParam('-p');
 		}
+		$command->addParam(null, $path);
+		$this->runCommandAndThrowExceptionIfFailed($command, 'Failed to create directory: ' . $path);
 	}
 
 	/**
@@ -76,21 +97,25 @@ class FileHandlerPhp implements IFileHandler {
 	 * @throws \YapepBase\Exception\File\Exception   If the operation failed.
 	 */
 	public function write($path, $data, $append = false, $lock = false) {
-		$flag = 0;
-		if ($append) {
-			$flag = $flag | FILE_APPEND;
-		}
+		$redirectType = $append
+			? CommandExecutor::OUTPUT_REDIRECT_STDOUT_APPEND
+			: CommandExecutor::OUTPUT_REDIRECT_STDOUT;
+
+		$diContainer = Application::getInstance()->getDiContainer();
+		$echoCommand = $diContainer->getCommandExecutor('echo')
+			->addParam(null, $data)
+			->setOutputRedirection($redirectType, $path, true);
+
 		if ($lock) {
-			$flag = $flag | LOCK_EX;
+			$this->runCommandAndThrowExceptionIfFailed($diContainer->getCommandExecutor('flock')
+				->addParam('-x')
+				->addParam(null, $path)
+				->addParam('-c', $echoCommand->getCommand()), 'Failed to write data to file: ' . $path);
+		} else {
+			$this->runCommandAndThrowExceptionIfFailed($echoCommand, 'Failed to write data to file: ' . $path);
 		}
 
-		$result = file_put_contents($path, $data, $flag);
-
-		if (false === $result) {
-			throw new Exception('Failed to write data to file: ' . $path);
-		}
-
-		return $result;
+		return strlen($data);
 	}
 
 	/**
@@ -112,12 +137,11 @@ class FileHandlerPhp implements IFileHandler {
 		if (!$this->checkIsPathExists($path)) {
 			throw new NotFoundException($path, 'Resource not found while changing owner: ' . $path);
 		}
-		if (!is_null($group) && !chgrp($path, $group)) {
-			throw new Exception('Failed to set the group "' . $group . '" of the resource: ' . $path);
-		}
-		if (!is_null($user) && !chown($path, $user)) {
-			throw new Exception('Failed to set the user "' . $user . '" of the resource: ' . $path);
-		}
+		$this->runCommandAndThrowExceptionIfFailed(
+			Application::getInstance()->getDiContainer()->getCommandExecutor('chown')
+				->addParam(null, (string)$user . ':' . (string)$group)
+				->addParam(null, $path),
+			'Failed to set the group "' . $group . '" and user "' . $user . '" of the resource: ' . $path);
 	}
 
 	/**
@@ -137,9 +161,12 @@ class FileHandlerPhp implements IFileHandler {
 		if (!$this->checkIsPathExists($path)) {
 			throw new NotFoundException($path, 'Resource not found while changing mode: ' . $path);
 		}
-		if (!chmod($path, $mode)) {
-			throw new Exception('Failed to set the mode "' . decoct($mode) . '" of the resource: ' . $path);
-		}
+
+		$this->runCommandAndThrowExceptionIfFailed(
+			Application::getInstance()->getDiContainer()->getCommandExecutor('chmod')
+				->addParam(null, decoct($mode))
+				->addParam(null, $path),
+			'Failed to set the mode "' . decoct($mode) . '" of the resource: ' . $path);
 	}
 
 	/**
@@ -161,9 +188,12 @@ class FileHandlerPhp implements IFileHandler {
 		if (!$this->checkIsPathExists($source)) {
 			throw new NotFoundException($source, 'Source file not found for copy: ' . $source);
 		}
-		if (!copy($source, $destination)) {
-			throw new Exception('Failed to copy file from ' . $source . ' to ' . $destination);
-		}
+
+		$this->runCommandAndThrowExceptionIfFailed(
+			Application::getInstance()->getDiContainer()->getCommandExecutor('cp')
+				->addParam(null, $source)
+				->addParam(null, $destination),
+			'Failed to copy file from ' . $source . ' to ' . $destination);
 	}
 
 	/**
@@ -184,9 +214,12 @@ class FileHandlerPhp implements IFileHandler {
 			throw new Exception('The given path is not a valid file: ' . $path);
 		}
 
-		if (!unlink($path)) {
-			throw new Exception('Failed to remove file: ' . $path);
-		}
+		$this->runCommandAndThrowExceptionIfFailed(
+			Application::getInstance()->getDiContainer()->getCommandExecutor('rm')
+				->addParam('-f')
+				->addParam(null, $path),
+			'Failed to remove file: ' . $path);
+
 	}
 
 	/**
@@ -214,30 +247,23 @@ class FileHandlerPhp implements IFileHandler {
 			throw new Exception('The given directory is not empty: ' . $path);
 		}
 
-		// Remove the contents one-by-one
-		foreach ($content as $subPath) {
-			$fullPath = rtrim($path, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $subPath;
+		$command = Application::getInstance()->getDiContainer()->getCommandExecutor('rm')
+			->addParam('-f');
 
-			// We found a directory
-			if ($this->checkIsDirectory($fullPath)) {
-				$this->removeDirectory($fullPath, true);
-			}
-			// We found a file
-			else {
-				$this->remove($fullPath);
-			}
+		if ($isRecursive){
+			$command->addParam('-r');
 		}
 
-		if (!rmdir($path)) {
-			throw new Exception('Failed to delete directory: ' . $path);
-		}
+		$command->addParam(null, $path);
+
+		$this->runCommandAndThrowExceptionIfFailed($command, 'Failed to delete directory: ' . $path);
 	}
 
 	/**
 	 * Moves the given file to the given destination.
 	 *
-	 * @link http://php.net/manual/en/function.rename.php
-	 * @link http://php.net/manual/en/function.move-uploaded-file.php
+	 * @link                                         http://php.net/manual/en/function.rename.php
+	 * @link                                         http://php.net/manual/en/function.move-uploaded-file.php
 	 *
 	 * @param string $sourcePath          Path of the file to move.
 	 * @param string $destinationPath     Destination of the moved file.
@@ -256,9 +282,12 @@ class FileHandlerPhp implements IFileHandler {
 		if ($checkIfIsUploaded && !is_uploaded_file($sourcePath)) {
 			throw new Exception('The given file is not uploaded through HTTP: ' . $sourcePath);
 		}
-		if (!rename($sourcePath, $destinationPath)) {
-			throw new Exception('Failed to move file from ' . $sourcePath . ' to ' . $destinationPath);
-		}
+
+		$this->runCommandAndThrowExceptionIfFailed(
+			Application::getInstance()->getDiContainer()->getCommandExecutor('rm')
+				->addParam(null, $sourcePath)
+				->addParam(null, $destinationPath)
+			, 'Failed to move file from ' . $sourcePath . ' to ' . $destinationPath);
 	}
 
 	/**
@@ -280,7 +309,13 @@ class FileHandlerPhp implements IFileHandler {
 	 * @return string|bool   The full path of the current directory or FALSE on failure.
 	 */
 	public function getCurrentDirectory() {
-		return getcwd();
+		$result = Application::getInstance()->getDiContainer()->getCommandExecutor('pwd')->run();
+
+		if (!$result->isSuccessful()) {
+			return false;
+		}
+
+		return trim($result->output);
 	}
 
 	/**
@@ -293,7 +328,7 @@ class FileHandlerPhp implements IFileHandler {
 	 * @return bool   TRUE if it exits, FALSE if not.
 	 */
 	public function checkIsPathExists($path) {
-		return file_exists($path);
+		return $this->runTestCommandOnFile($path, '-a');
 	}
 
 	/**
@@ -312,26 +347,40 @@ class FileHandlerPhp implements IFileHandler {
 	 * @return string   The content of the file, or FALSE on failure.
 	 */
 	public function getAsString($path, $offset = -1, $maxLength = null) {
-		if (!$this->checkIsFile($path)) {
-			throw new Exception('The given path is not a file: ' . $path);
-		}
 		if (!is_null($maxLength) && $maxLength < 0) {
 			throw new ParameterException('The maximum length cannot be less then 0. ' . $maxLength . ' given');
 		}
 
-		// The file_get_contents's maxlen parameter does not have a default value
-		if (is_null($maxLength)) {
-			$result = file_get_contents($path, null, null, $offset);
-		}
-		else {
-			$result = file_get_contents($path, null, null, $offset, $maxLength);
+		if (!$this->checkIsFile($path)) {
+			throw new Exception('The given path is not a file: ' . $path);
 		}
 
-		if (false === $result) {
-			throw new Exception('Failed to read file: ' . $path);
+		$diContainer = Application::getInstance()->getDiContainer();
+		$command = $diContainer->getCommandExecutor('cat')
+			->addParam(null, $path);
+
+		if ($maxLength == 0) {
+			// With the maxlength being 0 we always return an empty string.
+			return '';
+		} elseif ($offset > 0) {
+			$tailCommand = $diContainer->getCommandExecutor('tail')
+				->addParam('-c', '+' . ($offset + 1));
+
+			$command->setChainedCommand($tailCommand, CommandExecutor::OPERATOR_PIPE);
+
+			if ($maxLength > 0) {
+				$headCommand = $diContainer->getCommandExecutor('head')
+					->addParam('-c', (int)$maxLength);
+				$tailCommand->setChainedCommand($headCommand, CommandExecutor::OPERATOR_PIPE);
+			}
+		} elseif ((int)$maxLength > 0) {
+			// The file_get_contents's maxlen parameter does not have a default value
+			$headCommand = $diContainer->getCommandExecutor('head')
+				->addParam('-c', (int)$maxLength);
+			$command->setChainedCommand($headCommand, CommandExecutor::OPERATOR_PIPE);
 		}
 
-		return $result;
+		return $this->runCommandAndThrowExceptionIfFailed($command, 'Failed to read file: ' . $path)->output;
 	}
 
 	/**
@@ -349,14 +398,21 @@ class FileHandlerPhp implements IFileHandler {
 			throw new Exception('The given path is not a valid directory: ' . $path);
 		}
 
-		$content = scandir($path);
+		// Run ls through env, because on a lot of systems ls is aliased
+		$result = Application::getInstance()->getDiContainer()->getCommandExecutor('env')
+			->addParam(null, 'ls')
+			->addParam('-1')
+			->addParam('-A')
+			->run();
 
-		if (!empty($content[0]) && $content[0] == '.') {
-			unset($content[0]);
+		if (!$result->isSuccessful()) {
+			return array();
 		}
-		if (!empty($content[1]) && $content[1] == '..') {
-			unset($content[1]);
-		}
+
+		$content = explode('\n', trim($result->output));
+
+		// Sort in PHP as otherwise leading dots may screw up the sorting
+		sort($content);
 
 		return $content;
 	}
@@ -450,10 +506,10 @@ class FileHandlerPhp implements IFileHandler {
 	 * @throws \YapepBase\Exception\File\NotFoundException   If the path does not exist.
 	 */
 	public function checkIsDirectory($path) {
-		if (!$this->checkIsPathExists($path)) {
+		if ($this->checkIsPathExists($path)) {
 			throw new NotFoundException($path, 'The given path does not exist: ' . $path);
 		}
-		return is_dir($path);
+		return $this->runTestCommandOnFile($path, '-d');
 	}
 
 	/**
@@ -468,10 +524,10 @@ class FileHandlerPhp implements IFileHandler {
 	 * @throws \YapepBase\Exception\File\NotFoundException   If the path does not exits
 	 */
 	public function checkIsFile($path) {
-		if (!$this->checkIsPathExists($path)) {
+		if ($this->checkIsPathExists($path)) {
 			throw new NotFoundException($path, 'The given path does not exist: ' . $path);
 		}
-		return is_file($path);
+		return $this->runTestCommandOnFile($path, '-f');
 	}
 
 	/**
@@ -486,10 +542,10 @@ class FileHandlerPhp implements IFileHandler {
 	 * @throws \YapepBase\Exception\File\NotFoundException   If the path does not exits
 	 */
 	public function checkIsSymlink($path) {
-		if (!$this->checkIsPathExists($path)) {
+		if ($this->checkIsPathExists($path)) {
 			throw new NotFoundException($path, 'The given path does not exist: ' . $path);
 		}
-		return is_link($path);
+		return $this->runTestCommandOnFile($path, '-L');
 	}
 
 	/**
@@ -505,4 +561,42 @@ class FileHandlerPhp implements IFileHandler {
 	public function getBaseName($path, $suffix = null) {
 		return basename($path, $suffix);
 	}
+
+	/**
+	 * Runs a test command with the specified test type switch and returns whether it was successful.
+	 *
+	 * @param string $path             The path to test.
+	 * @param string $testTypeSwitch   The switch that specifies the test type.
+	 *
+	 * @return bool
+	 */
+	protected function runTestCommandOnFile($path, $testTypeSwitch) {
+		$result = Application::getInstance()->getDiContainer()->getCommandExecutor('env')
+			->addParam(null, 'test')
+			->addParam($testTypeSwitch, $path)
+			->run();
+		return $result
+			->isSuccessful();
+	}
+
+	/**
+	 * Runs a command and throws an exception if the run fails.
+	 *
+	 * @param ICommandExecutor $command            The command to run.
+	 * @param string           $exceptionMessage   The message of the exception.
+	 *
+	 * @return \YapepBase\Shell\CommandOutput   The output of the command.
+	 *
+	 * @throws \YapepBase\Exception\File\Exception   If the command failed to run.
+	 */
+	protected function runCommandAndThrowExceptionIfFailed(ICommandExecutor $command, $exceptionMessage) {
+		$result = $command->run();
+
+		if (!$result->isSuccessful()) {
+			throw new Exception($exceptionMessage, 0, null, $result);
+		}
+
+		return $result;
+	}
+
 }
