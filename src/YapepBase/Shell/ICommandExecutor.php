@@ -33,6 +33,20 @@ interface ICommandExecutor {
 	/** Binary OR operator. The right command will only run if the left command exited with a non-0 status code. */
 	const OPERATOR_BINARY_OR = '||';
 
+	/** Standard output redirection. */
+	const OUTPUT_REDIRECT_STDOUT = '>';
+	/** Standard error redirection. */
+	const OUTPUT_REDIRECT_STDERR = '2>';
+	/** Standard output redirection while appending to the target. */
+	const OUTPUT_REDIRECT_STDOUT_APPEND = '>>';
+	/** Standard error redirection while appendind to the target. */
+	const OUTPUT_REDIRECT_STDERR_APPEND = '2>>';
+
+	/** Standard output redirection target. */
+	const REDIRECT_TARGET_STDOUT = '&1';
+	/** Standard error redirection target. */
+	const REDIRECT_TARGET_STDERR = '&2';
+
 	/**
 	 * Sets the command.
 	 *
@@ -42,7 +56,20 @@ interface ICommandExecutor {
 	 */
 	public function setCommand($command);
 
-
+	/**
+	 * Sets an output redirection to the target.
+	 *
+	 * @param string $outputType     The output redirection type. {@uses self::OUTPUT_REDIRECT_*}
+	 * @param string $target         The target to redirect the output type
+	 * @param bool   $escapeTarget   Whether the target should be escaped (ie. a file) or not (ie. STDOUT).
+	 *
+	 * @return \YapepBase\Shell\ICommandExecutor   The current instance.
+	 *
+	 * @throws \YapepBase\Exception\ParameterException   If setting an invalid output redirection type.
+	 * @throws \YapepBase\Exception\Shell\Exception   If trying to set STDOUT or STDERR redirection and file output is
+	 *                                                used for the command.
+	 */
+	public function setOutputRedirection($outputType, $target, $escapeTarget = true);
 
 	/**
 	 * Sets the timeout for the command.
@@ -63,7 +90,7 @@ interface ICommandExecutor {
 	public function setSwitchValueSeparator($separator);
 
 	/**
-	 * Sets the output mode
+	 * Sets the output mode.
 	 *
 	 * @param int    $mode      The output mode. {@uses self::OUTPUT_}
 	 * @param string $logFile   The log file's path and name in case of file output mode.
@@ -71,8 +98,11 @@ interface ICommandExecutor {
 	 * @return \YapepBase\Shell\ICommandExecutor   The current instance.
 	 *
 	 * @throws \YapepBase\Exception\ParameterException   If adding file output mode without specifying a file path.
+	 * @throws \YapepBase\Exception\Shell\Exception   If STDOUT or STDERR redirection is set for the command with
+	 *                                                file output.
 	 */
 	public function setOutputMode($mode, $logFile = '');
+
 	/**
 	 * Adds a new output mode.
 	 *
@@ -82,6 +112,8 @@ interface ICommandExecutor {
 	 * @return \YapepBase\Shell\ICommandExecutor
 	 *
 	 * @throws \YapepBase\Exception\ParameterException   If adding file output mode without specifying a file path.
+	 * @throws \YapepBase\Exception\Shell\Exception   If STDOUT or STDERR redirection is set for the command with
+	 *                                                file output.
 	 */
 	public function addOutputMode($mode, $logFile = '');
 
@@ -113,6 +145,8 @@ interface ICommandExecutor {
 	 * Returns the full command.
 	 *
 	 * @return string
+	 *
+	 * @throws \YapepBase\Exception\Shell\Exception   If no command is set.
 	 */
 	public function getCommand();
 
@@ -122,7 +156,7 @@ interface ICommandExecutor {
 	 * @return \YapepBase\Shell\CommandOutput   Output of the run.
 	 *
 	 * @throws \YapepBase\Exception\Shell\Exception   If there was an error while opening the process
-	 *                                                or in case of a timeout.
+	 *                                                or in case of a timeout or no command is set.
 	 */
 	public function run();
 
