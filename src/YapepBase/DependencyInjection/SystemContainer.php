@@ -164,13 +164,13 @@ class SystemContainer extends Container {
 
 		$this[self::KEY_FILE_RESOURCE_HANDLER] = '\\YapepBase\\File\\ResourceHandlerPhp';
 
-		$this[self::KEY_FILE_HANDLER] = $this->share(function($container) {
+		$this[self::KEY_FILE_HANDLER] = function($container) {
 			return new FileHandlerPhp();
-		});
+		};
 
-		$this[self::KEY_COMMAND_EXECUTOR] = $this->share(function($container) {
+		$this[self::KEY_COMMAND_EXECUTOR] = function($container) {
 			return new CommandExecutor();
-		});
+		};
 
 		$this->searchNamespaces[self::NAMESPACE_SEARCH_BO] = array();
 		$this->searchNamespaces[self::NAMESPACE_SEARCH_DAO] = array();
@@ -308,6 +308,7 @@ class SystemContainer extends Container {
 		/** @var \YapepBase\Shell\ICommandExecutor $executor */
 		$executor = $this[self::KEY_COMMAND_EXECUTOR];
 		$executor->setCommand($command);
+		return $executor;
 	}
 
 	/**
