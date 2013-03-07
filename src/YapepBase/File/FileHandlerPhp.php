@@ -59,6 +59,9 @@ class FileHandlerPhp implements IFileHandler {
 		if (!mkdir($path, $mode, $isRecursive)) {
 			throw new Exception('Failed to create directory: ' . $path);
 		}
+
+		// Since mkdir() is affected by the umask, do a chmod, so the new directory will have the correct permissions
+		$this->changeMode($path, $mode);
 	}
 
 	/**
