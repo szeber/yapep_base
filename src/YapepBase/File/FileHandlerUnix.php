@@ -102,7 +102,11 @@ class FileHandlerUnix implements IFileHandler {
 			: CommandExecutor::OUTPUT_REDIRECT_STDOUT;
 
 		$diContainer = Application::getInstance()->getDiContainer();
-		$echoCommand = $diContainer->getCommandExecutor('echo')
+
+		// Make sure the binary is run and not any alias or shell built-in.
+		$echoCommand = $diContainer->getCommandExecutor('env')
+			->addParam(null, 'echo')
+			->addParam('-n')
 			->addParam(null, $data)
 			->setOutputRedirection($redirectType, $path, true);
 
@@ -284,7 +288,7 @@ class FileHandlerUnix implements IFileHandler {
 		}
 
 		$this->runCommandAndThrowExceptionIfFailed(
-			Application::getInstance()->getDiContainer()->getCommandExecutor('rm')
+			Application::getInstance()->getDiContainer()->getCommandExecutor('mv')
 				->addParam(null, $sourcePath)
 				->addParam(null, $destinationPath)
 			, 'Failed to move file from ' . $sourcePath . ' to ' . $destinationPath);
@@ -359,7 +363,7 @@ class FileHandlerUnix implements IFileHandler {
 		$command = $diContainer->getCommandExecutor('cat')
 			->addParam(null, $path);
 
-		if ($maxLength == 0) {
+		if ($maxLength === 0) {
 			// With the maxlength being 0 we always return an empty string.
 			return '';
 		} elseif ($offset > 0) {
@@ -403,13 +407,14 @@ class FileHandlerUnix implements IFileHandler {
 			->addParam(null, 'ls')
 			->addParam('-1')
 			->addParam('-A')
+			->addParam(null, $path)
 			->run();
 
 		if (!$result->isSuccessful()) {
 			return array();
 		}
 
-		$content = explode('\n', trim($result->output));
+		$content = explode("\n", trim($result->output));
 
 		// Sort in PHP as otherwise leading dots may screw up the sorting
 		sort($content);
@@ -506,7 +511,7 @@ class FileHandlerUnix implements IFileHandler {
 	 * @throws \YapepBase\Exception\File\NotFoundException   If the path does not exist.
 	 */
 	public function checkIsDirectory($path) {
-		if ($this->checkIsPathExists($path)) {
+		if (!$this->checkIsPathExists($path)) {
 			throw new NotFoundException($path, 'The given path does not exist: ' . $path);
 		}
 		return $this->runTestCommandOnFile($path, '-d');
@@ -524,7 +529,7 @@ class FileHandlerUnix implements IFileHandler {
 	 * @throws \YapepBase\Exception\File\NotFoundException   If the path does not exits
 	 */
 	public function checkIsFile($path) {
-		if ($this->checkIsPathExists($path)) {
+		if (!$this->checkIsPathExists($path)) {
 			throw new NotFoundException($path, 'The given path does not exist: ' . $path);
 		}
 		return $this->runTestCommandOnFile($path, '-f');
@@ -542,7 +547,7 @@ class FileHandlerUnix implements IFileHandler {
 	 * @throws \YapepBase\Exception\File\NotFoundException   If the path does not exits
 	 */
 	public function checkIsSymlink($path) {
-		if ($this->checkIsPathExists($path)) {
+		if (!$this->checkIsPathExists($path)) {
 			throw new NotFoundException($path, 'The given path does not exist: ' . $path);
 		}
 		return $this->runTestCommandOnFile($path, '-L');
@@ -571,11 +576,10 @@ class FileHandlerUnix implements IFileHandler {
 	 * @return bool
 	 */
 	protected function runTestCommandOnFile($path, $testTypeSwitch) {
-		$result = Application::getInstance()->getDiContainer()->getCommandExecutor('env')
+		return Application::getInstance()->getDiContainer()->getCommandExecutor('env')
 			->addParam(null, 'test')
 			->addParam($testTypeSwitch, $path)
-			->run();
-		return $result
+			->run()
 			->isSuccessful();
 	}
 
