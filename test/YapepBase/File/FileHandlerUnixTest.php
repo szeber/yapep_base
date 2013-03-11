@@ -186,16 +186,6 @@ class FileHandlerUnixTest extends  \YapepBase\BaseTest {
 	}
 
 	/**
-	 * Tests the changeOwner() method.
-	 *
-	 * @return void
-	 */
-	public function testChangeOwner() {
-		$this->markTestIncomplete(
-			'This can only be tested with root, but it would be unwise to run the tests as root');
-	}
-
-	/**
 	 * Tests the changeMode() method.
 	 *
 	 * @return void

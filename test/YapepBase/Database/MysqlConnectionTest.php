@@ -40,6 +40,7 @@ class MysqlConnectionTest extends \YapepBase\BaseTest {
 	 * We are using '_' as the param prefix.
 	 */
 	protected function setUp() {
+		parent::setUp();
 
 		if (!$this->isRunnable) {
 			$this->markTestSkipped('Required ENV variables missing');
@@ -61,7 +62,6 @@ class MysqlConnectionTest extends \YapepBase\BaseTest {
 		';
 
 		$this->connection->query($createTestTable);
-		parent::setUp();
 	}
 
 	/**
@@ -95,14 +95,14 @@ class MysqlConnectionTest extends \YapepBase\BaseTest {
 	 * Cleans up the environment after running a test.
 	 */
 	protected function tearDown() {
-		if (!$this->isRunnable) {
+		parent::tearDown();
+		if (!$this->isRunnable || empty($this->connection)) {
 			return;
 		}
 
 		$this->connection->query('DROP TABLE IF EXISTS test');
 		$this->connection->query('DROP TABLE IF EXISTS test2');
 
-		parent::tearDown();
 	}
 
 	/**

@@ -63,14 +63,14 @@ class FileHandlerPhpTest extends  \YapepBase\BaseTest {
 			$testPath = $this->getTestPath();
 
 			// Remove the files
-			foreach ($this->fileHandler as $path) {
+			foreach ($this->resourcesToRemove as $path) {
 				$fullPath = $testPath . $path;
 				if (is_file($fullPath)) {
 					unlink($fullPath);
 				}
 			}
 			// Remove the directories
-			foreach ($this->fileHandler as $path) {
+			foreach ($this->resourcesToRemove as $path) {
 				$fullPath = $testPath . $path;
 				if (is_dir($fullPath)) {
 					rmdir($fullPath);
@@ -175,15 +175,6 @@ class FileHandlerPhpTest extends  \YapepBase\BaseTest {
 		$this->assertEquals($fileContent . $newContent, file_get_contents($filePath));
 
 		$this->markTestIncomplete('Find a way to test the lock');
-	}
-
-	/**
-	 * Tests the changeOwner() method.
-	 *
-	 * @return void
-	 */
-	public function testChangeOwner() {
-		$this->markTestIncomplete();
 	}
 
 	/**

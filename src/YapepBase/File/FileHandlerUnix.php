@@ -141,6 +141,23 @@ class FileHandlerUnix implements IFileHandler {
 		if (!$this->checkIsPathExists($path)) {
 			throw new NotFoundException($path, 'Resource not found while changing owner: ' . $path);
 		}
+
+		if (is_numeric($user)) {
+			$systemUser = posix_getpwuid($user);
+			if (empty($systemUser)) {
+				throw new Exception('Unable to find user with UID: ' . $user);
+			}
+			$user = $systemUser['name'];
+		}
+
+		if (is_numeric($group)) {
+			$systemGroup = posix_getgrgid($group);
+			if (empty($systemGroup)) {
+				throw new Exception('Unable to find group with GID: ' . $group);
+			}
+			$group = $systemGroup['name'];
+		}
+
 		$this->runCommandAndThrowExceptionIfFailed(
 			Application::getInstance()->getDiContainer()->getCommandExecutor('chown')
 				->addParam(null, (string)$user . ':' . (string)$group)
