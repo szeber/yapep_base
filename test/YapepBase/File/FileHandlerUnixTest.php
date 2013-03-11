@@ -58,6 +58,8 @@ class FileHandlerUnixTest extends  \PHPUnit_Framework_TestCase {
 	protected function setUp() {
 		parent::setUp();
 
+		clearstatcache();
+
 		$this->testBasePath = rtrim(getenv('YAPEPBASE_TEST_TEMPPATH'), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
 
 		if (empty($this->testBasePath)) {
@@ -419,8 +421,7 @@ class FileHandlerUnixTest extends  \PHPUnit_Framework_TestCase {
 	 * @return void
 	 */
 	public function testGetListByGlob() {
-		$this->markTestIncomplete('Not created yet');
-		$directoryPath = $this->getTestPath();
+		$directoryPath = $this->testBasePath;
 		$filename = 'test.txt';
 		$filename2 = 'test1.txt';
 		$filename3 = 'test.php';
@@ -450,14 +451,10 @@ class FileHandlerUnixTest extends  \PHPUnit_Framework_TestCase {
 	 * @return void
 	 */
 	public function testGetModificationTime() {
-		$this->markTestIncomplete('Not created yet');
-		$directoryName = 'test';
-		$directory = new vfsStreamDirectory($directoryName);
 		$filename = 'test.txt';
-		$directory->addChild(new vfsStreamFile($filename));
-		vfsStreamWrapper::setRoot($directory);
 
-		$filePath = vfsStream::url($directoryName . DIRECTORY_SEPARATOR . $filename);
+		$filePath = $this->testBasePath . $filename;
+		touch($filePath);
 
 		$this->assertEquals(filemtime($filePath), $this->fileHandler->getModificationTime($filePath));
 
@@ -475,14 +472,10 @@ class FileHandlerUnixTest extends  \PHPUnit_Framework_TestCase {
 	 * @return void
 	 */
 	public function testGetSize() {
-		$this->markTestIncomplete('Not created yet');
-		$directoryName = 'test';
-		$directory = new vfsStreamDirectory($directoryName);
 		$filename = 'test.txt';
-		$directory->addChild(new vfsStreamFile($filename));
-		vfsStreamWrapper::setRoot($directory);
+		$filePath = $this->testBasePath . $filename;
 
-		$filePath = vfsStream::url($directoryName . DIRECTORY_SEPARATOR . $filename);
+		touch($filePath);
 
 		$this->assertEquals(filesize($filePath), $this->fileHandler->getSize($filePath));
 
@@ -500,15 +493,12 @@ class FileHandlerUnixTest extends  \PHPUnit_Framework_TestCase {
 	 * @return void
 	 */
 	public function testCheckIsDirectory() {
-		$this->markTestIncomplete('Not created yet');
-		$directoryName = 'test';
-		$directory = new vfsStreamDirectory($directoryName);
 		$filename = 'test.txt';
-		$directory->addChild(new vfsStreamFile($filename));
-		vfsStreamWrapper::setRoot($directory);
 
-		$filePath = vfsStream::url($directoryName . DIRECTORY_SEPARATOR . $filename);
-		$directoryPath = vfsStream::url($directoryName);
+		$filePath = $this->testBasePath . $filename;
+		$directoryPath = $this->testBasePath;
+
+		touch($filePath);
 
 		$this->assertFalse($this->fileHandler->checkIsDirectory($filePath));
 		try {
@@ -528,15 +518,12 @@ class FileHandlerUnixTest extends  \PHPUnit_Framework_TestCase {
 	 * @return void
 	 */
 	public function testCheckIsFile() {
-		$this->markTestIncomplete('Not created yet');
-		$directoryName = 'test';
-		$directory = new vfsStreamDirectory($directoryName);
 		$filename = 'test.txt';
-		$directory->addChild(new vfsStreamFile($filename));
-		vfsStreamWrapper::setRoot($directory);
 
-		$filePath = vfsStream::url($directoryName . DIRECTORY_SEPARATOR . $filename);
-		$directoryPath = vfsStream::url($directoryName);
+		$filePath = $this->testBasePath . $filename;
+		$directoryPath = $this->testBasePath;
+
+		touch($filePath);
 
 		$this->assertTrue($this->fileHandler->checkIsFile($filePath));
 		try {
