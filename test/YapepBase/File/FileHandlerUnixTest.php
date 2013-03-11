@@ -60,10 +60,12 @@ class FileHandlerUnixTest extends  \PHPUnit_Framework_TestCase {
 
 		clearstatcache();
 
-		$this->testBasePath = rtrim(getenv('YAPEPBASE_TEST_TEMPPATH'), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+		$this->testBasePath = rtrim(getenv('YAPEPBASE_TEST_TEMPPATH'), DIRECTORY_SEPARATOR);
 
 		if (empty($this->testBasePath)) {
 			$this->markTestSkipped('Test cannot be done without a test directory');
+		} else {
+			$this->testBasePath .= DIRECTORY_SEPARATOR;
 		}
 
 		if (stripos(PHP_OS, 'WIN') === 0) {
