@@ -32,7 +32,7 @@ class FileHandlerUnixTest extends  \PHPUnit_Framework_TestCase {
 	/**
 	 * Contains all the files and directories to remove after the end of a test.
 	 *
-	 * Add here all the FS resources you are creating in a test.
+	 * Add here all the file resources you are creating in a test.
 	 *
 	 * @var array
 	 */
@@ -43,10 +43,23 @@ class FileHandlerUnixTest extends  \PHPUnit_Framework_TestCase {
 		'testDir/testFile',
 	);
 
+	/**
+	 * Contains all the directories to remove after the end of a test.
+	 *
+	 * Add here all the directory resources you are creating in a test.
+	 * They will be deleted in the order they are specified here, and they must be empty when deleting.
+	 *
+	 * @var array
+	 */
 	protected $directoriesToRemove = array(
 		'testDir',
 	);
 
+	/**
+	 * The base directory that should be used when testing.
+	 *
+	 * @var string
+	 */
 	protected $testBasePath;
 
 	/**
