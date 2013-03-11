@@ -12,11 +12,12 @@ use YapepBase\Config;
 /**
  * Test class for LoggingErrorHandler.
  */
-class ErrorHandlerRegistryTest extends \PHPUnit_Framework_TestCase {
+class ErrorHandlerRegistryTest extends \YapepBase\BaseTest {
 
 	protected $errorReportingLevel;
 
 	public function setUp() {
+		parent::setUp();
 		$this->errorReportingLevel = error_reporting();
 		error_reporting(E_ALL);
 		Config::getInstance()->set('system.errorHandling.defaultIdTimeout', 0);

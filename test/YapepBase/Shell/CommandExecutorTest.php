@@ -17,7 +17,7 @@ namespace YapepBase\Shell;
  * @package    YapepBase
  * @subpackage Shell
  */
-class CommandExecutorTest extends \PHPUnit_Framework_TestCase {
+class CommandExecutorTest extends \YapepBase\BaseTest {
 
 	/**
 	 * Tests the full command creation method.

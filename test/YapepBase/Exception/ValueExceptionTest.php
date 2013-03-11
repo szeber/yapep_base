@@ -7,7 +7,7 @@ use \YapepBase\Exception\ValueException;
 /**
  * Test class for \YapepBase\Exception\ValueException.
  */
-class ValueExceptionTest extends \PHPUnit_Framework_TestCase {
+class ValueExceptionTest extends \YapepBase\BaseTest {
 	/**
 	 * Test an exception throw
 	 */

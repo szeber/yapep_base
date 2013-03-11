@@ -19,7 +19,7 @@ use YapepBase\File\FileHandlerUnix;
  * @package    YapepBase
  * @subpackage File
  */
-class FileHandlerUnixTest extends  \PHPUnit_Framework_TestCase {
+class FileHandlerUnixTest extends  \YapepBase\BaseTest {
 
 	/**
 	 * The FileHandler object.

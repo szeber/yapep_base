@@ -23,7 +23,7 @@ use YapepBase\Mock\Syslog\SyslogConnectionMock;
  * @package    YapepBase
  * @subpackage Log
  */
-class SyslogLoggerTest extends \PHPUnit_Framework_TestCase {
+class SyslogLoggerTest extends \YapepBase\BaseTest {
 
 	/** The name of the config entry for the syslog connection. */
 	const SYSLOG_CONNECTION_CONFIG_NAME = 'test';
@@ -52,6 +52,7 @@ class SyslogLoggerTest extends \PHPUnit_Framework_TestCase {
 	 * @return void
 	 */
 	protected function setUp() {
+		parent::setUp();
 		Config::getInstance()->set(array(
 			'resource.log.' . self::SYSLOG_CONNECTION_CONFIG_NAME . '.facility'         => LOG_LOCAL5,
 			'resource.log.' . self::SYSLOG_CONNECTION_CONFIG_NAME . '.applicationIdent'

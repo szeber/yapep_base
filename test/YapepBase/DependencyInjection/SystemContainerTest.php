@@ -5,7 +5,7 @@ namespace YapepBase\DependencyInjection;
 use YapepBase\Config;
 use YapepBase\DependencyInjection\SystemContainer;
 
-class SystemContainerTest extends \PHPUnit_Framework_TestCase {
+class SystemContainerTest extends \YapepBase\BaseTest {
 
 	protected function setUp() {
 		parent::setUp();

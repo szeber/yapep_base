@@ -23,7 +23,7 @@ use YapepBase\Request\IRequest;
  * @package    YapepBase
  * @subpackage subpackage
  */
-class ArrayRouterTest extends \PHPUnit_Framework_TestCase {
+class ArrayRouterTest extends \YapepBase\BaseTest {
 
 	/**
 	 * Stores the available routes

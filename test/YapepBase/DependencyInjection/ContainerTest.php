@@ -7,7 +7,7 @@ use YapepBase\Mock\DependencyInjection\ObjectMock;
 use YapepBase\Exception\ParameterException;
 
 
-class ContainerTest extends \PHPUnit_Framework_TestCase {
+class ContainerTest extends \YapepBase\BaseTest {
 
 	public function testSetWithString() {
 		$container = new Container();

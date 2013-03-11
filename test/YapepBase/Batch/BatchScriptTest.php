@@ -21,7 +21,7 @@ use YapepBase\Mock\Batch\BatchScriptMock;
  * @package    YapepBase
  * @subpackage Test\Batch
  */
-class BatchScriptTest extends \PHPUnit_Framework_TestCase {
+class BatchScriptTest extends \YapepBase\BaseTest {
 
 	/**
 	 * The error handler instance.

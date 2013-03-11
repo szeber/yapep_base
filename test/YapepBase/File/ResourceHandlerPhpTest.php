@@ -24,7 +24,7 @@ use YapepBase\File\ResourceHandlerPhp;
  * @package    YapepBase
  * @subpackage File
  */
-class ResourceHandlerPhpTest extends  \PHPUnit_Framework_TestCase {
+class ResourceHandlerPhpTest extends  \YapepBase\BaseTest {
 
 	/**
 	 * Path to the test file.

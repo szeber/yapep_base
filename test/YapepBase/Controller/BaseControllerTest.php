@@ -8,7 +8,7 @@ use YapepBase\DependencyInjection\SystemContainer;
 use YapepBase\Application;
 use YapepBase\Mock\Controller\MockController;
 
-class BaseControllerTest extends \PHPUnit_Framework_TestCase {
+class BaseControllerTest extends \YapepBase\BaseTest {
 
 	protected $originalDiContainer;
 

@@ -10,7 +10,7 @@ use YapepBase\Exception\DatabaseException;
 /**
  * MysqlConnection test case.
  */
-class MysqlConnectionTest extends \PHPUnit_Framework_TestCase {
+class MysqlConnectionTest extends \YapepBase\BaseTest {
 	/**
 	 * @var \YapepBase\Database\MysqlConnection
 	 */

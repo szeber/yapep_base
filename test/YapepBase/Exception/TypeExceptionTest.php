@@ -7,7 +7,7 @@ use \YapepBase\Exception\TypeException;
 /**
  * Test class for \YapepBase\Exception\TypeException.
  */
-class TypeExceptionTest extends \PHPUnit_Framework_TestCase {
+class TypeExceptionTest extends \YapepBase\BaseTest {
 	/**
 	 * Test throwing with a class
 	 */

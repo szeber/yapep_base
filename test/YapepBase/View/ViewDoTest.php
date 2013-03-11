@@ -23,7 +23,7 @@ use YapepBase\Application;
  * @package    YapepBase
  * @subpackage View
  */
-class ViewDoTest extends \PHPUnit_Framework_TestCase {
+class ViewDoTest extends \YapepBase\BaseTest {
 
 	/**
 	 * Thw View Data Object.

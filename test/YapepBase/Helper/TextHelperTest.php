@@ -19,7 +19,7 @@ use YapepBase\Helper\TextHelper;
  * @package    YapepBase
  * @subpackage Autoloader
  */
-class TextHelperTest extends \PHPUnit_Framework_TestCase {
+class TextHelperTest extends \YapepBase\BaseTest {
 
 	/**
 	 * Tests the stripSlashes() method.

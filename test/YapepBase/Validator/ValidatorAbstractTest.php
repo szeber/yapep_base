@@ -21,7 +21,7 @@ use YapepBase\Mock\Validator\MockValidator;
  * @package    YapepBase
  * @subpackage Validator
  */
-class ValidatorAbstractTest extends \PHPUnit_Framework_TestCase {
+class ValidatorAbstractTest extends \YapepBase\BaseTest {
 
 	/**
 	 * The mock validator object.

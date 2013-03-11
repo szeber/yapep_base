@@ -23,7 +23,7 @@ use YapepBase\Mock\View\MockBlock;
  * @package    YapepBase
  * @subpackage View
  */
-class ViewAbstractTest extends \PHPUnit_Framework_TestCase {
+class ViewAbstractTest extends \YapepBase\BaseTest {
 
 	/**
 	 * The View Mock object.

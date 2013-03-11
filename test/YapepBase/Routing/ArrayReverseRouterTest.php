@@ -21,7 +21,7 @@ use YapepBase\Exception\RouterException;
  * @package    YapepBase
  * @subpackage subpackage
  */
-class ArrayReverseRouterTest extends \PHPUnit_Framework_TestCase {
+class ArrayReverseRouterTest extends \YapepBase\BaseTest {
 
 	/**
 	 * Prepares the environment before running a test.

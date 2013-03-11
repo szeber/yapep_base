@@ -20,7 +20,7 @@ use YapepBase\Router\LanguageArrayReverseRouter;
  * @package    YapepBase
  * @subpackage subpackage
  */
-class LanguageArrayReverseRouterTest extends \PHPUnit_Framework_TestCase {
+class LanguageArrayReverseRouterTest extends \YapepBase\BaseTest {
 
 	/**
 	 * Prepares the environment before running a test.

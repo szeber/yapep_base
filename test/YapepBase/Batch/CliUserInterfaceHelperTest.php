@@ -21,7 +21,7 @@ use YapepBase\Exception\Exception;
  *
  * @todo   Implement testGetParsedArgs().
  */
-class CliUserInterfaceHelperTest extends \PHPUnit_Framework_TestCase {
+class CliUserInterfaceHelperTest extends \YapepBase\BaseTest {
 
 	public function testOutput() {
 		$helper = new CliUserInterfaceHelper('test script', 'test.php');

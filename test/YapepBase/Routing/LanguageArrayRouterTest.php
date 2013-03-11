@@ -24,7 +24,7 @@ use YapepBase\Request\IRequest;
  * @package    YapepBase
  * @subpackage subpackage
  */
-class LanguageArrayRouterTest extends \PHPUnit_Framework_TestCase {
+class LanguageArrayRouterTest extends \YapepBase\BaseTest {
 
 	/**
 	 * Contains the usable languages.

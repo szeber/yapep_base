@@ -7,7 +7,7 @@ use \YapepBase\Exception\IndexOutOfBoundsException;
 /**
  *  This class tests the functionality of \YapepBase\Exception\IndexOutOfBoundsException
  */
-class IndexOutOfBoundsExceptionTest extends \PHPUnit_Framework_TestCase {
+class IndexOutOfBoundsExceptionTest extends \YapepBase\BaseTest {
 	/**
 	 * Tests throwing the exception with an offset.
 	 */

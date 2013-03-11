@@ -21,7 +21,7 @@ use YapepBase\Exception\Exception;
 
 use YapepBase\Util\Random;
 
-class RandomTest extends \PHPUnit_Framework_TestCase {
+class RandomTest extends \YapepBase\BaseTest {
 
 	/**
 	 * Tests using the \mt_rand() function

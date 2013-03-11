@@ -21,7 +21,7 @@ use YapepBase\Exception\ControllerException;
  * @package    YapepBase
  * @subpackage Test\Controller
  */
-class ErrorControllerTest extends \PHPUnit_Framework_TestCase {
+class ErrorControllerTest extends \YapepBase\BaseTest {
 
 	public function testErrors() {
 		$response = null;

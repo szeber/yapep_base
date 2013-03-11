@@ -19,7 +19,7 @@ use YapepBase\Mock\Autoloader\AutoloaderMock;
  * @package    YapepBase
  * @subpackage Autoloader
  */
-class AutoloaderAbstractTest extends \PHPUnit_Framework_TestCase {
+class AutoloaderAbstractTest extends \YapepBase\BaseTest {
 
 	/**
 	 * The autoloader object to test.
@@ -35,6 +35,7 @@ class AutoloaderAbstractTest extends \PHPUnit_Framework_TestCase {
 	 * @return void
 	 */
 	protected function setUp() {
+		parent::setUp();
 		$this->autoloader = new AutoloaderMock();
 	}
 

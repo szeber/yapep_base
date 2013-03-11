@@ -24,7 +24,7 @@ use YapepBase\File\FileHandlerPhp;
  * @package    YapepBase
  * @subpackage File
  */
-class FileHandlerPhpTest extends  \PHPUnit_Framework_TestCase {
+class FileHandlerPhpTest extends  \YapepBase\BaseTest {
 
 	/**
 	 * The FileHandler object.

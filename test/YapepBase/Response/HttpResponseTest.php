@@ -5,7 +5,7 @@ namespace YapepBase\Response;
 use YapepBase\Response\HttpResponse;
 use YapepBase\Config;
 
-class HttpResponseTest extends \PHPUnit_Framework_TestCase {
+class HttpResponseTest extends \YapepBase\BaseTest {
 	/**
 	 * @var \YapepBase\Mock\Response\OutputMock
 	 */

@@ -18,7 +18,7 @@ use YapepBase\Request\HttpRequest;
  * @package    YapepBase
  * @subpackage Test\Request
  */
-class HttpRequestTest extends \PHPUnit_Framework_TestCase {
+class HttpRequestTest extends \YapepBase\BaseTest {
 
 	/**
 	 * The request

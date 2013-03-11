@@ -22,7 +22,7 @@ use YapepBase\Config;
  * @package    YapepBase
  * @subpackage Test\Session
  */
-abstract class SessionTestAbstract extends \PHPUnit_Framework_TestCase {
+abstract class SessionTestAbstract extends \YapepBase\BaseTest {
 
 	/**
 	 * Sets up the fixture, for example, open a network connection.

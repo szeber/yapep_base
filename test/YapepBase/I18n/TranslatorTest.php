@@ -24,7 +24,7 @@ use YapepBase\Exception\I18n\TranslationNotFoundException;
  * @package    YapepBase
  * @subpackage Test\I18n
  */
-class TranslatorTest extends \PHPUnit_Framework_TestCase {
+class TranslatorTest extends \YapepBase\BaseTest {
 
 	/**
 	 * The StorageMock instance

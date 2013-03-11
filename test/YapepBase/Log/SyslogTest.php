@@ -7,7 +7,7 @@ use YapepBase\Config;
 /**
  * Test class for Syslog.
  */
-class SyslogTest extends \PHPUnit_Framework_TestCase {
+class SyslogTest extends \YapepBase\BaseTest {
 
 	public function setUp() {
 		parent::setUp();

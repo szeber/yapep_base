@@ -18,7 +18,7 @@ namespace YapepBase\Event;
  */
 use YapepBase\Event\Event;
 
-class EventTest extends \PHPUnit_Framework_TestCase {
+class EventTest extends \YapepBase\BaseTest {
 
 	public function testEvent() {
 		$event = new Event('test');

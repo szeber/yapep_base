@@ -11,7 +11,7 @@ use YapepBase\ErrorHandler\ErrorHandlerHelper;
 /**
  * Test class for LoggingErrorHandler.
  */
-class LoggingErrorHandlerTest extends \PHPUnit_Framework_TestCase {
+class LoggingErrorHandlerTest extends \YapepBase\BaseTest {
 
 	/**
 	 * @var \YapepBase\Mock\Log\LoggerMock;
@@ -25,6 +25,7 @@ class LoggingErrorHandlerTest extends \PHPUnit_Framework_TestCase {
 	protected $errorHandler;
 
 	public function setUp() {
+		parent::setUp();
 		$this->logger = new LoggerMock();
 		$this->errorHandler = new LoggingErrorHandler($this->logger);
 	}

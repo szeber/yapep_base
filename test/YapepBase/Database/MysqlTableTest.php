@@ -11,7 +11,7 @@ use YapepBase\Mock\Database\TestTableMysqlMock;
 /**
  * MysqlTable test case.
  */
-class MysqlTableTest extends \PHPUnit_Framework_TestCase {
+class MysqlTableTest extends \YapepBase\BaseTest {
 
 	/**
 	 * Config instance

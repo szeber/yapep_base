@@ -7,7 +7,7 @@ use YapepBase\Database\DbFactory;
 /**
  * DbFactory test case.
  */
-class DbFactoryTest extends \PHPUnit_Framework_TestCase {
+class DbFactoryTest extends \YapepBase\BaseTest {
 
 	/**
 	 * Config instance
