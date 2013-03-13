@@ -14,6 +14,7 @@ use YapepBase\Exception\LdapAddException;
 use YapepBase\Exception\LdapBindException;
 use YapepBase\Exception\LdapConnectionException;
 use YapepBase\Exception\LdapDeleteException;
+use YapepBase\Exception\LdapException;
 use YapepBase\Exception\LdapModifyException;
 use YapepBase\Exception\LdapSearchException;
 
@@ -126,12 +127,20 @@ class LdapConnection {
 	 *
 	 * @return void
 	 *
-	 * @throws \YapepBase\Exception\LdapBindException
+	 * @throws \YapepBase\Exception\LdapBindException   If the bind failed.
+	 * @throws \YapepBase\Exception\LdapConnectionException   If the connection failed.
 	 */
 	public function bind(LdapDn $rootDn = null, $password = '') {
 		if (!$this->link) {
 			$this->connect();
 		}
+
+		$bindErrorCodes = array(
+			LdapException::LDAP_STRONG_AUTH_REQUIRED,
+			LdapException::LDAP_INAPPROPRIATE_AUTH,
+			LdapException::LDAP_INVALID_CREDENTIALS,
+			LdapException::AD_INVALID_CREDENTIALS,
+		);
 
 		if ($rootDn) {
 			if ($password) {
@@ -139,14 +148,19 @@ class LdapConnection {
 			} else {
 				$bind = @ldap_bind($this->link, (string)$rootDn);
 			}
-
-			if (!$bind) {
-				throw new LdapBindException($this->link);
-			}
 		} else {
 			$bind = @ldap_bind($this->link);
-			if (!$bind) {
+		}
+
+		if (!$bind) {
+			// We check the error code, as connections are only made at bind, so it's possible this is not a bind,
+			// but a connection error
+			if (in_array(ldap_errno($this->link), $bindErrorCodes)) {
+				// This is a bind error, throw an LdapBindException
 				throw new LdapBindException($this->link);
+			} else {
+				// This is a connection error, throw an LdapConnectionException
+				throw new LdapConnectionException($this->link);
 			}
 		}
 	}
