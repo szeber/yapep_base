@@ -319,6 +319,11 @@ class LdapConnection {
 			$result = @ldap_list($this->link, (string)$rootDn, strtr($filter, $filterParams), $attributes);
 		}
 		$result = @ldap_get_entries($this->link, $result);
+
+		if (empty($result)) {
+			return array();
+		}
+
 		$result = $this->postprocess($result);
 		if ($result === false) {
 			throw new LdapSearchException($this->link);
