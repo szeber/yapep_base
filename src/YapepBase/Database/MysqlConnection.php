@@ -39,6 +39,10 @@ class MysqlConnection extends DbConnection {
 			: array()
 		);
 
+		if (isset($configuration['isPersistent'])) {
+			$options[PDO::ATTR_PERSISTENT] = (bool)$configuration['isPersistent'];
+		}
+
 		$this->connection = new PDO($dsn, $configuration['user'], $configuration['password'], $options);
 
 		$this->query('SET NAMES ' . (empty($configuration['charset'])

@@ -194,6 +194,12 @@ class DbFactory {
 	 * @return void
 	 */
 	public static function clearConnections() {
+		foreach (self::$connections as $connectionTypes) {
+			foreach($connectionTypes as $connection) {
+				/** @var \YapepBase\Database\DbConnection $connection */
+				$connection->disconnect();
+			}
+		}
 		self::$connections = array();
 	}
 }
