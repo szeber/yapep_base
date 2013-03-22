@@ -81,6 +81,19 @@ class LdapDn {
 	}
 
 	/**
+	 * Adds an element to the beginning (leaf part) of the DN string.
+	 *
+	 * @param string $id      Type of the element.
+	 * @param string $value   Value of the element.
+	 *
+	 * @return \YapepBase\Ldap\LdapDn   The current LDAP DN instance.
+	 */
+	public function addLeafElement($id, $value) {
+		array_unshift($this->elements, array('id' => $id, 'value' => $value));
+		return $this;
+	}
+
+	/**
 	 * Escapes a string for use in an LDAP DN
 	 *
 	 * @param string $string   The string to escape

@@ -244,6 +244,110 @@ class LdapConnection {
 	}
 
 	/**
+	 * Sets an object's specified attribute to the given value.
+	 *
+	 * @param LdapDn $dn              The object's DN.
+	 * @param string $attributeName   The name of the attribute.
+	 * @param mixed  $value           The value to set for the attribute.
+	 *
+	 * @return void
+	 *
+	 * @throws \YapepBase\Exception\LdapModifyException
+	 */
+	public function setAttributeValue(LdapDn $dn, $attributeName, $value) {
+		if (!$this->link) {
+			$this->connect();
+		}
+
+		$result = @ldap_mod_replace($this->link, (string)$dn, array($attributeName => $value));
+
+		if (!$result) {
+			throw new LdapModifyException($this->link);
+		}
+	}
+
+	/**
+	 * Adds one or more values to an LDAP object's specified attribute.
+	 *
+	 * If the attribute's values should be unique, the method will make sure that the same value is not added twice
+	 * to the attribute.
+	 *
+	 * @param LdapDn $dn              The object's DN.
+	 * @param string $attributeName   Name of the attribute.
+	 * @param array  $valuesToAdd     The value(s) to add.
+	 * @param bool   $uniqueValues    Whether the attribute's values should be unique.
+	 *
+	 * @return bool   TRUE if the modification was successful, FALSE if the entity was not found.
+	 *
+	 * @throws \YapepBase\Exception\LdapModifyException
+	 */
+	public function addAttributeValues(LdapDn $dn, $attributeName, array $valuesToAdd, $uniqueValues = true) {
+		if (!$this->link) {
+			$this->connect();
+		}
+
+		$entry = $this->search($dn, 'objectclass=*', array(), array($attributeName));
+
+		if (empty($entry) || !isset($entry[0][$attributeName])) {
+			return false;
+		}
+
+		$currentValues = $entry[0][$attributeName];
+		$newValues = array_merge($currentValues, $valuesToAdd);
+
+		$newValues = $uniqueValues ? array_unique($newValues) : $newValues;
+
+		$result = @ldap_mod_replace($this->link, (string)$dn, array($attributeName => array_values($newValues)));
+
+		if (!$result) {
+			throw new LdapModifyException($this->link);
+		}
+
+		return true;
+	}
+
+	/**
+	 * Deletes one or more values to an LDAP object's specified attribute.
+	 *
+	 * @param LdapDn $dn               The object's DN.
+	 * @param string $attributeName    Name of the attribute.
+	 * @param array  $valuesToDelete   The value(s) to delete.
+	 *
+	 * @return bool   TRUE if the modification was successful, FALSE if the entity was not found.
+	 *
+	 * @throws \YapepBase\Exception\LdapModifyException
+	 */
+	public function deleteAttributeValues(LdapDn $dn, $attributeName, array $valuesToDelete) {
+		if (!$this->link) {
+			$this->connect();
+		}
+
+		$entry = $this->search($dn, 'objectclass=*', array(), array($attributeName));
+
+		if (empty($entry) || !isset($entry[0][$attributeName])) {
+			return false;
+		}
+
+		$currentValues = $entry[0][$attributeName];
+
+		$newValues = array();
+
+		foreach ($currentValues as $value) {
+			if (!in_array($value, $valuesToDelete)) {
+				$newValues[] = $value;
+			}
+		}
+
+		$result = @ldap_mod_add($this->link, (string)$dn, array($attributeName => $newValues));
+
+		if (!$result) {
+			throw new LdapModifyException($this->link);
+		}
+
+		return true;
+	}
+
+	/**
 	 * Decodes a hexadecimal character.
 	 *
 	 * @param string $value   The value to decode.
