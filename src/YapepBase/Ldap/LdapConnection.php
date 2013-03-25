@@ -338,7 +338,7 @@ class LdapConnection {
 			}
 		}
 
-		$result = @ldap_mod_add($this->link, (string)$dn, array($attributeName => $newValues));
+		$result = @ldap_mod_replace($this->link, (string)$dn, array($attributeName => $newValues));
 
 		if (!$result) {
 			throw new LdapModifyException($this->link);
