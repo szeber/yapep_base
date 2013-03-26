@@ -188,12 +188,12 @@ class HttpResponse implements IResponse {
 			case 206:
 				/**
 				 * In case of a partial-content the response must contain at least one of the following:
-				 * - A Content-Range setHeader
-				 * - A Date setHeader
+				 * - A Content-Range header
+				 * - A Date header
 				 */
 				if (!$this->hasHeader('Content-Range') || !$this->hasHeader('Date')) {
 					throw new \YapepBase\Exception\StandardsComplianceException(
-						'The Partial-Content (206) response requires a Content-Range and a Date setHeader to be set.');
+						'The Partial-Content (206) response requires a Content-Range and a Date header to be set.');
 				}
 				break;
 			case 301:
@@ -202,38 +202,38 @@ class HttpResponse implements IResponse {
 			case 305:
 			case 307:
 				/**
-				 * A Location setHeader field must be provided.
+				 * A Location header field must be provided.
 				 */
 				if (!$this->hasHeader('Location')) {
 					throw new \YapepBase\Exception\StandardsComplianceException('The ' . $this->statusCode
-						. ' status code require a Location setHeader to be set.');
+						. ' status code require a Location header to be set.');
 				}
 				break;
 			case 304:
 				/**
-				 * A Date setHeader must be provided
+				 * A Date header must be provided
 				 */
 				if (!$this->hasHeader('Date')) {
 					throw new \YapepBase\Exception\StandardsComplianceException(
-						'The 304 status code requires a Date setHeader to be set.');
+						'The 304 status code requires a Date header to be set.');
 				}
 				break;
 			case 401:
 				/**
-				 * A WWW-Authenticate setHeader must be provided, otherwise Opera will provide strange behaviour.
+				 * A WWW-Authenticate header must be provided, otherwise Opera will provide strange behaviour.
 				 */
 				if (!$this->hasHeader('WWW-Authenticate')) {
 					throw new \YapepBase\Exception\StandardsComplianceException(
-						'The 401 status code requires a WWW-Authenticate setHeader to be set.');
+						'The 401 status code requires a WWW-Authenticate header to be set.');
 				}
 				break;
 			case 405:
 				/**
-				 * An Allow setHeader must be provided.
+				 * An Allow header must be provided.
 				 */
 				if (!$this->hasHeader('Allow')) {
 					throw new \YapepBase\Exception\StandardsComplianceException(
-						'The 405 status code requires an Allow setHeader to be set.');
+						'The 405 status code requires an Allow header to be set.');
 				}
 				break;
 		}
@@ -368,16 +368,16 @@ class HttpResponse implements IResponse {
 	}
 
 	/**
-	 * Sets an HTTP setHeader.
+	 * Sets an HTTP header.
 	 *
-	 * @param string|array $header   The setHeader to set. If it is an array, every
-	 *                               part is used as a separate setHeader.
-	 * @param string       $value    The setHeader value to set. If empty, the
-	 *                               $setHeader will be exploded along a : sign.
+	 * @param string|array $header   The header to set. If it is an array, every
+	 *                               part is used as a separate header.
+	 * @param string       $value    The header value to set. If empty, the
+	 *                               $header will be exploded along a : sign.
 	 *
 	 * @return void
 	 *
-	 * @throws \YapepBase\Exception\ParameterException if an invalid setHeader
+	 * @throws \YapepBase\Exception\ParameterException if an invalid header
 	 *         configuration occurs
 	 */
 	public function addHeader($header, $value = null) {
@@ -396,7 +396,7 @@ class HttpResponse implements IResponse {
 			if (is_null($value)) {
 				$data = explode(':', $header, 2);
 				if (!array_key_exists(1, $data)) {
-					throw new \YapepBase\Exception\ParameterException('Invalid setHeader line: ' . $value);
+					throw new \YapepBase\Exception\ParameterException('Invalid header line: ' . $value);
 				}
 				$header = trim($data[0]);
 				$value = trim($data[1]);
@@ -406,7 +406,7 @@ class HttpResponse implements IResponse {
 			 * to avoid user agent bugs.
 			 */
 			if (!$value) {
-				throw new \YapepBase\Exception\ParameterException('Value for setHeader is empty: ' . $header);
+				throw new \YapepBase\Exception\ParameterException('Value for header is empty: ' . $header);
 			}
 			if (!array_key_exists($header, $this->headers)) {
 				$this->headers[$header] = array();
@@ -418,7 +418,7 @@ class HttpResponse implements IResponse {
 	/**
 	 * Removes one or more headers.
 	 *
-	 * @param string|array $header   The setHeader to remove.
+	 * @param string|array $header   The header to remove.
 	 *
 	 * @return void
 	 */
@@ -436,13 +436,13 @@ class HttpResponse implements IResponse {
 	}
 
 	/**
-	 * This function removes all previous values of a setHeader and sets the new
+	 * This function removes all previous values of a header and sets the new
 	 * values.
 	 *
-	 * @param string|array $header   The setHeader to set. If it is an array, every
-	 *                               part is used as a separate setHeader.
-	 * @param string       $value    The setHeader value to set. If empty, the
-	 *                               $setHeader will be exploded along a : sign.
+	 * @param string|array $header   The header to set. If it is an array, every
+	 *                               part is used as a separate header.
+	 * @param string       $value    The header value to set. If empty, the
+	 *                               $header will be exploded along a : sign.
 	 *
 	 * @return void
 	 */
@@ -452,7 +452,7 @@ class HttpResponse implements IResponse {
 	}
 
 	/**
-	 * Return an array of values for a setHeader, that has been set previously.
+	 * Return an array of values for a header, that has been set previously.
 	 *
 	 * @param string $header   The header name.
 	 *
@@ -468,9 +468,9 @@ class HttpResponse implements IResponse {
 	}
 
 	/**
-	 * Returns, if a setHeader has been set.
+	 * Returns, if a header has been set.
 	 *
-	 * @param string $header   A setHeader name
+	 * @param string $header   A header name
 	 *
 	 * @return bool
 	 */
