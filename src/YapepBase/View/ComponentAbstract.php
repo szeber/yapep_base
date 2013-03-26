@@ -28,7 +28,7 @@ abstract class ComponentAbstract extends BlockAbstract {
 	 *
 	 * @return string   The generated key.
 	 */
-	private function getKey($key) {
+	protected function getKey($key) {
 		return md5(get_class($this)) . '_' . $key;
 	}
 
