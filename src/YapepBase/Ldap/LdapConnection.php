@@ -322,7 +322,7 @@ class LdapConnection {
 			$this->connect();
 		}
 
-		$entry = $this->search($dn, 'objectclass=*', array(), array($attributeName));
+		$entry = $this->search($dn, 'objectclass=*', array(), array($attributeName, 'cn'));
 
 		if (empty($entry[0]['cn'])) {
 			return false;
