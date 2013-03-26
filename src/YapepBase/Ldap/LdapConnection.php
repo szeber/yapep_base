@@ -286,13 +286,13 @@ class LdapConnection {
 			$this->connect();
 		}
 
-		$entry = $this->search($dn, 'objectclass=*', array(), array($attributeName));
+		$entry = $this->search($dn, 'objectclass=*', array(), array('cn', $attributeName));
 
-		if (empty($entry) || !isset($entry[0][$attributeName])) {
+		if (empty($entry[0]['cn'])) {
 			return false;
 		}
 
-		$currentValues = $entry[0][$attributeName];
+		$currentValues = isset($entry[0][$attributeName]) ? $entry[0][$attributeName] : array();
 		$newValues = array_merge($currentValues, $valuesToAdd);
 
 		$newValues = $uniqueValues ? array_unique($newValues) : $newValues;
@@ -324,11 +324,11 @@ class LdapConnection {
 
 		$entry = $this->search($dn, 'objectclass=*', array(), array($attributeName));
 
-		if (empty($entry) || !isset($entry[0][$attributeName])) {
+		if (empty($entry[0]['cn'])) {
 			return false;
 		}
 
-		$currentValues = $entry[0][$attributeName];
+		$currentValues = isset($entry[0][$attributeName]) ? $entry[0][$attributeName] : array();
 
 		$newValues = array();
 
