@@ -193,7 +193,7 @@ class HttpResponse implements IResponse {
 				 */
 				if (!$this->hasHeader('Content-Range') || !$this->hasHeader('Date')) {
 					throw new \YapepBase\Exception\StandardsComplianceException(
-						'The Partial-Content (206) response requires a Content-Range and a Date setHeader to be set.');
+						'The Partial-Content (206) response requires a Content-Range and a Date header to be set.');
 				}
 				break;
 			case 301:
@@ -206,7 +206,7 @@ class HttpResponse implements IResponse {
 				 */
 				if (!$this->hasHeader('Location')) {
 					throw new \YapepBase\Exception\StandardsComplianceException('The ' . $this->statusCode
-						. ' status code require a Location setHeader to be set.');
+						. ' status code require a Location header to be set.');
 				}
 				break;
 			case 304:
@@ -215,7 +215,7 @@ class HttpResponse implements IResponse {
 				 */
 				if (!$this->hasHeader('Date')) {
 					throw new \YapepBase\Exception\StandardsComplianceException(
-						'The 304 status code requires a Date setHeader to be set.');
+						'The 304 status code requires a Date header to be set.');
 				}
 				break;
 			case 401:
@@ -224,7 +224,7 @@ class HttpResponse implements IResponse {
 				 */
 				if (!$this->hasHeader('WWW-Authenticate')) {
 					throw new \YapepBase\Exception\StandardsComplianceException(
-						'The 401 status code requires a WWW-Authenticate setHeader to be set.');
+						'The 401 status code requires a WWW-Authenticate header to be set.');
 				}
 				break;
 			case 405:
@@ -233,7 +233,7 @@ class HttpResponse implements IResponse {
 				 */
 				if (!$this->hasHeader('Allow')) {
 					throw new \YapepBase\Exception\StandardsComplianceException(
-						'The 405 status code requires an Allow setHeader to be set.');
+						'The 405 status code requires an Allow header to be set.');
 				}
 				break;
 		}
