@@ -250,6 +250,9 @@ abstract class BatchScript implements ITerminatable {
 		}
 		catch (\Exception $exception) {
 			$this->removeSignalHandler();
+			if (self::EXIT_CODE_SUCCESS == $this->getExitCode()) {
+				$this->setExitCode(self::EXIT_CODE_UNHANDLED_EXCEPTION);
+			}
 			Application::getInstance()->getDiContainer()->getErrorHandlerRegistry()->handleException($exception);
 		}
 		$this->removeSignalHandler();
@@ -367,10 +370,16 @@ abstract class BatchScript implements ITerminatable {
 	/**
 	 * Called just before the application exits.
 	 *
+	 * @param bool $isFatalError   TRUE if the termination is because of a fatal error.
+	 *
 	 * @return void
 	 */
-	public function terminate() {
-		exit($this->exitCode);
+	public function terminate($isFatalError) {
+		if ($isFatalError && self::EXIT_CODE_SUCCESS == $this->getExitCode()) {
+			$this->setExitCode(self::EXIT_CODE_FATAL_ERROR);
+		}
+
+		exit($this->getExitCode());
 	}
 
 }

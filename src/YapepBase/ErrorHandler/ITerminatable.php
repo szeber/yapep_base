@@ -27,7 +27,9 @@ interface ITerminatable {
 	/**
 	 * Called just before the application exits.
 	 *
+	 * @param bool $isFatalError   TRUE if the termination is because of a fatal error.
+	 *
 	 * @return void
 	 */
-	public function terminate();
+	public function terminate($isFatalError);
 }

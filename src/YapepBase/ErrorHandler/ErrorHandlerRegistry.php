@@ -263,11 +263,13 @@ class ErrorHandlerRegistry {
 	/**
 	 * Run when the registered error handler terminates the current execution.
 	 *
+	 * @param bool $isFatalError   TRUE if the termination is because of a fatal error.
+	 *
 	 * @return void
 	 */
-	protected function terminate() {
+	protected function terminate($isFatalError) {
 		if (!empty($this->terminator)) {
-			$this->terminator->terminate();
+			$this->terminator->terminate($isFatalError);
 		}
 
 		exit;
@@ -287,7 +289,7 @@ class ErrorHandlerRegistry {
 			// Normal shutdown or we are not the system handler
 			if ($this->isRegistered) {
 				// We are only running the termination function if we are the registered error handler.
-				$this->terminate();
+				$this->terminate(false);
 			}
 			return;
 		}
@@ -301,7 +303,7 @@ class ErrorHandlerRegistry {
 			// We have no error handlers defined, send the fatal error to the SAPI's logger.
 			error_log('No errorhandlers are defined and a fatal error occured: ' . $error['message']
 				. '. File: ' . $error['file'] . ', line: ' . $error['line'] . '. Type: ' . $error['type'], 4);
-			$this->terminate();
+			$this->terminate(true);
 			return;
 		}
 
@@ -343,7 +345,7 @@ class ErrorHandlerRegistry {
 					break;
 			}
 		}
-		$this->terminate();
+		$this->terminate(true);
 	}
 
 	/**
