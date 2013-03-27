@@ -14,6 +14,7 @@ namespace YapepBase\ErrorHandler;
 
 use YapepBase\Application;
 use YapepBase\Config;
+use YapepBase\Exception\Exception;
 
 /**
  * Registry class holding the registered error handlers.
@@ -55,6 +56,13 @@ class ErrorHandlerRegistry {
 	 * @var array
 	 */
 	protected $currentlyHandledError = array();
+
+	/**
+	 * The terminator instance.
+	 *
+	 * @var ITerminatable
+	 */
+	protected $terminator;
 
 	/**
 	 * Constructor.
@@ -236,6 +244,36 @@ class ErrorHandlerRegistry {
 	}
 
 	/**
+	 * Sets the terminator object.
+	 *
+	 * @param ITerminatable $terminator   The terminator instance.
+	 *
+	 * @return void
+	 *
+	 * @throws \YapepBase\Exception\Exception   If trying to add a terminator when a terminator is already set.
+	 */
+	public function setTerminator(ITerminatable $terminator) {
+		if (!empty($this->terminator)) {
+			throw new Exception('Trying to set terminator when there is already one set');
+		}
+
+		$this->terminator = $terminator;
+	}
+
+	/**
+	 * Run when the registered error handler terminates the current execution.
+	 *
+	 * @return void
+	 */
+	protected function terminate() {
+		if (!empty($this->terminator)) {
+			$this->terminator->terminate();
+		}
+
+		exit;
+	}
+
+	/**
 	 * Handles script shutdown.
 	 *
 	 * @return void
@@ -247,6 +285,10 @@ class ErrorHandlerRegistry {
 
 		if (!$error || !$this->isRegistered || !$this->isErrorFatal($error['type'])) {
 			// Normal shutdown or we are not the system handler
+			if ($this->isRegistered) {
+				// We are only running the termination function if we are the registered error handler.
+				$this->terminate();
+			}
 			return;
 		}
 
@@ -259,6 +301,7 @@ class ErrorHandlerRegistry {
 			// We have no error handlers defined, send the fatal error to the SAPI's logger.
 			error_log('No errorhandlers are defined and a fatal error occured: ' . $error['message']
 				. '. File: ' . $error['file'] . ', line: ' . $error['line'] . '. Type: ' . $error['type'], 4);
+			$this->terminate();
 			return;
 		}
 
@@ -300,7 +343,7 @@ class ErrorHandlerRegistry {
 					break;
 			}
 		}
-
+		$this->terminate();
 	}
 
 	/**

@@ -185,6 +185,7 @@ abstract class LockingBatchScript extends BatchScript {
 		if (!flock($fp, LOCK_EX | LOCK_NB)) {
 			// File is locked by an other instance, skip this run.
 			fclose($fp);
+			$this->setExitCode(self::EXIT_CODE_LOCK_FAILED);
 			return false;
 		}
 		ftruncate($fp, 0);
