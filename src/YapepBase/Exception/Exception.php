@@ -34,7 +34,7 @@ class Exception extends \Exception {
 	 * @param \Exception $previous   Previous exceptions.
 	 * @param mixed      $data       Any debugging data.
 	 */
-	public function __construct($message = "", $code = 0, \Exception $previous = null, $data = null) {
+	public function __construct($message = '', $code = 0, \Exception $previous = null, $data = null) {
 		parent::__construct($message, $code, $previous);
 		$this->data = $data;
 	}

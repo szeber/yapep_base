@@ -11,6 +11,7 @@
 namespace YapepBase\DependencyInjection;
 
 
+use YapepBase\Communication\CurlFactory;
 use YapepBase\Debugger\IDebugger;
 use YapepBase\File\FileHandlerPhp;
 use YapepBase\Database\DbConnection;
@@ -64,6 +65,8 @@ class SystemContainer extends Container {
 	const KEY_FILE_HANDLER = 'fileHandler';
 	/** Key containing the command executor. */
 	const KEY_COMMAND_EXECUTOR = 'commandExecutor';
+	/** Key containing the curl factory. */
+	const KEY_CURL_FACTORY = 'curlFactory';
 
 	/**
 	 * Name of the namespace which holds the controllers.
@@ -172,6 +175,10 @@ class SystemContainer extends Container {
 			return new CommandExecutor();
 		};
 
+		$this[self::KEY_CURL_FACTORY] = function($container) {
+			return new CurlFactory();
+		};
+
 		$this->searchNamespaces[self::NAMESPACE_SEARCH_BO] = array();
 		$this->searchNamespaces[self::NAMESPACE_SEARCH_DAO] = array();
 		$this->searchNamespaces[self::NAMESPACE_SEARCH_VALIDATOR] = array();
@@ -220,6 +227,15 @@ class SystemContainer extends Container {
 	 */
 	public function getLoggerRegistry() {
 		return $this[self::KEY_LOGGER_REGISTRY];
+	}
+
+	/**
+	 * Returns a CurlFactory instance.
+	 *
+	 * @return \YapepBase\Communication\CurlFactory
+	 */
+	public function getCurlFactory() {
+		return $this[self::KEY_CURL_FACTORY];
 	}
 
 	/**
