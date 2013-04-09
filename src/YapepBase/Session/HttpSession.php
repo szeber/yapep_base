@@ -2,13 +2,15 @@
 /**
  * This file is part of YAPEPBase.
  *
- * @package      YapepBase
- * @subpackage   Session
- * @copyright    2011 The YAPEP Project All rights reserved.
- * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
+ * @package    YapepBase
+ * @subpackage Session
+ * @copyright  2011 The YAPEP Project All rights reserved.
+ * @license    http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
 namespace YapepBase\Session;
+
+
 use YapepBase\Request\HttpRequest;
 use YapepBase\Exception\Exception;
 use YapepBase\Application;
@@ -192,6 +194,8 @@ class HttpSession extends SessionAbstract {
 	 * @param string $name     The name of the cookie will be populated here. (Outgoing parameter)
 	 * @param string $domain   The domain of the cookie will be populated here. (Outgoing parameter)
 	 * @param string $path     The path of the cookie will be populated here. (Outgoing parameter)
+	 *
+	 * @return void
 	 */
 	public function getCookieDetails(&$name, &$domain, &$path) {
 		$name = $this->cookieName;

@@ -2,13 +2,15 @@
 /**
  * This file is part of YAPEPBase.
  *
- * @package      YapepBase
- * @subpackage   Session
- * @copyright    2011 The YAPEP Project All rights reserved.
- * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
+ * @package    YapepBase
+ * @subpackage Session
+ * @copyright  2011 The YAPEP Project All rights reserved.
+ * @license    http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
 namespace YapepBase\Session;
+
+
 use YapepBase\Exception\Exception;
 use YapepBase\Storage\IStorage;
 use YapepBase\Util\Random;
@@ -90,7 +92,7 @@ abstract class SessionAbstract implements ISession {
 	 * @throws \YapepBase\Exception\ConfigException   On configuration problems
 	 * @throws \YapepBase\Exception\Exception         On other problems
 	 */
-	public function __construct($configName, IStorage $storage,$autoRegister = true) {
+	public function __construct($configName, IStorage $storage, $autoRegister = true) {
 		if (!$storage->isTtlSupported()) {
 			throw new Exception('Storage without TTL support passed to session handler.');
 		}
