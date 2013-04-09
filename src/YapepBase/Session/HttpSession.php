@@ -185,4 +185,17 @@ class HttpSession extends SessionAbstract {
 
 		$this->response->setCookie($this->cookieName, '', 1, $this->cookiePath, $this->cookieDomain);
 	}
+
+	/**
+	 * Returns the details of the Session Cookie.
+	 *
+	 * @param string $name     The name of the cookie will be populated here. (Outgoing parameter)
+	 * @param string $domain   The domain of the cookie will be populated here. (Outgoing parameter)
+	 * @param string $path     The path of the cookie will be populated here. (Outgoing parameter)
+	 */
+	public function getCookieDetails(&$name, &$domain, &$path) {
+		$name = $this->cookieName;
+		$domain = $this->cookieDomain;
+		$path = $this->cookiePath;
+	}
 }
