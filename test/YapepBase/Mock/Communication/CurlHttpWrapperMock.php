@@ -8,7 +8,9 @@
  * @license    http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
-namespace YapepBase\Communication;
+namespace YapepBase\Mock\Communication;
+
+use YapepBase\Communication\CurlHttpWrapper;
 
 /**
  * Mock class for the CurlHttpWrapper.
