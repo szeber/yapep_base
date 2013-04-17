@@ -42,7 +42,7 @@ class CurlFactoryMock extends CurlFactory {
 	 * @return \YapepBase\Communication\CurlHttpWrapper
 	 */
 	public function get($method, $url, $parameters = array(), $additionalHeaders = array(), $extraOptions = array()) {
-		if (empty($curl)) {
+		if (empty($this->instances)) {
 			throw new Exception('No CURL wrapper instance is set');
 		}
 		return array_shift($this->instances);
