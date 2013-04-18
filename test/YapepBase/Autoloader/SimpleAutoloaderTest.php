@@ -40,6 +40,28 @@ class SimpleAutoloaderTest extends \YapepBase\BaseTest {
 	}
 
 	/**
+	 * Tests the addClassPath() method.
+	 *
+	 * @return void
+	 */
+	public function testAddClassPath() {
+		$classPath = '/test/test1';
+		$classPath2 = '/test/test2';
+		$this->simpleAutoloader->addClassPath($classPath);
+		$this->simpleAutoloader->addClassPath($classPath2 . '////');
+
+		$this->assertEquals($classPath, $this->simpleAutoloader->classPaths[0]);
+		$this->assertEquals($classPath2, $this->simpleAutoloader->classPaths[1]);
+
+		$classPathForNamespace = '/test/namespace';
+		$namespace = 'Test\\Test';
+
+		$this->simpleAutoloader->addClassPath($classPathForNamespace, $namespace);
+
+		$this->assertEquals($classPathForNamespace, $this->simpleAutoloader->classPathsWithNamespace[$namespace]);
+	}
+
+	/**
 	 * Tests the getPaths() method.
 	 *
 	 * @return void

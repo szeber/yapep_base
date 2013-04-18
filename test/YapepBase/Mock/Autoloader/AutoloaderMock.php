@@ -11,7 +11,7 @@
 namespace YapepBase\Mock\Autoloader;
 
 
-use YapepBase\Autoloader\AutoloaderAbstract;
+use YapepBase\Autoloader\IAutoloader;
 
 /**
  * Mock class for the AutoloaderAbstract.
@@ -19,7 +19,7 @@ use YapepBase\Autoloader\AutoloaderAbstract;
  * @package    YapepBase
  * @subpackage Mock\Autoloader
  */
-class AutoloaderMock extends AutoloaderAbstract {
+class AutoloaderMock implements IAutoloader {
 
 	/**
 	 * Stores the classes already loaded.

@@ -11,7 +11,7 @@
 namespace YapepBase\Autoloader;
 
 // We need this here, as at this point probably we don't have a working autoloader yet
-require_once 'AutoloaderAbstract.php';
+require_once 'IAutoLoader.php';
 
 /**
  * SimpleAutoloader class
@@ -19,7 +19,46 @@ require_once 'AutoloaderAbstract.php';
  * @package    YapepBase
  * @subpackage Autoloader
  */
-class SimpleAutoloader extends AutoloaderAbstract {
+class SimpleAutoloader implements IAutoloader {
+
+	/**
+	 * The class paths to use
+	 *
+	 * @var array
+	 */
+	protected $classPaths = array();
+
+	/**
+	 * The class paths to use for given namespace prefixes.
+	 *
+	 * The key is tha namespace prefix, and the value is the path
+	 *
+	 * @var array
+	 */
+	protected $classPathsWithNamespace = array();
+
+	/**
+	 * Adds a path to use on class loading.
+	 *
+	 * @param string $path             The path to use.
+	 * @param string $forceNameSpace   A full namespace. If given all the classes in a namespace having
+	 *                                    this prefix will be searched at this path only.
+	 *
+	 * @return \YapepBase\Autoloader\IAutoloader
+	 */
+	public function addClassPath($path, $forceNameSpace = null) {
+		$path = rtrim($path, DIRECTORY_SEPARATOR);
+		if (!is_null($forceNameSpace)) {
+
+			$forceNameSpace = ltrim($forceNameSpace, '\\');
+			$this->classPathsWithNamespace[$forceNameSpace] = $path;
+		}
+		else {
+			$this->classPaths[] = $path;
+		}
+
+		return $this;
+	}
 
 	/**
 	 * Returns the possible full paths for the given class.
