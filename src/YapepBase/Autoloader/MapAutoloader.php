@@ -12,7 +12,7 @@ namespace YapepBase\Autoloader;
 
 
 // We need this here, as at this point probably we don't have a working autoloader yet
-require_once 'IAutoLoader.php';
+require_once __DIR__ . '/IAutoloader.php';
 
 /**
  * Autoloader class which works by a map.
