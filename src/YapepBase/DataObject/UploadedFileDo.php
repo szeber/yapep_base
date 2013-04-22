@@ -10,6 +10,7 @@
 
 
 namespace YapepBase\DataObject;
+use YapepBase\Application;
 use YapepBase\Exception\ParameterException;
 
 /**
@@ -77,6 +78,15 @@ class UploadedFileDo {
 		if ($nameCount != count($this->sizes) || $nameCount != count($this->types)) {
 			// The sizes don't match, so it's an invalid data array
 			throw new ParameterException('Invalid array provided. The size of the keys do not match');
+		}
+
+		$fileHandler = Application::getInstance()->getDiContainer()->getFileHandler();
+
+		// If the filesize is smaller than 0, we have a file that's bigger than 2GB, repopulate the file sizes.
+		foreach ($this->sizes as $index => $size) {
+			if ($size < 0 && $fileHandler->checkIsPathExists($this->temporaryFiles[$index])) {
+				$this->sizes[$index] = $fileHandler->getSize($this->temporaryFiles[$index]);
+			}
 		}
 	}
 
