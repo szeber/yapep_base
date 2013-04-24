@@ -21,4 +21,14 @@ class ResponseMock implements \YapepBase\Response\IResponse {
 	public function sendError() {
 
 	}
+
+	/**
+	 * Clears all previous, not sent output in the buffer.
+	 *
+	 * @return void
+	 */
+	public function clearAllOutput() {
+
+	}
+
 }

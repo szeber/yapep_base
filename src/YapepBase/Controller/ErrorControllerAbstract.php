@@ -19,6 +19,20 @@ use YapepBase\Exception\ControllerException;
  */
 abstract class ErrorControllerAbstract extends HttpController {
 
+
+	/**
+	 * Runs before the action.
+	 *
+	 * @return void
+	 *
+	 * @throws \YapepBase\Exception\ControllerException   On error.
+	 */
+	protected function before() {
+		// Clear all previous output before rendering
+		$this->response->clearAllOutput();
+		parent::before();
+	}
+
 	/**
 	 * Runs on page not found (404) errors
 	 *

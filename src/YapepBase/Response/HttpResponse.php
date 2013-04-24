@@ -572,4 +572,17 @@ class HttpResponse implements IResponse {
 	public function hasCookie($name) {
 		return array_key_exists($name, $this->cookies);
 	}
+
+	/**
+	 * Clears all previous, not sent output in the buffer.
+	 *
+	 * @return void
+	 */
+	public function clearAllOutput() {
+		while (ob_get_level() > 0) {
+			ob_end_clean();
+		}
+		$this->startOutputBuffer();
+	}
+
 }
