@@ -8,6 +8,8 @@
  */
 
 namespace YapepBase;
+
+
 use YapepBase\Exception\ConfigException;
 
 /**
@@ -168,4 +170,12 @@ class Config {
 		$this->configurationData = array();
 	}
 
+	/**
+	 * Returns the stored data.
+	 *
+	 * @return array
+	 */
+	public function toArray() {
+		return $this->configurationData;
+	}
 }
