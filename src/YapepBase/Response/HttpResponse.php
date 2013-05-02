@@ -90,6 +90,13 @@ class HttpResponse implements IResponse {
 	protected $output;
 
 	/**
+	 * Stores the ob level for the status when the response was created.
+	 *
+	 * @var int
+	 */
+	protected $startingObLevel;
+
+	/**
 	 * Standard HTTP status codes
 	 *
 	 * @var array
@@ -160,6 +167,9 @@ class HttpResponse implements IResponse {
 	 * @return void
 	 */
 	protected function startOutputBuffer() {
+		if (is_null($this->startingObLevel)) {
+			$this->startingObLevel = ob_get_level();
+		}
 		ob_start();
 	}
 
@@ -269,8 +279,10 @@ class HttpResponse implements IResponse {
 			$this->output->setCookie($cookie['name'], $cookie['value'], $cookie['expiration'], $cookie['path'],
 				$cookie['domain'], $cookie['secure'], $cookie['httpOnly']);
 		}
-		$obContents = ob_get_contents();
-		ob_clean();
+		$obContents = '';
+		while (ob_get_level() > $this->startingObLevel) {
+			$obContents .= ob_get_clean();
+		}
 		$this->output->out($renderedBody);
 		$this->output->out($obContents);
 	}
@@ -579,7 +591,7 @@ class HttpResponse implements IResponse {
 	 * @return void
 	 */
 	public function clearAllOutput() {
-		while (ob_get_level() > 0) {
+		while (ob_get_level() > $this->startingObLevel) {
 			ob_end_clean();
 		}
 		$this->startOutputBuffer();
