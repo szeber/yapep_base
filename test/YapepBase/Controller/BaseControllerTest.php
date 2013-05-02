@@ -12,8 +12,11 @@ class BaseControllerTest extends \YapepBase\BaseTest {
 
 	protected $originalDiContainer;
 
+	protected $originalObLevel;
+
 	protected function setUp() {
 		parent::setUp();
+		$this->originalObLevel = ob_get_level();
 		$application               = Application::getInstance();
 		$this->originalDiContainer = $application->getDiContainer();
 		$diContainer = new SystemContainer();
@@ -37,7 +40,11 @@ class BaseControllerTest extends \YapepBase\BaseTest {
 		$application = Application::getInstance();
 		$application->setDiContainer($this->originalDiContainer);
 		$application->clearI18nTranslator();
+		while (ob_get_level() > $this->originalObLevel) {
+			ob_end_flush();
+		}
 	}
+
 
 	public function testRun() {
 		$response = null;

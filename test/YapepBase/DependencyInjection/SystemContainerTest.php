@@ -7,10 +7,20 @@ use YapepBase\DependencyInjection\SystemContainer;
 
 class SystemContainerTest extends \YapepBase\BaseTest {
 
+	protected $originalObLevel;
+
 	protected function setUp() {
 		parent::setUp();
 		// TODO Make this setting global. For this, there should be a base class for all tests [szeber]
 		Config::getInstance()->set('system.project.name', 'test');
+		$this->originalObLevel = ob_get_level();
+	}
+
+	protected function tearDown() {
+		parent::tearDown();
+		while (ob_get_level() > $this->originalObLevel) {
+			ob_end_flush();
+		}
 	}
 
 	public function testConstructor() {

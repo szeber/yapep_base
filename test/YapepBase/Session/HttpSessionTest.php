@@ -28,11 +28,21 @@ use YapepBase\Session\HttpSession;
  */
 class HttpSessionTest extends SessionTestAbstract {
 
+	protected $originalObLevel;
+
 	protected function setUp() {
 		parent::setUp();
+		$this->originalObLevel = ob_get_level();
 		Config::getInstance()->set(array(
 			'resource.missingCookieName.namespace'  => 'test2',
 		));
+	}
+
+	protected function tearDown() {
+		parent::tearDown();
+		while (ob_get_level() > $this->originalObLevel) {
+			ob_end_flush();
+		}
 	}
 
 	/**

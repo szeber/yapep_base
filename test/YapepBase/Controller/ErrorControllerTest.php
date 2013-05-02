@@ -23,6 +23,20 @@ use YapepBase\Exception\ControllerException;
  */
 class ErrorControllerTest extends \YapepBase\BaseTest {
 
+	protected $originalObLevel;
+
+	protected function setUp() {
+		parent::setUp();
+		$this->originalObLevel = ob_get_level();
+	}
+
+	protected function tearDown() {
+		parent::tearDown();
+		while (ob_get_level() > $this->originalObLevel) {
+			ob_end_flush();
+		}
+	}
+
 	public function testErrors() {
 		$response = null;
 
