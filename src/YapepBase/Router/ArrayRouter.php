@@ -90,7 +90,7 @@ class ArrayRouter implements IRouter {
 	 * @throws RouterException   On errors. (Including if the route is not found)
 	 */
 	public function getRoute(&$controller = null, &$action = null) {
-		$target = $this->getTarget();
+		$target = rtrim($this->getTarget(), '/');
 		$method = $this->getMethod();
 
 		// If the target doesn't start with a '/', add one
