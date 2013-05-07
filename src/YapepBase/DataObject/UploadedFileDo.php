@@ -64,7 +64,10 @@ class UploadedFileDo {
 	 * @throws \YapepBase\Exception\ParameterException   If the provided data array doesn't have the required structure.
 	 */
 	public function __construct(array $data) {
-		if (!isset($data['name']) || empty($data['tmp_name']) || !isset($data['size']) || !isset($data['error'])) {
+		if (
+			!isset($data['name'])|| !isset($data['error']) || !isset($data['size'])
+			|| (empty($data['tmp_name']) && $data['error'] == UPLOAD_ERR_OK)
+		) {
 			throw new ParameterException('Invalid array provided. Some required fields are missing');
 		}
 
