@@ -11,6 +11,7 @@
 
 namespace YapepBase\Database;
 
+use YapepBase\Debugger\Item\SqlQueryItem;
 use YapepBase\Exception\DatabaseException;
 use \PDO;
 use \PDOException;
@@ -134,8 +135,9 @@ abstract class DbConnection {
 				foreach ($params as $paramName => $paramValue) {
 					$paramsQuoted[$paramName] = $this->quote($paramValue);
 				}
-				$queryId = $debugger->logQuery(IDebugger::QUERY_TYPE_DB,
-					$this->getBackendType() . '.' . $this->connectionName, $query, $paramsQuoted);
+				$debugItem = new SqlQueryItem($this->getBackendType(), $this->getBackendType() . '.'
+					. $this->connectionName, $query, $paramsQuoted);
+				$debugger->addItem($debugItem);
 				$startTime = microtime(true);
 			}
 
@@ -147,7 +149,7 @@ abstract class DbConnection {
 
 			// If we have a debugger, we have to log the execution time
 			if ($debugger !== false) {
-				$debugger->logQueryExecutionTime(IDebugger::QUERY_TYPE_DB, $queryId, microtime(true) - $startTime);
+				$debugItem->setExecutionTime(microtime(true) - $startTime);
 			}
 
 			return new DbResult($statement);

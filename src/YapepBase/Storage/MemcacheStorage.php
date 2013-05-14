@@ -10,6 +10,7 @@
 
 namespace YapepBase\Storage;
 use YapepBase\Application;
+use YapepBase\Debugger\Item\StorageItem;
 use YapepBase\Exception\StorageException;
 use YapepBase\Exception\ConfigException;
 use YapepBase\DependencyInjection\SystemContainer;
@@ -147,18 +148,14 @@ class MemcacheStorage extends StorageAbstract {
 		}
 		$debugger = Application::getInstance()->getDiContainer()->getDebugger();
 
-		// If we have a debugger, we have to log the query
-		if ($debugger !== false) {
-			$queryId = $debugger->logQuery(IDebugger::QUERY_TYPE_CACHE, 'memcache.' . $this->currentConfigurationName,
-				'set ' . $key . ' for ' . $ttl, $data);
-			$startTime = microtime(true);
-		}
+		$startTime = microtime(true);
 
 		$this->memcache->set($this->makeKey($key), $data, 0, $ttl);
 
-		// If we have a debugger, we have to log the execution time
+		// If we have a debugger, we have to log the request
 		if ($debugger !== false) {
-			$debugger->logQueryExecutionTime(IDebugger::QUERY_TYPE_CACHE, $queryId, microtime(true) - $startTime);
+			$debugger->addItem(new StorageItem('memcache', 'memcache.' . $this->currentConfigurationName,
+				StorageItem::METHOD_SET . ' ' . $key . ' for ' . $ttl, $data, microtime(true) - $startTime));
 		}
 	}
 
@@ -174,19 +171,14 @@ class MemcacheStorage extends StorageAbstract {
 	public function get($key) {
 		$debugger = Application::getInstance()->getDiContainer()->getDebugger();
 
-		// If we have a debugger, we have to log the query
-		if ($debugger !== false) {
-			$queryId = $debugger->logQuery(IDebugger::QUERY_TYPE_CACHE, 'memcache.' . $this->currentConfigurationName,
-				'get ' . $key);
-			$startTime = microtime(true);
-		}
+		$startTime = microtime(true);
 
 		$value = $this->memcache->get($this->makeKey($key));
 
-		// If we have a debugger, we have to log the execution time
+		// If we have a debugger, we have to log the request
 		if ($debugger !== false) {
-			$debugger->logQueryExecutionTime(IDebugger::QUERY_TYPE_CACHE, $queryId, microtime(true) - $startTime,
-				$value);
+			$debugger->addItem(new StorageItem('memcache', 'memcache.' . $this->currentConfigurationName,
+				StorageItem::METHOD_GET . ' ' . $key, $value, microtime(true) - $startTime));
 		}
 
 		return $value;
@@ -207,18 +199,14 @@ class MemcacheStorage extends StorageAbstract {
 		}
 		$debugger = Application::getInstance()->getDiContainer()->getDebugger();
 
-		// If we have a debugger, we have to log the query
-		if ($debugger !== false) {
-			$queryId = $debugger->logQuery(IDebugger::QUERY_TYPE_CACHE, 'memcache.' . $this->currentConfigurationName,
-				'delete ' . $key);
-			$startTime = microtime(true);
-		}
+		$startTime = microtime(true);
 
 		$this->memcache->delete($this->makeKey($key));
 
-		// If we have a debugger, we have to log the execution time
+		// If we have a debugger, we have to log the request
 		if ($debugger !== false) {
-			$debugger->logQueryExecutionTime(IDebugger::QUERY_TYPE_CACHE, $queryId, microtime(true) - $startTime);
+			$debugger->addItem(new StorageItem('memcache', 'memcache.' . $this->currentConfigurationName,
+				StorageItem::METHOD_DELETE . ' ' . $key, null, microtime(true) - $startTime));
 		}
 	}
 
