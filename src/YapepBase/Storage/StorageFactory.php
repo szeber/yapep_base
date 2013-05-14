@@ -89,7 +89,7 @@ class StorageFactory {
 	 *
 	 * @return \YapepBase\Storage\StorageAbstract
 	 */
-	protected function getStorage($configName, $storageType) {
+	protected static function getStorage($configName, $storageType) {
 		switch ($storageType) {
 			case self::TYPE_DUMMY:
 				return new DummyStorage($configName);
