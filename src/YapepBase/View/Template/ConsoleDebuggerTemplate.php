@@ -256,11 +256,15 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 		$sqlQueryTimes = 0;
 		$cacheRequests = array();
 		$cacheTimes = 0;
+		$storageRequests = array();
+		$storageTimes = 0;
 		$curlRequests = array();
 		$curlTimes = 0;
 		$timeMilestones = array();
 		$memoryMilestones = array();
 		$resources = array();
+
+		$cacheBackendTypes = array('memcache', 'memcached', 'dummy');
 		foreach ($this->items as $type => $items) {
 			switch ($type) {
 				case IDebugItem::DEBUG_ITEM_MESSAGE:
@@ -280,12 +284,16 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 					}
 					break;
 
-				case IDebugItem::DEBUG_ITEM_CACHE:
-					$cacheRequests = $items;
+				case IDebugItem::DEBUG_ITEM_STORAGE:
+					$storageRequests = $items;
 					foreach ($items as $item) {
 						/** @var \YapepBase\Debugger\Item\IDebugItem $item */
 						$data = $item->getData();
-						$cacheTimes += $data[StorageItem::LOCAL_FIELD_EXECUTION_TIME];
+						$storageTimes += $data[StorageItem::LOCAL_FIELD_EXECUTION_TIME];
+						if (in_array($data[StorageItem::LOCAL_FIELD_BACKEND_TYPE], $cacheBackendTypes)) {
+							$cacheRequests[] = $item;
+							$cacheTimes += $data[StorageItem::LOCAL_FIELD_EXECUTION_TIME];
+						}
 					}
 					break;
 

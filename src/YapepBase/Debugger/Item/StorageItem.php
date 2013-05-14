@@ -34,7 +34,7 @@ class StorageItem extends QueryItemAbstract {
 	 * @return string
 	 */
 	public function getType() {
-		return self::DEBUG_ITEM_CACHE;
+		return self::DEBUG_ITEM_STORAGE;
 	}
 
 }

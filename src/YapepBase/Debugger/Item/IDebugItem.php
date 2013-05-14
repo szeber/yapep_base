@@ -28,7 +28,7 @@ interface IDebugItem {
 	/** SQL query item type. */
 	const DEBUG_ITEM_SQL_QUERY = 'sqlQuery';
 	/** Cache request item type. */
-	const DEBUG_ITEM_CACHE = 'cache';
+	const DEBUG_ITEM_STORAGE = 'storage';
 	/** Curl request item type. */
 	const DEBUG_ITEM_CURL_REQUEST = 'curlRequest';
 	/** Time milestone item type. */
