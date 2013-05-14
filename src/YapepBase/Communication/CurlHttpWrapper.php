@@ -11,6 +11,10 @@
 
 namespace YapepBase\Communication;
 
+use YapepBase\Application;
+use YapepBase\Debugger\IDebugger;
+use YapepBase\Debugger\Item\CurlRequestItem;
+
 /**
  * Wrapper class for sending HTTP requests with CURL.
  *
@@ -67,6 +71,34 @@ class CurlHttpWrapper {
 	protected $url;
 
 	/**
+	 * The request method.
+	 *
+	 * @var string
+	 */
+	protected $method;
+
+	/**
+	 * The request parameters.
+	 *
+	 * @var array
+	 */
+	protected $parameters;
+
+	/**
+	 * The additional request headers for the request.
+	 *
+	 * @var array
+	 */
+	protected $additionalHeaders;
+
+	/**
+	 * The extra curl options for the request.
+	 *
+	 * @var array
+	 */
+	protected $extraOptions;
+
+	/**
 	 * The cookies that are going to be sent with the request.
 	 *
 	 * @var array
@@ -111,7 +143,7 @@ class CurlHttpWrapper {
 					// Rebuild the URL. If we have pecl_http with http_build_url use it,
 					// otherwise use the PHP implementation.
 					$url = (
-						function_exists('http_build_url')
+					function_exists('http_build_url')
 						? http_build_url($urlParts)
 						: $this->buildUrl($urlParts)
 					);
@@ -137,7 +169,11 @@ class CurlHttpWrapper {
 			$options[CURLOPT_HTTPHEADER] = array_values($additionalHeaders);
 		}
 
-		$this->url = $url;
+		$this->url               = $url;
+		$this->method            = $method;
+		$this->parameters        = $parameters;
+		$this->additionalHeaders = $additionalHeaders;
+		$this->extraOptions      = $extraOptions;
 
 		$this->curl = curl_init($url);
 		curl_setopt_array($this->curl, $options);
@@ -219,9 +255,21 @@ class CurlHttpWrapper {
 			curl_setopt($this->curl, CURLOPT_COOKIE, implode('; ', $cookies));
 		}
 
+		$debugger = Application::getInstance()->getDiContainer()->getDebugger();
+
+		// If we have a debugger, we have to log the query
+		$startTime = microtime(true);
 		$result = curl_exec($this->curl);
+
+
+		if ($debugger !== false) {
+			$debugger->addItem(new CurlRequestItem(CurlRequestItem::PROTOCOL_HTTP, $this->method, $this->url,
+				$this->parameters, $this->additionalHeaders, $this->extraOptions, microtime(true) - $startTime));
+		}
+
 		if (false === $result) {
 			$this->error = curl_error($this->curl);
+
 			throw new \YapepBase\Exception\Exception('Curl Error:' . curl_error($this->curl));
 		}
 

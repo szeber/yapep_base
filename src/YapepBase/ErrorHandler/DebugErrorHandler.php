@@ -12,6 +12,7 @@ namespace YapepBase\ErrorHandler;
 
 
 use YapepBase\Application;
+use YapepBase\Debugger\Item\ErrorItem;
 use YapepBase\ErrorHandler\IErrorHandler;
 use YapepBase\ErrorHandler\ErrorHandlerHelper;
 
@@ -38,7 +39,8 @@ class DebugErrorHandler implements IErrorHandler {
 		$debugger = Application::getInstance()->getDiContainer()->getDebugger();
 
 		if ($debugger) {
-			$debugger->logError($errorLevel, $message, $file, $line, $context, $backTrace, $errorId);
+			$debugItem = new ErrorItem($errorLevel, $message, $file, $line, $context, $backTrace, $errorId);
+			$debugger->addItem($debugItem);
 		}
 	}
 
@@ -46,11 +48,11 @@ class DebugErrorHandler implements IErrorHandler {
 	 * Handles an uncaught exception. The exception must extend the \Exception class to be handled.
 	 *
 	 * @param \Exception $exception   The exception to handle.
-	 * @param string    $errorId     The internal ID of the error.
+	 * @param string     $errorId     The internal ID of the error.
 	 */
 	public function handleException(\Exception $exception, $errorId) {
 		$this->handleError(ErrorHandlerHelper::E_EXCEPTION, $exception->getMessage(), $exception->getFile(),
-			$exception->getLine(), array(), $errorId, $exception->getTrace());
+			$exception->getLine(), array('Exception' => $exception), $errorId, $exception->getTrace());
 	}
 
 	/**
@@ -66,7 +68,8 @@ class DebugErrorHandler implements IErrorHandler {
 		$debugger = Application::getInstance()->getDiContainer()->getDebugger();
 
 		if ($debugger) {
-			$debugger->logError($errorLevel, $message, $file, $line, array(), array(), $errorId);
+			$debugItem = new ErrorItem($errorLevel, $message, $file, $line, array(), array(), $errorId);
+			$debugger->addItem($debugItem);
 
 			// In case of Fatal error, the code probably halted, so we have to handle it
 			$debugger->handleShutdown();

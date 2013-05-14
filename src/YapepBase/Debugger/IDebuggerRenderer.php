@@ -84,13 +84,7 @@ interface IDebuggerRenderer {
 	 * @param float $runTime         The number of seconds with microseconds, the application run for.
 	 * @param int   $currentMemory   The current memory usage in bytes.
 	 * @param int   $peakMemory      The peak memory usage in bytes.
-	 * @param array $times           Array with the timing milestones.
-	 * @param array $memoryUsages    Array with the memory usage milestones.
-	 * @param array $info            Array with the logged info items.
-	 * @param array $errors          Array with any errors that occured.
-	 * @param array $queries         Array with all queries that have run (including timing information if available).
-	 * @param array $queryTimes      Array with the timing totals for each query type.
-	 * @param array $counters        Array with the location counters.
+	 * @param array $items           2 dimensional array of the debug items, where the 1st dimension's key is the type.
 	 * @param array $serverParams    Params of the $_SERVER superglobal.
 	 * @param array $postParams      Params what received through post method.
 	 * @param array $getParams       Params what received through get method.
@@ -100,21 +94,7 @@ interface IDebuggerRenderer {
 	 * @return void
 	 */
 	public function render(
-		$startTime,
-		$runTime,
-		$currentMemory,
-		$peakMemory,
-		array $times,
-		array $memoryUsages,
-		array $info,
-		array $errors,
-		array $queries,
-		array $queryTimes,
-		array $counters,
-		array $serverParams,
-		array $postParams,
-		array $getParams,
-		array $cookieParams,
-		array $sessionParams
+		$startTime, $runTime, $currentMemory, $peakMemory, array $items, array $serverParams, array $postParams,
+		array $getParams, array $cookieParams, array $sessionParams
 	);
 }

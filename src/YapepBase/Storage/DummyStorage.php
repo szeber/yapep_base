@@ -12,7 +12,7 @@ namespace YapepBase\Storage;
 
 
 use YapepBase\Application;
-use YapepBase\Debugger\IDebugger;
+use YapepBase\Debugger\Item\StorageItem;
 
 /**
  * Storage class for dummy storage.
@@ -38,10 +38,8 @@ class DummyStorage extends StorageAbstract {
 
 		// If we have a debugger, we have to log the query
 		if ($debugger !== false) {
-			$queryId = $debugger->logQuery(IDebugger::QUERY_TYPE_CACHE, 'dummy.' . $this->currentConfigurationName,
-				'set ' . $key . ' for ' . $ttl, $data);
-			$startTime = microtime(true);
-			$debugger->logQueryExecutionTime(IDebugger::QUERY_TYPE_CACHE, $queryId, microtime(true) - $startTime);
+			$debugger->addItem(new StorageItem('dummy', 'dummy.' . $this->currentConfigurationName,
+				StorageItem::METHOD_SET . ' ' . $key . ' for ' . $ttl, $data, 0));
 		}
 	}
 
@@ -57,11 +55,8 @@ class DummyStorage extends StorageAbstract {
 
 		// If we have a debugger, we have to log the query
 		if ($debugger !== false) {
-			$queryId = $debugger->logQuery(IDebugger::QUERY_TYPE_CACHE, 'dummy.' . $this->currentConfigurationName,
-				'get ' . $key);
-			$startTime = microtime(true);
-			$debugger->logQueryExecutionTime(IDebugger::QUERY_TYPE_CACHE, $queryId, microtime(true) - $startTime,
-				false);
+			$debugger->addItem(new StorageItem('dummy', 'dummy.' . $this->currentConfigurationName,
+				StorageItem::METHOD_GET . ' ' . $key, false, 0));
 		}
 
 		return false;
@@ -81,11 +76,8 @@ class DummyStorage extends StorageAbstract {
 
 		// If we have a debugger, we have to log the query
 		if ($debugger !== false) {
-			$queryId = $debugger->logQuery(IDebugger::QUERY_TYPE_CACHE, 'dummy.' . $this->currentConfigurationName,
-				'delete ' . $key);
-			$startTime = microtime(true);
-
-			$debugger->logQueryExecutionTime(IDebugger::QUERY_TYPE_CACHE, $queryId, microtime(true) - $startTime);
+			$debugger->addItem(new StorageItem('dummy', 'dummy.' . $this->currentConfigurationName,
+				StorageItem::METHOD_DELETE . ' ' . $key, null, 0));
 		}
 	}
 

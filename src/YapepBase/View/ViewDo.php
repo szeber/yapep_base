@@ -10,6 +10,7 @@
 
 namespace YapepBase\View;
 
+use YapepBase\Exception\ParameterException;
 use YapepBase\View\ViewAbstract;
 use YapepBase\Application;
 use YapepBase\Mime\MimeType;
@@ -60,6 +61,8 @@ class ViewDo {
 	 * @param bool   $raw   if TRUE it will return the raw (unescaped) data.
 	 *
 	 * @return mixed   The data stored with the given key.
+	 *
+	 * @todo Review error handling. We should throw exceptions where possible. [szeber]
 	 */
 	final public function get($key, $raw = false) {
 		if (empty($key)) {
@@ -120,7 +123,12 @@ class ViewDo {
 				throw new Exception('Key already exist: ' . $nameOrData);
 			}
 			$this->dataRaw[$nameOrData] = $value;
-			$this->data[$nameOrData] = $this->escape($value);
+			try {
+				$this->data[$nameOrData] = $this->escape($value);
+			} catch (ParameterException $e) {
+				// The parameter was not escaped, continue as normal without adding to the data array.
+				// These parameters can only be accessed as raw.
+			}
 		}
 	}
 
@@ -204,13 +212,15 @@ class ViewDo {
 	}
 
 	/**
-	 * Escpaes the value based on the response content type.
+	 * Escapes the value based on the response content type.
 	 *
 	 * @param mixed $value   The value to escape.
 	 *
 	 * @return mixed   The escaped value
+	 *
+	 * @throws \YapepBase\Exception\ParameterException   If a non-escapable type is passed.
 	 */
-	protected function escape($value) {
+	public function escape($value) {
 		switch ($this->contentType) {
 			case MimeType::HTML:
 			default:
@@ -225,19 +235,43 @@ class ViewDo {
 	 * @param mixed $value   The data wat should be escaped.
 	 *
 	 * @return mixed   The escaped value.
+	 *
+	 * @throws \YapepBase\Exception\ParameterException   If a non-escapable type is passed.
 	 */
 	protected function escapeForHtml($value) {
 		switch (gettype($value)) {
 			case 'string':
 				return htmlspecialchars($value);
+				break;
 
 			case 'array':
 				foreach ($value as $elementKey => $elementValue) {
 					$value[$elementKey] = $this->escape($elementValue);
 				}
+				return $value;
+				break;
+
+			case 'object':
+				if (($value instanceof \Iterator) && ($value instanceof \ArrayAccess)) {
+					foreach ($value as $elementKey => $elementValue) {
+						$value[$elementKey] = $this->escape($elementValue);
+					}
+					return $value;
+				} elseif (method_exists($value, '__toString')) {
+					return $this->escape((string)$value);
+				} else {
+					throw new ParameterException('Unable to escape objects');
+				}
+				break;
+
+			case 'unknown type':
+			case 'resource':
+				throw new ParameterException('Unable to escape resources and unknown types');
+				break;
 
 			default:
 				return $value;
+				break;
 		}
 	}
 }

@@ -11,6 +11,7 @@
 namespace YapepBase\Storage;
 
 
+use YapepBase\Debugger\Item\StorageItem;
 use YapepBase\Exception\StorageException;
 use YapepBase\Exception\ConfigException;
 use YapepBase\Application;
@@ -149,12 +150,7 @@ class MemcachedStorage extends StorageAbstract implements IIncrementable {
 		}
 		$debugger = Application::getInstance()->getDiContainer()->getDebugger();
 
-		// If we have a debugger, we have to log the query
-		if ($debugger !== false) {
-			$queryId = $debugger->logQuery(IDebugger::QUERY_TYPE_CACHE, 'memcached.' . $this->currentConfigurationName,
-				'set ' . $key . ' for ' . $ttl, $data);
-			$startTime = microtime(true);
-		}
+		$startTime = microtime(true);
 
 		if (!$this->memcache->set($this->makeKey($key), $data, $ttl)) {
 			$code = $this->memcache->getResultCode();
@@ -164,9 +160,10 @@ class MemcachedStorage extends StorageAbstract implements IIncrementable {
 			}
 		}
 
-		// If we have a debugger, we have to log the execution time
+		// If we have a debugger, we have to log the request
 		if ($debugger !== false) {
-			$debugger->logQueryExecutionTime(IDebugger::QUERY_TYPE_CACHE, $queryId, microtime(true) - $startTime);
+			$debugger->addItem(new StorageItem('memcached', 'memcached.' . $this->currentConfigurationName,
+				StorageItem::METHOD_SET . ' ' . $key . ' for ' . $ttl, $data, microtime(true) - $startTime));
 		}
 	}
 
@@ -182,12 +179,7 @@ class MemcachedStorage extends StorageAbstract implements IIncrementable {
 	public function get($key) {
 		$debugger = Application::getInstance()->getDiContainer()->getDebugger();
 
-		// If we have a debugger, we have to log the query
-		if ($debugger !== false) {
-			$queryId = $debugger->logQuery(IDebugger::QUERY_TYPE_CACHE, 'memcached.' . $this->currentConfigurationName,
-				'get ' . $key);
-			$startTime = microtime(true);
-		}
+		$startTime = microtime(true);
 
 		$result = $this->memcache->get($this->makeKey($key));
 		if (false === $result) {
@@ -197,10 +189,10 @@ class MemcachedStorage extends StorageAbstract implements IIncrementable {
 					. $this->memcache->getResultMessage(), $this->memcache->getResultCode());
 			}
 		}
-		// If we have a debugger, we have to log the execution time
+		// If we have a debugger, we have to log the request
 		if ($debugger !== false) {
-			$debugger->logQueryExecutionTime(IDebugger::QUERY_TYPE_CACHE, $queryId, microtime(true) - $startTime,
-				$result);
+			$debugger->addItem(new StorageItem('memcached', 'memcached.' . $this->currentConfigurationName,
+				StorageItem::METHOD_GET . ' ' . $key, $result, microtime(true) - $startTime));
 		}
 
 		return $result;
@@ -221,18 +213,14 @@ class MemcachedStorage extends StorageAbstract implements IIncrementable {
 		}
 		$debugger = Application::getInstance()->getDiContainer()->getDebugger();
 
-		// If we have a debugger, we have to log the query
-		if ($debugger !== false) {
-			$queryId = $debugger->logQuery(IDebugger::QUERY_TYPE_CACHE, 'memcached.' . $this->currentConfigurationName,
-				'delete ' . $key);
-			$startTime = microtime(true);
-		}
+		$startTime = microtime(true);
 
 		$this->memcache->delete($this->makeKey($key));
 
-		// If we have a debugger, we have to log the execution time
+		// If we have a debugger, we have to log the request
 		if ($debugger !== false) {
-			$debugger->logQueryExecutionTime(IDebugger::QUERY_TYPE_CACHE, $queryId, microtime(true) - $startTime);
+			$debugger->addItem(new StorageItem('memcached', 'memcached.' . $this->currentConfigurationName,
+				StorageItem::METHOD_DELETE . ' ' . $key, null, microtime(true) - $startTime));
 		}
 	}
 
