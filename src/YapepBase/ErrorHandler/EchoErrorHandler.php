@@ -38,7 +38,7 @@ class EchoErrorHandler implements IErrorHandler {
 		$errorLevelDescription = $helper->getPhpErrorLevelDescription($errorLevel);
 
 		echo '[' . $errorLevelDescription . '(' . $errorLevel . ')]: ' . $message . ' on line ' . $line
-			. ' in ' . $file . "\n";
+			. ' in ' . $file . '(ID: ' . $errorId . ')' . "\n";
 	}
 
 	/**
@@ -54,7 +54,7 @@ class EchoErrorHandler implements IErrorHandler {
 	public function handleException(\Exception $exception, $errorId) {
 		echo '[' . ErrorHandlerHelper::E_EXCEPTION_DESCRIPTION . ']: Unhandled ' . get_class($exception) . ': '
 			. $exception->getMessage() . '(' . $exception->getCode() . ') on line ' . $exception->getLine() . ' in '
-			. $exception->getFile() . "\n";
+			. $exception->getFile() . '(ID: ' . $errorId . ')' . "\n";
 	}
 
 	/**
@@ -75,6 +75,6 @@ class EchoErrorHandler implements IErrorHandler {
 		$errorLevelDescription = $helper->getPhpErrorLevelDescription($errorLevel);
 
 		echo '[' . $errorLevelDescription . '(' . $errorLevel . ')]: ' . $message . ' on line ' . $line
-			. ' in ' . $file . "\n";
+			. ' in ' . $file . '(ID: ' . $errorId . ')' . "\n";
 	}
 }
