@@ -39,7 +39,7 @@ class DebugErrorHandler implements IErrorHandler {
 		$debugger = Application::getInstance()->getDiContainer()->getDebugger();
 
 		if ($debugger) {
-			$debugItem = new ErrorItem($errorLevel, $message, $file, $line, $context, $backTrace, $errorId);
+			$debugItem = new ErrorItem($errorLevel, $message, $file, $line, $context, $errorId);
 			$debugger->addItem($debugItem);
 		}
 	}
@@ -68,7 +68,7 @@ class DebugErrorHandler implements IErrorHandler {
 		$debugger = Application::getInstance()->getDiContainer()->getDebugger();
 
 		if ($debugger) {
-			$debugItem = new ErrorItem($errorLevel, $message, $file, $line, array(), array(), $errorId);
+			$debugItem = new ErrorItem($errorLevel, $message, $file, $line, array(), $errorId);
 			$debugger->addItem($debugItem);
 
 			// In case of Fatal error, the code probably halted, so we have to handle it

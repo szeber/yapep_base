@@ -195,7 +195,12 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 					' . $message . '<br/>
 					in <var>' . $file . '</var>, <u>line ' . $line . '</u>
 				</p>
-				<div class="yapep-debug-container" id="yapep-debug-error-' . $id . '">
+			';
+		if (!empty($errorData[ErrorItem::LOCAL_FIELD_DEBUG_DATA_URL])) {
+			$errorHtml .= '<p><a href="' . $errorData[ErrorItem::LOCAL_FIELD_DEBUG_DATA_URL]
+				. '" target="_blank">Debug data</a></p>';
+		}
+		$errorHtml .= '<div class="yapep-debug-container" id="yapep-debug-error-' . $id . '">
 					<h3>Source code</h3>
 					<ol start="' . $firstLine . '" class="yapep-debug-code">
 		';
@@ -205,10 +210,7 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 			}
 			$codeLine = str_replace('&lt;?php&nbsp;', '', highlight_string('<?php '.$codeLine, true));
 			if ($line > $lineNumber) {
-				foreach (
-					$errorData[ErrorItem::LOCAL_FIELD_CONTEXT] + $errorData[ErrorItem::LOCAL_FIELD_TRACE]
-						as $varName => $value
-				) {
+				foreach ($errorData[ErrorItem::LOCAL_FIELD_CONTEXT] as $varName => $value) {
 					if (is_scalar($value) || is_array($value)) {
 						$tooltip = $this->viewDo->escape(gettype($value) . ': ' . print_r($value, true));
 					}
@@ -230,13 +232,6 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 				. ($lineNumber == $line ? 'yapep-debug-code-highlight' : '') . '">' . $codeLine . '</li>';
 		}
 		$errorHtml .= '</ol>';
-
-		if ($errorData[ErrorItem::LOCAL_FIELD_CODE] === ErrorHandlerHelper::E_EXCEPTION) {
-			$errorHtml .= '<h3>Debug trace</h3>'
-				. '<pre id="yapep-debug-error-trace-' . $id . '">'
-				. highlight_string(print_r($errorData[ErrorItem::LOCAL_FIELD_TRACE], true), true)
-				. '</pre>';
-		}
 
 		$errorHtml .= '</div>';
 		$errorHtml .= '</div>';
@@ -1014,7 +1009,7 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 			<div class="yapep-debug-error-item yapep-debug-curl-connection-<?= (string)$requestData[CurlRequestItem::LOCAL_FIELD_HOST] ?>"">
 				<p class="yapep-debug-clickable" onclick="Yapep.toggle('CURL<?= $index ?>'); return false;">
 					<b><?= $requestData[CurlRequestItem::LOCAL_FIELD_PROTOCOL] ?> <?= $requestData[CurlRequestItem::LOCAL_FIELD_METHOD] ?>: <?= $requestData[CurlRequestItem::LOCAL_FIELD_URL] ?></b> -&gt;
-					<b><?= (isset($requestData[CurlRequestItem::LOCAL_FIELD_EXECUTION_TIME]) ? sprintf('%.4f', $query[CurlRequestItem::LOCAL_FIELD_EXECUTION_TIME]) : '') ?></b> sec in  ||
+					<b><?= (isset($requestData[CurlRequestItem::LOCAL_FIELD_EXECUTION_TIME]) ? sprintf('%.4f', $requestData[CurlRequestItem::LOCAL_FIELD_EXECUTION_TIME]) : '') ?></b> sec in  ||
 					<var><?= $requestData[CurlRequestItem::FIELD_FILE] ?></var>,
 					<u>line <?= $requestData[CurlRequestItem::FIELD_LINE] ?></u>
 				</p>

@@ -36,8 +36,6 @@ class ErrorItem extends ItemAbstract implements ISourceLocatable {
 	const LOCAL_FIELD_MESSAGE = 'message';
 	/** Local context field. */
 	const LOCAL_FIELD_CONTEXT = 'context';
-	/** Backtrace field. */
-	const LOCAL_FIELD_TRACE = 'trace';
 	/** Error ID field. */
 	const LOCAL_FIELD_ID = 'id';
 	/** Field for the source code around the error source. */
@@ -55,10 +53,9 @@ class ErrorItem extends ItemAbstract implements ISourceLocatable {
 	 * @param int    $line      The number of the line where the error occured.If its <var>0</var>,
 	 *                             then it logs the line where logError() called from.
 	 * @param array  $context   The variables from the actual context.
-	 * @param array  $trace     The backtrace for the error.
 	 * @param string $id        The id of the error.
 	 */
-	public function __construct($code, $message, $file, $line, array $context, array $trace, $id) {
+	public function __construct($code, $message, $file, $line, array $context, $id) {
 		if (empty($trace)) {
 			$trace = array();
 			if (empty($file) || $line === 0) {
@@ -74,7 +71,6 @@ class ErrorItem extends ItemAbstract implements ISourceLocatable {
 			self::FIELD_FILE                 => $file,
 			self::FIELD_LINE                 => $line,
 			self::LOCAL_FIELD_CONTEXT        => $context,
-			self::LOCAL_FIELD_TRACE          => $trace,
 			self::LOCAL_FIELD_ID             => $id,
 			self::LOCAL_FIELD_SOURCE_CODE    => $this->getSource($file, $line),
 			self::LOCAL_FIELD_DEBUG_DATA_URL => $this->getDebugDataUrl($id),
@@ -94,7 +90,6 @@ class ErrorItem extends ItemAbstract implements ISourceLocatable {
 			self::FIELD_FILE                 => 'File',
 			self::FIELD_LINE                 => 'Line',
 			self::LOCAL_FIELD_CONTEXT        => 'Local context',
-			self::LOCAL_FIELD_TRACE          => 'Backtrace',
 			self::LOCAL_FIELD_ID             => 'Error ID',
 			self::LOCAL_FIELD_SOURCE_CODE    => 'Source code',
 			self::LOCAL_FIELD_DEBUG_DATA_URL => 'URL to the debug data',
