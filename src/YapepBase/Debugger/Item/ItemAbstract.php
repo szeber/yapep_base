@@ -48,7 +48,7 @@ abstract class ItemAbstract implements IDebugItem {
 	 * @throws \YapepBase\Exception\ParameterException   If the field does not exist.
 	 */
 	public function getField($fieldName) {
-		if (!isset($this->data[$fieldName])) {
+		if (!array_key_exists($fieldName, $this->data)) {
 			throw new ParameterException('Invalid field name: ' . $fieldName);
 		}
 		return $this->data[$fieldName];
