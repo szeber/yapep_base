@@ -220,7 +220,7 @@ abstract class BatchScript implements ITerminatable {
 	public function run() {
 		$this->setAsTerminator();
 		$eventHandlerRegistry = Application::getInstance()->getDiContainer()->getEventHandlerRegistry();
-		$eventHandlerRegistry->raise(new Event(Event::TYPE_APPSTART));
+		$eventHandlerRegistry->raise(new Event(Event::TYPE_APPLICATION_BEFORE_RUN));
 
 		$this->prepareSwitches();
 		try {
@@ -245,7 +245,9 @@ abstract class BatchScript implements ITerminatable {
 				echo $this->cliHelper->getUsageOutput(true);
 			}
 			else {
+				$eventHandlerRegistry->raise(new Event(Event::TYPE_CONTROLLER_BEFORE_ACTION));
 				$this->execute();
+				$eventHandlerRegistry->raise(new Event(Event::TYPE_CONTROLLER_AFTER_ACTION));
 			}
 		}
 		catch (\Exception $exception) {
@@ -258,7 +260,7 @@ abstract class BatchScript implements ITerminatable {
 		$this->removeSignalHandler();
 
 		$this->runAfter();
-		$eventHandlerRegistry->raise(new Event(Event::TYPE_APPFINISH));
+		$eventHandlerRegistry->raise(new Event(Event::TYPE_APPLICATION_AFTER_RUN));
 	}
 
 	/**

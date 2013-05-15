@@ -102,7 +102,7 @@ abstract class SessionTestAbstract extends \YapepBase\BaseTest {
 		$sessionData = array('session.test.test' => array('test' => 'testValue'));
 		$storage = null;
 		$session = $this->getSession('test', $sessionData);
-		$session->handleEvent(new Event(Event::TYPE_APPSTART));
+		$session->handleEvent(new Event(Event::TYPE_APPLICATION_BEFORE_CONTROLLER_RUN));
 		$this->assertSame('testValue', $session['test'], 'Loaded value is invalid');
 	}
 
@@ -113,9 +113,9 @@ abstract class SessionTestAbstract extends \YapepBase\BaseTest {
 	 */
 	public function testInvalidEventHandling() {
 		$session = $this->getSession();
-		$session->handleEvent(new Event(Event::TYPE_APPSTART));
+		$session->handleEvent(new Event(Event::TYPE_APPLICATION_BEFORE_CONTROLLER_RUN));
 		$session['test'] = 'testValue';
-		$session->handleEvent(new Event(Event::TYPE_APPSTART));
+		$session->handleEvent(new Event(Event::TYPE_APPLICATION_BEFORE_CONTROLLER_RUN));
 		$this->assertSame('testValue', $session['test'], 'Loading the session twice overwrites data');
 	}
 
@@ -164,26 +164,32 @@ abstract class SessionTestAbstract extends \YapepBase\BaseTest {
 		$eventHandlerRegistry = Application::getInstance()->getDiContainer()->getEventHandlerRegistry();
 		$session = $this->getSession(null, array(), $storage, true);
 
-		$this->assertTrue(in_array($session, $eventHandlerRegistry->getEventHandlers(Event::TYPE_APPSTART), true),
+		$this->assertTrue(in_array($session, $eventHandlerRegistry->getEventHandlers(
+				Event::TYPE_APPLICATION_BEFORE_CONTROLLER_RUN), true),
 			'Autoregistration failed for APPSTART event');
 
-		$this->assertTrue(in_array($session, $eventHandlerRegistry->getEventHandlers(Event::TYPE_APPFINISH), true),
+		$this->assertTrue(in_array($session, $eventHandlerRegistry->getEventHandlers(
+				Event::TYPE_APPLICATION_AFTER_CONTROLLER_RUN), true),
 			'Autoegistration failed for APPFINISH event');
 
 		$session->removeEventHandler();
 
-		$this->assertFalse(in_array($session, $eventHandlerRegistry->getEventHandlers(Event::TYPE_APPSTART), true),
+		$this->assertFalse(in_array($session, $eventHandlerRegistry->getEventHandlers(
+				Event::TYPE_APPLICATION_BEFORE_CONTROLLER_RUN), true),
 			'Unregistration failed for APPSTART event');
 
-		$this->assertFalse(in_array($session, $eventHandlerRegistry->getEventHandlers(Event::TYPE_APPFINISH), true),
+		$this->assertFalse(in_array($session, $eventHandlerRegistry->getEventHandlers(
+				Event::TYPE_APPLICATION_AFTER_CONTROLLER_RUN), true),
 			'Unregistration failed for APPFINISH event');
 
 		$session->registerEventHandler();
 
-		$this->assertTrue(in_array($session, $eventHandlerRegistry->getEventHandlers(Event::TYPE_APPSTART), true),
+		$this->assertTrue(in_array($session, $eventHandlerRegistry->getEventHandlers(
+				Event::TYPE_APPLICATION_BEFORE_CONTROLLER_RUN), true),
 			'Manual registration failed for APPSTART event');
 
-		$this->assertTrue(in_array($session, $eventHandlerRegistry->getEventHandlers(Event::TYPE_APPFINISH), true),
+		$this->assertTrue(in_array($session, $eventHandlerRegistry->getEventHandlers(
+				Event::TYPE_APPLICATION_AFTER_CONTROLLER_RUN), true),
 			'Manual registration failed for APPFINISH event');
 	}
 
@@ -207,9 +213,9 @@ abstract class SessionTestAbstract extends \YapepBase\BaseTest {
 	public function testEventStorage() {
 		$storage = $this->getStorageMock();
 		$session = $this->getSession(null, array(), $storage);
-		$session->handleEvent(new Event(Event::TYPE_APPSTART));
+		$session->handleEvent(new Event(Event::TYPE_APPLICATION_BEFORE_CONTROLLER_RUN));
 		$session['test'] = 'testValue';
-		$session->handleEvent(new Event(Event::TYPE_APPFINISH));
+		$session->handleEvent(new Event(Event::TYPE_APPLICATION_AFTER_CONTROLLER_RUN));
 		$storedData = $storage->getData();
 		$this->assertSame(
 			array('session.test.' . $session->getId() => array('test' => 'testValue')),

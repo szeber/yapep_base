@@ -454,7 +454,8 @@ class SystemContainer extends Container {
 	public function setDebugger(IDebugger $debugger) {
 		$this->debugger = $debugger;
 		if ($debugger instanceof IEventHandler) {
-			$this->getEventHandlerRegistry()->registerEventHandler(Event::TYPE_APPFINISH, $debugger);
+			$this->getEventHandlerRegistry()->registerEventHandler(Event::TYPE_APPLICATION_BEFORE_OUTPUT_SEND,
+				$debugger);
 		}
 	}
 

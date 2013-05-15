@@ -269,6 +269,15 @@ class HttpRequest implements IRequest {
 	}
 
 	/**
+	 * Returns all of the server parameters.
+	 *
+	 * @return array
+	 */
+	public function getAllServer() {
+		return $this->server;
+	}
+
+	/**
 	 * Retruns the specified route param, or the default value if it's not set.
 	 *
 	 * @param string $name      The name of the cookie.

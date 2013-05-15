@@ -309,7 +309,7 @@ class Application {
 	public function run() {
 		$eventHandlerRegistry = $this->diContainer->getEventHandlerRegistry();
 		try {
-			$eventHandlerRegistry->raise(new Event(Event::TYPE_APPSTART));
+			$eventHandlerRegistry->raise(new Event(Event::TYPE_APPLICATION_BEFORE_RUN));
 			$controllerName = null;
 			$action = null;
 			try {
@@ -329,8 +329,14 @@ class Application {
 			}
 
 			$controller = $this->getDiContainer()->getController($controllerName, $this->request, $this->response);
+
+			$eventHandlerRegistry->raise(new Event(Event::TYPE_APPLICATION_BEFORE_CONTROLLER_RUN));
 			$controller->run($action);
+			$eventHandlerRegistry->raise(new Event(Event::TYPE_APPLICATION_AFTER_CONTROLLER_RUN));
+
+			$eventHandlerRegistry->raise(new Event(Event::TYPE_APPLICATION_BEFORE_OUTPUT_SEND));
 			$this->response->send();
+			$eventHandlerRegistry->raise(new Event(Event::TYPE_APPLICATION_AFTER_OUTPUT_SEND));
 			// @codeCoverageIgnoreStart
 		} catch (HttpException $exception) {
 			$this->runErrorAction($exception->getCode());
@@ -339,7 +345,20 @@ class Application {
 		} catch (\Exception $exception) {
 			$this->handleFatalException($exception);
 		}
-		$eventHandlerRegistry->raise(new Event(Event::TYPE_APPFINISH));
+		// Check that all required events were raised
+		$requiredEventTypes = array(
+			Event::TYPE_APPLICATION_BEFORE_RUN,
+			Event::TYPE_APPLICATION_BEFORE_CONTROLLER_RUN,
+			Event::TYPE_APPLICATION_AFTER_CONTROLLER_RUN,
+			Event::TYPE_APPLICATION_BEFORE_OUTPUT_SEND,
+			Event::TYPE_APPLICATION_AFTER_OUTPUT_SEND,
+		);
+
+		foreach ($requiredEventTypes as $eventType) {
+			$this->raiseEventIfNotRaisedYet($eventType);
+		}
+
+		$eventHandlerRegistry->raise(new Event(Event::TYPE_APPLICATION_AFTER_RUN));
 		// @codeCoverageIgnoreEnd
 	}
 
@@ -395,8 +414,27 @@ class Application {
 		$this->dispatchedController = $controllerName;
 		$this->dispatchedAction = $errorCode;
 
+		$this->raiseEventIfNotRaisedYet(Event::TYPE_APPLICATION_BEFORE_CONTROLLER_RUN);
 		$controller->run($errorCode);
+		$this->raiseEventIfNotRaisedYet(Event::TYPE_APPLICATION_AFTER_CONTROLLER_RUN);
+
+		$this->raiseEventIfNotRaisedYet(Event::TYPE_APPLICATION_BEFORE_OUTPUT_SEND);
 		$this->response->send();
+		$this->raiseEventIfNotRaisedYet(Event::TYPE_APPLICATION_AFTER_OUTPUT_SEND);
+	}
+
+	/**
+	 * Raises an event if an event with it's type was not yet raised.
+	 *
+	 * @param string $eventType   The event type
+	 *
+	 * @return void
+	 */
+	protected function raiseEventIfNotRaisedYet($eventType) {
+		$eventHandlerRegistry = $this->diContainer->getEventHandlerRegistry();
+		if (is_null($eventHandlerRegistry->getLastTimeForEventType($eventType))) {
+			$eventHandlerRegistry->raise(new Event($eventType));
+		}
 	}
 
 	/**

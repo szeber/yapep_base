@@ -107,9 +107,9 @@ class HttpSessionTest extends SessionTestAbstract {
 		/** @var \YapepBase\Mock\Storage\StorageMock $storage */
 		$storage = null;
 		$session = $this->getHttpSession(null, array(), $output, $response, $storage);
-		$session->handleEvent(new Event(Event::TYPE_APPSTART));
+		$session->handleEvent(new Event(Event::TYPE_APPLICATION_BEFORE_CONTROLLER_RUN));
 		$session['test'] = 'testValue';
-		$session->handleEvent(new Event(Event::TYPE_APPFINISH));
+		$session->handleEvent(new Event(Event::TYPE_APPLICATION_AFTER_CONTROLLER_RUN));
 		$response->send();
 		$storedData = $storage->getData();
 		$this->assertSame(
