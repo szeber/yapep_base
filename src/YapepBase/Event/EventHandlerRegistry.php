@@ -27,6 +27,13 @@ class EventHandlerRegistry {
 	protected $eventHandlers = array();
 
 	/**
+	 * Stores the timestamp with microsecond precision, that each event type was last raised in an associative array.
+	 *
+	 * @var array
+	 */
+	protected $lastTimesForEventTypes = array();
+
+	/**
 	 * Registers a new event handler for the given event type
 	 *
 	 * @param string                         $eventType      The event type. {@uses Event::TYPE_*}
@@ -98,11 +105,23 @@ class EventHandlerRegistry {
 	 */
 	public function raise(Event $event) {
 		$type = $event->getType();
+		$this->lastTimesForEventTypes[$type] = microtime(true);
 		if (!empty($this->eventHandlers[$type])) {
 			foreach ($this->eventHandlers[$type] as $handler) {
 				/** @var \YapepBase\Event\IEventHandler $handler */
 				$handler->handleEvent($event);
 			}
 		}
+	}
+
+	/**
+	 * Returns the timestamp of the time the given event type was last raised.
+	 *
+	 * @param string $eventType   The event type.
+	 *
+	 * @return float|null   The timestamp with microsecond precision or NULL if the event type was never raised.
+	 */
+	public function getLastTimeForEventType($eventType) {
+		return isset($this->lastTimesForEventTypes[$eventType]) ? $this->lastTimesForEventTypes[$eventType] : null;
 	}
 }

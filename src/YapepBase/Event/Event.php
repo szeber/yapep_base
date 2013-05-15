@@ -18,18 +18,26 @@ namespace YapepBase\Event;
  */
 class Event {
 
-	/** Application start event type. */
-	const TYPE_APPSTART = 'application.start';
-	/** Application finish event tyoe. */
-	const TYPE_APPFINISH = 'application.finish';
-	/** Event that's sent after the application finishes and before the output is sent. */
+	/** Event type that is raised when the application starts to run. */
+	const TYPE_APPLICATION_BEFORE_RUN = 'application.beforeRun';
+	/**
+	 * Event type that is raised when the application finishes to run.
+	 *
+	 * This should be the last event raised by the application.
+	 */
+	const TYPE_APPLICATION_AFTER_RUN = 'application.afterRun';
+	/** Event type that is raised before the controller's run method is called. */
+	const TYPE_APPLICATION_BEFORE_CONTROLLER_RUN = 'application.beforeControllerRun';
+	/** Event type that is raised after the controller's run method finishes. */
+	const TYPE_APPLICATION_AFTER_CONTROLLER_RUN = 'application.afterControllerRun';
+	/** Event that's sent after the controller finishes and before the output is sent. */
 	const TYPE_APPLICATION_BEFORE_OUTPUT_SEND = 'application.beforeOutputSend';
-	/** Event that's sent ater the application finishes and the output is sent. */
+	/** Event that's sent after the controller finishes and the output is sent. */
 	const TYPE_APPLICATION_AFTER_OUTPUT_SEND = 'application.afterOutputSend';
-	/** Controller before action event type. */
-	const TYPE_CONTROLLER_BEFORE = 'controller.beforeAction';
-	/** Controller after action event type. */
-	const TYPE_CONTROLLER_AFTER = 'controller.afterAction';
+	/** Event type that is raised before the controller's action is called (after the before() method). */
+	const TYPE_CONTROLLER_BEFORE_ACTION = 'controller.beforeAction';
+	/** Event type that is raised after the controller's action is called (before the after() method). */
+	const TYPE_CONTROLLER_AFTER_ACTION = 'controller.afterAction';
 
 	/**
 	 * The event's type

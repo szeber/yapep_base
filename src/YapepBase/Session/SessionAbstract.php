@@ -167,8 +167,8 @@ abstract class SessionAbstract implements ISession {
 	 */
 	public function registerEventHandler() {
 		$registry = Application::getInstance()->getDiContainer()->getEventHandlerRegistry();
-		$registry->registerEventHandler(Event::TYPE_APPSTART, $this);
-		$registry->registerEventHandler(Event::TYPE_APPFINISH, $this);
+		$registry->registerEventHandler(Event::TYPE_APPLICATION_BEFORE_CONTROLLER_RUN, $this);
+		$registry->registerEventHandler(Event::TYPE_APPLICATION_AFTER_CONTROLLER_RUN, $this);
 	}
 
 	/**
@@ -178,8 +178,8 @@ abstract class SessionAbstract implements ISession {
 	 */
 	public function removeEventHandler() {
 		$registry = Application::getInstance()->getDiContainer()->getEventHandlerRegistry();
-		$registry->removeEventHandler(Event::TYPE_APPSTART, $this);
-		$registry->removeEventHandler(Event::TYPE_APPFINISH, $this);
+		$registry->removeEventHandler(Event::TYPE_APPLICATION_BEFORE_CONTROLLER_RUN, $this);
+		$registry->removeEventHandler(Event::TYPE_APPLICATION_AFTER_CONTROLLER_RUN, $this);
 	}
 
 	/**
@@ -287,11 +287,11 @@ abstract class SessionAbstract implements ISession {
 	 */
 	public function handleEvent(Event $event) {
 		switch ($event->getType()) {
-			case Event::TYPE_APPSTART:
+			case Event::TYPE_APPLICATION_BEFORE_CONTROLLER_RUN:
 				$this->loadSession();
 				break;
 
-			case Event::TYPE_APPFINISH:
+			case Event::TYPE_APPLICATION_AFTER_CONTROLLER_RUN:
 				$this->saveSession();
 				break;
 		}
