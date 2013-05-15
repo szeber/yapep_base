@@ -22,6 +22,10 @@ class Event {
 	const TYPE_APPSTART = 'application.start';
 	/** Application finish event tyoe. */
 	const TYPE_APPFINISH = 'application.finish';
+	/** Event that's sent after the application finishes and before the output is sent. */
+	const TYPE_APPLICATION_BEFORE_OUTPUT_SEND = 'application.beforeOutputSend';
+	/** Event that's sent ater the application finishes and the output is sent. */
+	const TYPE_APPLICATION_AFTER_OUTPUT_SEND = 'application.afterOutputSend';
 	/** Controller before action event type. */
 	const TYPE_CONTROLLER_BEFORE = 'controller.beforeAction';
 	/** Controller after action event type. */

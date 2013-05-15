@@ -144,7 +144,7 @@ class DebuggerRegistry implements IDebugger, IEventHandler {
 	 */
 	public function handleEvent(Event $event) {
 		switch ($event->getType()) {
-			case Event::TYPE_APPFINISH:
+			case Event::TYPE_APPLICATION_BEFORE_OUTPUT_SEND:
 				$this->render();
 				break;
 		}

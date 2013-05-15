@@ -308,6 +308,7 @@ class Application {
 	 */
 	public function run() {
 		$eventHandlerRegistry = $this->diContainer->getEventHandlerRegistry();
+		$finishEventsRaised = false;
 		try {
 			$eventHandlerRegistry->raise(new Event(Event::TYPE_APPSTART));
 			$controllerName = null;
@@ -330,6 +331,9 @@ class Application {
 
 			$controller = $this->getDiContainer()->getController($controllerName, $this->request, $this->response);
 			$controller->run($action);
+			$eventHandlerRegistry->raise(new Event(Event::TYPE_APPFINISH));
+			$eventHandlerRegistry->raise(new Event(Event::TYPE_APPLICATION_BEFORE_OUTPUT_SEND));
+			$finishEventsRaised = true;
 			$this->response->send();
 			// @codeCoverageIgnoreStart
 		} catch (HttpException $exception) {
@@ -339,7 +343,12 @@ class Application {
 		} catch (\Exception $exception) {
 			$this->handleFatalException($exception);
 		}
-		$eventHandlerRegistry->raise(new Event(Event::TYPE_APPFINISH));
+		if (!$finishEventsRaised) {
+			// There was an exception thrown before the finish events were sent, so send th
+			$eventHandlerRegistry->raise(new Event(Event::TYPE_APPFINISH));
+			$eventHandlerRegistry->raise(new Event(Event::TYPE_APPLICATION_BEFORE_OUTPUT_SEND));
+		}
+		$eventHandlerRegistry->raise(new Event(Event::TYPE_APPLICATION_AFTER_OUTPUT_SEND));
 		// @codeCoverageIgnoreEnd
 	}
 
