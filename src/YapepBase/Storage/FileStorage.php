@@ -11,6 +11,8 @@
 
 namespace YapepBase\Storage;
 
+use YapepBase\Application;
+use YapepBase\Debugger\Item\StorageItem;
 use YapepBase\Exception\ParameterException;
 
 use YapepBase\Exception\StorageException;
@@ -22,19 +24,23 @@ use YapepBase\Config;
  *
  * Configuration options:
  *     <ul>
- *         <li>path:           The full path to the directory to use. It must be writable.</li>
- *         <li>storePlainText: If TRUE, the data will be stored as plain text, not serialized.
- *                             Disables TTL functionality. Optional, defaults to FALSE.</li>
- *         <li>filePrefix:     The files will be prefixed with this string.
- *                             No checking is done on the string. Optional, defaults to empty string.</li>
- *         <li>fileSuffix:     The files will be suffixed with this string.
- *                             No checking is done on the string. Optional, defaults to empty string.</li>
- *         <li>fileMode:       The mode of the files in unix octal notation. If path does not exists,
- *                             and will be created, this mode will be set for it. Optional, defaults to 0644.</li>
- *         <li>hashKey:        If TRUE, the key will be hashed before being used for the filename.
- *                             Optional, defaults to FALSE.</li>
- *         <li>readOnly:       If TRUE, the storage instance will be read only, and any write attempts will
- *                             throw an exception. Optional, defaults to FALSE</li>
+ *         <li>path:             The full path to the directory to use. It must be writable.</li>
+ *         <li>storePlainText:   If TRUE, the data will be stored as plain text, not serialized.
+ *                               Disables TTL functionality. Optional, defaults to FALSE.</li>
+ *         <li>filePrefix:       The files will be prefixed with this string.
+ *                               No checking is done on the string. Optional, defaults to empty string.</li>
+ *         <li>fileSuffix:       The files will be suffixed with this string.
+ *                               No checking is done on the string. Optional, defaults to empty string.</li>
+ *         <li>fileMode:         The mode of the files in unix octal notation. If path does not exists,
+ *                               and will be created, this mode will be set for it. Optional, defaults to 0644.</li>
+ *         <li>hashKey:          If TRUE, the key will be hashed before being used for the filename.
+ *                               Optional, defaults to FALSE.</li>
+ *         <li>readOnly:         If TRUE, the storage instance will be read only, and any write attempts will
+ *                               throw an exception. Optional, defaults to FALSE</li>
+ *         <li>debuggerDisabled: If TRUE, the storage will not add the requests to the debugger if it's available.
+ *                               This is useful for example for a storage instance, that is used to store the
+ *                               DebugDataCreator's debug information as they can become quite large, and if they were
+ *                               sent to the client it can cause problems. Optional, defaults to FALSE.
  *     </ul>
  *
  * @package    YapepBase
@@ -95,6 +101,13 @@ class FileStorage extends StorageAbstract {
 	protected $readOnly = false;
 
 	/**
+	 * If TRUE, no debug items are created by this storage.
+	 *
+	 * @var bool
+	 */
+	protected $debuggerDisabled;
+
+	/**
 	 * Sets up the backend.
 	 *
 	 * @param array $config   The configuration data for the backend.
@@ -119,6 +132,7 @@ class FileStorage extends StorageAbstract {
 		$this->fileMode = (empty($config['fileMode']) ? 0644 : $config['fileMode']);
 		$this->hashKey = (isset($config['hashKey']) ? (bool)$config['hashKey'] : false);
 		$this->readOnly = (isset($config['readOnly']) ? (bool)$config['readOnly'] : false);
+		$this->debuggerDisabled = (isset($config['debuggerDisabled'])) ? (bool)$config['debuggerDisabled'] : false;
 
 		if (!file_exists($this->path)) {
 			if (!mkdir($this->path, ($this->fileMode | 0111), true)) {
@@ -169,6 +183,7 @@ class FileStorage extends StorageAbstract {
 		if ($this->readOnly) {
 			throw new StorageException('Trying to write to a read only storage');
 		}
+		$startTime = microtime(true);
 		$fileName = $this->makeFullPath($key);
 		// save error handled via exception
 		if (false === @file_put_contents($fileName, $this->prepareData($key, $data, $ttl))) {
@@ -176,6 +191,12 @@ class FileStorage extends StorageAbstract {
 		}
 		// Disable potential warnings if unit testing with vfsStream
 		@\chmod($fileName, $this->fileMode);
+
+		$debugger = Application::getInstance()->getDiContainer()->getDebugger();
+		if (!$this->debuggerDisabled && $debugger !== false) {
+			$debugger->addItem(new StorageItem('file', 'file.' . $this->currentConfigurationName,
+				StorageItem::METHOD_SET . ' ' . $key . ' for ' . $ttl, $data, microtime(true) - $startTime));
+		}
 	}
 
 	/**
@@ -242,7 +263,9 @@ class FileStorage extends StorageAbstract {
 	 * @throws \YapepBase\Exception\StorageException      On error.
 	 */
 	public function get($key) {
+		$startTime = microtime(true);
 		$fileName = $this->makeFullPath($key);
+		$data = false;
 		if (file_exists($fileName)) {
 			if (!is_readable($fileName) || false === ($contents = file_get_contents($fileName))) {
 				throw new StorageException('Unable to read file: ' . $fileName);
@@ -251,9 +274,15 @@ class FileStorage extends StorageAbstract {
 			if (false === $data) {
 				unlink($fileName);
 			}
-			return $data;
 		}
-		return false;
+
+		$debugger = Application::getInstance()->getDiContainer()->getDebugger();
+		if (!$this->debuggerDisabled && $debugger !== false) {
+			$debugger->addItem(new StorageItem('file', 'file.' . $this->currentConfigurationName,
+				StorageItem::METHOD_GET . ' ' . $key, $data, microtime(true) - $startTime));
+		}
+
+		return $data;
 	}
 
 	/**
@@ -269,11 +298,18 @@ class FileStorage extends StorageAbstract {
 		if ($this->readOnly) {
 			throw new StorageException('Trying to write to a read only storage');
 		}
+		$startTime = microtime(true);
 		$fileName = $this->makeFullPath($key);
 		if (file_exists($fileName)) {
 			if (!unlink($fileName)) {
 				throw new StorageException('Unable to delete file: ' . $fileName);
 			}
+		}
+
+		$debugger = Application::getInstance()->getDiContainer()->getDebugger();
+		if (!$this->debuggerDisabled && $debugger !== false) {
+			$debugger->addItem(new StorageItem('file', 'file.' . $this->currentConfigurationName,
+				StorageItem::METHOD_DELETE . ' ' . $key, null, microtime(true) - $startTime));
 		}
 	}
 

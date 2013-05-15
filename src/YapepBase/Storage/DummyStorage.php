@@ -19,10 +19,25 @@ use YapepBase\Debugger\Item\StorageItem;
  *
  * It wont store anything, and it will return false for every data query attempt.
  *
+ * Configuration options:
+ *     <ul>
+ *         <li>debuggerDisabled: If TRUE, the storage will not add the requests to the debugger if it's available.
+ *                               This is useful for example for a storage instance, that is used to store the
+ *                               DebugDataCreator's debug information as they can become quite large, and if they were
+ *                               sent to the client it can cause problems. Optional, defaults to FALSE.
+ *     </ul>
+ *
  * @package    YapepBase
  * @subpackage Storage
  */
 class DummyStorage extends StorageAbstract {
+
+	/**
+	 * If TRUE, no debug items are created by this storage.
+	 *
+	 * @var bool
+	 */
+	protected $debuggerDisabled;
 
 	/**
 	 * Stores data the specified key
@@ -37,7 +52,7 @@ class DummyStorage extends StorageAbstract {
 		$debugger = Application::getInstance()->getDiContainer()->getDebugger();
 
 		// If we have a debugger, we have to log the query
-		if ($debugger !== false) {
+		if (!$this->debuggerDisabled && $debugger !== false) {
 			$debugger->addItem(new StorageItem('dummy', 'dummy.' . $this->currentConfigurationName,
 				StorageItem::METHOD_SET . ' ' . $key . ' for ' . $ttl, $data, 0));
 		}
@@ -54,7 +69,7 @@ class DummyStorage extends StorageAbstract {
 		$debugger = Application::getInstance()->getDiContainer()->getDebugger();
 
 		// If we have a debugger, we have to log the query
-		if ($debugger !== false) {
+		if (!$this->debuggerDisabled && $debugger !== false) {
 			$debugger->addItem(new StorageItem('dummy', 'dummy.' . $this->currentConfigurationName,
 				StorageItem::METHOD_GET . ' ' . $key, false, 0));
 		}
@@ -75,7 +90,7 @@ class DummyStorage extends StorageAbstract {
 		$debugger = Application::getInstance()->getDiContainer()->getDebugger();
 
 		// If we have a debugger, we have to log the query
-		if ($debugger !== false) {
+		if (!$this->debuggerDisabled && $debugger !== false) {
 			$debugger->addItem(new StorageItem('dummy', 'dummy.' . $this->currentConfigurationName,
 				StorageItem::METHOD_DELETE . ' ' . $key, null, 0));
 		}
@@ -118,5 +133,6 @@ class DummyStorage extends StorageAbstract {
 	 * @return void
 	 */
 	protected function setupConfig(array $config) {
+		$this->debuggerDisabled = isset($config['debuggerDisabled']) ? (bool)$config['debuggerDisabled'] : false;
 	}
 }
