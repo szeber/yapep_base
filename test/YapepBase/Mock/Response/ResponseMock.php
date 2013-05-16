@@ -18,6 +18,15 @@ class ResponseMock implements \YapepBase\Response\IResponse {
 	public function send() {
 
 	}
+
+	/**
+	 * Renders the output.
+	 *
+	 * @return void
+	 */
+	public function render() {
+	}
+
 	public function sendError() {
 
 	}
