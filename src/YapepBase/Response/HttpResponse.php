@@ -330,6 +330,17 @@ class HttpResponse implements IResponse {
 	}
 
 	/**
+	 * Renders the output.
+	 *
+	 * @return void
+	 */
+	public function render() {
+		if (!empty($this->body) && !is_string($this->body)) {
+			$this->body = $this->body->toString();
+		}
+	}
+
+	/**
 	 * Renders and returns the HTTP response body.
 	 *
 	 * @return string

@@ -47,6 +47,13 @@ interface IResponse {
 	public function setRenderedBody($body);
 
 	/**
+	 * Renders the output.
+	 *
+	 * @return void
+	 */
+	public function render();
+
+	/**
 	 * Sends the response
 	 *
 	 * @return void

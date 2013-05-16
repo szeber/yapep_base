@@ -334,6 +334,8 @@ class Application {
 			$controller->run($action);
 			$eventHandlerRegistry->raise(new Event(Event::TYPE_APPLICATION_AFTER_CONTROLLER_RUN));
 
+			$this->response->render();
+
 			$eventHandlerRegistry->raise(new Event(Event::TYPE_APPLICATION_BEFORE_OUTPUT_SEND));
 			$this->response->send();
 			$eventHandlerRegistry->raise(new Event(Event::TYPE_APPLICATION_AFTER_OUTPUT_SEND));
