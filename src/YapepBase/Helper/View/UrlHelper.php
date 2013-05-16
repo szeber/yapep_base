@@ -34,7 +34,7 @@ class UrlHelper extends HelperAbstract {
 	 *
 	 * @return string   The target
 	 */
-	public static function getRouteTarget($controller, $action, array $params = array(), array $getParams = array()) {
+	public function getRouteTarget($controller, $action, array $params = array(), array $getParams = array()) {
 		try {
 			$url = Application::getInstance()->getRouter()->getTargetForControllerAction($controller, $action, $params);
 			return $url . (empty($getParams) ? '' : ('?' . http_build_query($getParams)));
@@ -55,7 +55,7 @@ class UrlHelper extends HelperAbstract {
 	 *
 	 * @return string   The generated URL.
 	 */
-	public static function getCurrentUrl($withParams = true, array $extraParams = array()) {
+	public function getCurrentUrl($withParams = true, array $extraParams = array()) {
 		/** @var \YapepBase\Request\HttpRequest $request  */
 		$request = Application::getInstance()->getRequest();
 
@@ -91,7 +91,7 @@ class UrlHelper extends HelperAbstract {
 	 *
 	 * @return bool
 	 */
-	public static function checkIsCurrentUri($controller, $action, array $params) {
+	public function checkIsCurrentUri($controller, $action, array $params) {
 		$application = Application::getInstance();
 		/** @var \YapepBase\Request\HttpRequest $request  */
 		$request = $application->getRequest();
@@ -114,7 +114,7 @@ class UrlHelper extends HelperAbstract {
 	 *
 	 * @return bool
 	 */
-	public static function checkIsCurrentControllerAction($controller, $action) {
+	public function checkIsCurrentControllerAction($controller, $action) {
 		// Get the current controller and action
 		$currentController = null;
 		$currentAction = null;
