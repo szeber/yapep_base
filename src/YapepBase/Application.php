@@ -343,7 +343,9 @@ class Application {
 		} catch (HttpException $exception) {
 			$this->runErrorAction($exception->getCode());
 		} catch (RedirectException $exception) {
+			$eventHandlerRegistry->raise(new Event(Event::TYPE_APPLICATION_BEFORE_OUTPUT_SEND));
 			$this->response->send();
+			$eventHandlerRegistry->raise(new Event(Event::TYPE_APPLICATION_AFTER_OUTPUT_SEND));
 		} catch (\Exception $exception) {
 			$this->handleFatalException($exception);
 		}
