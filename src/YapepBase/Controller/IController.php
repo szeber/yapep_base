@@ -15,6 +15,15 @@ use YapepBase\Request\IRequest;
 /**
  * Controller interface
  *
+ * Configuration options:
+ * <ul>
+ *   <li>system.performStrictControllerActionNameValidation: If this option is TRUE, the action's name will be
+ *                                                           validated in a case sensitive manner. This is recommended
+ *                                                           for development, but not recommended for production as it
+ *                                                           can cause errors, and will somewhat impact the performance.
+ *                                                           Optional, defaults to FALSE.</li>
+ * </ul>
+ *
  * @package    YapepBase
  * @subpackage Controller
  */
