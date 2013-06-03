@@ -45,24 +45,39 @@ class LanguageArrayRouter extends ArrayRouter {
 	/**
 	 * Constructor
 	 *
-	 * @param \YapepBase\Request\IRequest   $request           The request instance
-	 * @param array                         $routes            The list of available routes
-	 * @param string                        $defaultLanguage   The default language code to use.
-	 * @param array                         $usableLanguages   Contains the usable languages.
+	 * @param \YapepBase\Request\IRequest $request           The request instance
+	 * @param array                       $routes            The list of available routes
+	 * @param string                      $defaultLanguage   The default language code to use.
+	 * @param array                       $usableLanguages   Contains the usable languages.
+	 * @param IReverseRouter              $reverseRouter     The reverse router to use.
 	 */
-	public function __construct(IRequest $request, array $routes, $defaultLanguage, $usableLanguages) {
+	public function __construct(
+		IRequest $request, array $routes, $defaultLanguage, $usableLanguages, IReverseRouter $reverseRouter = null
+	) {
 		$this->defaultLanguage = $defaultLanguage;
 		$this->usableLanguages = $usableLanguages;
 
-		$uri = $request->getTarget();
-		$uriParts = explode('/' , trim($uri, '/'));
-
-		$this->currentLanguage = in_array($uriParts[0], $this->usableLanguages)
-			? $uriParts[0]
-			: $this->defaultLanguage;
+		$this->currentLanguage = $this->getCurrentLanguageFromRequest($request, $usableLanguages, $defaultLanguage);
 
 		parent::__construct($request, $routes,
-			new LanguageArrayReverseRouter($routes, $this->currentLanguage, $this->defaultLanguage));
+			empty($reverseRouter)
+				? new LanguageArrayReverseRouter($routes, $this->currentLanguage, $this->defaultLanguage)
+				: $reverseRouter
+		);
+	}
+
+	/**
+	 * Returns the current language from the request object.
+	 *
+	 * @param IRequest $request
+	 *
+	 * @return string
+	 */
+	public function getCurrentLanguageFromRequest(IRequest $request, array $usableLanguages, $defaultLanguage) {
+		$uri      = $request->getTarget();
+		$uriParts = explode('/', trim($uri, '/'));
+
+		return in_array($uriParts[0], $usableLanguages) ? $uriParts[0] : $defaultLanguage;
 	}
 
 	/**

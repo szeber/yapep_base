@@ -10,8 +10,10 @@
 
 namespace YapepBase\Helper\View;
 
+use YapepBase\Exception\Exception;
 use YapepBase\Helper\HelperAbstract;
 use YapepBase\Application;
+use YapepBase\Router\ILanguageReverseRouter;
 
 /**
  * UrlHelper class. Contains helper methods related to routing. Usable by the View layer.
@@ -41,6 +43,35 @@ class UrlHelper extends HelperAbstract {
 		} catch (\Exception $exception) {
 			trigger_error('Exception of type ' . get_class($exception) . ' occured in ' . __METHOD__
 				. '. Requested controller/action: ' . $controller . '/' . $action, E_USER_ERROR);
+			return '#';
+		}
+	}
+
+	/**
+	 * Returns the target for the specified controller and action in the given language
+	 *
+	 * @param string $controller   Name of the controller
+	 * @param string $action       Name of the action
+	 * @param string $language     Code of the language, the target is requested for.
+	 * @param array  $params       Route params
+	 * @param array  $getParams    The parameters should be placed in the url.
+	 *
+	 * @return string
+	 */
+	public function getRouteTargetInLanguage(
+		$controller, $action, $language, array $params = array(), array $getParams = array()
+	) {
+		try {
+			$router = Application::getInstance()->getRouter();
+			if ($router instanceof ILanguageReverseRouter) {
+				$url = $router->getTargetForControllerActionInLanguage($controller, $action, $language, $params);
+				return $url . (empty($getParams) ? '' : ('?' . http_build_query($getParams)));
+			} else {
+				throw new Exception('The router is not an instance of ILanguageReverseRouter');
+			}
+		} catch (\Exception $exception) {
+			trigger_error('Exception of type ' . get_class($exception) . ' occured in ' . __METHOD__
+			. '. Requested controller/action: ' . $controller . '/' . $action, E_USER_ERROR);
 			return '#';
 		}
 	}

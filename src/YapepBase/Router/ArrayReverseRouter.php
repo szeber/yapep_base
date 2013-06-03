@@ -67,21 +67,22 @@ class ArrayReverseRouter implements IReverseRouter {
 	 */
 	public function getTargetForControllerAction($controller, $action, $params = array()) {
 		$key = $controller . '/' . $action;
-		if (!isset($this->routes[$key])) {
+		$routes = $this->getRouteArray();
+		if (!isset($routes[$key])) {
 			throw new RouterException('No route found for controller and action: ' . $controller . '/' . $action,
 				RouterException::ERR_NO_ROUTE_FOUND);
 		}
 
 		$target = false;
-		if (is_array($this->routes[$key])) {
-			foreach ($this->routes[$key] as $route) {
+		if (is_array($routes[$key])) {
+			foreach ($routes[$key] as $route) {
 				$target = $this->getParameterizedRoute($route, $params);
 				if (false !== $target) {
 					break;
 				}
 			}
 		} else {
-			$target = $this->getParameterizedRoute($this->routes[$key], $params);
+			$target = $this->getParameterizedRoute($routes[$key], $params);
 		}
 
 		if (false === $target) {
@@ -95,6 +96,15 @@ class ArrayReverseRouter implements IReverseRouter {
 			$target = '/' . $target;
 		}
 		return $target;
+	}
+
+	/**
+	 * Returns the array of routes.
+	 *
+	 * @return array
+	 */
+	protected function getRouteArray() {
+		return $this->routes;
 	}
 
 	/**
