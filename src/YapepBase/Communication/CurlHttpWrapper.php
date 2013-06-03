@@ -11,9 +11,10 @@
 
 namespace YapepBase\Communication;
 
+
 use YapepBase\Application;
-use YapepBase\Debugger\IDebugger;
 use YapepBase\Debugger\Item\CurlRequestItem;
+use YapepBase\Exception\CurlException;
 
 /**
  * Wrapper class for sending HTTP requests with CURL.
@@ -114,6 +115,8 @@ class CurlHttpWrapper {
 	 * @param array  $additionalHeaders   Additional HTTP headers for the request.
 	 * @param array  $extraOptions        Extra options for the request. The options must be in an associative array,
 	 *                                    the key must be a valid CURL option name, and the value the value for that key
+	 *
+	 * @throws \YapepBase\Exception\CurlException   In case of invalid data given.
 	 */
 	public function __construct(
 		$method, $url, $parameters = array(), $additionalHeaders = array(), $extraOptions = array()
@@ -134,34 +137,31 @@ class CurlHttpWrapper {
 					$query = http_build_query($parameters);
 					$urlParts = parse_url($url);
 					if (false === $urlParts || empty($urlParts['scheme']) || empty($urlParts['host'])) {
-						// TODO Figure out why we are not just throwing an exception here [szeber]
-						trigger_error('Invalid URL: ' . $url, E_USER_ERROR);
-						exit;
+						throw new CurlException('Invalid URL: ' . $url);
 					}
 					$urlParts['query'] = empty($urlParts['query']) ? $query : $query . '&' . $urlParts['query'];
 
 					// Rebuild the URL. If we have pecl_http with http_build_url use it,
 					// otherwise use the PHP implementation.
-					$url = (
-					function_exists('http_build_url')
+					$url = function_exists('http_build_url')
 						? http_build_url($urlParts)
-						: $this->buildUrl($urlParts)
-					);
+						: $this->buildUrl($urlParts);
 				}
 				break;
 
 			case self::METHOD_POST:
 				$options[CURLOPT_POST] = true;
 				if (empty($parameters)) {
-					trigger_error('HTTP POST request without parameters', E_USER_WARNING);
+					throw new CurlException('HTTP POST request without parameters');
 				} else {
-					$options[CURLOPT_POSTFIELDS] = http_build_query($parameters);
+					$formattedParameters = array();
+					$this->formatDataForPost($parameters, $formattedParameters);
+					$options[CURLOPT_POSTFIELDS] = $formattedParameters;
 				}
 				break;
 
 			default:
-				trigger_error('Invalid HTTP method: ' . $method, E_USER_ERROR);
-				die;
+				throw new CurlException('Invalid HTTP method: ' . $method);
 				break;
 		}
 
@@ -180,16 +180,40 @@ class CurlHttpWrapper {
 	}
 
 	/**
+	 * Formats the given data for posting.
+	 *
+	 * @param array  $post              The post data.
+	 * @param array  $output            The result will be populated here.
+	 * @param string $paramNamePrefix   Prefix for the parameter name.
+	 *
+	 * @return void
+	 */
+	protected function formatDataForPost(array $post, array &$output, $paramNamePrefix = null) {
+		foreach ($post as $key => $value) {
+			$currentKey = !empty($paramNamePrefix)
+				? $paramNamePrefix . '[' . $key . ']'
+				: $key;
+
+			if (is_array($value) || is_object($value)) {
+				$this->formatDataForPost($value, $output, $currentKey);
+			} else {
+				$output[$currentKey] = $value;
+			}
+		}
+	}
+
+	/**
 	 * Builds an url from an array returned by parse_url. Use http_build_url if it's available on the system.
 	 *
 	 * @param array $urlParts   The parts of the URL.
+	 *
+	 * @throws \YapepBase\Exception\CurlException   In case of invalid data given.
 	 *
 	 * @return string
 	 */
 	protected function buildUrl($urlParts) {
 		if (empty($urlParts['host'])) {
-			trigger_error('Building URL without a host', E_USER_ERROR);
-			die;
+			throw new CurlException('Building URL without a host');
 		}
 		$url = (empty($urlParts['scheme']) ? 'http' : $urlParts['scheme']) . '://';
 		if (!empty($urlParts['user'])) {
