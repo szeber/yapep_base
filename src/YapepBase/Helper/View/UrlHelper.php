@@ -128,9 +128,9 @@ class UrlHelper extends HelperAbstract {
 		$request = $application->getRequest();
 		$router = $application->getRouter();
 
-		$uri = $request->getTarget();
+		$uri = rtrim($request->getTarget(), '/');
 
-		return $uri == $router->getTargetForControllerAction($controller, $action, $params);
+		return $uri == rtrim($router->getTargetForControllerAction($controller, $action, $params), '/');
 	}
 
 	/**
