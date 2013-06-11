@@ -25,6 +25,8 @@ class StorageItem extends QueryItemAbstract {
 	const METHOD_GET = 'get';
 	/** Delete storage method. */
 	const METHOD_DELETE = 'delete';
+	/** Clear storage method. */
+	const METHOD_CLEAR = 'clear';
 
 	/**
 	 * Returns the item's type.
@@ -36,5 +38,4 @@ class StorageItem extends QueryItemAbstract {
 	public function getType() {
 		return self::DEBUG_ITEM_STORAGE;
 	}
-
 }

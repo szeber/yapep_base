@@ -179,17 +179,6 @@ interface IFileHandler {
 	public function getCurrentDirectory();
 
 	/**
-	 * Checks if the given directory or file exists.
-	 *
-	 * @link http://php.net/manual/en/function.file-exists.php
-	 *
-	 * @param string $path   Path to the file or directory.
-	 *
-	 * @return bool   TRUE if it exits, FALSE if not.
-	 */
-	public function checkIsPathExists($path);
-
-	/**
 	 * Reads entire file into a string.
 	 *
 	 * @link http://php.net/manual/en/function.file-get-contents.php
@@ -262,6 +251,16 @@ interface IFileHandler {
 	 */
 	public function getSize($path);
 
+	/**
+	 * Checks if the given directory or file exists.
+	 *
+	 * @link http://php.net/manual/en/function.file-exists.php
+	 *
+	 * @param string $path   Path to the file or directory.
+	 *
+	 * @return bool   TRUE if it exits, FALSE if not.
+	 */
+	public function checkIsPathExists($path);
 
 	/**
 	 * Checks if the given path is a directory or not.
@@ -296,11 +295,37 @@ interface IFileHandler {
 	 *
 	 * @param string $path   The path to check.
 	 *
-	 * @return bool   TRUE if it is a file, FALSE if not.
+	 * @return bool   TRUE if it is a symlink, FALSE if not.
 	 *
 	 * @throws \YapepBase\Exception\File\NotFoundException   If the path does not exits
 	 */
 	public function checkIsSymlink($path);
+
+	/**
+	 * Checks if the given path is readable.
+	 *
+	 * @link http://php.net/manual/en/function.is-writable.php
+	 *
+	 * @param string $path   The path to check.
+	 *
+	 * @return bool   TRUE if it is readable, FALSE if not.
+	 *
+	 * @throws \YapepBase\Exception\File\NotFoundException   If the path does not exits
+	 */
+	public function checkIsReadable($path);
+
+	/**
+	 * Checks if the given path is writable.
+	 *
+	 * @link http://php.net/manual/en/function.is-writable.php
+	 *
+	 * @param string $path   The path to check.
+	 *
+	 * @return bool   TRUE if it is writable, FALSE if not.
+	 *
+	 * @throws \YapepBase\Exception\File\NotFoundException   If the path does not exits
+	 */
+	public function checkIsWritable($path);
 
 	/**
 	 * Returns trailing name component of path

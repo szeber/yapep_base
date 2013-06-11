@@ -179,8 +179,8 @@ class FileHandlerPhp implements IFileHandler {
 	 * @return void
 	 *
 	 * @throws \YapepBase\Exception\File\NotFoundException   If the given path is not found.
-	 * @throws \YapepBase\Exception\File\Exception   If it failed to delete the file or the given path
-	 *                                               is not a regular file.
+	 * @throws \YapepBase\Exception\File\Exception           If it failed to delete the file or the given path
+	 *                                                       is not a regular file.
 	 */
 	public function remove($path) {
 		if (!$this->checkIsFile($path)) {
@@ -284,19 +284,6 @@ class FileHandlerPhp implements IFileHandler {
 	 */
 	public function getCurrentDirectory() {
 		return getcwd();
-	}
-
-	/**
-	 * Checks if the given directory or file exists.
-	 *
-	 * @link http://php.net/manual/en/function.file-exists.php
-	 *
-	 * @param string $path   Path to the file or directory.
-	 *
-	 * @return bool   TRUE if it exits, FALSE if not.
-	 */
-	public function checkIsPathExists($path) {
-		return file_exists($path);
 	}
 
 	/**
@@ -442,6 +429,19 @@ class FileHandlerPhp implements IFileHandler {
 	}
 
 	/**
+	 * Checks if the given directory or file exists.
+	 *
+	 * @link http://php.net/manual/en/function.file-exists.php
+	 *
+	 * @param string $path   Path to the file or directory.
+	 *
+	 * @return bool   TRUE if it exits, FALSE if not.
+	 */
+	public function checkIsPathExists($path) {
+		return file_exists($path);
+	}
+
+	/**
 	 * Checks if the given path is a directory or not.
 	 *
 	 * @link http://php.net/manual/en/function.is-dir.php
@@ -484,7 +484,7 @@ class FileHandlerPhp implements IFileHandler {
 	 *
 	 * @param string $path   The path to check.
 	 *
-	 * @return bool   TRUE if it is a file, FALSE if not.
+	 * @return bool   TRUE if it is a symlink, FALSE if not.
 	 *
 	 * @throws \YapepBase\Exception\File\NotFoundException   If the path does not exits
 	 */
@@ -493,6 +493,42 @@ class FileHandlerPhp implements IFileHandler {
 			throw new NotFoundException($path, 'The given path does not exist: ' . $path);
 		}
 		return is_link($path);
+	}
+
+	/**
+	 * Checks if the given path is readable.
+	 *
+	 * @link http://php.net/manual/en/function.is-writable.php
+	 *
+	 * @param string $path   The path to check.
+	 *
+	 * @return bool   TRUE if it is readable, FALSE if not.
+	 *
+	 * @throws \YapepBase\Exception\File\NotFoundException   If the path does not exits
+	 */
+	public function checkIsReadable($path) {
+		if (!$this->checkIsPathExists($path)) {
+			throw new NotFoundException($path, 'The given path does not exist: ' . $path);
+		}
+		return is_readable($path);
+	}
+
+	/**
+	 * Checks if the given path is writable.
+	 *
+	 * @link http://php.net/manual/en/function.is-writable.php
+	 *
+	 * @param string $path   The path to check.
+	 *
+	 * @return bool   TRUE if it is writable, FALSE if not.
+	 *
+	 * @throws \YapepBase\Exception\File\NotFoundException   If the path does not exits
+	 */
+	public function checkIsWritable($path) {
+		if (!$this->checkIsPathExists($path)) {
+			throw new NotFoundException($path, 'The given path does not exist: ' . $path);
+		}
+		return is_writable($path);
 	}
 
 	/**

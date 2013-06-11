@@ -2,19 +2,20 @@
 /**
  * This file is part of YAPEPBase.
  *
- * @package      YapepBase
- * @subpackage   Storage
- * @copyright    2011 The YAPEP Project All rights reserved.
- * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
+ * @package    YapepBase
+ * @subpackage Storage
+ * @copyright  2011 The YAPEP Project All rights reserved.
+ * @license    http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
 namespace YapepBase\Storage;
+
+
 use YapepBase\Application;
 use YapepBase\Debugger\Item\StorageItem;
 use YapepBase\Exception\StorageException;
 use YapepBase\Exception\ConfigException;
 use YapepBase\DependencyInjection\SystemContainer;
-use YapepBase\Debugger\IDebugger;
 
 /**
  * MemcacheStorage class
@@ -219,6 +220,30 @@ class MemcacheStorage extends StorageAbstract {
 		if (!$this->debuggerDisabled && $debugger !== false) {
 			$debugger->addItem(new StorageItem('memcache', 'memcache.' . $this->currentConfigurationName,
 				StorageItem::METHOD_DELETE . ' ' . $key, null, microtime(true) - $startTime));
+		}
+	}
+
+	/**
+	 * Deletes every data in the storage.
+	 *
+	 * <b>Warning!</b> Flushes the whole memcached server
+	 *
+	 * @return mixed
+	 */
+	public function clear() {
+		if ($this->readOnly) {
+			throw new StorageException('Trying to write to a read only storage');
+		}
+		$debugger = Application::getInstance()->getDiContainer()->getDebugger();
+
+		$startTime = microtime(true);
+
+		$this->memcache->flush();
+
+		// If we have a debugger, we have to log the request
+		if (!$this->debuggerDisabled && $debugger !== false) {
+			$debugger->addItem(new StorageItem('memcache', 'memcache.' . $this->currentConfigurationName,
+				StorageItem::METHOD_CLEAR, null, microtime(true) - $startTime));
 		}
 	}
 

@@ -97,6 +97,21 @@ class DummyStorage extends StorageAbstract {
 	}
 
 	/**
+	 * Deletes every data in the storage.
+	 *
+	 * @return mixed
+	 */
+	public function clear() {
+		$debugger = Application::getInstance()->getDiContainer()->getDebugger();
+
+		// If we have a debugger, we have to log the query
+		if (!$this->debuggerDisabled && $debugger !== false) {
+			$debugger->addItem(new StorageItem('dummy', 'dummy.' . $this->currentConfigurationName,
+				StorageItem::METHOD_CLEAR, null, 0));
+		}
+	}
+
+	/**
 	 * Returns if the backend is persistent or volatile.
 	 *
 	 * If the backend is volatile a system or service restart may destroy all the stored data.

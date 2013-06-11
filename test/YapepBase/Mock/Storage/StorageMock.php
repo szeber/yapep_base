@@ -60,6 +60,15 @@ class StorageMock implements IStorage {
 	}
 
 	/**
+	 * Deletes every data in the storage.
+	 *
+	 * @return mixed
+	 */
+	public function clear() {
+		$this->data = array();
+	}
+
+	/**
 	 * (non-PHPdoc)
 	 * @see YapepBase\Storage.IStorage::get()
 	 */

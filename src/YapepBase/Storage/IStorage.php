@@ -59,6 +59,13 @@ interface IStorage {
 	public function delete($key);
 
 	/**
+	 * Deletes every data in the storage.
+	 *
+	 * @return mixed
+	 */
+	public function clear();
+
+	/**
 	 * Returns if the backend is persistent or volatile.
 	 *
 	 * If the backend is volatile a system or service restart may destroy all the stored data.
