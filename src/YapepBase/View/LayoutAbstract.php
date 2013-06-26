@@ -291,12 +291,13 @@ abstract class LayoutAbstract extends ViewAbstract {
 	/**
 	 * Adds a Javascript file to the setHeader.
 	 *
-	 * @param string $file   The path of the javascript file.
+	 * @param string $file        The path of the javascript file.
+	 * @param string $condition   The condition of the loading.
 	 *
 	 * @return void
 	 */
-	public function addHeaderJavaScript($file) {
-		$this->headerJavaScripts[] = $file;
+	public function addHeaderJavaScript($file, $condition = '') {
+		$this->headerJavaScripts[$condition][] = $file;
 	}
 
 	/**
@@ -305,22 +306,19 @@ abstract class LayoutAbstract extends ViewAbstract {
 	 * @return void
 	 */
 	protected function renderHeaderJavaScripts() {
-		$result = '';
-		foreach (array_unique($this->headerJavaScripts) as $file) {
-			$result .= '<script type="text/javascript" src="' . $file . '"></script>' . "\n";
-		}
-		echo $result;
+		echo $this->getRenderedJavascripts($this->headerJavaScripts);
 	}
 
 	/**
 	 * Adds a Javascript file to the footer.
 	 *
-	 * @param string $file   The path of the javascript file.
+	 * @param string $file        The path of the javascript file.
+	 * @param string $condition   The condition of the loading.
 	 *
 	 * @return void
 	 */
-	public function addFooterJavaScript($file) {
-		$this->footerJavaScripts[] = $file;
+	public function addFooterJavaScript($file, $condition = '') {
+		$this->footerJavaScripts[$condition][] = $file;
 	}
 
 	/**
@@ -329,11 +327,30 @@ abstract class LayoutAbstract extends ViewAbstract {
 	 * @return void
 	 */
 	protected function renderFooterJavaScripts() {
+		echo $this->getRenderedJavascripts($this->footerJavaScripts);
+	}
+
+	/**
+	 * Renders the script tags and returns them.
+	 *
+	 * @param array $javaScripts   Array contains the javascript files by conditions.
+	 *
+	 * @return string
+	 */
+	protected function getRenderedJavascripts(array $javaScripts) {
 		$result = '';
-		foreach (array_unique($this->footerJavaScripts) as $file) {
-			$result .= '<script type="text/javascript" src="' . $file . '"></script>' . "\n";
+
+		foreach ($javaScripts as $condition => $files) {
+			array_unique($files);
+
+			$result .= !empty($condition) ? '<!--[if ' . $condition . ']>' . "\n" : '';
+			foreach ($files as $file) {
+				$result .= '<script type="text/javascript" src="' . $file . '"></script>' . "\n";
+			}
+			$result .= !empty($condition) ? '<![endif]-->' . "\n" : '';
 		}
-		echo $result;
+
+		return $result;
 	}
 
 	/**
