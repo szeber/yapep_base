@@ -20,7 +20,7 @@ use YapepBase\Mock\Helper\HelperMock;
  * @package    YapepBase
  * @subpackage Helper
  */
-class HelperTest extends \PHPUnit_Framework_TestCase {
+class HelperTest extends \YapepBase\BaseTest {
 
 	protected function setUp() {
 		parent::setUp();

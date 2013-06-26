@@ -10,7 +10,7 @@ use YapepBase\Exception\Exception;
 /**
  * Test class for LoggingErrorHandler.
  */
-class DebugDataCreatorTest extends \PHPUnit_Framework_TestCase {
+class DebugDataCreatorTest extends \YapepBase\BaseTest {
 
 	/**
 	 * @var \YapepBase\Mock\Storage\StorageMock;

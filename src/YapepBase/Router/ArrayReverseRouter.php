@@ -9,8 +9,9 @@
  */
 
 namespace YapepBase\Router;
+
+
 use YapepBase\Exception\RouterException;
-use YapepBase\Request\IRequest;
 
 /**
  * Gets the route for the specified controller and action based on an associative array.
@@ -66,21 +67,22 @@ class ArrayReverseRouter implements IReverseRouter {
 	 */
 	public function getTargetForControllerAction($controller, $action, $params = array()) {
 		$key = $controller . '/' . $action;
-		if (!isset($this->routes[$key])) {
+		$routes = $this->getRouteArray();
+		if (!isset($routes[$key])) {
 			throw new RouterException('No route found for controller and action: ' . $controller . '/' . $action,
 				RouterException::ERR_NO_ROUTE_FOUND);
 		}
 
 		$target = false;
-		if (is_array($this->routes[$key])) {
-			foreach ($this->routes[$key] as $route) {
+		if (is_array($routes[$key])) {
+			foreach ($routes[$key] as $route) {
 				$target = $this->getParameterizedRoute($route, $params);
 				if (false !== $target) {
 					break;
 				}
 			}
 		} else {
-			$target = $this->getParameterizedRoute($this->routes[$key], $params);
+			$target = $this->getParameterizedRoute($routes[$key], $params);
 		}
 
 		if (false === $target) {
@@ -97,6 +99,15 @@ class ArrayReverseRouter implements IReverseRouter {
 	}
 
 	/**
+	 * Returns the array of routes.
+	 *
+	 * @return array
+	 */
+	protected function getRouteArray() {
+		return $this->routes;
+	}
+
+	/**
 	 * Returns the route with the parameters, or FALSE if a param is missing, or not all params are used.
 	 *
 	 * @param string $route    The route.
@@ -104,11 +115,15 @@ class ArrayReverseRouter implements IReverseRouter {
 	 *
 	 * @return bool|mixed
 	 */
-	public function getParameterizedRoute($route, array $params) {
+	protected function getParameterizedRoute($route, array $params) {
 		$route = preg_replace('/^\s*\[[^\]]+\]\s*/', '', $route);
 		if (strstr($route, '{')) {
 			foreach ($params as $key => $value) {
-				$route = preg_replace('/\{' . preg_quote($key, '/') . ':[^}]+\}/', $value, $route);
+				$count = 0;
+				$route = preg_replace('/\{' . preg_quote($key, '/') . ':[^}]+\}/', $value, $route, -1, $count);
+				if ($count < 1) {
+					return false;
+				}
 			}
 			if (strstr($route, '{')) {
 				return false;

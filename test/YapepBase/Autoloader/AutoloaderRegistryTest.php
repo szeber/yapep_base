@@ -20,7 +20,7 @@ use YapepBase\Mock\Autoloader\AutoloaderMock;
  * @package    YapepBase
  * @subpackage Autoloader
  */
-class AutoloaderRegistryTest extends \PHPUnit_Framework_TestCase {
+class AutoloaderRegistryTest extends \YapepBase\BaseTest {
 
 	/**
 	 * The autoloader registry object.
@@ -36,6 +36,7 @@ class AutoloaderRegistryTest extends \PHPUnit_Framework_TestCase {
 	 * @return void
 	 */
 	public function setUp() {
+		parent::setUp();
 		$this->autoloaderRegistry = new AutoloaderRegistryMock();
 	}
 

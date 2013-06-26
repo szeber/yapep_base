@@ -11,7 +11,7 @@ use YapepBase\Mock\Database\TestTableMysqlMock;
 /**
  * MysqlTable test case.
  */
-class MysqlTableTest extends \PHPUnit_Framework_TestCase {
+class MysqlTableTest extends \YapepBase\BaseTest {
 
 	/**
 	 * Config instance
@@ -51,6 +51,7 @@ class MysqlTableTest extends \PHPUnit_Framework_TestCase {
 	 * Prepares the environment before running a test.
 	 */
 	protected function setUp() {
+		parent::setUp();
 		if (!$this->isRunnable) {
 			$this->markTestSkipped('Required ENV variables missing');
 			return;
@@ -114,7 +115,8 @@ class MysqlTableTest extends \PHPUnit_Framework_TestCase {
 	 * Cleans up the environment after running a test.
 	 */
 	protected function tearDown() {
-		if (!$this->isRunnable) {
+		parent::tearDown();
+		if (!$this->isRunnable || empty($this->connection)) {
 			return;
 		}
 
@@ -125,7 +127,6 @@ class MysqlTableTest extends \PHPUnit_Framework_TestCase {
 		}
 		$this->config = null;
 		DbFactory::clearConnections();
-		parent::tearDown();
 	}
 
 	/**

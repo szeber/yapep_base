@@ -11,7 +11,7 @@
 namespace YapepBase\Autoloader;
 
 
-use YapepBase\Autoloader\AutoloaderAbstract;
+use YapepBase\Autoloader\IAutoloader;
 
 /**
  * Handles adding and removing autoloaders to/from the application.
@@ -65,22 +65,22 @@ class AutoloaderRegistry {
 	/**
 	 * Adds a new autoloader object to the end of the list.
 	 *
-	 * @param \YapepBase\Autoloader\AutoloaderAbstract $autoloader   The autoloader object to register.
+	 * @param \YapepBase\Autoloader\IAutoloader $autoloader   The autoloader object to register.
 	 *
 	 * @return void
 	 */
-	public function addAutoloader(AutoloaderAbstract $autoloader) {
+	public function addAutoloader(IAutoloader $autoloader) {
 		$this->registeredAutoloaders[] = $autoloader;
 	}
 
 	/**
 	 * Adds a new autoloader object to the beginning of the list.
 	 *
-	 * @param \YapepBase\Autoloader\AutoloaderAbstract $autoloader   The autoloader object to register.
+	 * @param \YapepBase\Autoloader\IAutoloader $autoloader   The autoloader object to register.
 	 *
 	 * @return void
 	 */
-	public function prependAutoloader(AutoloaderAbstract $autoloader) {
+	public function prependAutoloader(IAutoloader $autoloader) {
 		array_unshift($this->registeredAutoloaders, $autoloader);
 	}
 
@@ -102,7 +102,7 @@ class AutoloaderRegistry {
 	 */
 	public function load($className) {
 		foreach ($this->registeredAutoloaders as $autoloader) {
-			/** @var \YapepBase\Autoloader\AutoloaderAbstract $autoloader */
+			/** @var \YapepBase\Autoloader\IAutoloader $autoloader */
 			if ($autoloader->load($className)) {
 				return true;
 			}

@@ -13,6 +13,7 @@ namespace YapepBase\Response;
 
 use YapepBase\Config;
 use YapepBase\Exception\Exception;
+use YapepBase\Exception\ParameterException;
 use YapepBase\Exception\RedirectException;
 use YapepBase\Mime\MimeType;
 use YapepBase\Request\HttpRequest;
@@ -90,6 +91,20 @@ class HttpResponse implements IResponse {
 	protected $output;
 
 	/**
+	 * Stores the ob level for the status when the response was created.
+	 *
+	 * @var int
+	 */
+	protected $startingObLevel;
+
+	/**
+	 * Stores whether the output buffering is enabled.
+	 *
+	 * @var bool
+	 */
+	protected $isBufferingEnabled;
+
+	/**
 	 * Standard HTTP status codes
 	 *
 	 * @var array
@@ -144,14 +159,14 @@ class HttpResponse implements IResponse {
 	 *                                              Uses PhpOutput if none given.
 	 */
 	public function __construct(IOutput $output = null) {
-		$this->setContentType(MimeType::HTML);
-		$this->startOutputBuffer();
 		// @codeCoverageIgnoreStart
 		if (!$output) {
 			$output = new PhpOutput();
 		}
 		// @codeCoverageIgnoreEnd
 		$this->output = $output;
+		$this->startOutputBuffer();
+		$this->setContentType(MimeType::HTML);
 	}
 
 	/**
@@ -160,7 +175,67 @@ class HttpResponse implements IResponse {
 	 * @return void
 	 */
 	protected function startOutputBuffer() {
+		$this->isBufferingEnabled = true;
+		if (is_null($this->startingObLevel)) {
+			$this->startingObLevel = ob_get_level();
+		}
 		ob_start();
+	}
+
+	/**
+	 * Disables output buffering and sends all output.
+	 *
+	 * @return void
+	 */
+	protected function disableOutputBuffer() {
+		$this->isBufferingEnabled = false;
+
+		$this->sendHeaders();
+
+		$this->headers = array();
+		$this->cookies = array();
+
+		while (ob_get_level() > $this->startingObLevel) {
+			$this->output->out(ob_get_clean());
+		}
+		$this->startingObLevel = null;
+	}
+
+	/**
+	 * Sets whether output buffering should be enabled or not.
+	 *
+	 * By default output buffering is enabled. If disabling this, the output will be echoed instead of using the
+	 * output object to send it, so the response object has no control over it. This may cause problems with the
+	 * sending of headers for example.
+	 * If disabling the buffering it will flush and disable all output buffers that were created after
+	 * the initialization of the response object. It will also send all headers that were added.
+	 *
+	 * @param bool $isEnabled   If TRUE, enables, if FALSE disables the output buffering.
+	 *
+	 * @return mixed
+	 *
+	 * @throws \YapepBase\Exception\ParameterException   If the output buffering is already in the specified status.
+	 */
+	public function setOutputBufferingStatus($isEnabled) {
+		if ($isEnabled == $this->isBufferingEnabled) {
+			throw new ParameterException('Trying to set the output buffer status to '
+			. ($isEnabled ? 'enabled' : 'disabled') . ', but it is already in that status');
+		}
+
+		if ($isEnabled) {
+			$this->startOutputBuffer();
+		} else {
+			$this->disableOutputBuffer();
+		}
+	}
+
+	/**
+	 * Returns TRUE if the output buffering is enabled, FALSE if it's not.
+	 *
+	 * @return bool
+	 */
+	public function getOutputBufferingStatus() {
+		return $this->isBufferingEnabled;
 	}
 
 	/**
@@ -188,12 +263,12 @@ class HttpResponse implements IResponse {
 			case 206:
 				/**
 				 * In case of a partial-content the response must contain at least one of the following:
-				 * - A Content-Range setHeader
-				 * - A Date setHeader
+				 * - A Content-Range header
+				 * - A Date header
 				 */
 				if (!$this->hasHeader('Content-Range') || !$this->hasHeader('Date')) {
 					throw new \YapepBase\Exception\StandardsComplianceException(
-						'The Partial-Content (206) response requires a Content-Range and a Date setHeader to be set.');
+						'The Partial-Content (206) response requires a Content-Range and a Date header to be set.');
 				}
 				break;
 			case 301:
@@ -202,38 +277,38 @@ class HttpResponse implements IResponse {
 			case 305:
 			case 307:
 				/**
-				 * A Location setHeader field must be provided.
+				 * A Location header field must be provided.
 				 */
 				if (!$this->hasHeader('Location')) {
 					throw new \YapepBase\Exception\StandardsComplianceException('The ' . $this->statusCode
-						. ' status code require a Location setHeader to be set.');
+						. ' status code require a Location header to be set.');
 				}
 				break;
 			case 304:
 				/**
-				 * A Date setHeader must be provided
+				 * A Date header must be provided
 				 */
 				if (!$this->hasHeader('Date')) {
 					throw new \YapepBase\Exception\StandardsComplianceException(
-						'The 304 status code requires a Date setHeader to be set.');
+						'The 304 status code requires a Date header to be set.');
 				}
 				break;
 			case 401:
 				/**
-				 * A WWW-Authenticate setHeader must be provided, otherwise Opera will provide strange behaviour.
+				 * A WWW-Authenticate header must be provided, otherwise Opera will provide strange behaviour.
 				 */
 				if (!$this->hasHeader('WWW-Authenticate')) {
 					throw new \YapepBase\Exception\StandardsComplianceException(
-						'The 401 status code requires a WWW-Authenticate setHeader to be set.');
+						'The 401 status code requires a WWW-Authenticate header to be set.');
 				}
 				break;
 			case 405:
 				/**
-				 * An Allow setHeader must be provided.
+				 * An Allow header must be provided.
 				 */
 				if (!$this->hasHeader('Allow')) {
 					throw new \YapepBase\Exception\StandardsComplianceException(
-						'The 405 status code requires an Allow setHeader to be set.');
+						'The 405 status code requires an Allow header to be set.');
 				}
 				break;
 		}
@@ -255,22 +330,18 @@ class HttpResponse implements IResponse {
 
 		$renderedBody = $this->getRenderedBody();
 
-		$this->checkStandards($renderedBody);
+		if ($this->isBufferingEnabled) {
+			// If OB is disabled, output is sent immediately, so headers are already sent
+			$this->checkStandards($renderedBody);
 
-		$this->isResponseSent = true;
+			$this->isResponseSent = true;
 
-		$this->output->setHeader('HTTP/1.1 ' . (int)$this->statusCode . ' ' . $this->statusMessage);
-		foreach ($this->headers as $name => $header) {
-			foreach ($header as $value) {
-				$this->output->setHeader($name . ': ' . $value);
-			}
+			$this->sendHeaders();
 		}
-		foreach ($this->cookies as $cookie) {
-			$this->output->setCookie($cookie['name'], $cookie['value'], $cookie['expiration'], $cookie['path'],
-				$cookie['domain'], $cookie['secure'], $cookie['httpOnly']);
+		$obContents = '';
+		while ($this->isBufferingEnabled && ob_get_level() > $this->startingObLevel) {
+			$obContents .= ob_get_clean();
 		}
-		$obContents = ob_get_contents();
-		ob_clean();
 		$this->output->out($renderedBody);
 		$this->output->out($obContents);
 	}
@@ -318,12 +389,26 @@ class HttpResponse implements IResponse {
 	}
 
 	/**
+	 * Renders the output.
+	 *
+	 * @return void
+	 */
+	public function render() {
+		if (!empty($this->body) && !is_string($this->body)) {
+			$this->body = $this->body->toString();
+		}
+	}
+
+	/**
 	 * Renders and returns the HTTP response body.
 	 *
 	 * @return string
 	 */
 	public function getRenderedBody() {
-		return (string)$this->body;
+		if (empty($this->body) || is_string($this->body)) {
+			return (string)$this->body;
+		}
+		return $this->body->toString();
 	}
 
 	/**
@@ -344,6 +429,9 @@ class HttpResponse implements IResponse {
 		}
 		$this->statusCode = $statusCode;
 		$this->statusMessage = $statusMessage;
+		if (!$this->isBufferingEnabled) {
+			$this->output->setHeader('HTTP/1.1 ' . (int)$this->statusCode . ' ' . $this->statusMessage);
+		}
 	}
 
 	/**
@@ -365,16 +453,16 @@ class HttpResponse implements IResponse {
 	}
 
 	/**
-	 * Sets an HTTP setHeader.
+	 * Sets an HTTP header.
 	 *
-	 * @param string|array $header   The setHeader to set. If it is an array, every
-	 *                               part is used as a separate setHeader.
-	 * @param string       $value    The setHeader value to set. If empty, the
-	 *                               $setHeader will be exploded along a : sign.
+	 * @param string|array $header   The header to set. If it is an array, every
+	 *                               part is used as a separate header.
+	 * @param string       $value    The header value to set. If empty, the
+	 *                               $header will be exploded along a : sign.
 	 *
 	 * @return void
 	 *
-	 * @throws \YapepBase\Exception\ParameterException if an invalid setHeader
+	 * @throws \YapepBase\Exception\ParameterException if an invalid header
 	 *         configuration occurs
 	 */
 	public function addHeader($header, $value = null) {
@@ -393,7 +481,7 @@ class HttpResponse implements IResponse {
 			if (is_null($value)) {
 				$data = explode(':', $header, 2);
 				if (!array_key_exists(1, $data)) {
-					throw new \YapepBase\Exception\ParameterException('Invalid setHeader line: ' . $value);
+					throw new \YapepBase\Exception\ParameterException('Invalid header line: ' . $value);
 				}
 				$header = trim($data[0]);
 				$value = trim($data[1]);
@@ -403,23 +491,34 @@ class HttpResponse implements IResponse {
 			 * to avoid user agent bugs.
 			 */
 			if (!$value) {
-				throw new \YapepBase\Exception\ParameterException('Value for setHeader is empty: ' . $header);
+				throw new \YapepBase\Exception\ParameterException('Value for header is empty: ' . $header);
 			}
-			if (!array_key_exists($header, $this->headers)) {
-				$this->headers[$header] = array();
+			if ($this->isBufferingEnabled) {
+				if (!array_key_exists($header, $this->headers)) {
+					$this->headers[$header] = array();
+				}
+				$this->headers[$header][] = $value;
+			} else {
+				$this->output->setHeader($header . ':' . $value);
 			}
-			$this->headers[$header][] = $value;
 		}
 	}
 
 	/**
 	 * Removes one or more headers.
 	 *
-	 * @param string|array $header   The setHeader to remove.
+	 * If output buffering is disabled all headers are sent immediately, so it's not possible to remove any headers.
+	 *
+	 * @param string|array $header   The header to remove.
 	 *
 	 * @return void
+	 *
+	 * @throws \YapepBase\Exception\Exception   If output buffering is disabled.
 	 */
 	public function removeHeader($header) {
+		if (!$this->isBufferingEnabled) {
+			throw new Exception('Output buffering is disabled, so it is not possible to remove a header');
+		}
 		if (is_array($header)) {
 			foreach ($header as $h) {
 				$this->removeHeader($h);
@@ -433,23 +532,28 @@ class HttpResponse implements IResponse {
 	}
 
 	/**
-	 * This function removes all previous values of a setHeader and sets the new
+	 * This function removes all previous values of a header and sets the new
 	 * values.
 	 *
-	 * @param string|array $header   The setHeader to set. If it is an array, every
-	 *                               part is used as a separate setHeader.
-	 * @param string       $value    The setHeader value to set. If empty, the
-	 *                               $setHeader will be exploded along a : sign.
+	 * @param string|array $header   The header to set. If it is an array, every
+	 *                               part is used as a separate header.
+	 * @param string       $value    The header value to set. If empty, the
+	 *                               $header will be exploded along a : sign.
 	 *
 	 * @return void
 	 */
 	public function setHeader($header, $value = null) {
-		$this->removeHeader($header);
+		if ($this->isBufferingEnabled) {
+			$this->removeHeader($header);
+		}
 		$this->addHeader($header, $value);
 	}
 
 	/**
-	 * Return an array of values for a setHeader, that has been set previously.
+	 * Return an array of values for a header, that has been set previously.
+	 *
+	 * If the output buffering is disabled, all headers are immediately sent, so it's not possible to get their value,
+	 * so in this case this method will always throw an exception.
 	 *
 	 * @param string $header   The header name.
 	 *
@@ -465,9 +569,11 @@ class HttpResponse implements IResponse {
 	}
 
 	/**
-	 * Returns, if a setHeader has been set.
+	 * Returns, if a header has been set.
 	 *
-	 * @param string $header   A setHeader name
+	 * If the output buffering is disabled, all headers are immediately sent, so this method will always return FALSE.
+	 *
+	 * @param string $header   A header name
 	 *
 	 * @return bool
 	 */
@@ -548,15 +654,20 @@ class HttpResponse implements IResponse {
 				$domain = null;
 			}
 		}
-		$this->cookies[$name] = array(
-			'name'       => $name,
-			'value'      => $value,
-			'expiration' => $expiration,
-			'path'       => $path,
-			'domain'     => $domain,
-			'secure'     => $secure,
-			'httpOnly'   => $httpOnly,
-		);
+
+		if ($this->isBufferingEnabled) {
+			$this->cookies[$name] = array(
+				'name'       => $name,
+				'value'      => $value,
+				'expiration' => $expiration,
+				'path'       => $path,
+				'domain'     => $domain,
+				'secure'     => $secure,
+				'httpOnly'   => $httpOnly,
+			);
+		} else {
+			$this->output->setCookie($name, $value, $expiration, $path, $domain, $secure, $httpOnly);
+		}
 	}
 
 	/**
@@ -569,4 +680,35 @@ class HttpResponse implements IResponse {
 	public function hasCookie($name) {
 		return array_key_exists($name, $this->cookies);
 	}
+
+	/**
+	 * Clears all previous, not sent output in the buffer.
+	 *
+	 * @return void
+	 */
+	public function clearAllOutput() {
+		while (ob_get_level() > $this->startingObLevel) {
+			ob_end_clean();
+		}
+		$this->startOutputBuffer();
+	}
+
+	/**
+	 * Sends all headers (including cookie headers).
+	 *
+	 * @return void
+	 */
+	protected function sendHeaders() {
+		$this->output->setHeader('HTTP/1.1 ' . (int)$this->statusCode . ' ' . $this->statusMessage);
+		foreach ($this->headers as $name => $header) {
+			foreach ($header as $value) {
+				$this->output->setHeader($name . ': ' . $value);
+			}
+		}
+		foreach ($this->cookies as $cookie) {
+			$this->output->setCookie($cookie['name'], $cookie['value'], $cookie['expiration'], $cookie['path'],
+				$cookie['domain'], $cookie['secure'], $cookie['httpOnly']);
+		}
+	}
+
 }

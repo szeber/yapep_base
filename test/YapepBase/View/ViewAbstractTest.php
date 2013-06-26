@@ -11,8 +11,9 @@
 namespace YapepBase\View;
 
 use \PHPUnit_Framework_AssertionFailedError;
+use YapepBase\Mock\View\MockLayout;
+use YapepBase\Mock\View\MockTemplate;
 
-use YapepBase\Mime\MimeType;
 use YapepBase\Mock\View\ViewMock;
 use YapepBase\Mock\View\MockBlock;
 
@@ -22,7 +23,7 @@ use YapepBase\Mock\View\MockBlock;
  * @package    YapepBase
  * @subpackage View
  */
-class ViewAbstractTest extends \PHPUnit_Framework_TestCase {
+class ViewAbstractTest extends \YapepBase\BaseTest {
 
 	/**
 	 * The View Mock object.
@@ -93,13 +94,31 @@ class ViewAbstractTest extends \PHPUnit_Framework_TestCase {
 	public function testRenderBlock() {
 		$testContent = 'Test, just for this method!' . "\n";
 
+		// Test a View object
 		$block = new MockBlock();
 		$block->setContent($testContent);
-
 		ob_start();
 		$this->viewMock->renderBlock($block);
 		$result = ob_get_clean();
 
 		$this->assertEquals($testContent, $result, 'The rendered content should be the same as in the block');
+
+		// Test a Template object
+		$block = new MockBlock();
+		$template = new MockTemplate();
+		ob_start();
+		$template->renderBlock($block);
+		ob_end_clean();
+
+		$this->assertTrue($block->getLayout() instanceof MockLayout);
+
+		// Test a Layout object
+		$block = new MockBlock();
+		$layout = new MockLayout();
+		ob_start();
+		$layout->renderBlock($block);
+		ob_end_clean();
+
+		$this->assertTrue($block->getLayout() instanceof MockLayout);
 	}
 }

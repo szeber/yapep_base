@@ -21,7 +21,7 @@ use YapepBase\Mock\Batch\BatchScriptMock;
  * @package    YapepBase
  * @subpackage Test\Batch
  */
-class BatchScriptTest extends \PHPUnit_Framework_TestCase {
+class BatchScriptTest extends \YapepBase\BaseTest {
 
 	/**
 	 * The error handler instance.
@@ -62,8 +62,8 @@ class BatchScriptTest extends \PHPUnit_Framework_TestCase {
 		$errorHandlerRegistry->addErrorHandler($this->errorHandler);
 
 		$eventHandlerRegistry = new \YapepBase\Event\EventHandlerRegistry();
-		$eventHandlerRegistry->registerEventHandler(Event::TYPE_APPSTART, $this->eventHandler);
-		$eventHandlerRegistry->registerEventHandler(Event::TYPE_APPFINISH, $this->eventHandler);
+		$eventHandlerRegistry->registerEventHandler(Event::TYPE_APPLICATION_BEFORE_RUN, $this->eventHandler);
+		$eventHandlerRegistry->registerEventHandler(Event::TYPE_APPLICATION_AFTER_RUN, $this->eventHandler);
 
 		$diContainer[SystemContainer::KEY_ERROR_HANDLER_REGISTRY] = $errorHandlerRegistry;
 		$diContainer[SystemContainer::KEY_EVENT_HANDLER_REGISTRY] = $eventHandlerRegistry;

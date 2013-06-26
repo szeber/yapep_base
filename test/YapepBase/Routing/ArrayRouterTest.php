@@ -10,6 +10,8 @@
 
 
 namespace YapepBase\Routing;
+
+
 use YapepBase\Exception\RouterException;
 use YapepBase\Mock\Request\RequestMock;
 use YapepBase\Router\ArrayRouter;
@@ -21,7 +23,7 @@ use YapepBase\Request\IRequest;
  * @package    YapepBase
  * @subpackage subpackage
  */
-class ArrayRouterTest extends \PHPUnit_Framework_TestCase {
+class ArrayRouterTest extends \YapepBase\BaseTest {
 
 	/**
 	 * Stores the available routes

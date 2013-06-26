@@ -19,7 +19,7 @@ use YapepBase\Event\Event;
  * @package    YapepBase
  * @subpackage Test\Event
  */
-class EventHandlerTest extends \PHPUnit_Framework_TestCase {
+class EventHandlerTest extends \YapepBase\BaseTest {
 
 	public function testRegistration() {
 		$registry = new EventHandlerRegistry();

@@ -14,6 +14,7 @@ use YapepBase\Exception\LdapAddException;
 use YapepBase\Exception\LdapBindException;
 use YapepBase\Exception\LdapConnectionException;
 use YapepBase\Exception\LdapDeleteException;
+use YapepBase\Exception\LdapException;
 use YapepBase\Exception\LdapModifyException;
 use YapepBase\Exception\LdapSearchException;
 
@@ -126,12 +127,20 @@ class LdapConnection {
 	 *
 	 * @return void
 	 *
-	 * @throws \YapepBase\Exception\LdapBindException
+	 * @throws \YapepBase\Exception\LdapBindException   If the bind failed.
+	 * @throws \YapepBase\Exception\LdapConnectionException   If the connection failed.
 	 */
 	public function bind(LdapDn $rootDn = null, $password = '') {
 		if (!$this->link) {
 			$this->connect();
 		}
+
+		$bindErrorCodes = array(
+			LdapException::LDAP_STRONG_AUTH_REQUIRED,
+			LdapException::LDAP_INAPPROPRIATE_AUTH,
+			LdapException::LDAP_INVALID_CREDENTIALS,
+			LdapException::AD_INVALID_CREDENTIALS,
+		);
 
 		if ($rootDn) {
 			if ($password) {
@@ -139,14 +148,19 @@ class LdapConnection {
 			} else {
 				$bind = @ldap_bind($this->link, (string)$rootDn);
 			}
-
-			if (!$bind) {
-				throw new LdapBindException($this->link);
-			}
 		} else {
 			$bind = @ldap_bind($this->link);
-			if (!$bind) {
+		}
+
+		if (!$bind) {
+			// We check the error code, as connections are only made at bind, so it's possible this is not a bind,
+			// but a connection error
+			if (in_array(ldap_errno($this->link), $bindErrorCodes)) {
+				// This is a bind error, throw an LdapBindException
 				throw new LdapBindException($this->link);
+			} else {
+				// This is a connection error, throw an LdapConnectionException
+				throw new LdapConnectionException($this->link);
 			}
 		}
 	}
@@ -230,6 +244,110 @@ class LdapConnection {
 	}
 
 	/**
+	 * Sets an object's specified attribute to the given value.
+	 *
+	 * @param LdapDn $dn              The object's DN.
+	 * @param string $attributeName   The name of the attribute.
+	 * @param mixed  $value           The value to set for the attribute.
+	 *
+	 * @return void
+	 *
+	 * @throws \YapepBase\Exception\LdapModifyException
+	 */
+	public function setAttributeValue(LdapDn $dn, $attributeName, $value) {
+		if (!$this->link) {
+			$this->connect();
+		}
+
+		$result = @ldap_mod_replace($this->link, (string)$dn, array($attributeName => $value));
+
+		if (!$result) {
+			throw new LdapModifyException($this->link);
+		}
+	}
+
+	/**
+	 * Adds one or more values to an LDAP object's specified attribute.
+	 *
+	 * If the attribute's values should be unique, the method will make sure that the same value is not added twice
+	 * to the attribute.
+	 *
+	 * @param LdapDn $dn              The object's DN.
+	 * @param string $attributeName   Name of the attribute.
+	 * @param array  $valuesToAdd     The value(s) to add.
+	 * @param bool   $uniqueValues    Whether the attribute's values should be unique.
+	 *
+	 * @return bool   TRUE if the modification was successful, FALSE if the entity was not found.
+	 *
+	 * @throws \YapepBase\Exception\LdapModifyException
+	 */
+	public function addAttributeValues(LdapDn $dn, $attributeName, array $valuesToAdd, $uniqueValues = true) {
+		if (!$this->link) {
+			$this->connect();
+		}
+
+		$entry = $this->search($dn, 'objectclass=*', array(), array('cn', $attributeName));
+
+		if (empty($entry[0]['cn'])) {
+			return false;
+		}
+
+		$currentValues = isset($entry[0][$attributeName]) ? $entry[0][$attributeName] : array();
+		$newValues = array_merge($currentValues, $valuesToAdd);
+
+		$newValues = $uniqueValues ? array_unique($newValues) : $newValues;
+
+		$result = @ldap_mod_replace($this->link, (string)$dn, array($attributeName => array_values($newValues)));
+
+		if (!$result) {
+			throw new LdapModifyException($this->link);
+		}
+
+		return true;
+	}
+
+	/**
+	 * Deletes one or more values to an LDAP object's specified attribute.
+	 *
+	 * @param LdapDn $dn               The object's DN.
+	 * @param string $attributeName    Name of the attribute.
+	 * @param array  $valuesToDelete   The value(s) to delete.
+	 *
+	 * @return bool   TRUE if the modification was successful, FALSE if the entity was not found.
+	 *
+	 * @throws \YapepBase\Exception\LdapModifyException
+	 */
+	public function deleteAttributeValues(LdapDn $dn, $attributeName, array $valuesToDelete) {
+		if (!$this->link) {
+			$this->connect();
+		}
+
+		$entry = $this->search($dn, 'objectclass=*', array(), array($attributeName, 'cn'));
+
+		if (empty($entry[0]['cn'])) {
+			return false;
+		}
+
+		$currentValues = isset($entry[0][$attributeName]) ? $entry[0][$attributeName] : array();
+
+		$newValues = array();
+
+		foreach ($currentValues as $value) {
+			if (!in_array($value, $valuesToDelete)) {
+				$newValues[] = $value;
+			}
+		}
+
+		$result = @ldap_mod_replace($this->link, (string)$dn, array($attributeName => $newValues));
+
+		if (!$result) {
+			throw new LdapModifyException($this->link);
+		}
+
+		return true;
+	}
+
+	/**
 	 * Decodes a hexadecimal character.
 	 *
 	 * @param string $value   The value to decode.
@@ -305,6 +423,11 @@ class LdapConnection {
 			$result = @ldap_list($this->link, (string)$rootDn, strtr($filter, $filterParams), $attributes);
 		}
 		$result = @ldap_get_entries($this->link, $result);
+
+		if (empty($result)) {
+			return array();
+		}
+
 		$result = $this->postprocess($result);
 		if ($result === false) {
 			throw new LdapSearchException($this->link);

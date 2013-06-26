@@ -5,7 +5,7 @@ namespace YapepBase\Response;
 use YapepBase\Response\HttpResponse;
 use YapepBase\Config;
 
-class HttpResponseTest extends \PHPUnit_Framework_TestCase {
+class HttpResponseTest extends \YapepBase\BaseTest {
 	/**
 	 * @var \YapepBase\Mock\Response\OutputMock
 	 */
@@ -18,6 +18,8 @@ class HttpResponseTest extends \PHPUnit_Framework_TestCase {
 	 */
 	protected $response;
 
+	protected $originalObLevel;
+
 	/**
 	 * @see PHPUnit_Framework_TestCase::setUp()
 	 */
@@ -25,8 +27,16 @@ class HttpResponseTest extends \PHPUnit_Framework_TestCase {
 
 		parent::setUp();
 
+		$this->originalObLevel = ob_get_level();
 		$this->output = new \YapepBase\Mock\Response\OutputMock();
 		$this->createCleanResponse();
+	}
+
+	protected function tearDown() {
+		parent::tearDown();
+		while (ob_get_level() > $this->originalObLevel) {
+			ob_end_flush();
+		}
 	}
 
 	/**

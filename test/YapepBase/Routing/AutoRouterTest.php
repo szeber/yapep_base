@@ -20,7 +20,7 @@ use YapepBase\Router\AutoRouter;
  * @package    YapepBase
  * @subpackage subpackage
  */
-class AutoRouterTest extends \PHPUnit_Framework_TestCase {
+class AutoRouterTest extends \YapepBase\BaseTest {
 
 	/**
 	 * Prepares the environment before running a test.

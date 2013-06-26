@@ -3,12 +3,12 @@
  * This file is part of YAPEPBase.
  *
  * @package    YapepBase
- * @subpackage Autoloader
+ * @subpackage Helper
  * @copyright  2011 The YAPEP Project All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
-namespace YapepBase\Autoloader;
+namespace YapepBase\Helper;
 
 
 use YapepBase\Helper\TextHelper;
@@ -17,9 +17,9 @@ use YapepBase\Helper\TextHelper;
  * Test class for TextHelper.
  *
  * @package    YapepBase
- * @subpackage Autoloader
+ * @subpackage Helper
  */
-class TextHelperTest extends \PHPUnit_Framework_TestCase {
+class TextHelperTest extends \YapepBase\BaseTest {
 
 	/**
 	 * Tests the stripSlashes() method.

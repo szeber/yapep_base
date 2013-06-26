@@ -9,7 +9,7 @@ use YapepBase\Exception\ConfigException;
  *
  * @todo add checks for exception handling when we start throwing exceptions for not-set config values
  */
-class ConfigTest extends \PHPUnit_Framework_TestCase
+class ConfigTest extends \YapepBase\BaseTest
 {
 	/**
 	 * @var \YapepBase\Config

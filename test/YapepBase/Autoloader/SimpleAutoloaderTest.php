@@ -19,7 +19,7 @@ use YapepBase\Mock\Autoloader\SimpleAutoloaderMock;
  * @package    YapepBase
  * @subpackage Autoloader
  */
-class SimpleAutoloaderTest extends \PHPUnit_Framework_TestCase {
+class SimpleAutoloaderTest extends \YapepBase\BaseTest {
 
 	/**
 	 * The SimpleAutoloader object.
@@ -35,7 +35,30 @@ class SimpleAutoloaderTest extends \PHPUnit_Framework_TestCase {
 	 * @return void
 	 */
 	protected function setUp() {
+		parent::setUp();
 		$this->simpleAutoloader = new SimpleAutoloaderMock();
+	}
+
+	/**
+	 * Tests the addClassPath() method.
+	 *
+	 * @return void
+	 */
+	public function testAddClassPath() {
+		$classPath = '/test/test1';
+		$classPath2 = '/test/test2';
+		$this->simpleAutoloader->addClassPath($classPath);
+		$this->simpleAutoloader->addClassPath($classPath2 . '////');
+
+		$this->assertEquals($classPath, $this->simpleAutoloader->classPaths[0]);
+		$this->assertEquals($classPath2, $this->simpleAutoloader->classPaths[1]);
+
+		$classPathForNamespace = '/test/namespace';
+		$namespace = 'Test\\Test';
+
+		$this->simpleAutoloader->addClassPath($classPathForNamespace, $namespace);
+
+		$this->assertEquals($classPathForNamespace, $this->simpleAutoloader->classPathsWithNamespace[$namespace]);
 	}
 
 	/**
@@ -46,9 +69,11 @@ class SimpleAutoloaderTest extends \PHPUnit_Framework_TestCase {
 	public function testGetPaths() {
 		$classPath1 = DIRECTORY_SEPARATOR . 'test' . DIRECTORY_SEPARATOR . 'path1';
 		$classPath2 = DIRECTORY_SEPARATOR . 'test' . DIRECTORY_SEPARATOR . 'path2' . DIRECTORY_SEPARATOR;
+		$classPath3 = DIRECTORY_SEPARATOR . 'test' . DIRECTORY_SEPARATOR . 'path3';
 
 		$this->simpleAutoloader->addClassPath($classPath1);
 		$this->simpleAutoloader->addClassPath($classPath2);
+		$this->simpleAutoloader->addClassPath($classPath3, '\Test\Namespaced');
 
 		$filePaths = $this->simpleAutoloader->getPaths('Test\TestClass');
 		$expectedResult = array(
@@ -59,6 +84,15 @@ class SimpleAutoloaderTest extends \PHPUnit_Framework_TestCase {
 		sort($expectedResult);
 
 		$this->assertEquals($expectedResult, $filePaths);
+
+		$filePaths = $this->simpleAutoloader->getPaths('Test\Namespaced\TestClass');
+		$expectedResult = array(
+			$classPath3 . DIRECTORY_SEPARATOR . 'Test' . DIRECTORY_SEPARATOR . 'Namespaced'
+				. DIRECTORY_SEPARATOR . 'TestClass.php',
+		);
+
+		$this->assertSame($expectedResult, $filePaths,
+			'In case of the namespaced loading only files from the given directory should be loaded');
 	}
 
 	/**

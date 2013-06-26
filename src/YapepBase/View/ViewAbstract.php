@@ -2,20 +2,20 @@
 /**
  * This file is part of YAPEPBase.
  *
- * @package      YapepBase
- * @subpackage   View
- * @copyright    2011 The YAPEP Project All rights reserved.
- * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
+ * @package    YapepBase
+ * @subpackage View
+ * @copyright  2011 The YAPEP Project All rights reserved.
+ * @license    http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
 
 namespace YapepBase\View;
 
+
 use YapepBase\Application;
-use YapepBase\Config;
 use YapepBase\Exception\Exception;
-use YapepBase\Mime\MimeType;
 use YapepBase\Storage\IStorage;
+use YapepBase\View\IHasLayout;
 use YapepBase\View\ViewDo;
 
 /**
@@ -74,14 +74,7 @@ abstract class ViewAbstract {
 	 * @return void
 	 */
 	protected function render() {
-		try {
-			$this->renderContent();
-		}
-		catch (\Exception $exception) {
-			trigger_error('Unhandled exception occured while rendering template: '
-					. $exception->getMessage() . ' in ' . $exception->getFile() .  ', line: ' . $exception->getLine(),
-				E_USER_ERROR);
-		}
+		$this->renderContent();
 	}
 
 	/**
@@ -91,7 +84,7 @@ abstract class ViewAbstract {
 	 *
 	 * @return string
 	 */
-	public function __toString() {
+	public function toString() {
 		$result = $this->getFromStorage();
 
 		if ($result === false) {
@@ -99,6 +92,7 @@ abstract class ViewAbstract {
 			$this->render();
 			$result = ob_get_clean();
 
+			// If an exception occurs, we don't want to cache the output.
 			$this->setToStorage($result);
 		}
 		return $result;
@@ -123,7 +117,16 @@ abstract class ViewAbstract {
 	 * @return void
 	 */
 	protected function renderBlock(BlockAbstract $block) {
-		echo (string)$block;
+		// The View Object can have a layout, so we give it to the block as well to provide access
+		if ($this instanceof IHasLayout && $this->checkHasLayout()) {
+			$block->setLayout($this->getLayout());
+		}
+		// The current View Object is a Layout, so we pass it to the block as well
+		elseif ($this instanceof LayoutAbstract) {
+			$block->setLayout($this);
+		}
+
+		echo $block->toString();
 	}
 
 	/**
@@ -260,6 +263,7 @@ abstract class ViewAbstract {
 	 * @return string
 	 */
 	protected function _($string, $parameters = array(), $language = null) {
-		return Application::getInstance()->getI18nTranslator()->translate(__CLASS__, $string, $parameters, $language);
+		return Application::getInstance()->getI18nTranslator()->translate(get_class($this), $string, $parameters,
+			$language);
 	}
 }

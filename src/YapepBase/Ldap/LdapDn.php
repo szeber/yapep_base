@@ -10,6 +10,8 @@
 
 namespace YapepBase\Ldap;
 
+use YapepBase\Exception\ParameterException;
+
 /**
  * An object, that represents the distinguished name, which is the object's location in the LDAP tree.
  *
@@ -79,6 +81,19 @@ class LdapDn {
 	}
 
 	/**
+	 * Adds an element to the beginning (leaf part) of the DN string.
+	 *
+	 * @param string $id      Type of the element.
+	 * @param string $value   Value of the element.
+	 *
+	 * @return \YapepBase\Ldap\LdapDn   The current LDAP DN instance.
+	 */
+	public function addLeafElement($id, $value) {
+		array_unshift($this->elements, array('id' => $id, 'value' => $value));
+		return $this;
+	}
+
+	/**
 	 * Escapes a string for use in an LDAP DN
 	 *
 	 * @param string $string   The string to escape
@@ -91,5 +106,26 @@ class LdapDn {
 		}
 
 		return $string;
+	}
+
+	/**
+	 * Parses a DN string and returns the DN object, that represents it.
+	 *
+	 * @param string $string   The LDAP string to parse.
+	 *
+	 * @return \YapepBase\Ldap\LdapDn
+	 *
+	 * @throws \YapepBase\Exception\ParameterException
+	 */
+	public static function getFromString($string) {
+		$parts = explode(',', $string);
+		$elements = array();
+		foreach ($parts as $part) {
+			if (!preg_match('/^\s*([^\s]+)\s*=\s*([^\s]+)\s*$/', $part, $matches)) {
+				throw new ParameterException('Invalid DN string: ' . $string);
+			}
+			$elements[] = array('id' => $matches[1], 'value' => $matches[2]);
+		}
+		return new static($elements);
 	}
 }

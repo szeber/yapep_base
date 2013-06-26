@@ -10,6 +10,8 @@
 
 namespace YapepBase\Ldap;
 
+use YapepBase\Exception\ParameterException;
+
 /**
  * This class provides an authentication and authoriziation solution against an LDAP database. OpenLDAP and
  * ActiveDirectory are both supported.
@@ -34,9 +36,8 @@ namespace YapepBase\Ldap;
  * Using LdapAuthenticationProvider against a standard OpenLDAP database:
  *
  * $connection = new LdapConnection();
- * $aaa        = new LdapAuthenticationProvider($connection);
- * $aaa->setAuthMode(LdapAuthenticationProvider::AUTHMODE_BIND);
- * $aaa->setGroupMode(LdapAuthenticationProvider::AUTHMODE_USER);
+ * $aaa        = new LdapAuthenticationProvider($connection, LdapAuthenticationProvider::AUTHMODE_BIND,
+ *     LdapAuthenticationProvider::GROUPMODE_USER));
  * $aaa->setUserDn(new LdapDn(array(
  *     array('id' => 'ou', 'value' => 'Users'),
  *     array('id' => 'dc', 'value' => 'example'),
@@ -188,9 +189,17 @@ class LdapAuthenticationProvider {
 	 * Sets up the connection to run queries against.
 	 *
 	 * @param LdapConnection $connection   The connection which will be used.
+	 * @param int            $authMode     The authrentication mode. {@uses self::AUTHMODE_* }
+	 * @param int            $groupMode    The group check mode. {@uses self::GROUPMODE_*}
+	 *
+	 * @throws \YapepBase\Exception\ParameterException   If the authentication or group mode is invalid.
 	 */
-	public function __construct(LdapConnection $connection) {
+	public function __construct(
+		LdapConnection $connection, $authMode = self::AUTHMODE_BIND, $groupMode = self::GROUPMODE_USER
+	) {
 		$this->connection = $connection;
+		$this->setAuthMode($authMode);
+		$this->setGroupMode($groupMode);
 	}
 
 	/**
@@ -199,15 +208,14 @@ class LdapAuthenticationProvider {
 	 * @param int $authMode   {@uses self::AUTHMODE_* }.
 	 *
 	 * @return void
+	 *
+	 * @throws \YapepBase\Exception\ParameterException   If the authentication mode is invalid.
 	 */
 	public function setAuthMode($authMode) {
-		switch ($authMode) {
-			case self::AUTHMODE_BIND:
-				//Fall through
-			case self::AUTHMODE_SEARCH:
-				$this->authMode = $authMode;
-				break;
+		if (!in_array($authMode, array(self::AUTHMODE_BIND, self::AUTHMODE_SEARCH), true)) {
+			throw new ParameterException('Invalid auth mode: ' . $authMode);
 		}
+		$this->authMode = $authMode;
 	}
 
 	/**
@@ -216,15 +224,14 @@ class LdapAuthenticationProvider {
 	 * @param int $groupMode   {@uses self::GROUPMODE_*}
 	 *
 	 * @return void
+	 *
+	 * @throws \YapepBase\Exception\ParameterException   If the group check mode is invalid.
 	 */
 	public function setGroupMode($groupMode) {
-		switch ($groupMode) {
-			case self::GROUPMODE_USER:
-				// Fall through
-			case self::GROUPMODE_REBIND:
-				$this->groupMode = $groupMode;
-				break;
+		if (!in_array($groupMode, array(self::GROUPMODE_REBIND, self::GROUPMODE_USER), true)) {
+			throw new ParameterException('Invalid group mode: ' . $groupMode);
 		}
+		$this->groupMode = $groupMode;
 	}
 
 	/**
@@ -255,10 +262,14 @@ class LdapAuthenticationProvider {
 	 * @param string $attribute   The attribute.
 	 *
 	 * @return void
+	 *
+	 * @throws ParameterException   If the attribute is invalid.
 	 */
 	public function setUserAttribute($attribute) {
-		// TODO: Casting should be replaced by type checking and ParameterException throwing [emul]
-		$this->userAttribute = (string)$attribute;
+		if (!is_string($attribute)) {
+			throw new ParameterException('Invalid attribute ' . $attribute);
+		}
+		$this->userAttribute = $attribute;
 	}
 
 	/**
@@ -267,10 +278,14 @@ class LdapAuthenticationProvider {
 	 * @param string $attribute   The attribute.
 	 *
 	 * @return void
+	 *
+	 * @throws ParameterException   If the attribute is invalid.
 	 */
 	public function setUserPasswordAttribute($attribute) {
-		// TODO: Casting should be replaced by type checking and ParameterException throwing [emul]
-		$this->userPasswordAttribute = (string)$attribute;
+		if (!is_string($attribute)) {
+			throw new ParameterException('Invalid attribute ' . $attribute);
+		}
+		$this->userPasswordAttribute = $attribute;
 	}
 
 	/**
@@ -279,10 +294,14 @@ class LdapAuthenticationProvider {
 	 * @param string $attribute   The attribute.
 	 *
 	 * @return void
+	 *
+	 * @throws ParameterException   If the attribute is not a string.
 	 */
 	public function setGroupAttribute($attribute) {
-		// TODO: Casting should be replaced by type checking and ParameterException throwing [emul]
-		$this->groupAttribute = (string)$attribute;
+		if (!is_string($attribute)) {
+			throw new ParameterException('Invalid attribute ' . $attribute);
+		}
+		$this->groupAttribute = $attribute;
 	}
 
 	/**
@@ -292,11 +311,18 @@ class LdapAuthenticationProvider {
 	 * @param bool   $isDn        The attribute contains a full DN.
 	 *
 	 * @return void
+	 *
+	 * @throws ParameterException   If the attribute is not a string or isDn is not a bool.
 	 */
 	public function setGroupAttributeOnUser($attribute, $isDn) {
-		// TODO: Casting should be replaced by type checking and ParameterException throwing [emul]
-		$this->groupAttributeOnUser     = (string)$attribute;
-		$this->groupAttributeOnUserIsDn = (bool)$isDn;
+		if (!is_string($attribute)) {
+			throw new ParameterException('Invalid attribute ' . $attribute);
+		}
+		if (!is_string($attribute)) {
+			throw new ParameterException('The isDn parameter is not a bool: ' . $isDn);
+		}
+		$this->groupAttributeOnUser     = $attribute;
+		$this->groupAttributeOnUserIsDn = $isDn;
 	}
 
 	/**
@@ -306,11 +332,18 @@ class LdapAuthenticationProvider {
 	 * @param bool   $isDn        The attribute contains a full DN.
 	 *
 	 * @return void
+	 *
+	 * @throws ParameterException   If the attribute is not a string or isDn is not a bool.
 	 */
 	public function setUserAttributeOnGroup($attribute, $isDn) {
-		// TODO: Casting should be replaced by type checking and ParameterException throwing [emul]
-		$this->userAttributeOnGroup     = (string)$attribute;
-		$this->userAttributeOnGroupIsDn = (bool)$isDn;
+		if (!is_string($attribute)) {
+			throw new ParameterException('Invalid attribute ' . $attribute);
+		}
+		if (!is_string($attribute)) {
+			throw new ParameterException('The isDn parameter is not a bool: ' . $isDn);
+		}
+		$this->userAttributeOnGroup     = $attribute;
+		$this->userAttributeOnGroupIsDn = $isDn;
 	}
 
 	/**
@@ -320,11 +353,15 @@ class LdapAuthenticationProvider {
 	 * @param string $password   The password.
 	 *
 	 * @return void
+	 *
+	 * @throws ParameterException   If the password is not a string.
 	 */
 	public function setBindParams(LdapDn $bindDn, $password) {
+		if (!is_string($password)) {
+			throw new ParameterException('Invalid password ' . $password);
+		}
 		$this->bindDn   = $bindDn;
-		// TODO: Casting should be replaced by type checking and ParameterException throwing [emul]
-		$this->password = (string)$password;
+		$this->password = $password;
 	}
 
 	/**
@@ -333,10 +370,14 @@ class LdapAuthenticationProvider {
 	 * @param string $group   The group name.
 	 *
 	 * @return void
+	 *
+	 * @throws ParameterException   If the password is not a string.
 	 */
 	public function setRequiredGroup($group) {
-		// TODO: Casting should be replaced by type checking and ParameterException throwing [emul]
-		$this->requiredGroup = (string)$group;
+		if (!is_string($group)) {
+			throw new ParameterException('Invalid group ' . $group);
+		}
+		$this->requiredGroup = $group;
 	}
 
 	/**
@@ -426,18 +467,20 @@ class LdapAuthenticationProvider {
 	 * @throws \YapepBase\Exception\ParameterException   If the configuration is verifiably wrong.
 	 */
 	protected function authenticate($username, $password) {
-		// TODO: Some inline documentation would be nice, to easily understand whats happening [emul]
-
+		// Check configuration
 		if (!is_int($this->authMode)) {
 			throw new \YapepBase\Exception\ParameterException('Authentication mode is not configured. Please call ' .
 				'LdapAuthenticationProvider::setAuthMode() before calling authenticateAndAuthorize()');
 		}
 
+		// Try authenticating with the selected authentication mode
 		if ($this->authMode == self::AUTHMODE_BIND) {
 			$dn = $this->buildUserDn($username);
 			try {
+				// Bind to the server with the specified user and password
 				$this->connection->bind($dn, $password);
 			} catch (\YapepBase\Exception\LdapBindException $e) {
+				// The bind failed, but there was no connection error so the authentication failed.
 				return false;
 			}
 			return true;
@@ -445,26 +488,23 @@ class LdapAuthenticationProvider {
 			try {
 				$this->connection->bind($this->bindDn, $this->password);
 			} catch (\YapepBase\Exception\LdapBindException $e) {
+				// The bind failed because the configured user/password are invalid. This is not an authentication
+				// failure as not the authenticated user/password are invalid, but a configuration error.
 				throw new \YapepBase\Exception\ParameterException('Can\'t bind to LDAP server with the given ' .
 					'credentials.');
 			}
 			$base = $this->buildUserDn($username);
 			$filter = array($this->userPasswordAttribute . '=:_userPassword');
-			$filterparams = array('userPassword' => $password);
+			$filterParams = array('userPassword' => $password);
 			$results = $this->connection->search(
 				$base,
 				$filter,
-				$filterparams,
+				$filterParams,
 				array('dn'),
 				LdapConnection::DEREF_NEVER,
 				LdapConnection::SCOPE_SUB);
 
-			// TODO: Not really an issue, but an empty() is enough here i think, and its much faster [emul]
-			if (count($results)) {
-				return true;
-			} else {
-				return false;
-			}
+			return !empty($results);
 		} else {
 			throw new \YapepBase\Exception\ParameterException('Invalid authentication mode configured. Please call ' .
 				'LdapAuthenticationProvider::setAuthMode() before calling authenticateAndAuthorize()');
@@ -481,22 +521,26 @@ class LdapAuthenticationProvider {
 	 * @throws \YapepBase\Exception\ParameterException   If the configuration is verifiably wrong.
 	 */
 	protected function authorize($username) {
-		// TODO: Some inline documentation would be nice, to easily understand whats happening [emul]
 
+		// Authorization was successful if no group membership is required
 		if (!$this->requiredGroup) {
 			return true;
 		}
 
 		if ($this->groupMode == self::GROUPMODE_REBIND) {
 			try {
+				// Bind to the server with the configured user and password
 				$this->connection->bind($this->userDn, $this->password);
 			} catch (\YapepBase\Exception\LdapBindException $e) {
+				// The bind failed, this is because the user/password is invalid.
+				// We are not authenticating here, so this is an error.
 				throw new \YapepBase\Exception\ParameterException('Can\'t bind to LDAP server with the given ' .
 					'credentials.');
 			}
 		}
 
 		if ($this->groupAttributeOnUser) {
+			// Check if the user has the required group attribute
 			$base = $this->buildUserDn($username);
 			if ($this->groupAttributeOnUserIsDn) {
 				$param = (string)$this->buildGroupDn($this->requiredGroup);
@@ -505,6 +549,7 @@ class LdapAuthenticationProvider {
 			}
 			$filter = $this->groupAttributeOnUser;
 		} elseif ($this->userAttributeOnGroup) {
+			// Check if the group has the required user attribute
 			$base = $this->buildGroupDn($this->requiredGroup);
 			if ($this->userAttributeOnGroupIsDn) {
 				$param = (string)$this->buildUserDn($username);
@@ -520,6 +565,7 @@ class LdapAuthenticationProvider {
 				'LdapAuthenticationProvider::authenticateAndAuthorize()');
 		}
 
+		// Do the search
 		$results = $this->connection->search(
 			$base,
 			$filter . '=:_param',
@@ -528,11 +574,6 @@ class LdapAuthenticationProvider {
 			LdapConnection::DEREF_NEVER,
 			LdapConnection::SCOPE_SUB);
 
-		// TODO: Not really an issue, but an empty() is enough here i think, and its much faster [emul]
-		if (count($results)) {
-			return true;
-		} else {
-			return false;
-		}
+		return !empty($results);
 	}
 }

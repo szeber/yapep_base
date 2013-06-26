@@ -2,18 +2,18 @@
 /**
  * This file is part of YAPEPBase.
  *
- * @package      YapepBase
- * @subpackage   Session
- * @copyright    2011 The YAPEP Project All rights reserved.
- * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
+ * @package    YapepBase
+ * @subpackage Session
+ * @copyright  2011 The YAPEP Project All rights reserved.
+ * @license    http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
 namespace YapepBase\Session;
+
+
 use YapepBase\Exception\Exception;
 use YapepBase\Storage\IStorage;
 use YapepBase\Util\Random;
-use YapepBase\Request\IRequest;
-use YapepBase\Response\IResponse;
 use YapepBase\Application;
 use YapepBase\Event\Event;
 use YapepBase\Exception\ConfigException;
@@ -46,20 +46,6 @@ abstract class SessionAbstract implements ISession {
 	 * @var \YapepBase\Storage\IStorage
 	 */
 	protected $storage;
-
-	/**
-	 * The request instance.
-	 *
-	 * @var \YapepBase\Request\IRequest
-	 */
-	protected $request;
-
-	/**
-	 * The response instance.
-	 *
-	 * @var \YapepBase\Response\IResponse
-	 */
-	protected $response;
 
 	/**
 	 * The session lifetime in seconds.
@@ -101,23 +87,17 @@ abstract class SessionAbstract implements ISession {
 	 *
 	 * @param string                        $configName     Name of the session config.
 	 * @param \YapepBase\Storage\IStorage   $storage        The storage object.
-	 * @param \YapepBase\Request\IRequest   $request        The request object.
-	 * @param \YapepBase\Response\IResponse $response       The response object.
 	 * @param bool                          $autoRegister   If TRUE, it will automatically register as an event handler.
 	 *
 	 * @throws \YapepBase\Exception\ConfigException   On configuration problems
 	 * @throws \YapepBase\Exception\Exception         On other problems
 	 */
-	public function __construct(
-		$configName, IStorage $storage, IRequest $request, IResponse $response, $autoRegister = true
-	) {
+	public function __construct($configName, IStorage $storage, $autoRegister = true) {
 		if (!$storage->isTtlSupported()) {
 			throw new Exception('Storage without TTL support passed to session handler.');
 		}
 
 		$this->storage  = $storage;
-		$this->request  = $request;
-		$this->response = $response;
 
 		$config = Config::getInstance()->get('resource.session.' . $configName . '.*', false);
 		if (empty($config)) {
@@ -138,7 +118,7 @@ abstract class SessionAbstract implements ISession {
 			$this->registerEventHandler();
 		}
 
-		$this->id = $this->getSessionIdFromRequest();
+		$this->id = $this->getSessionId();
 	}
 
 	/**
@@ -154,11 +134,11 @@ abstract class SessionAbstract implements ISession {
 	abstract protected function validateConfig(array $config);
 
 	/**
-	 * Returns the session ID from the request object. If the request has no session, it returns NULL.
+	 * Returns the session ID. If there is no session ID, it returns NULL.
 	 *
 	 * @return string
 	 */
-	abstract protected function getSessionIdFromRequest();
+	abstract protected function getSessionId();
 
 	/**
 	 * This method is called when the session has been initialized (loaded or created).
@@ -170,7 +150,7 @@ abstract class SessionAbstract implements ISession {
 	}
 
 	/**
-	 * This method is called if a request with a non-existing session ID is received.
+	 * This method is called if an invalid session ID is received.
 	 *
 	 * It can be used for example to log the request. The method should not return anything, and not stop execution.
 	 *
@@ -187,8 +167,8 @@ abstract class SessionAbstract implements ISession {
 	 */
 	public function registerEventHandler() {
 		$registry = Application::getInstance()->getDiContainer()->getEventHandlerRegistry();
-		$registry->registerEventHandler(Event::TYPE_APPSTART, $this);
-		$registry->registerEventHandler(Event::TYPE_APPFINISH, $this);
+		$registry->registerEventHandler(Event::TYPE_APPLICATION_BEFORE_CONTROLLER_RUN, $this);
+		$registry->registerEventHandler(Event::TYPE_APPLICATION_AFTER_CONTROLLER_RUN, $this);
 	}
 
 	/**
@@ -198,8 +178,8 @@ abstract class SessionAbstract implements ISession {
 	 */
 	public function removeEventHandler() {
 		$registry = Application::getInstance()->getDiContainer()->getEventHandlerRegistry();
-		$registry->removeEventHandler(Event::TYPE_APPSTART, $this);
-		$registry->removeEventHandler(Event::TYPE_APPFINISH, $this);
+		$registry->removeEventHandler(Event::TYPE_APPLICATION_BEFORE_CONTROLLER_RUN, $this);
+		$registry->removeEventHandler(Event::TYPE_APPLICATION_AFTER_CONTROLLER_RUN, $this);
 	}
 
 	/**
@@ -227,7 +207,7 @@ abstract class SessionAbstract implements ISession {
 	 *
 	 * @return void
 	 */
-	protected function loadSession() {
+	public function loadSession() {
 		if ($this->isLoaded) {
 			return;
 		}
@@ -253,7 +233,7 @@ abstract class SessionAbstract implements ISession {
 	 *
 	 * @throws \YapepBase\Exception\Exception   If trying to save a not loaded session
 	 */
-	protected function saveSession() {
+	public function saveSession() {
 		if (!$this->isLoaded) {
 			throw new Exception('Saving a session that has not been loaded yet');
 		}
@@ -307,11 +287,11 @@ abstract class SessionAbstract implements ISession {
 	 */
 	public function handleEvent(Event $event) {
 		switch ($event->getType()) {
-			case Event::TYPE_APPSTART:
+			case Event::TYPE_APPLICATION_BEFORE_CONTROLLER_RUN:
 				$this->loadSession();
 				break;
 
-			case Event::TYPE_APPFINISH:
+			case Event::TYPE_APPLICATION_AFTER_CONTROLLER_RUN:
 				$this->saveSession();
 				break;
 		}

@@ -2,22 +2,21 @@
 /**
  * This file is part of YAPEPBase.
  *
- * @package      YapepBase
- * @subpackage   Session
- * @copyright    2011 The YAPEP Project All rights reserved.
- * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
+ * @package    YapepBase
+ * @subpackage Session
+ * @copyright  2011 The YAPEP Project All rights reserved.
+ * @license    http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
 namespace YapepBase\Session;
+
+
 use YapepBase\Request\HttpRequest;
 use YapepBase\Exception\Exception;
 use YapepBase\Application;
-use YapepBase\Event\Event;
-use YapepBase\Event\IEventHandler;
 use YapepBase\Response\HttpResponse;
 use YapepBase\Storage\IStorage;
 use YapepBase\Exception\ConfigException;
-use YapepBase\Config;
 
 /**
  * Implements session handling for HTTP requests.
@@ -85,6 +84,28 @@ class HttpSession extends SessionAbstract {
 	protected $cacheLimitersEnabled;
 
 	/**
+	 * Constructor
+	 *
+	 * @param string                           $configName     Name of the session config.
+	 * @param \YapepBase\Storage\IStorage      $storage        The storage object.
+	 * @param \YapepBase\Request\HttpRequest   $request        The request object.
+	 * @param \YapepBase\Response\HttpResponse $response       The response object.
+	 * @param bool                             $autoRegister   If TRUE, it will automatically register as an event
+	 *                                                         handler.
+	 *
+	 * @throws \YapepBase\Exception\ConfigException   On configuration problems
+	 * @throws \YapepBase\Exception\Exception         On other problems
+	 */
+	public function __construct(
+		$configName, IStorage $storage, HttpRequest $request, HttpResponse $response, $autoRegister = true
+	) {
+		$this->request  = $request;
+		$this->response = $response;
+
+		parent::__construct($configName, $storage, $autoRegister);
+	}
+
+	/**
 	 * Validates the configuration.
 	 *
 	 * @param array $config   The configuration array.
@@ -118,7 +139,7 @@ class HttpSession extends SessionAbstract {
 	 *
 	 * @return string
 	 */
-	protected function getSessionIdFromRequest() {
+	protected function getSessionId() {
 		return $this->request->getCookie($this->cookieName, null);
 	}
 
@@ -165,5 +186,20 @@ class HttpSession extends SessionAbstract {
 		parent::destroy();
 
 		$this->response->setCookie($this->cookieName, '', 1, $this->cookiePath, $this->cookieDomain);
+	}
+
+	/**
+	 * Returns the details of the Session Cookie.
+	 *
+	 * @param string $name     The name of the cookie will be populated here. (Outgoing parameter)
+	 * @param string $domain   The domain of the cookie will be populated here. (Outgoing parameter)
+	 * @param string $path     The path of the cookie will be populated here. (Outgoing parameter)
+	 *
+	 * @return void
+	 */
+	public function getCookieDetails(&$name, &$domain, &$path) {
+		$name = $this->cookieName;
+		$domain = $this->cookieDomain;
+		$path = $this->cookiePath;
 	}
 }

@@ -11,6 +11,7 @@
 
 namespace YapepBase\Database;
 
+use YapepBase\Debugger\Item\SqlQueryItem;
 use YapepBase\Exception\DatabaseException;
 use \PDO;
 use \PDOException;
@@ -93,6 +94,15 @@ abstract class DbConnection {
 	abstract protected function connect(array $configuration);
 
 	/**
+	 * Closes the database connection.
+	 *
+	 * @return void
+	 */
+	public function disconnect() {
+		$this->connection = null;
+	}
+
+	/**
 	 * Returns the prefix which is for prefixing parameters in the query.
 	 *
 	 * @return string
@@ -112,6 +122,9 @@ abstract class DbConnection {
 	 * @throws \YapepBase\Exception\DatabaseException   On execution errors.
 	 */
 	public function query($query, array $params = array()) {
+		if (empty($this->connection)) {
+			throw new DatabaseException('Connection to the database is not established');
+		}
 		try {
 			$debugger = Application::getInstance()->getDiContainer()->getDebugger();
 
@@ -122,8 +135,9 @@ abstract class DbConnection {
 				foreach ($params as $paramName => $paramValue) {
 					$paramsQuoted[$paramName] = $this->quote($paramValue);
 				}
-				$queryId = $debugger->logQuery(IDebugger::QUERY_TYPE_DB,
-					$this->getBackendType() . '.' . $this->connectionName, $query, $paramsQuoted);
+				$debugItem = new SqlQueryItem($this->getBackendType(), $this->getBackendType() . '.'
+					. $this->connectionName, $query, $paramsQuoted);
+				$debugger->addItem($debugItem);
 				$startTime = microtime(true);
 			}
 
@@ -135,7 +149,7 @@ abstract class DbConnection {
 
 			// If we have a debugger, we have to log the execution time
 			if ($debugger !== false) {
-				$debugger->logQueryExecutionTime(IDebugger::QUERY_TYPE_DB, $queryId, microtime(true) - $startTime);
+				$debugItem->setExecutionTime(microtime(true) - $startTime);
 			}
 
 			return new DbResult($statement);
@@ -214,8 +228,13 @@ abstract class DbConnection {
 	 * If there already is an open transaction, it just increments the transaction counter.
 	 *
 	 * @return int   The number of open transactions.
+	 *
+	 * @throws DatabaseException   If no database connection is established.
 	 */
 	public function beginTransaction() {
+		if (empty($this->connection)) {
+			throw new DatabaseException('Connection to the database is not established');
+		}
 		if (0 == $this->transactionCount) {
 			$this->connection->beginTransaction();
 			$this->transactionFailed = false;
@@ -231,8 +250,13 @@ abstract class DbConnection {
 	 * if any further statements fail.
 	 *
 	 * @return bool   TRUE if the transaction was committed, FALSE if it was rolled back.
+	 *
+	 * @throws DatabaseException   If no database connection is established.
 	 */
 	public function completeTransaction() {
+		if (empty($this->connection)) {
+			throw new DatabaseException('Connection to the database is not established');
+		}
 		$this->transactionCount--;
 		if (0 == $this->transactionCount) {
 			if ($this->transactionFailed) {
@@ -262,8 +286,13 @@ abstract class DbConnection {
 	 * @param mixed $value   The value to quote.
 	 *
 	 * @return string   The quoted value.
+	 *
+	 * @throws DatabaseException   If no database connection is established.
 	 */
 	public function quote($value) {
+		if (empty($this->connection)) {
+			throw new DatabaseException('Connection to the database is not established');
+		}
 		return $this->connection->quote($value, $this->getParamType($value));
 	}
 
@@ -279,6 +308,9 @@ abstract class DbConnection {
 	 * @see PDO::lastInsertId()
 	 */
 	public function lastInsertId($name = null) {
+		if (empty($this->connection)) {
+			throw new DatabaseException('Connection to the database is not established');
+		}
 		try {
 			return $this->connection->lastInsertId($name);
 		} catch (PDOException $exception) {

@@ -23,7 +23,7 @@ use YapepBase\Exception\ParameterException;
  * @package    YapepBase
  * @subpackage BusinessObject
  */
-class BoAbstractTest extends \PHPUnit_Framework_TestCase {
+class BoAbstractTest extends \YapepBase\BaseTest {
 
 	/**
 	 * @var \YapepBase\DependencyInjection\SystemContainer

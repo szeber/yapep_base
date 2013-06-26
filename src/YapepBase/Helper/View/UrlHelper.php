@@ -10,8 +10,10 @@
 
 namespace YapepBase\Helper\View;
 
+use YapepBase\Exception\Exception;
 use YapepBase\Helper\HelperAbstract;
 use YapepBase\Application;
+use YapepBase\Router\ILanguageReverseRouter;
 
 /**
  * UrlHelper class. Contains helper methods related to routing. Usable by the View layer.
@@ -34,13 +36,42 @@ class UrlHelper extends HelperAbstract {
 	 *
 	 * @return string   The target
 	 */
-	public static function getRouteTarget($controller, $action, array $params = array(), array $getParams = array()) {
+	public function getRouteTarget($controller, $action, array $params = array(), array $getParams = array()) {
 		try {
 			$url = Application::getInstance()->getRouter()->getTargetForControllerAction($controller, $action, $params);
 			return $url . (empty($getParams) ? '' : ('?' . http_build_query($getParams)));
 		} catch (\Exception $exception) {
 			trigger_error('Exception of type ' . get_class($exception) . ' occured in ' . __METHOD__
 				. '. Requested controller/action: ' . $controller . '/' . $action, E_USER_ERROR);
+			return '#';
+		}
+	}
+
+	/**
+	 * Returns the target for the specified controller and action in the given language
+	 *
+	 * @param string $controller   Name of the controller
+	 * @param string $action       Name of the action
+	 * @param string $language     Code of the language, the target is requested for.
+	 * @param array  $params       Route params
+	 * @param array  $getParams    The parameters should be placed in the url.
+	 *
+	 * @return string
+	 */
+	public function getRouteTargetInLanguage(
+		$controller, $action, $language, array $params = array(), array $getParams = array()
+	) {
+		try {
+			$router = Application::getInstance()->getRouter();
+			if ($router instanceof ILanguageReverseRouter) {
+				$url = $router->getTargetForControllerActionInLanguage($controller, $action, $language, $params);
+				return $url . (empty($getParams) ? '' : ('?' . http_build_query($getParams)));
+			} else {
+				throw new Exception('The router is not an instance of ILanguageReverseRouter');
+			}
+		} catch (\Exception $exception) {
+			trigger_error('Exception of type ' . get_class($exception) . ' occured in ' . __METHOD__
+			. '. Requested controller/action: ' . $controller . '/' . $action, E_USER_ERROR);
 			return '#';
 		}
 	}
@@ -55,7 +86,7 @@ class UrlHelper extends HelperAbstract {
 	 *
 	 * @return string   The generated URL.
 	 */
-	public static function getCurrentUrl($withParams = true, array $extraParams = array()) {
+	public function getCurrentUrl($withParams = true, array $extraParams = array()) {
 		/** @var \YapepBase\Request\HttpRequest $request  */
 		$request = Application::getInstance()->getRequest();
 
@@ -91,15 +122,15 @@ class UrlHelper extends HelperAbstract {
 	 *
 	 * @return bool
 	 */
-	public static function checkIsCurrentUri($controller, $action, array $params) {
+	public function checkIsCurrentUri($controller, $action, array $params) {
 		$application = Application::getInstance();
 		/** @var \YapepBase\Request\HttpRequest $request  */
 		$request = $application->getRequest();
 		$router = $application->getRouter();
 
-		$uri = $request->getTarget();
+		$uri = rtrim($request->getTarget(), '/');
 
-		return $uri == $router->getTargetForControllerAction($controller, $action, $params);
+		return $uri == rtrim($router->getTargetForControllerAction($controller, $action, $params), '/');
 	}
 
 	/**
@@ -114,7 +145,7 @@ class UrlHelper extends HelperAbstract {
 	 *
 	 * @return bool
 	 */
-	public static function checkIsCurrentControllerAction($controller, $action) {
+	public function checkIsCurrentControllerAction($controller, $action) {
 		// Get the current controller and action
 		$currentController = null;
 		$currentAction = null;

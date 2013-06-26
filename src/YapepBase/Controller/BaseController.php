@@ -10,6 +10,7 @@
 
 namespace YapepBase\Controller;
 use YapepBase\Application;
+use YapepBase\Config;
 use YapepBase\Exception\RedirectException;
 use YapepBase\Exception\ControllerException;
 use YapepBase\Response\IResponse;
@@ -18,6 +19,15 @@ use YapepBase\View\ViewAbstract;
 
 /**
  * Base class for generic controllers.
+ *
+ * Configuration options:
+ * <ul>
+ *   <li>system.performStrictControllerActionNameValidation: If this option is TRUE, the action's name will be
+ *                                                           validated in a case sensitive manner. This is recommended
+ *                                                           for development, but not recommended for production as it
+ *                                                           can cause errors, and will somewhat impact the performance.
+ *                                                           Optional, defaults to FALSE.</li>
+ * </ul>
  *
  * @package    YapepBase
  * @subpackage Controller
@@ -113,6 +123,15 @@ abstract class BaseController implements IController {
 		if (!method_exists($this, $methodName)) {
 			throw new ControllerException('Action ' . $methodName . ' does not exist in ' . get_class($this),
 				ControllerException::ERR_ACTION_NOT_FOUND);
+		}
+		if (Config::getInstance()->get('system.performStrictControllerActionNameValidation', false)) {
+			$reflection = new \ReflectionClass($this);
+			$method = $reflection->getMethod($methodName);
+			if ($method->name != $methodName) {
+				throw new ControllerException('Invalid case when running action ' . $methodName . ' in '
+					. get_class($this)  . '. The valid case is: ' . $method->name,
+					ControllerException::ERR_ACTION_NOT_FOUND);
+			}
 		}
 		$this->before();
 		$result = $this->runAction($methodName);

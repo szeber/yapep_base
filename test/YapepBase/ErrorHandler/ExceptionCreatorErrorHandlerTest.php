@@ -10,7 +10,7 @@ use \ErrorException;
 /**
  * Test class for LoggingErrorHandler.
  */
-class ExceptionCreatorErrorHandlerTest extends \PHPUnit_Framework_TestCase {
+class ExceptionCreatorErrorHandlerTest extends \YapepBase\BaseTest {
 
 	/**
 	 * The original ErrorReporting level before the test.

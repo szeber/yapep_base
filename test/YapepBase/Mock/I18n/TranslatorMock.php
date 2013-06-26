@@ -25,14 +25,21 @@ class TranslatorMock implements ITranslator {
 	 *
 	 * The method will be passed the same parameters, in the same order, that the translate method receives.
 	 *
-	 * @var Closure
+	 * @var \Closure
 	 */
 	public $translationMethod;
 
 	/**
+	 * The default language.
+	 *
+	 * @var string
+	 */
+	public $defaultLanguage;
+
+	/**
 	 * Constructor. Sets the translation method.
 	 *
-	 * @param Closure $translationMethod   The translation method. If not set, it defaults to returning the same string.
+	 * @param \Closure $translationMethod   The translation method. If not set, it defaults to returning the same string
 	 */
 	function __construct(\Closure $translationMethod = null) {
 		if (is_null($translationMethod)) {
@@ -60,6 +67,17 @@ class TranslatorMock implements ITranslator {
 	public function translate($sourceClass, $string, array $params = array(), $language = null) {
 		$translationMethod = $this->translationMethod;
 		return $translationMethod($sourceClass, $string, $params, $language);
+	}
+
+	/**
+	 * Sets the default language for the translator instance.
+	 *
+	 * @param string $language   The default language for the translations.
+	 *
+	 * @return void
+	 */
+	public function setDefaultLanguage($language) {
+		$this->defaultLanguage = $language;
 	}
 
 }

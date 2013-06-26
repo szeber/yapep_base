@@ -33,4 +33,13 @@ interface ITranslator {
 	 * @throws \YapepBase\Exception\I18n\ParameterException             If there are problems with the parameters.
 	 */
 	public function translate($sourceClass, $string, array $params = array(), $language = null);
+
+	/**
+	 * Sets the default language for the translator instance.
+	 *
+	 * @param string $language   The default language for the translations.
+	 *
+	 * @return void
+	 */
+	public function setDefaultLanguage($language);
 }

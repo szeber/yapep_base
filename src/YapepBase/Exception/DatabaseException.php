@@ -21,4 +21,7 @@ class DatabaseException extends Exception {
 
 	/** Duplicate key violation error code. */
 	const ERR_DUPLICATE_KEY_VIOLATION = 23000;
+
+	/** Numeric value out of range error code. */
+	const ERR_NUMERIC_VALUE_OUT_OF_RANGE = 22003;
 }

@@ -7,7 +7,7 @@ use YapepBase\Database\SqliteConnection;
 /**
  * SqliteConnection test case.
  */
-class SqliteConnectionTest extends \PHPUnit_Framework_TestCase {
+class SqliteConnectionTest extends \YapepBase\BaseTest {
 
 	/**
 	 * @var \YapepBase\Database\SqliteConnection

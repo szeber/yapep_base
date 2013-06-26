@@ -18,7 +18,7 @@ use YapepBase\Request\HttpRequest;
  * @package    YapepBase
  * @subpackage Test\Request
  */
-class HttpRequestTest extends \PHPUnit_Framework_TestCase {
+class HttpRequestTest extends \YapepBase\BaseTest {
 
 	/**
 	 * The request
@@ -66,8 +66,24 @@ class HttpRequestTest extends \PHPUnit_Framework_TestCase {
 		$env = array(
 			'envParam' => 'env_value',
 		);
+		$files = array(
+			'uploadedFile' => array(
+				'name' => 'test',
+				'type' => 'text/plain',
+				'tmp_name' => '/tmp/test',
+				'error' => UPLOAD_ERR_OK,
+				'size' => 10,
+			),
+			'noUploadedFile' => array(
+				'name' => '',
+				'type' => '',
+				'tmp_name' => '',
+				'error' => UPLOAD_ERR_NO_FILE,
+				'size' => 0,
+			),
+		);
 
-		return new HttpRequest($get, $post, $cookie, $server, $env, array(), true);
+		return new HttpRequest($get, $post, $cookie, $server, $env, $files, true);
 	}
 
 	/**
@@ -344,5 +360,41 @@ class HttpRequestTest extends \PHPUnit_Framework_TestCase {
 
 		$this->assertTrue($this->request->hasCookie('cookie'));
 		$this->assertFalse($this->request->hasCookie('post_param'));
+	}
+
+	/**
+	 * Tests getting the data for an uploaded file.
+	 *
+	 * @return void
+	 */
+	public function testGetFile() {
+		$this->assertFalse($this->request->getFile('nonExistent'),
+			'FALSE should be returned for a non-existing file upload');
+
+		$this->assertFalse($this->request->getFile('noUploadedFile'),
+			'FALSE should be returned if the upload field was specified, but no file was uploaded');
+
+		$result = $this->request->getFile('uploadedFile');
+
+		$this->assertInstanceOf('\YapepBase\DataObject\UploadedFileDo', $result,
+			'The result should be an UploadedFileDo for a completed upload');
+
+		$this->assertSame(UPLOAD_ERR_OK, $result->getError(), 'Invalid uploaded file status code');
+	}
+
+	/**
+	 * Tests checking if there the data for an uploaded file.
+	 *
+	 * @return void
+	 */
+	public function testHasFile() {
+		$this->assertFalse($this->request->hasFile('nonExistent'),
+			'FALSE should be returned for a non-existing file upload');
+
+		$this->assertTrue($this->request->hasFile('noUploadedFile'),
+			'TRUE should be returned if the upload is specified, but no file is uploaded');
+
+		$this->assertTrue($this->request->hasFile('uploadedFile'),
+			'TRUE should be returned for completed uploads.');
 	}
 }

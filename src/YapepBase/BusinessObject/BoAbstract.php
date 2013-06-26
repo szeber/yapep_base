@@ -224,7 +224,7 @@ abstract class BoAbstract {
 	 *
 	 * @return \YapepBase\Database\DbTable
 	 */
-	public function getTable($databaseNamespace, $name, DbConnection $connection = null) {
+	protected function getTable($databaseNamespace, $name, DbConnection $connection = null) {
 		return Application::getInstance()->getDiContainer()->getDbTable($databaseNamespace, $name, $connection);
 	}
 }

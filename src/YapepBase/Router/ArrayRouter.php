@@ -87,10 +87,10 @@ class ArrayRouter implements IRouter {
 	 *
 	 * @return string   The controller and action separated by a '/' character.
 	 *
-	 * @throws RouterException   On errors. (Includig if the route is not found)
+	 * @throws RouterException   On errors. (Including if the route is not found)
 	 */
 	public function getRoute(&$controller = null, &$action = null) {
-		$target = $this->getTarget();
+		$target = rtrim($this->getTarget(), '/');
 		$method = $this->getMethod();
 
 		// If the target doesn't start with a '/', add one
@@ -98,7 +98,7 @@ class ArrayRouter implements IRouter {
 			$target = '/' . $target;
 		}
 
-		foreach ($this->routes as $controllerAction => $path) {
+		foreach ($this->getRouteArray() as $controllerAction => $path) {
 			if ($this->testIfPathMatchesTarget($path, $method, $target)) {
 				list($controller, $action) = explode('/', $controllerAction, 2);
 				return $controllerAction;
@@ -107,6 +107,15 @@ class ArrayRouter implements IRouter {
 
 		// There was no valid route
 		throw new RouterException('No route found for path: ' . $target, RouterException::ERR_NO_ROUTE_FOUND);
+	}
+
+	/**
+	 * Returns the array of routes.
+	 *
+	 * @return array
+	 */
+	public function getRouteArray() {
+		return $this->routes;
 	}
 
 	/**

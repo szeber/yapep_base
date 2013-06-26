@@ -59,6 +59,13 @@ interface IStorage {
 	public function delete($key);
 
 	/**
+	 * Deletes every data in the storage.
+	 *
+	 * @return mixed
+	 */
+	public function clear();
+
+	/**
 	 * Returns if the backend is persistent or volatile.
 	 *
 	 * If the backend is volatile a system or service restart may destroy all the stored data.
@@ -73,4 +80,11 @@ interface IStorage {
 	 * @return bool
 	 */
 	public function isTtlSupported();
+
+	/**
+	 * Returns TRUE if the storage backend is read only, FALSE otherwise.
+	 *
+	 * @return bool
+	 */
+	public function isReadOnly();
 }

@@ -110,7 +110,7 @@ class ViewMock extends \YapepBase\View\ViewAbstract {
 	}
 
 	/**
-	 * Sets the storage object which will be used for cacheing the rendered view.
+	 * Sets the storage object which will be used for caching the rendered view.
 	 *
 	 * @param \YapepBase\Storage\IStorage $storage        The object for caching.
 	 * @param array                       $keyModifiers   Associative array which holds the keys and values,

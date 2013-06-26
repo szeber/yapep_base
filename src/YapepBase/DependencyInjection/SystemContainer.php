@@ -11,6 +11,7 @@
 namespace YapepBase\DependencyInjection;
 
 
+use YapepBase\Communication\CurlFactory;
 use YapepBase\Debugger\IDebugger;
 use YapepBase\File\FileHandlerPhp;
 use YapepBase\Database\DbConnection;
@@ -30,6 +31,7 @@ use YapepBase\Mime\MimeType;
 use YapepBase\Request\IRequest;
 use YapepBase\Response\IResponse;
 use YapepBase\Session\SessionRegistry;
+use YapepBase\Shell\CommandExecutor;
 use YapepBase\Storage\IStorage;
 use YapepBase\View\ViewDo;
 
@@ -62,6 +64,10 @@ class SystemContainer extends Container {
 	const KEY_FILE_RESOURCE_HANDLER = 'fileResourceHandler';
 	/** Key containing the file handler. */
 	const KEY_FILE_HANDLER = 'fileHandler';
+	/** Key containing the command executor. */
+	const KEY_COMMAND_EXECUTOR = 'commandExecutor';
+	/** Key containing the curl factory. */
+	const KEY_CURL_FACTORY = 'curlFactory';
 
 	/**
 	 * Name of the namespace which holds the controllers.
@@ -162,9 +168,17 @@ class SystemContainer extends Container {
 
 		$this[self::KEY_FILE_RESOURCE_HANDLER] = '\\YapepBase\\File\\ResourceHandlerPhp';
 
-		$this[self::KEY_FILE_HANDLER] = $this->share(function($container) {
+		$this[self::KEY_FILE_HANDLER] = function($container) {
 			return new FileHandlerPhp();
-		});
+		};
+
+		$this[self::KEY_COMMAND_EXECUTOR] = function($container) {
+			return new CommandExecutor();
+		};
+
+		$this[self::KEY_CURL_FACTORY] = function($container) {
+			return new CurlFactory();
+		};
 
 		$this->searchNamespaces[self::NAMESPACE_SEARCH_BO] = array();
 		$this->searchNamespaces[self::NAMESPACE_SEARCH_DAO] = array();
@@ -214,6 +228,15 @@ class SystemContainer extends Container {
 	 */
 	public function getLoggerRegistry() {
 		return $this[self::KEY_LOGGER_REGISTRY];
+	}
+
+	/**
+	 * Returns a CurlFactory instance.
+	 *
+	 * @return \YapepBase\Communication\CurlFactory
+	 */
+	public function getCurlFactory() {
+		return $this[self::KEY_CURL_FACTORY];
 	}
 
 	/**
@@ -289,6 +312,20 @@ class SystemContainer extends Container {
 	 */
 	public function getFileHandler() {
 		return $this[self::KEY_FILE_HANDLER];
+	}
+
+	/**
+	 * Returns a CommandExecutor instance.
+	 *
+	 * @param string $command   The command to run.
+	 *
+	 * @return \YapepBase\Shell\ICommandExecutor
+	 */
+	public function getCommandExecutor($command) {
+		/** @var \YapepBase\Shell\ICommandExecutor $executor */
+		$executor = $this[self::KEY_COMMAND_EXECUTOR];
+		$executor->setCommand($command);
+		return $executor;
 	}
 
 	/**
@@ -418,7 +455,8 @@ class SystemContainer extends Container {
 	public function setDebugger(IDebugger $debugger) {
 		$this->debugger = $debugger;
 		if ($debugger instanceof IEventHandler) {
-			$this->getEventHandlerRegistry()->registerEventHandler(Event::TYPE_APPFINISH, $debugger);
+			$this->getEventHandlerRegistry()->registerEventHandler(Event::TYPE_APPLICATION_BEFORE_OUTPUT_SEND,
+				$debugger);
 		}
 	}
 

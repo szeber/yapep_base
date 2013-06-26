@@ -15,7 +15,9 @@ namespace YapepBase\Batch;
 
 use YapepBase\Application;
 use YapepBase\DependencyInjection\SystemContainer;
+use YapepBase\ErrorHandler\ITerminatable;
 use YapepBase\Event\Event;
+use YapepBase\Exception\ParameterException;
 use YapepBase\Mime\MimeType;
 use YapepBase\View\ViewDo;
 
@@ -24,13 +26,46 @@ use YapepBase\View\ViewDo;
  *
  * Handles event dispatching for application start and finish, and handles unhandled exceptions.
  *
+ * Setting the exit code for the script is possible. When setting it, the PHP execution environment's exit codes are
+ * not allowed, so the exit code is distinguishable from a PHP execution error. Custom exit codes should be above 100.
+ *
  * @package    YapepBase
  * @subpackage Batch
  */
-abstract class BatchScript {
+abstract class BatchScript implements ITerminatable {
 
 	/** Help usage. */
 	const HELP_USAGE = 'help';
+
+	/** Exit code for successful execution */
+	const EXIT_CODE_SUCCESS = 0;
+
+	/** Exit code that PHP outputs if the specified source file is not found. */
+	const EXIT_CODE_PHP_FILE_NOT_FOUND = 1;
+
+	/**
+	 * Exit code that PHP outputs if the execution was aborted because of a fatal error
+	 * (E_ERROR, unhandled exception, parse errors, etc).
+	 */
+	const EXIT_CODE_PHP_FATAL_ERROR = 255;
+
+	/** Exit code for invalid invocation (switch or parameter errors). */
+	const EXIT_CODE_INVOCATION_ERROR = 10;
+
+	/** Exit code for runtime errors. */
+	const EXIT_CODE_RUNTIME_ERROR = 20;
+
+	/** Exit code for fatal errors. */
+	const EXIT_CODE_FATAL_ERROR = 30;
+
+	/** Exit code for unhandled exceptions. */
+	const EXIT_CODE_UNHANDLED_EXCEPTION = 31;
+
+	/** Exit code for aborted runs because of a signal. */
+	const EXIT_CODE_SIGNAL_ABORT = 40;
+
+	/** Exit code for failed locking errors. */
+	const EXIT_CODE_LOCK_FAILED = 50;
 
 	/**
 	 * Stores the content type used by the script for output.
@@ -68,9 +103,17 @@ abstract class BatchScript {
 	protected $handleSignals = false;
 
 	/**
+	 * The exit code for the execution.
+	 *
+	 * @var int
+	 */
+	private $exitCode;
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
+		$this->setExitCode(self::EXIT_CODE_SUCCESS);
 		$this->cliHelper = new CliUserInterfaceHelper($this->getScriptDescription());
 		$this->setSignalHandler();
 
@@ -97,7 +140,7 @@ abstract class BatchScript {
 	abstract protected function abort();
 
 	/**
-	 * Returns the script's decription.
+	 * Returns the script's description.
 	 *
 	 * This method should return a the description for the script. It will be used as the script description in the
 	 * help.
@@ -134,6 +177,40 @@ abstract class BatchScript {
 	}
 
 	/**
+	 * Sets the current instance as the terminator object.
+	 *
+	 * @return void
+	 */
+	protected function setAsTerminator() {
+		Application::getInstance()->getDiContainer()->getErrorHandlerRegistry()->setTerminator($this);
+	}
+
+	/**
+	 * Sets the exit code for the batch script
+	 *
+	 * @param int $exitCode   The exit code to set.
+	 *
+	 * @return void
+	 *
+	 * @throws \YapepBase\Exception\ParameterException   If a PHP specific exit code is used.
+	 */
+	protected function setExitCode($exitCode) {
+		if (in_array($exitCode, array(self::EXIT_CODE_PHP_FILE_NOT_FOUND, self::EXIT_CODE_PHP_FATAL_ERROR))) {
+			throw new ParameterException('Setting PHP specific exit codes is not allowed: ' . $exitCode);
+		}
+		$this->exitCode = $exitCode;
+	}
+
+	/**
+	 * Returns the currently set exit code.
+	 *
+	 * @return int
+	 */
+	protected function getExitCode() {
+		return $this->exitCode;
+	}
+
+	/**
 	 * Starts script execution.
 	 *
 	 * @return void
@@ -141,8 +218,9 @@ abstract class BatchScript {
 	 * @throws \Exception   On errors
 	 */
 	public function run() {
+		$this->setAsTerminator();
 		$eventHandlerRegistry = Application::getInstance()->getDiContainer()->getEventHandlerRegistry();
-		$eventHandlerRegistry->raise(new Event(Event::TYPE_APPSTART));
+		$eventHandlerRegistry->raise(new Event(Event::TYPE_APPLICATION_BEFORE_RUN));
 
 		$this->prepareSwitches();
 		try {
@@ -150,6 +228,11 @@ abstract class BatchScript {
 		}
 		catch (\Exception $exception) {
 			$this->cliHelper->setErrorMessage($exception->getMessage());
+
+			// Set the exit code to invocation error if it's currently set to success.
+			if ($this->getExitCode() == self::EXIT_CODE_SUCCESS) {
+				$this->setExitCode(self::EXIT_CODE_INVOCATION_ERROR);
+			}
 
 			echo $this->cliHelper->getUsageOutput(false);
 			// Re-throw the exception
@@ -162,17 +245,22 @@ abstract class BatchScript {
 				echo $this->cliHelper->getUsageOutput(true);
 			}
 			else {
+				$eventHandlerRegistry->raise(new Event(Event::TYPE_CONTROLLER_BEFORE_ACTION));
 				$this->execute();
+				$eventHandlerRegistry->raise(new Event(Event::TYPE_CONTROLLER_AFTER_ACTION));
 			}
 		}
 		catch (\Exception $exception) {
 			$this->removeSignalHandler();
+			if (self::EXIT_CODE_SUCCESS == $this->getExitCode()) {
+				$this->setExitCode(self::EXIT_CODE_UNHANDLED_EXCEPTION);
+			}
 			Application::getInstance()->getDiContainer()->getErrorHandlerRegistry()->handleException($exception);
 		}
 		$this->removeSignalHandler();
 
 		$this->runAfter();
-		$eventHandlerRegistry->raise(new Event(Event::TYPE_APPFINISH));
+		$eventHandlerRegistry->raise(new Event(Event::TYPE_APPLICATION_AFTER_RUN));
 	}
 
 	/**
@@ -222,22 +310,35 @@ abstract class BatchScript {
 	/**
 	 * Signal handler
 	 *
-	 * @param int $signo   The signal number.
+	 * @param int $signal   The signal number.
 	 *
 	 * @return void
 	 *
 	 * @codeCoverageIgnore
 	 */
-	final public function handleSignal($signo) {
+	final public function handleSignal($signal) {
 		if ($this->handleSignals) {
-			switch ($signo) {
+			switch ($signal) {
 				case SIGTERM:
 				case SIGHUP:
 				case SIGINT:
+					$this->setExitCode(self::EXIT_CODE_SIGNAL_ABORT);
+					$this->runBeforeAbort();
 					$this->abort();
 					break;
 			}
 		}
+	}
+
+	/**
+	 * Runs before the abort() method called.
+	 *
+	 * Can be handy if you want to implement some logging.
+	 *
+	 * @return void
+	 */
+	protected function runBeforeAbort() {
+		// noop
 	}
 
 	/**
@@ -267,4 +368,20 @@ abstract class BatchScript {
 		return Application::getInstance()->getI18nTranslator()->translate(get_class($this), $string, $parameters,
 			$language);
 	}
+
+	/**
+	 * Called just before the application exits.
+	 *
+	 * @param bool $isFatalError   TRUE if the termination is because of a fatal error.
+	 *
+	 * @return void
+	 */
+	public function terminate($isFatalError) {
+		if ($isFatalError && self::EXIT_CODE_SUCCESS == $this->getExitCode()) {
+			$this->setExitCode(self::EXIT_CODE_FATAL_ERROR);
+		}
+
+		exit($this->getExitCode());
+	}
+
 }

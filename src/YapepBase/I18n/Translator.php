@@ -294,4 +294,15 @@ class Translator implements ITranslator {
 		}
 		return $string;
 	}
+
+	/**
+	 * Sets the default language for the translator instance.
+	 *
+	 * @param string $language   The default language for the translations.
+	 *
+	 * @return void
+	 */
+	public function setDefaultLanguage($language) {
+		$this->defaultLanguage = $language;
+	}
 }

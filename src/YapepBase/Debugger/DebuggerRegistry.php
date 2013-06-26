@@ -12,6 +12,7 @@ namespace YapepBase\Debugger;
 
 
 use YapepBase\Application;
+use YapepBase\Debugger\Item\IDebugItem;
 use YapepBase\Event\IEventHandler;
 use YapepBase\Event\Event;
 
@@ -47,61 +48,12 @@ class DebuggerRegistry implements IDebugger, IEventHandler {
 	protected $startTime;
 
 	/**
-	 * Array of timings with name. Stores UNIX timestamps with microseconds to the names.
-	 *
-	 * @var array
-	 */
-	protected $times = array();
-
-	/**
-	 * Array of memory usages stored by the given names. Stores a byte value to every name.
-	 *
-	 * @var array
-	 */
-	protected $memoryUsages = array();
-
-	/**
-	 * Logged messages.
-	 *
-	 * @var array
-	 */
-	protected $messages = array();
-
-	/**
-	 * The logged errors.
-	 *
-	 * @var array
-	 */
-	protected $errors = array();
-
-	/**
 	 * Stores whether the render() method has already been called.
 	 *
 	 * @var bool
 	 */
 	protected $isRendered = false;
 
-	/**
-	 * The logged queries.
-	 *
-	 * @var array
-	 */
-	protected $queries = array(
-		self::QUERY_TYPE_DB    => array(),
-		self::QUERY_TYPE_CACHE => array(),
-		self::QUERY_TYPE_CURL  => array(),
-	);
-
-	/**
-	 * The aggregated times of the queries.
-	 *
-	 * @var float
-	 */
-	protected $queryTimes = array(
-		self::QUERY_TYPE_DB    => 0,
-		self::QUERY_TYPE_CACHE => 0,
-		self::QUERY_TYPE_CURL  => 0,
-	);
 
 	/**
 	 * The registered renderers.
@@ -111,16 +63,11 @@ class DebuggerRegistry implements IDebugger, IEventHandler {
 	protected $renderers = array();
 
 	/**
-	 * Counters used for the logs.
+	 * The added debug items.
 	 *
 	 * @var array
 	 */
-	protected $counters = array(
-		self::COUNTER_TYPE_CACHE => array(),
-		self::COUNTER_TYPE_CURL  => array(),
-		self::COUNTER_TYPE_DB    => array(),
-		self::COUNTER_TYPE_ERROR => array(),
-	);
+	protected $items = array();
 
 	/**
 	 * Constructor.
@@ -132,54 +79,34 @@ class DebuggerRegistry implements IDebugger, IEventHandler {
 		$this->urlToLogFiles = $urlToLogFiles;
 		$this->urlParamName = $urlParamName;
 
-		$this->startTime = isset($_SERVER['REQUEST_TIME_FLOAT']) ? $_SERVER['REQUEST_TIME_FLOAT'] : microtime(true);
+		$this->startTime = isset($_SERVER['REQUEST_TIME_FLOAT'])
+			? (float)$_SERVER['REQUEST_TIME_FLOAT']
+			: microtime(true);
 	}
 
 	/**
-	 * Stores a timing with the given name.
+	 * Returns the time when the request was started as a float timestamp (microtime).
 	 *
-	 * @param string $name   The name of the timing.
-	 *
-	 * @return void
+	 * @return float
 	 */
-	public function addClockMilestone($name) {
-		$this->times[] = array(
-			'name'    => $name,
-			'elapsed' => null,
-			'logged'  => microtime(true),
-		);
+	public function getStartTime() {
+		return $this->startTime;
 	}
 
 	/**
-	 * Stores a memory usage with the given name.
+	 * Adds a new debug item to the debugger.
 	 *
-	 * @param string $name   The name of the measure.
-	 *
-	 * @return void
-	 */
-	public function addMemoryUsageMilestone($name) {
-		$this->memoryUsages[] = array(
-			'name'    => $name,
-			'current' => memory_get_usage(true),
-			'peak'    => memory_get_peak_usage(true)
-		);
-	}
-
-	/**
-	 * Stores a message.
-	 *
-	 * @param mixed $message   The message that should be stored.
+	 * @param \YapepBase\Debugger\Item\IDebugItem $item   The debug item.
 	 *
 	 * @return void
 	 */
-	public function logMessage($message) {
-		$trace = debug_backtrace(false);
-
-		$this->messages[] = array(
-			'message' => $message,
-			'file'    => $trace[0]['file'],
-			'line'    => $trace[0]['line'],
-		);
+	public function addItem(IDebugItem $item) {
+		$type = $item->getType();
+		if (isset($this->items[$type])) {
+			$this->items[$type][] = $item;
+		} else {
+			$this->items[$type] = array($item);
+		}
 	}
 
 	/**
@@ -195,136 +122,6 @@ class DebuggerRegistry implements IDebugger, IEventHandler {
 		}
 
 		return str_replace($this->urlParamName, $errorId, $this->urlToLogFiles);
-	}
-
-	/**
-	 * Logs and error.
-	 *
-	 * @param int    $code      The code of the error.
-	 * @param string $message   Error message.
-	 * @param string $file      The name of the file, where the error occured. If its empty,
-	 *                             then it logs the file where logError() called from.
-	 * @param int    $line      The number of the line where the error occured.If its <var>0</var>,
-	 *                             then it logs the line where logError() called from.
-	 * @param array  $context   The variables from the actual context.
-	 * @param array  $trace     The backtrace for the error.
-	 * @param string $id        The id of the error.
-	 *
-	 * @return void
-	 */
-	public function logError(
-		$code, $message, $file = '', $line = 0, array $context = array(), array $trace = array(), $id = ''
-	) {
-		if (empty($trace)) {
-			$trace = array();
-			if (empty($file) || $line === 0) {
-				$trace = debug_backtrace(false);
-				$file = $trace['file'];
-				$line = $trace['line'];
-			}
-		}
-
-		$this->errors[] = array(
-			'code'    => $code,
-			'message' => $message,
-			'file'    => $file,
-			'line'    => $line,
-			'context' => $context,
-			'trace'   => $trace,
-			'id'      => $id,
-			'source'  => $this->getSource($file, $line),
-			'logFile' => $this->getErrorLogUrl($id)
-		);
-
-		$locationId = $file . ' @ ' . $line;
-
-		if (!isset($this->counters['error'][$locationId])) {
-			$this->counters['error'][$locationId] = 1;
-		}
-		else {
-			$this->counters['error'][$locationId]++;
-		}
-	}
-
-	/**
-	 * Logs the given query.
-	 *
-	 * @param string $type             The type of the query {@uses IDebugger::QUERY_TYPE_*}.
-	 * @param string $connectionName   Connection identification string with backend type.
-	 * @param string $query            The query string.
-	 * @param mixed  $params           The params used by the query.
-	 *
-	 * @return int   The id of the query, which can be used to measure the execution time of it.
-	 */
-	public function logQuery($type, $connectionName, $query, $params = null) {
-		$file = '?';
-		$line = '?';
-		$trace = debug_backtrace();
-
-		if (isset($trace[1])) {
-			$trace[1] += array('file' => '?', 'line' => '?');
-			$file = $trace[1]['file'];
-			$line = $trace[1]['line'];
-		}
-
-		$queryId = count($this->queries[$type]);
-		$this->queries[$type][$queryId] = array(
-			'file'           => $file,
-			'line'           => $line,
-			'query'          => $query,
-			'params'         => $params,
-			'runTime'        => null,
-			'connectionName' => $connectionName,
-		);
-
-		$locationId = $file . ' @ ' . $line;
-
-		switch ($type) {
-			case self::QUERY_TYPE_CACHE:
-				$counterType = self::COUNTER_TYPE_CACHE;
-				break;
-
-			case self::QUERY_TYPE_CURL:
-				$counterType = self::COUNTER_TYPE_CURL;
-				break;
-
-			case self::QUERY_TYPE_DB:
-				$counterType = self::COUNTER_TYPE_DB;
-				break;
-
-			default:
-				// Unknown type
-				$counterType = $type;
-				break;
-		}
-
-		if (!isset($this->counters[$counterType][$locationId])) {
-			$this->counters[$counterType][$locationId] = 1;
-		}
-		else {
-			$this->counters[$counterType][$locationId]++;
-		}
-		return $queryId;
-	}
-
-	/**
-	 * Logs the timing of the given query.
-	 *
-	 * @param string $type            The type of the query {@uses IDebugger::QUERY_TYPE_*}.
-	 * @param int    $queryId         The id of the query.
-	 * @param float  $executionTime   The execution time of the query.
-	 * @param mixed  $params          The params what used by the query.
-	 *
-	 * @return void
-	 */
-	public function logQueryExecutionTime($type, $queryId, $executionTime, $params = null) {
-		if (!empty($params)) {
-			$this->queries[$type][$queryId]['params'] = (array)$params;
-		}
-
-		$this->queries[$type][$queryId]['runTime'] = $executionTime;
-
-		$this->queryTimes[$type] += $executionTime;
 	}
 
 	/**
@@ -347,7 +144,7 @@ class DebuggerRegistry implements IDebugger, IEventHandler {
 	 */
 	public function handleEvent(Event $event) {
 		switch ($event->getType()) {
-			case Event::TYPE_APPFINISH:
+			case Event::TYPE_APPLICATION_BEFORE_OUTPUT_SEND:
 				$this->render();
 				break;
 		}
@@ -369,12 +166,6 @@ class DebuggerRegistry implements IDebugger, IEventHandler {
 		$runTime = $endTime - $this->startTime;
 		$currentMemory = memory_get_usage(true);
 		$peakMemory = memory_get_peak_usage(true);
-		$times = $this->times;
-
-		// Calculate elapsed times.
-		foreach ($times as $key => $time) {
-			$times[$key]['elapsed'] = $time['logged'] - $this->startTime;
-		}
 
 		/** @var \YapepBase\Debugger\IDebuggerRenderer $renderer */
 		foreach ($this->renderers as $renderer) {
@@ -383,13 +174,7 @@ class DebuggerRegistry implements IDebugger, IEventHandler {
 				$runTime,
 				$currentMemory,
 				$peakMemory,
-				$times,
-				$this->memoryUsages,
-				$this->messages,
-				$this->errors,
-				$this->queries,
-				$this->queryTimes,
-				$this->counters,
+				$this->items,
 				$_SERVER,
 				$_POST,
 				$_GET,
@@ -397,27 +182,6 @@ class DebuggerRegistry implements IDebugger, IEventHandler {
 				Application::getInstance()->getDiContainer()->getSessionRegistry()->getAllData()
 			);
 		}
-	}
-
-	/**
-	 * Reads the given number of rows surrounding the given line of the file.
-	 *
-	 * @param string $file    Path of the file.
-	 * @param int    $line    The number of the line.
-	 * @param int    $range   Number of rows should be read before and after the given line.
-	 *
-	 * @return array   The rows indexed by the number of the rows.
-	 */
-	protected function getSource($file, $line, $range = 5) {
-		$result = array();
-		$buffer = file($file, FILE_IGNORE_NEW_LINES);
-		if ($buffer !== false) {
-			// We shift the ordinal numbers by one, to fit to the line numbers.
-			array_unshift($buffer, null);
-			unset($buffer[0]);
-			$result = array_slice($buffer, max(0, $line - $range - 1), 2 * $range + 1, true);
-		}
-		return $result;
 	}
 
 	/**

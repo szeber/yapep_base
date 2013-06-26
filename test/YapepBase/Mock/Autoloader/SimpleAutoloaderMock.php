@@ -22,6 +22,22 @@ use YapepBase\Autoloader\SimpleAutoloader;
 class SimpleAutoloaderMock extends SimpleAutoloader {
 
 	/**
+	 * The class paths to use
+	 *
+	 * @var array
+	 */
+	public $classPaths = array();
+
+	/**
+	 * The class paths to use for given namespace prefixes.
+	 *
+	 * The key is tha namespace prefix, and the value is the path
+	 *
+	 * @var array
+	 */
+	public $classPathsWithNamespace = array();
+
+	/**
 	 * Returns the possible full paths for the given class.
 	 *
 	 * @param string $className   Namespace and name of the class.

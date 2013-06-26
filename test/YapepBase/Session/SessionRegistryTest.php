@@ -19,7 +19,7 @@ use YapepBase\Mock\Session\SessionMock;
  * @package    YapepBase
  * @subpackage Test\Session
  */
-class SessionRegistryTest extends \PHPUnit_Framework_TestCase {
+class SessionRegistryTest extends \YapepBase\BaseTest {
 
 	public function testRegistration() {
 		$session = new SessionMock('test');
