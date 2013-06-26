@@ -40,21 +40,23 @@ class SimpleAutoloader implements IAutoloader {
 	/**
 	 * Adds a path to use on class loading.
 	 *
-	 * @param string $path             The path to use.
-	 * @param string $forceNameSpace   A full namespace. If given all the classes in a namespace having
-	 *                                    this prefix will be searched at this path only.
+	 * @param array|string $path             The path(s) to use.
+	 * @param string       $forceNameSpace   A full namespace. If given all the classes in a namespace having
+	 *                                          this prefix will be searched at this path only.
 	 *
 	 * @return \YapepBase\Autoloader\IAutoloader
 	 */
 	public function addClassPath($path, $forceNameSpace = null) {
-		$path = rtrim($path, DIRECTORY_SEPARATOR);
-		if (!is_null($forceNameSpace)) {
+		foreach ((array)$path as $pathItem) {
+			$pathItem = rtrim($pathItem, DIRECTORY_SEPARATOR);
+			if (!is_null($forceNameSpace)) {
 
-			$forceNameSpace = ltrim($forceNameSpace, '\\');
-			$this->classPathsWithNamespace[$forceNameSpace] = $path;
-		}
-		else {
-			$this->classPaths[] = $path;
+				$forceNameSpace = ltrim($forceNameSpace, '\\');
+				$this->classPathsWithNamespace[$forceNameSpace] = $pathItem;
+			}
+			else {
+				$this->classPaths[] = $pathItem;
+			}
 		}
 
 		return $this;

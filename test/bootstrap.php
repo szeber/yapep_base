@@ -25,6 +25,7 @@ if (defined('APP_ROOT')) {
 	$autoloader->addClassPath(APP_ROOT . '/class');
 }
 $autoloader->addClassPath(TEST_DIR);
+
 foreach ($autoloadDirs as $dir) {
 	$autoloader->addClassPath($dir);
 }
