@@ -109,17 +109,22 @@ class CurlHttpWrapper {
 	/**
 	 * Constructor.
 	 *
-	 * @param string $method              The request method {@uses self::METHOD_*}.
-	 * @param string $url                 The URL of the request.
-	 * @param array  $parameters          The GET or POST parameters for the request.
-	 * @param array  $additionalHeaders   Additional HTTP headers for the request.
-	 * @param array  $extraOptions        Extra options for the request. The options must be in an associative array,
-	 *                                    the key must be a valid CURL option name, and the value the value for that key
+	 * @param string $method                              The request method {@uses self::METHOD_*}.
+	 * @param string $url                                 The URL of the request.
+	 * @param array  $parameters                          The GET or POST parameters for the request.
+	 * @param array  $additionalHeaders                   Additional HTTP headers for the request.
+	 * @param array  $extraOptions                        Extra options for the request. The options must be in an
+	 *                                                    associative array, the key must be a valid CURL option name,
+	 *                                                    and the value the value for that key.
+	 * @param bool   $forceQueryStringFormattingForPost   If TRUE, and this is a POST request, the post data will be
+	 *                                                    formatted as a query string, instead of sending it as
+	 *                                                    multipart/form-data.
 	 *
-	 * @throws \YapepBase\Exception\CurlException   In case of invalid data given.
+	 * @throws \YapepBase\Exception\CurlException In case of invalid data given.
 	 */
 	public function __construct(
-		$method, $url, $parameters = array(), $additionalHeaders = array(), $extraOptions = array()
+		$method, $url, $parameters = array(), $additionalHeaders = array(), $extraOptions = array(),
+		$forceQueryStringFormattingForPost = false
 	) {
 		if (empty($extraOptions) || !is_array($extraOptions)) {
 			$options = array();
@@ -153,6 +158,8 @@ class CurlHttpWrapper {
 				$options[CURLOPT_POST] = true;
 				if (empty($parameters)) {
 					throw new CurlException('HTTP POST request without parameters');
+				} elseif ($forceQueryStringFormattingForPost) {
+					$options[CURLOPT_POSTFIELDS] = http_build_query($parameters);
 				} else {
 					$formattedParameters = array();
 					$this->formatDataForPost($parameters, $formattedParameters);
