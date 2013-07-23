@@ -182,7 +182,7 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 		$file = $this->viewDo->escape($errorData[ErrorItem::FIELD_FILE]);
 		$line = $this->viewDo->escape($errorData[ErrorItem::FIELD_LINE]);
 
-		$id = $this->viewDo->escape($errorData[ErrorItem::LOCAL_FIELD_ID]);
+		$id = uniqid($this->viewDo->escape($errorData[ErrorItem::LOCAL_FIELD_ID]));
 		$message = '[' . $this->viewDo->escape(
 			$errorHandlerHelper->getPhpErrorLevelDescription($errorData[ErrorItem::LOCAL_FIELD_CODE]))
 			. '] ' . $this->viewDo->escape($errorData[ErrorItem::LOCAL_FIELD_MESSAGE]);
