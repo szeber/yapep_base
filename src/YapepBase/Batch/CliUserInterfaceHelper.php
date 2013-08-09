@@ -9,6 +9,7 @@
  */
 
 namespace YapepBase\Batch;
+use Ulrichsg\Getopt;
 use YapepBase\Exception\Exception;
 
 /**
@@ -137,6 +138,13 @@ class CliUserInterfaceHelper {
 	protected $usageSwitches = array(self::ALL_USAGE_KEY => array());
 
 	/**
+	 * Operands for each usage.
+	 *
+	 * @var array
+	 */
+	protected $usageOperands = array(self::ALL_USAGE_KEY => array());
+
+	/**
 	 * Description of the script.
 	 *
 	 * @var string
@@ -165,6 +173,13 @@ class CliUserInterfaceHelper {
 	protected $longSwitches = array();
 
 	/**
+	 * The getopt instance.
+	 *
+	 * @var \Ulrichsg\Getopt
+	 */
+	protected $getopt;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param string $description   Description of the script. All newlines are converted to spaces in it, and multiple
@@ -174,6 +189,7 @@ class CliUserInterfaceHelper {
 	public function __construct($description, $scriptName = null) {
 		$this->description = preg_replace('/\s{2,}/', ' ', str_replace(array("\n", "\r"), ' ', trim($description)));
 		$this->scriptName = (empty($scriptName) ? basename($_SERVER['argv'][0]) : $scriptName);
+		$this->getopt = new Getopt();
 	}
 
 	/**
@@ -188,6 +204,7 @@ class CliUserInterfaceHelper {
 		end($this->usages);
 		$usageIndex = key($this->usages);
 		$this->usageSwitches[$usageIndex] = array();
+		$this->usageOperands[$usageIndex] = array();
 		return $usageIndex;
 	}
 
@@ -262,6 +279,53 @@ class CliUserInterfaceHelper {
 		} else {
 			throw new Exception('The specified usage index is not set: ' . $usageIndexes);
 		}
+
+		if (empty($paramName)) {
+			$paramType = Getopt::NO_ARGUMENT;
+		} else {
+			$paramType = $paramIsOptional ? Getopt::OPTIONAL_ARGUMENT : getopt::REQUIRED_ARGUMENT;
+		}
+
+		$this->getopt->addOptions(array(
+			array(empty($shortName) ? null : $shortName, empty($longName) ? null : $longName, $paramType)
+		));
+	}
+
+	/**
+	 * Adds an operand to the list of operands.
+	 *
+	 * @param string    $name              The name of the operand.
+	 * @param int|array $usageIndexes      An array containing the usage indexes for the switch, or optionally an int
+	 *                                     if the switch is only valid for one usage method. If set to NULL, it will be
+	 *                                     added to all usages.{@see self::addUsage()}
+	 * @param bool      $isOptional        If TRUE, the operand is optional.
+	 * @param bool      $treatAsLiteral    If TRUE, the name is treated as a literal, not the name of a parameter.
+	 *
+	 * @return void
+	 * @throws \YapepBase\Exception\Exception
+	 */
+	public function addOperand($name, $usageIndexes, $isOptional = false, $treatAsLiteral = false) {
+		$operandData = array(
+			'name'           => $name,
+			'isOptional'     => $isOptional,
+			'treatAsLiteral' => $treatAsLiteral,
+		);
+
+		if (is_null($usageIndexes)) {
+			$this->usageOperands[self::ALL_USAGE_KEY][] = $operandData;
+		} elseif (is_array($usageIndexes)) {
+			foreach ($usageIndexes as $index) {
+				if (!isset($this->usageOperands[$index])) {
+					throw new Exception('The specified usage index is not set: ' . $index);
+				}
+				$this->usageOperands[$index][] = $operandData;
+			}
+		} elseif (is_numeric($usageIndexes) && isset($this->usageOperands[$usageIndexes])) {
+			$this->usageOperands[$usageIndexes][] = $operandData;
+		} else {
+			throw new Exception('The specified usage index is not set: ' . $usageIndexes);
+		}
+
 	}
 
 	/**
@@ -299,7 +363,8 @@ class CliUserInterfaceHelper {
 		$message .= (count($this->usages) > 1 ? 'Usages:' : 'Usage:') . "\n\n";
 		foreach ($this->usages as $index => $usage) {
 			$message .= $this->getUsageWithSwitches($usage,
-				array_merge($this->usageSwitches[self::ALL_USAGE_KEY], $this->usageSwitches[$index]));
+				array_merge($this->usageSwitches[self::ALL_USAGE_KEY], $this->usageSwitches[$index]),
+				array_merge($this->usageOperands[self::ALL_USAGE_KEY], $this->usageOperands[$index]));
 		}
 
 		if ($showHelp) {
@@ -348,10 +413,11 @@ class CliUserInterfaceHelper {
 	 *
 	 * @param string $description   Description of the usage method.
 	 * @param array  $switches      Array containing all the switches that are valid for the given usage.
+	 * @param array  $operands      Array containing all the operands that are valid for the given usage.
 	 *
 	 * @return string
 	 */
-	protected function getUsageWithSwitches($description, array $switches) {
+	protected function getUsageWithSwitches($description, array $switches, array $operands) {
 		$commandFormat = $this->scriptName;
 		foreach ($switches as $switchData) {
 			$commandFormat .= ' ';
@@ -383,6 +449,15 @@ class CliUserInterfaceHelper {
 			$commandFormat .= ' ' . ($switchData['isOptional'] ? '[' : '') . implode('|', $switchVersions)
 				. ($switchData['isOptional'] ? ']' : '');
 		}
+		foreach ($operands as $operandData) {
+			$commandFormat .= ' '
+				. ($operandData['isOptional'] ? '[' : '')
+				. ($operandData['treatAsLiteral'] ? '' : '<')
+				. $operandData['name']
+				. ($operandData['treatAsLiteral'] ? '' : '>')
+				. ($operandData['isOptional'] ? ']' : '');
+		}
+
 		return $this->getIndentedBlock($description . ':', 1) . $this->getIndentedBlock($commandFormat, 2) . "\n";
 	}
 
@@ -428,43 +503,6 @@ class CliUserInterfaceHelper {
 	}
 
 	/**
-	 * Returns the short option list in getopt's format for all defined switches.
-	 *
-	 * @return string
-	 */
-	public function getGetoptShortList() {
-		$switches = '';
-		foreach ($this->switches as $switchData) {
-			if (!empty($switchData['shortName'])) {
-				$switches .= $switchData['shortName'];
-				if (!empty($switchData['paramName'])) {
-					$switches .= ($switchData['paramIsOptional'] ? '::' : ':');
-				}
-			}
-		}
-		return $switches;
-	}
-
-	/**
-	 * Returns the long option list in getopt's format for all defined switches.
-	 *
-	 * @return string
-	 */
-	public function getGetoptLongList() {
-		$switches = array();
-		foreach ($this->switches as $switch) {
-			if (!empty($switch['longName'])) {
-				$name = $switch['longName'];
-				if (!empty($switch['paramName'])) {
-					$name .= ($switch['paramIsOptional'] ? '::' : ':');
-				}
-				$switches[] = $name;
-			}
-		}
-		return $switches;
-	}
-
-	/**
 	 * Returns the arguments that have been parsed by getopt.
 	 *
 	 * Be careful, that any not defined input in the script arguments will stop parsing any further arguments.
@@ -475,6 +513,19 @@ class CliUserInterfaceHelper {
 	 * @codeCoverageIgnore   The getopt function can not be tested
 	 */
 	public function getParsedArgs() {
-		return getopt($this->getGetoptShortList(), $this->getGetoptLongList());
+		$this->getopt->parse();
+		return $this->getopt->getOptions();
+	}
+
+	/**
+	 * Returns the operands that were parsed by getopt.
+	 *
+	 * These are the arguments after the switches.
+	 *
+	 * @return array
+	 */
+	public function getParsedOperands() {
+		$this->getopt->parse();
+		return $this->getopt->getOperands();
 	}
 }
