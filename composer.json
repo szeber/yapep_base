@@ -9,8 +9,7 @@
 	"require-dev": {
 		"mikey179/vfsStream": ">=1.1.0",
 		"phpunit/phpunit": "3.7.x-dev",
-		"mockery/mockery": ">=0.7.2",
-		"ulrichsg/getopt-php": ">=1.1.0"
+		"mockery/mockery": ">=0.7.2"
 	},
 	"autoload": {
 		"psr-0": { "YapepBase": "src/" }
