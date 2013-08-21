@@ -129,10 +129,10 @@ abstract class DbTable {
 	 * @throws \YapepBase\Exception\ParameterException   If the field is not defined or no set values are set for it.
 	 */
 	public function getSetValues($field) {
-		if (!isset($this->enumValues[$field])) {
+		if (!isset($this->setValues[$field])) {
 			throw new ParameterException('No set values are defined for field ' . $field);
 		}
-		return $this->enumValues[$field];
+		return $this->setValues[$field];
 	}
 
 	/**
