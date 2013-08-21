@@ -57,6 +57,13 @@ abstract class DbTable {
 	protected $enumValues = array();
 
 	/**
+	 * Associative array containing all possible values for the set fields.
+	 *
+	 * @var array
+	 */
+	protected $setValues = array();
+
+	/**
 	 * Constructor
 	 *
 	 * @param DbConnection $dbConnection   The connection what should be used by the class.
@@ -71,7 +78,7 @@ abstract class DbTable {
 	}
 
 	/**
-	 * Visszaadja az adatbazis tabla nevet, amelyen az objektum dolgozik.
+	 * Returns the name of the table in the database which is represented by the object.
 	 *
 	 * @return string
 	 */
@@ -83,7 +90,7 @@ abstract class DbTable {
 	 * Returns the connection for the given type of query.
 	 *
 	 * @param string $type   The type of the query. Can be reading ({@link DbFactory::TYPE_READ_ONLY}),
-	 *                    writing ({@DbFactory Db::TYPE_READ_WRITE}).
+	 *                       writing ({@DbFactory Db::TYPE_READ_WRITE}).
 	 *
 	 * @return DbConnection
 	 */
@@ -108,6 +115,22 @@ abstract class DbTable {
 	public function getEnumValues($field) {
 		if (!isset($this->enumValues[$field])) {
 			throw new ParameterException('No enum values are defined for field ' . $field);
+		}
+		return $this->enumValues[$field];
+	}
+
+	/**
+	 * Returns the possible SET values for the specified field in the table.
+	 *
+	 * @param string $field   Name of the field. {@uses self::FIELD_*}
+	 *
+	 * @return array
+	 *
+	 * @throws \YapepBase\Exception\ParameterException   If the field is not defined or no set values are set for it.
+	 */
+	public function getSetValues($field) {
+		if (!isset($this->enumValues[$field])) {
+			throw new ParameterException('No set values are defined for field ' . $field);
 		}
 		return $this->enumValues[$field];
 	}
