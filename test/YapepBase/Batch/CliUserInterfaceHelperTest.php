@@ -87,25 +87,6 @@ Usages:
 
 ';
 		$this->assertSame($expectedOutput, $helper->getUsageOutput(false));
-
-		$shortList = $helper->getGetoptShortList();
-		$longList = $helper->getGetoptLongList();
-
-		$regexPrefix = '/(^|[a-z:])';
-		$regexSuffix = '([a-z]|$)/';
-
-		// Short options
-		$this->assertTrue((bool)preg_match($regexPrefix . 'a::' . $regexSuffix, $shortList),
-			'Invalid optional value short switch');
-		$this->assertTrue((bool)preg_match($regexPrefix . 'b' . $regexSuffix, $shortList),
-			'Invalid simple short switch');
-		$this->assertTrue((bool)preg_match($regexPrefix . 'd:' . $regexSuffix, $shortList),
-			'Invalid required value short switch');
-
-		// Long options
-		$this->assertTrue(in_array('test::', $longList, true), 'Invalid optional value long switch');
-		$this->assertTrue(in_array('test3', $longList, true), 'Invalid simple long switch');
-		$this->assertTrue(in_array('test4:', $longList, true), 'Invalid required value long switch');
 	}
 
 	public function testErrors() {
