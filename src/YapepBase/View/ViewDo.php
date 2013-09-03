@@ -246,7 +246,7 @@ class ViewDo {
 
 			case 'array':
 				foreach ($value as $elementKey => $elementValue) {
-					$value[$elementKey] = $this->escape($elementValue);
+					$value[$elementKey] = $this->escapeForHtml($elementValue);
 				}
 				return $value;
 				break;
@@ -254,11 +254,11 @@ class ViewDo {
 			case 'object':
 				if (($value instanceof \Iterator) && ($value instanceof \ArrayAccess)) {
 					foreach ($value as $elementKey => $elementValue) {
-						$value[$elementKey] = $this->escape($elementValue);
+						$value[$elementKey] = $this->escapeForHtml($elementValue);
 					}
 					return $value;
 				} elseif (method_exists($value, '__toString')) {
-					return $this->escape((string)$value);
+					return $this->escapeForHtml((string)$value);
 				} else {
 					throw new ParameterException('Unable to escape objects');
 				}
