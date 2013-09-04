@@ -418,6 +418,10 @@ class FileHandlerUnix implements IFileHandler {
 			return array();
 		}
 
+		if ('' == trim($result->output)) {
+			return array();
+		}
+
 		$content = explode("\n", trim($result->output));
 
 		// Sort in PHP as otherwise leading dots may screw up the sorting
