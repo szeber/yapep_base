@@ -103,14 +103,18 @@ class DbFactory {
 			if (is_null(static::$paramPrefix)) {
 				static::$paramPrefix = (string)$config->get('system.database.paramPrefix', '');
 			}
+
 			$properties = array(
 				'backendType',
 				'charset',
 				'database',
 				'host',
+				'isPersistent',
 				'password',
 				'path',
 				'user',
+				'useTraditionalStrictMode',
+				'timezone'
 			);
 			$configData = array();
 			foreach ($properties as $property) {
