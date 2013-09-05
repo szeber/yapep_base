@@ -66,13 +66,13 @@ class StorageFactory {
 		if (!isset(static::$storages[$configName])) {
 			$config = Config::getInstance();
 
-			$configOptions = $config->get('resource.storage.' . $configName . '.*', false);
+			$storageType = $config->get('resource.storage.' . $configName . '.storageType');
 
-			if (empty($configOptions['storageType'])) {
+			if (empty($storageType)) {
 				throw new StorageException('No storageType configured in the config: ' . $configName);
 			}
 
-			static::$storages[$configName] = static::getStorage($configName, $configOptions['storageType']);
+			static::$storages[$configName] = static::getStorage($configName, $storageType);
 
 		}
 		return static::$storages[$configName];

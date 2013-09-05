@@ -1,6 +1,8 @@
 <?php
 
 namespace YapepBase\Database;
+
+
 use YapepBase\Config;
 use YapepBase\Database\DbFactory;
 

@@ -2,14 +2,16 @@
 /**
  * This file is part of YAPEPBase.
  *
- * @package      YapepBase
- * @subpackage   Storage
- * @copyright    2011 The YAPEP Project All rights reserved.
- * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
+ * @package    YapepBase
+ * @subpackage Storage
+ * @copyright  2011 The YAPEP Project All rights reserved.
+ * @license    http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
 
 namespace YapepBase\Storage;
+
+
 use YapepBase\Exception\ConfigException;
 use YapepBase\Config;
 
@@ -42,12 +44,28 @@ abstract class StorageAbstract implements IStorage {
 	public function __construct($configName) {
 		$this->currentConfigurationName = $configName;
 
-		$config = Config::getInstance()->get('resource.storage.' . $configName . '.*', false);
-		if (false === $config) {
-			throw new ConfigException('Configuration not found: ' . $configName);
+		$properties = $this->getConfigProperties();
+		$configData = array();
+		foreach ($properties as $property) {
+			try {
+				$configData[$property] =
+					Config::getInstance()->get('resource.storage.' . $configName . '.' . $property);
+
+			}
+			catch (ConfigException $e) {
+				// We just swallow this because we don't know what properties do we need in advance
+			}
 		}
-		$this->setupConfig($config);
+
+		$this->setupConfig($configData);
 	}
+
+	/**
+	 * Returns the config properties(last part of the key) used by the class.
+	 *
+	 * @return array
+	 */
+	abstract protected function getConfigProperties();
 
 	/**
 	 * Sets up the backend.

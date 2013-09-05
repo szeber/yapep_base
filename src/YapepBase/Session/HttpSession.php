@@ -27,7 +27,7 @@ use YapepBase\Exception\ConfigException;
  * <ul>
  *     <li>namespace: The namespace used for the session. This namespace is used to register to the session
  *                    registry, and also used as part of the key used during the storage of the session data.</li>
- *     <li>lifetime: The lifetime of the sesssion in seconds. Optional.</li>
+ *     <li>lifetime: The lifetime of the session in seconds. Optional.</li>
  *     <li><b>cookieName: Name of the cookie that stores the session ID.</li>
  *     <li>cookieDomain: The domain to use for the session cookie. Optional, if not set it will use the current
  *                       domain.</li>
@@ -103,6 +103,20 @@ class HttpSession extends SessionAbstract {
 		$this->response = $response;
 
 		parent::__construct($configName, $storage, $autoRegister);
+	}
+
+	/**
+	 * Returns the config properties(last part of the key) used by the class.
+	 *
+	 * @return array
+	 */
+	protected function getConfigProperties() {
+		return array(
+			'cacheLimitersEnabled',
+			'cookieDomain',
+			'cookieName',
+			'cookiePath',
+		);
 	}
 
 	/**

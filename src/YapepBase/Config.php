@@ -15,7 +15,7 @@ use YapepBase\Exception\ConfigException;
 /**
  * Config singleton class.
  *
- * Configuration data can be stored in a hierarchycal way, the parents separated from their children by '.' characters.
+ * Configuration data can be stored in a hierarchical way, the parents separated from their children by '.' characters.
  * For example 'system.database.paramPrefix'. All child nodes of a parent can be retrieved by adding '.*' to the name
  * of the parent.
  *
@@ -95,8 +95,8 @@ class Config {
 	 * In wildcard mode the whole section that begins as the name before the wildcard, will be returned.
 	 * If no results are found, the default will be returned. If name is '*', all the settings are returned.
 	 *
-	 * For compatibility reasons right now we only trigger a E_USER_NOTICE, and not throw exceptions for config option
-	 * requests that are not set and don't have a default set for them.
+	 * Be careful! The wildcard lookup can be really slow if you have a big configuration, as it has to search through
+	 * the entries to find the desired one.
 	 *
 	 * @param string $name               The name of the setting to look for.
 	 * @param mixed  $default            If the setting is not found, this value will be returned. A NULL value is
@@ -137,13 +137,13 @@ class Config {
 				}
 			}
 			if (empty($result) && is_null($default)) {
-				throw new ConfigException('Configuration option not found. Key: ' . $name, E_USER_NOTICE);
+				throw new ConfigException('Configuration option not found. Key: ' . $name);
 			}
 			return (empty($result) ? $default : $result);
 		}
 
 		if (empty($result) && is_null($default)) {
-			throw new ConfigException('Configuration option not found. Key: ' . $name, E_USER_NOTICE);
+			throw new ConfigException('Configuration option not found. Key: ' . $name);
 		}
 		return $default;
 	}

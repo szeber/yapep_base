@@ -99,20 +99,35 @@ abstract class SessionAbstract implements ISession {
 
 		$this->storage  = $storage;
 
-		$config = Config::getInstance()->get('resource.session.' . $configName . '.*', false);
-		if (empty($config)) {
+		$properties = array(
+			'namespace',
+			'lifetime',
+		);
+		$properties = array_merge($properties, $this->getConfigProperties());
+		$configData = array();
+		foreach ($properties as $property) {
+			try {
+				$configData[$property] =
+					Config::getInstance()->get('resource.session.' . $configName . '.' . $property);
+
+			}
+			catch (ConfigException $e) {
+				// We just swallow this because we don't know what properties do we need in advance
+			}
+		}
+
+		if (empty($configData)) {
 			throw new ConfigException('Configuration not found for session handler: ' . $configName);
 		}
-		if (!is_array($config)) {
-			throw new ConfigException('Invalid configuration for session handler: ' . $configName);
-		}
-		if (!isset($config['namespace'])) {
+		if (!isset($configData['namespace'])) {
 			throw new ConfigException('No namespace has been set for the session handler: ' . $configName);
 		}
-		$this->namespace = $config['namespace'];
-		$this->lifetime = (isset($config['lifetime']) ? (int)$config['lifetime'] : self::DEFAULT_LIFETIME);
+		$this->validateConfig($configData);
 
-		$this->validateConfig($config);
+		$this->namespace = $configData['namespace'];
+		$this->lifetime = empty($configData['lifetime'])
+			? self::DEFAULT_LIFETIME
+			: (int)$configData['lifetime'];
 
 		if ($autoRegister) {
 			$this->registerEventHandler();
@@ -120,6 +135,13 @@ abstract class SessionAbstract implements ISession {
 
 		$this->id = $this->getSessionId();
 	}
+
+	/**
+	 * Returns the config properties(last part of the key) used by the class.
+	 *
+	 * @return array
+	 */
+	abstract protected function getConfigProperties();
 
 	/**
 	 * Validates the configuration.

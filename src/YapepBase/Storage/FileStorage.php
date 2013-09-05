@@ -134,6 +134,24 @@ class FileStorage extends StorageAbstract {
 	}
 
 	/**
+	 * Returns the config properties(last part of the key) used by the class.
+	 *
+	 * @return array
+	 */
+	protected function getConfigProperties() {
+		return array(
+			'path',
+			'storePlainText',
+			'filePrefix',
+			'fileSuffix',
+			'fileMode',
+			'hashKey',
+			'readOnly',
+			'debuggerDisabled'
+		);
+	}
+
+	/**
 	 * Sets up the backend.
 	 *
 	 * @param array $config   The configuration data for the backend.
@@ -154,13 +172,13 @@ class FileStorage extends StorageAbstract {
 			$this->path .= DIRECTORY_SEPARATOR;
 		}
 
-		$this->storePlainText = (isset($config['storePlainText']) && $config['storePlainText']);
-		$this->filePrefix = (isset($config['filePrefix']) ? $config['filePrefix'] : '');
-		$this->fileSuffix = (isset($config['fileSuffix']) ? $config['fileSuffix'] : '');
-		$this->fileMode = (empty($config['fileMode']) ? 0644 : $config['fileMode']);
-		$this->hashKey = (isset($config['hashKey']) ? (bool)$config['hashKey'] : false);
-		$this->readOnly = (isset($config['readOnly']) ? (bool)$config['readOnly'] : false);
-		$this->debuggerDisabled = (isset($config['debuggerDisabled'])) ? (bool)$config['debuggerDisabled'] : false;
+		$this->storePlainText   = empty($config['storePlainText'])   ? false : (bool)$config['storePlainText'];
+		$this->filePrefix       = empty($config['filePrefix'])       ? ''    : $config['filePrefix'];
+		$this->fileSuffix       = empty($config['fileSuffix'])       ? ''    : $config['fileSuffix'];
+		$this->fileMode         = empty($config['fileMode'])         ? 0644  : $config['fileMode'];
+		$this->hashKey          = empty($config['hashKey'])          ? false : (bool)$config['hashKey'];
+		$this->readOnly         = empty($config['readOnly'])         ? false : (bool)$config['readOnly'];
+		$this->debuggerDisabled = empty($config['debuggerDisabled']) ? false : (bool)$config['debuggerDisabled'];
 
 		// If the given path does not exist
 		if (!$this->fileHandler->checkIsPathExists($this->path)) {

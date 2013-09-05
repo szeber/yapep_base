@@ -141,6 +141,15 @@ class DummyStorage extends StorageAbstract {
 	}
 
 	/**
+	 * Returns the config properties(last part of the key) used by the class.
+	 *
+	 * @return array
+	 */
+	protected function getConfigProperties() {
+		return array('debuggerDisabled');
+	}
+
+	/**
 	 * Sets up the backend.
 	 *
 	 * @param array $config   The configuration data for the backend.
