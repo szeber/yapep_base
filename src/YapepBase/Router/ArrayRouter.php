@@ -2,13 +2,15 @@
 /**
  * This file is part of YAPEPBase.
  *
- * @package      YapepBase
- * @subpackage   Router
- * @copyright    2011 The YAPEP Project All rights reserved.
- * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
+ * @package    YapepBase
+ * @subpackage Router
+ * @copyright  2011 The YAPEP Project All rights reserved.
+ * @license    http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
 namespace YapepBase\Router;
+
+
 use YapepBase\Exception\RouterException;
 use YapepBase\Request\IRequest;
 
@@ -84,13 +86,18 @@ class ArrayRouter implements IRouter {
 	 *
 	 * @param string $controller   The controller class name. (Outgoing parameter)
 	 * @param string $action       The action name in the controller class. (Outgoing parameter)
+	 * @param string $uri          The uri to check. If not given, the current uri will be used.
 	 *
 	 * @return string   The controller and action separated by a '/' character.
 	 *
 	 * @throws RouterException   On errors. (Including if the route is not found)
 	 */
-	public function getRoute(&$controller = null, &$action = null) {
-		$target = rtrim($this->getTarget(), '/');
+	public function getRoute(&$controller = null, &$action = null, $uri = null) {
+		$target = empty($uri)
+			? rtrim($this->getTarget(), '/')
+			: $uri;
+		// TODO: In case of a given URI is used, this method will always use the method of the current request
+		// TODO:   Consider adding the method as a parameter, if this can cause problems [emul]
 		$method = $this->getMethod();
 
 		// If the target doesn't start with a '/', add one

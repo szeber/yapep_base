@@ -2,14 +2,16 @@
 /**
  * This file is part of YAPEPBase.
  *
- * @package      YapepBase
- * @subpackage   Router
- * @copyright    2011 The YAPEP Project All rights reserved.
- * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
+ * @package    YapepBase
+ * @subpackage Router
+ * @copyright  2011 The YAPEP Project All rights reserved.
+ * @license    http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
 
 namespace YapepBase\Router;
+
+
 use YapepBase\Request\IRequest;
 
 /**
@@ -43,29 +45,36 @@ class AutoRouter implements IRouter {
 	 *
 	 * @param string $controller   $he controller class name. (Outgoing parameter)
 	 * @param string $action       The action name in the controller class. (Outgoing parameter)
+	 * @param string $uri          The uri to check. If not given, the current uri will be used.
 	 *
 	 * @return string   The controller and action separated by a '/' character.
 	 *
 	 * @throws \YapepBase\Exception\RouterException   On errors. (Including if the route is not found)
 	 */
-	public function getRoute(&$controller = null, &$action = null) {
-		$target = explode('/', trim($this->request->getTarget(), '/ '));
+	public function getRoute(&$controller = null, &$action = null, $uri = null) {
+		$uri = empty($uri)
+			? $this->request->getTarget()
+			: $uri;
+		$target = explode('/', trim($uri, '/ '));
 		$controller = array_shift($target);
+
 		if (empty($controller)) {
 			$controller = 'Index';
 		} else {
 			$controller = $this->convertPathPartToName($controller);
 		}
+
 		if (empty($target)) {
 			$action = 'Index';
 		} else {
 			$action = $this->convertPathPartToName(array_shift($target));
 		}
+
 		foreach ($target as $key => $value) {
 			$this->request->setParam($key, $value);
 		}
-		return $controller . '/' . $action;
 
+		return $controller . '/' . $action;
 	}
 
 	/**
