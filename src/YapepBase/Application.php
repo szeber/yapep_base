@@ -179,7 +179,7 @@ class Application {
 	}
 
 	/**
-	 * Sets the DI contianer to be used by the application
+	 * Sets the DI container to be used by the application
 	 *
 	 * @param \YapepBase\DependencyInjection\SystemContainer $diContainer   The DI container instance to use
 	 *
@@ -307,7 +307,11 @@ class Application {
 	 * @return void
 	 */
 	public function run() {
+		// Inform the ErrorHandler about the run
+		$this->diContainer->getErrorHandlerRegistry()->reportApplicationRun();
+
 		$eventHandlerRegistry = $this->diContainer->getEventHandlerRegistry();
+
 		try {
 			$eventHandlerRegistry->raise(new Event(Event::TYPE_APPLICATION_BEFORE_RUN));
 			$controllerName = null;

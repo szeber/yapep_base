@@ -65,6 +65,13 @@ class ErrorHandlerRegistry {
 	protected $terminator;
 
 	/**
+	 * Indicates if the Application has been started.
+	 *
+	 * @var bool
+	 */
+	protected $isApplicationStarted = false;
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
@@ -102,6 +109,15 @@ class ErrorHandlerRegistry {
 			restore_exception_handler();
 			$this->isRegistered = false;
 		}
+	}
+
+	/**
+	 * The object can be informed about the Application run via this method.
+	 *
+	 * @return void
+	 */
+	public function reportApplicationRun() {
+		$this->isApplicationStarted = true;
 	}
 
 	/**
@@ -268,6 +284,10 @@ class ErrorHandlerRegistry {
 	 * @return void
 	 */
 	protected function terminate($isFatalError) {
+		if (php_sapi_name() != 'cli' && !$this->isApplicationStarted) {
+			header('HTTP/1.1 500');
+		}
+
 		if (!empty($this->terminator)) {
 			$this->terminator->terminate($isFatalError);
 		}
@@ -321,7 +341,7 @@ class ErrorHandlerRegistry {
 			$message = 'A fatal error occured while handling the error with the id: '
 				. $this->currentlyHandledError['errorId'] . '. Fatal error ID: ' . $errorId;
 
-		// If we have a previously unhandled error, handle it. This can be caused by errors in one of the registered
+			// If we have a previously unhandled error, handle it. This can be caused by errors in one of the registered
 			foreach ($this->errorHandlers as $errorHandler) {
 				$errorHandler->handleShutdown($error['type'], $message, $error['file'], $error['line'],
 					$this->generateErrorId($message, $error['file'], $error['line']));
