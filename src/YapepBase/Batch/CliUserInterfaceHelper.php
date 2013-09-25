@@ -9,11 +9,10 @@
  */
 
 namespace YapepBase\Batch;
-use Ulrichsg\Getopt;
 use YapepBase\Exception\Exception;
 
 /**
- * Class for creating help output for batch scripts.
+ * Class for creating help output for batch scripts and getting parsed switches and operands.
  *
  * Example usage:
  * <code>
@@ -38,7 +37,7 @@ use YapepBase\Exception\Exception;
  * $args = $helper->getParsedArgs();
  *
  * // Set the verbose option
- * if (isset($args['v']) || isset($args['verbose'])) {
+ * if (isset($args['v'])) {
  *     $verbose = true;
  * } else {
  *     $verbose = false;
@@ -173,11 +172,12 @@ class CliUserInterfaceHelper {
 	protected $longSwitches = array();
 
 	/**
-	 * The getopt instance.
+	/**
+	 * The argument parser instance.
 	 *
-	 * @var \Ulrichsg\Getopt
+	 * @var CliArgumentParser
 	 */
-	protected $getopt;
+	protected $argumentParser;
 
 	/**
 	 * Constructor.
@@ -189,7 +189,7 @@ class CliUserInterfaceHelper {
 	public function __construct($description, $scriptName = null) {
 		$this->description = preg_replace('/\s{2,}/', ' ', str_replace(array("\n", "\r"), ' ', trim($description)));
 		$this->scriptName = (empty($scriptName) ? basename($_SERVER['argv'][0]) : $scriptName);
-		$this->getopt = new Getopt();
+		$this->argumentParser = new CliArgumentParser();
 	}
 
 	/**
@@ -280,15 +280,7 @@ class CliUserInterfaceHelper {
 			throw new Exception('The specified usage index is not set: ' . $usageIndexes);
 		}
 
-		if (empty($paramName)) {
-			$paramType = Getopt::NO_ARGUMENT;
-		} else {
-			$paramType = $paramIsOptional ? Getopt::OPTIONAL_ARGUMENT : getopt::REQUIRED_ARGUMENT;
-		}
-
-		$this->getopt->addOptions(array(
-			array(empty($shortName) ? null : $shortName, empty($longName) ? null : $longName, $paramType)
-		));
+		$this->argumentParser->addSwitch($shortName, $longName, !empty($paramName), $paramIsOptional);
 	}
 
 	/**
@@ -503,29 +495,26 @@ class CliUserInterfaceHelper {
 	}
 
 	/**
-	 * Returns the arguments that have been parsed by getopt.
-	 *
-	 * Be careful, that any not defined input in the script arguments will stop parsing any further arguments.
-	 * {@see http://php.net/getopt}
+	 * Returns the arguments that have been parsed.
 	 *
 	 * @return array
 	 *
-	 * @codeCoverageIgnore   The getopt function can not be tested
+	 * @throws \YapepBase\Exception\Exception   If the parsing failed.
 	 */
 	public function getParsedArgs() {
-		$this->getopt->parse();
-		return $this->getopt->getOptions();
+		$this->argumentParser->parse();
+		return $this->argumentParser->getParsedSwitches();
 	}
 
 	/**
-	 * Returns the operands that were parsed by getopt.
+	 * Returns the operands that were parsed.
 	 *
 	 * These are the arguments after the switches.
 	 *
 	 * @return array
 	 */
 	public function getParsedOperands() {
-		$this->getopt->parse();
-		return $this->getopt->getOperands();
+		$this->argumentParser->parse();
+		return $this->argumentParser->getParsedOperands();
 	}
 }
