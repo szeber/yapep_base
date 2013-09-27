@@ -24,18 +24,22 @@ class CommandOutput {
 	public $output = '';
 	/** @var string|int   The return code of the command. */
 	public $code = '';
+	/** @var string       The command that was actually executed with all framework added extensions. */
+	public $executedCommand = '';
 
 	/**
 	 * Constructor.
 	 *
-	 * @param string $command   The command that was run.
-	 * @param string $output    Output of the command.
-	 * @param string $code      The return code of the command.
+	 * @param string $command           The command that was run.
+	 * @param string $output            Output of the command.
+	 * @param string $code              The return code of the command.
+	 * @param string $executedCommand   The command that was actually executed with all framework added extensions.
 	 */
-	public function __construct($command = '', $output = '', $code = '') {
-		$this->command = $command;
-		$this->output  = $output;
-		$this->code    = $code;
+	public function __construct($command = '', $output = '', $code = '', $executedCommand = '') {
+		$this->command         = $command;
+		$this->output          = $output;
+		$this->code            = $code;
+		$this->executedCommand = $executedCommand;
 	}
 
 	/**
