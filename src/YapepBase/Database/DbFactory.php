@@ -2,20 +2,20 @@
 /**
  * This file is part of YAPEPBase.
  *
- * @package      YapepBase
- * @subpackage   Database
- * @copyright    2011 The YAPEP Project All rights reserved.
- * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
+ * @package    YapepBase
+ * @subpackage Database
+ * @copyright  2011 The YAPEP Project All rights reserved.
+ * @license    http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
 
 namespace YapepBase\Database;
 
 
+use YapepBase\Config;
 use YapepBase\Database\DbConnection;
 use YapepBase\Exception\ConfigException;
 use YapepBase\Exception\DatabaseException;
-use YapepBase\Config;
 
 /**
  * Factory class for database connections.

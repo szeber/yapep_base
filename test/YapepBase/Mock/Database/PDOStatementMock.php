@@ -8,7 +8,17 @@ namespace YapepBase\Mock\Database;
  * @codeCoverageIgnore
  */
 class PDOStatementMock extends \PDOStatement {
+
+
 	protected $data;
+
+	/**
+	 * Exception what will be thrown when the execute() is called.
+	 *
+	 * @var \Exception
+	 */
+	protected $exceptionForExecute;
+
 	public function __construct($data) {
 		$this->data = $data;
 	}
@@ -40,6 +50,33 @@ class PDOStatementMock extends \PDOStatement {
 				return $this->data;
 			default:
 				throw new \YapepBase\Exception\NotImplementedException();
+		}
+	}
+
+	/**
+	 * Sets the exception what should be thrown when the execute is called.
+	 *
+	 * @param \Exception $exception
+	 *
+	 */
+	public function setException(\Exception $exception) {
+		$this->exceptionForExecute = $exception;
+	}
+
+	/**
+	 * Overwritten execute to be able to set the desired output.
+	 *
+	 * @param array $input_parameters
+	 *
+	 * @throws
+	 * @return bool
+	 */
+	public function execute(array $input_parameters = null) {
+		$exception = $this->exceptionForExecute;
+		$this->exceptionForExecute = null;
+
+		if (!empty($exception)) {
+			throw $exception;
 		}
 	}
 }

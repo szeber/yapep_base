@@ -6,6 +6,9 @@ namespace YapepBase\Database;
 use YapepBase\Database\DbFactory;
 use YapepBase\Database\MysqlConnection;
 use YapepBase\Exception\DatabaseException;
+use YapepBase\Exception\Exception;
+use YapepBase\Mock\Database\MysqlConnectionMock;
+use YapepBase\Mock\Database\PdoMock;
 
 /**
  * MysqlConnection test case.
@@ -132,6 +135,53 @@ class MysqlConnectionTest extends \YapepBase\BaseTest {
 
 		$this->assertInstanceOf('\YapepBase\Database\DbResult', $result, 'Result is of wrong type');
 		$this->assertEquals('key1', $result->fetchColumn(0), 'Invalid result');
+
+		// Test if it fails for the first Exception
+		$behavior = array(
+			1 => new DatabaseException('test', 12),
+		);
+		$pdoMock = new PdoMock($behavior);
+		$mysqlConnectionMock = new MysqlConnectionMock($pdoMock);
+
+		try {
+			$mysqlConnectionMock->query('test');
+			$this->fail('This method should throw an Exception');
+		}
+		catch(DatabaseException $e) {
+			$this->assertEquals(12, $e->getCode());
+		}
+
+		// Test with a Mysql server has gone away error
+		$behavior = array(
+			1 => new DatabaseException('SQLSTATE[HY000]: General error: 2006 MySQL server has gone away'),
+			2 => new DatabaseException('test', 12)
+		);
+		$pdoMock = new PdoMock($behavior);
+		$mysqlConnectionMock = new MysqlConnectionMock($pdoMock);
+
+		try {
+			$mysqlConnectionMock->query('test');
+			$mysqlConnectionMock->query('test');
+			$this->fail('This method should throw an Exception');
+		}
+		catch(DatabaseException $e) {
+			$this->assertEquals(12, $e->getCode());
+		}
+
+		// Test if it runs only once if everything is fine
+		$behavior = array(
+			1 => 'test',
+			2 => new DatabaseException('test', 12)
+		);
+		$pdoMock = new PdoMock($behavior);
+		$mysqlConnectionMock = new MysqlConnectionMock($pdoMock);
+
+		try {
+			$mysqlConnectionMock->query('test');
+		}
+		catch(\Exception $e) {
+			$this->fail('This method should not throw an Exception');
+		}
 	}
 
 	/**
@@ -338,5 +388,4 @@ class MysqlConnectionTest extends \YapepBase\BaseTest {
 			$this->assertEquals('UTC', $result, 'The time zone has not been set');
 		}
 	}
-
 }
