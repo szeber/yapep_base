@@ -51,4 +51,13 @@ class MimeType {
 
 	/** Image type: GIF. */
 	const IMAGE_GIF = 'image/gif';
+
+	/** Video type: MP4. */
+	const VIDEO_MP4 = 'video/mp4';
+
+	/** Video type: WEBM. */
+	const VIDEO_WEBM = 'video/webm';
+
+	/** Video type: FLV. */
+	const VIDEO_X_FLV = 'video/x-flv';
 }
