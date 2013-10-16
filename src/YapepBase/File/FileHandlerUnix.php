@@ -231,7 +231,7 @@ class FileHandlerUnix implements IFileHandler {
 	 *                                               is not a regular file.
 	 */
 	public function remove($path) {
-		if (!$this->checkIsFile($path)) {
+		if ($this->checkIsDirectory($path)) {
 			throw new Exception('The given path is not a valid file: ' . $path);
 		}
 
