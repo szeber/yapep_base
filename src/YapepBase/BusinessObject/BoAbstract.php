@@ -2,19 +2,19 @@
 /**
  * This file is part of YAPEPBase.
  *
- * @package      YapepBase
- * @subpackage   BusinessObject
- * @copyright    2011 The YAPEP Project All rights reserved.
- * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
+ * @package    YapepBase
+ * @subpackage BusinessObject
+ * @copyright  2011 The YAPEP Project All rights reserved.
+ * @license    http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
 namespace YapepBase\BusinessObject;
 
+
 use YapepBase\Application;
-use YapepBase\Database\DbConnection;
 use YapepBase\Config;
+use YapepBase\Database\DbConnection;
 use YapepBase\Exception\ParameterException;
-use YapepBase\Storage\IStorage;
 
 /**
  * BoAbstract class which should be extended by every Bo classes.
@@ -46,7 +46,7 @@ abstract class BoAbstract {
 	 * Constructor.
 	 *
 	 * @param string $keyPrefix   The prefix for the cache keys of the bo instance. If not set, one will be generated
-	 *                            based on the configuration and the classname.
+	 *                            based on the configuration and the class-name.
 	 */
 	public function __construct($keyPrefix = null) {
 		if (empty($keyPrefix)) {
