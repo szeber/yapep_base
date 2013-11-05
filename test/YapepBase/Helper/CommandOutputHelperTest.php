@@ -12,6 +12,7 @@ namespace YapepBase\Helper;
 
 
 use YapepBase\Config;
+use YapepBase\File\FileHandlerPhp;
 use YapepBase\Shell\CommandExecutor;
 
 /**
@@ -47,6 +48,21 @@ class CommandOutputHelperTest extends \YapepBase\BaseTest {
 
 		$this->commandOutputHelper = new CommandOutputHelper();
 
+	}
+
+	protected function tearDown() {
+		parent::tearDown();
+		$testPath = getenv('YAPEPBASE_TEST_TEMPPATH');
+
+		if (empty($testPath)) {
+			return;
+		}
+
+		if (file_exists($testPath)) {
+			$fileHandler = new FileHandlerPhp();
+
+			$fileHandler->removeDirectory($testPath, true);
+		}
 	}
 
 	/**
