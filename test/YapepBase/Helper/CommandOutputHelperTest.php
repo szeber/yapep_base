@@ -14,6 +14,7 @@ namespace YapepBase\Helper;
 use YapepBase\Config;
 use YapepBase\File\FileHandlerPhp;
 use YapepBase\Shell\CommandExecutor;
+use YapepBase\Shell\CommandOutput;
 
 /**
  * Test class for CommandOutputHelper.
@@ -47,7 +48,6 @@ class CommandOutputHelperTest extends \YapepBase\BaseTest {
 		parent::setUp();
 
 		$this->commandOutputHelper = new CommandOutputHelper();
-
 	}
 
 	protected function tearDown() {
@@ -86,6 +86,7 @@ class CommandOutputHelperTest extends \YapepBase\BaseTest {
 			->shouldReceive('run')
 			->andReturnUsing(function() use ($testInstance, $expectedError) {
 				file_put_contents($testInstance->testFilePath, $expectedError);
+				return new CommandOutput('test', '', 0, 'test 2> ' . $testInstance->testFilePath);
 			})
 			->getMock();
 
@@ -94,7 +95,7 @@ class CommandOutputHelperTest extends \YapepBase\BaseTest {
 		}
 
 		if (!file_exists($testPath) && !mkdir($testPath, 0755, true)) {
-			$this->fail('The given path does not exist, and cannot be created: ' . $testPath);
+			$this->fail('The test path does not exist, and cannot be created: ' . $testPath);
 		}
 
 		Config::getInstance()->set('system.commandOutputHelper.work.path', $testPath);
