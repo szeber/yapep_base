@@ -445,4 +445,32 @@ class FileStorage extends StorageAbstract {
 		return $this->readOnly;
 	}
 
+	/**
+	 * Returns the configuration data for the storage backend. This includes the storage type as used by
+	 * the storage factory.
+	 *
+	 * @return array
+	 */
+	public function getConfigData() {
+		return array(
+			'storageType'      => StorageFactory::TYPE_FILE,
+			'path'             => $this->path,
+			'storePlainText'   => $this->storePlainText,
+			'filePrefix'       => $this->filePrefix,
+			'fileSuffix'       => $this->fileSuffix,
+			'fileMode'         => $this->fileMode,
+			'hashKey'          => $this->hashKey,
+			'readOnly'         => $this->readOnly,
+			'debuggerDisabled' => $this->debuggerDisabled,
+		);
+//			'path',
+//			'storePlainText',
+//			'filePrefix',
+//			'fileSuffix',
+//			'fileMode',
+//			'hashKey',
+//			'readOnly',
+//			'debuggerDisabled'
+
+	}
 }
