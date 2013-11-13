@@ -159,4 +159,17 @@ class DummyStorage extends StorageAbstract {
 	protected function setupConfig(array $config) {
 		$this->debuggerDisabled = isset($config['debuggerDisabled']) ? (bool)$config['debuggerDisabled'] : false;
 	}
+
+	/**
+	 * Returns the configuration data for the storage backend. This includes the storage type as used by
+	 * the storage factory.
+	 *
+	 * @return array
+	 */
+	public function getConfigData() {
+		return array(
+			'storageType'      => StorageFactory::TYPE_DUMMY,
+			'debuggerDisabled' => $this->debuggerDisabled,
+		);
+	}
 }

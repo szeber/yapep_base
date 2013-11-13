@@ -319,4 +319,22 @@ class MemcachedStorage extends StorageAbstract implements IIncrementable {
 		return $this->readOnly;
 	}
 
+	/**
+	 * Returns the configuration data for the storage backend. This includes the storage type as used by
+	 * the storage factory.
+	 *
+	 * @return array
+	 */
+	public function getConfigData() {
+		return array(
+			'storageType'      => StorageFactory::TYPE_MEMCACHED,
+			'host'             => $this->host,
+			'port'             => $this->port,
+			'keyPrefix'        => $this->keyPrefix,
+			'keySuffix'        => $this->keySuffix,
+			'hashKey'          => $this->hashKey,
+			'readOnly'         => $this->readOnly,
+			'debuggerDisabled' => $this->debuggerDisabled,
+		);
+	}
 }

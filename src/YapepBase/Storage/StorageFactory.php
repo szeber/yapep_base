@@ -13,10 +13,6 @@ namespace YapepBase\Storage;
 
 use YapepBase\Config;
 use YapepBase\Exception\StorageException;
-use YapepBase\Storage\DummyStorage;
-use YapepBase\Storage\MemcachedStorage;
-use YapepBase\Storage\MemcacheStorage;
-use YapepBase\Storage\FileStorage;
 
 /**
  * Factory class which returns the required Storage object by config.
