@@ -426,6 +426,8 @@ class Application {
 		$controller->run($errorCode);
 		$this->raiseEventIfNotRaisedYet(Event::TYPE_APPLICATION_AFTER_CONTROLLER_RUN);
 
+		$this->response->render();
+
 		$this->raiseEventIfNotRaisedYet(Event::TYPE_APPLICATION_BEFORE_OUTPUT_SEND);
 		$this->response->send();
 		$this->raiseEventIfNotRaisedYet(Event::TYPE_APPLICATION_AFTER_OUTPUT_SEND);
