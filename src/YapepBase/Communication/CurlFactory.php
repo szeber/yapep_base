@@ -32,14 +32,16 @@ class CurlFactory {
 	 * @param bool   $forceQueryStringFormattingForPost   If TRUE, and this is a POST request, the post data will be
 	 *                                                    formatted as a query string, instead of sending it as
 	 *                                                    multipart/form-data.
+	 * @param bool   $allowCustomPost                     If TRUE, and this is a POST request, then the custom post
+	 *                                                    fields will be set from the extra options.
 	 *
 	 * @return \YapepBase\Communication\CurlHttpWrapper
 	 */
 	public function get(
 		$method, $url, $parameters = array(), $additionalHeaders = array(), $extraOptions = array(),
-		$forceQueryStringFormattingForPost = false
+		$forceQueryStringFormattingForPost = false, $allowCustomPost = false
 	) {
 		return new CurlHttpWrapper($method, $url, $parameters, $additionalHeaders, $extraOptions,
-			$forceQueryStringFormattingForPost);
+			$forceQueryStringFormattingForPost, $allowCustomPost);
 	}
 }

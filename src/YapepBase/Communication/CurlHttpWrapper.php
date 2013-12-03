@@ -119,12 +119,14 @@ class CurlHttpWrapper {
 	 * @param bool   $forceQueryStringFormattingForPost   If TRUE, and this is a POST request, the post data will be
 	 *                                                    formatted as a query string, instead of sending it as
 	 *                                                    multipart/form-data.
+	 * @param bool   $allowCustomPost                     If TRUE, and this is a POST request, then the custom post
+	 *                                                    fields will be set from the extra options.
 	 *
 	 * @throws \YapepBase\Exception\CurlException In case of invalid data given.
 	 */
 	public function __construct(
 		$method, $url, $parameters = array(), $additionalHeaders = array(), $extraOptions = array(),
-		$forceQueryStringFormattingForPost = false
+		$forceQueryStringFormattingForPost = false, $allowCustomPost = false
 	) {
 		if (empty($extraOptions) || !is_array($extraOptions)) {
 			$options = array();
@@ -156,14 +158,16 @@ class CurlHttpWrapper {
 
 			case self::METHOD_POST:
 				$options[CURLOPT_POST] = true;
-				if (empty($parameters)) {
-					throw new CurlException('HTTP POST request without parameters');
-				} elseif ($forceQueryStringFormattingForPost) {
-					$options[CURLOPT_POSTFIELDS] = http_build_query($parameters);
-				} else {
-					$formattedParameters = array();
-					$this->formatDataForPost($parameters, $formattedParameters);
-					$options[CURLOPT_POSTFIELDS] = $formattedParameters;
+				if (!$allowCustomPost) {
+					if (empty($parameters)) {
+						throw new CurlException('HTTP POST request without parameters');
+					} elseif ($forceQueryStringFormattingForPost) {
+						$options[CURLOPT_POSTFIELDS] = http_build_query($parameters);
+					} else {
+						$formattedParameters = array();
+						$this->formatDataForPost($parameters, $formattedParameters);
+						$options[CURLOPT_POSTFIELDS] = $formattedParameters;
+					}
 				}
 				break;
 
