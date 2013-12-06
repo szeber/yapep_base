@@ -28,6 +28,8 @@ class CurlHttpWrapper {
 	const METHOD_GET = 'GET';
 	/** POST method */
 	const METHOD_POST = 'POST';
+	/** PUT method */
+	const METHOD_PUT = 'PUT';
 
 	/**
 	 * The CURL connection resource
@@ -116,11 +118,11 @@ class CurlHttpWrapper {
 	 * @param array  $extraOptions                        Extra options for the request. The options must be in an
 	 *                                                    associative array, the key must be a valid CURL option name,
 	 *                                                    and the value the value for that key.
-	 * @param bool   $forceQueryStringFormattingForPost   If TRUE, and this is a POST request, the post data will be
-	 *                                                    formatted as a query string, instead of sending it as
+	 * @param bool $forceQueryStringFormattingForPost     If TRUE, and this is a POST or PUT request, the post data
+	 *                                                    will be formatted as a query string, instead of sending it as
 	 *                                                    multipart/form-data.
-	 * @param bool   $allowCustomPost                     If TRUE, and this is a POST request, then the custom post
-	 *                                                    fields will be set from the extra options.
+	 * @param bool $allowCustomPost                       If TRUE, and this is a POST or PUT request, then the custom
+	 *                                                    post fields will be set from the extra options.
 	 *
 	 * @throws \YapepBase\Exception\CurlException In case of invalid data given.
 	 */
@@ -161,6 +163,21 @@ class CurlHttpWrapper {
 				if (!$allowCustomPost) {
 					if (empty($parameters)) {
 						throw new CurlException('HTTP POST request without parameters');
+					} elseif ($forceQueryStringFormattingForPost) {
+						$options[CURLOPT_POSTFIELDS] = http_build_query($parameters);
+					} else {
+						$formattedParameters = array();
+						$this->formatDataForPost($parameters, $formattedParameters);
+						$options[CURLOPT_POSTFIELDS] = $formattedParameters;
+					}
+				}
+				break;
+
+			case self::METHOD_PUT:
+				$options[CURLOPT_CUSTOMREQUEST] = self::METHOD_PUT;
+				if (!$allowCustomPost) {
+					if (empty($parameters)) {
+						throw new CurlException('HTTP PUT request without parameters');
 					} elseif ($forceQueryStringFormattingForPost) {
 						$options[CURLOPT_POSTFIELDS] = http_build_query($parameters);
 					} else {
