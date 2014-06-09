@@ -95,7 +95,8 @@ class DebugDataCreator implements IErrorHandler  {
 			. ' in ' . $exception->getFile();
 
 		$this->storage->set($errorId, $this->getDebugData($errorId, $errorMessage,
-			($this->isTestMode ? array() : $exception->getTrace())));
+			($this->isTestMode ? array() : $exception->getTrace()),
+			($this->isTestMode ? array() : array('exception' => $exception))));
 	}
 
 	/**

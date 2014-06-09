@@ -87,4 +87,12 @@ interface IStorage {
 	 * @return bool
 	 */
 	public function isReadOnly();
+
+	/**
+	 * Returns the configuration data for the storage backend. This includes the storage type as used by
+	 * the storage factory.
+	 *
+	 * @return array
+	 */
+	public function getConfigData();
 }

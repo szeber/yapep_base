@@ -83,6 +83,13 @@ class LanguageArrayReverseRouter extends ArrayReverseRouter {
 			? ''
 			: '/' . $this->currentLanguage;
 
-		return $languagePrefix . parent::getTargetForControllerAction($controller, $action, $params);
+		$uri = parent::getTargetForControllerAction($controller, $action, $params);
+		if (empty($languagePrefix)) {
+			return $uri;
+		}
+		else {
+			return $languagePrefix . rtrim($uri, '/');
+		}
+
 	}
 }

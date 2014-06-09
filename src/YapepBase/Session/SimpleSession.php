@@ -42,6 +42,16 @@ class SimpleSession extends SessionAbstract {
 	}
 
 	/**
+	 * Returns the config properties(last part of the key) used by the class.
+	 *
+	 * @return array
+	 */
+	protected function getConfigProperties() {
+		// No configuration is necessary.
+		return array();
+	}
+
+	/**
 	 * Validates the configuration.
 	 *
 	 * @param array $config   The configuration array.

@@ -154,9 +154,6 @@ interface ICommandExecutor {
 	 * Runs the command.
 	 *
 	 * @return \YapepBase\Shell\CommandOutput   Output of the run.
-	 *
-	 * @throws \YapepBase\Exception\Shell\Exception   If there was an error while opening the process
-	 *                                                or in case of a timeout or no command is set.
 	 */
 	public function run();
 

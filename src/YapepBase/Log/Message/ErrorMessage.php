@@ -41,7 +41,7 @@ class ErrorMessage extends MessageAbstract {
 	 *
 	 * @return void
 	 *
-	 * @link Config <b>application.name</b> key
+	 * @link Config <b>system.application.name</b> key
 	 */
 	public function set($errorMessage, $errorType, $errorId, $priority) {
 		$this->message = $errorMessage;

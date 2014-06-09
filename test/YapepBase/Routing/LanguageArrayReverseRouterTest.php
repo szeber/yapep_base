@@ -54,7 +54,7 @@ class LanguageArrayReverseRouterTest extends \YapepBase\BaseTest {
 			list($controller, $action) = explode('/', $controllerAction);
 			$generatedUri = $reverseRouter->getTargetForControllerAction($controller, $action);
 
-			$this->assertEquals('/de' . $uri, $generatedUri);
+			$this->assertEquals('/de' . rtrim($uri, '/'), $generatedUri);
 		}
 
 		// Test with the same as the default

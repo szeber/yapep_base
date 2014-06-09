@@ -12,6 +12,7 @@ namespace YapepBase\Mock\Storage;
 use YapepBase\Exception\ParameterException;
 
 use YapepBase\Storage\IStorage;
+use YapepBase\Storage\StorageFactory;
 
 /**
  * StorageMock class
@@ -104,4 +105,20 @@ class StorageMock implements IStorage {
 		return $this->readOnly;
 	}
 
+	/**
+	 * Returns the configuration data for the storage backend. This includes the storage type as used by
+	 * the storage factory.
+	 *
+	 * @return array
+	 */
+	public function getConfigData() {
+		return array(
+			// Since this is a mock storage, we'll use the dummy storage type.
+			'storageType'      => StorageFactory::TYPE_DUMMY,
+			'ttlSupport'       => $this->ttlSupport,
+			'persistent'       => $this->persistent,
+			'readOnly'         => $this->readOnly,
+			'debuggerDisabled' => true,
+		);
+	}
 }

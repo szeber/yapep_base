@@ -11,7 +11,6 @@
 namespace YapepBase\View;
 
 use YapepBase\Exception\ParameterException;
-use YapepBase\View\ViewAbstract;
 use YapepBase\Application;
 use YapepBase\Mime\MimeType;
 use YapepBase\Exception\Exception;
@@ -67,17 +66,37 @@ class ViewDo {
 	final public function get($key, $raw = false) {
 		if (empty($key)) {
 			trigger_error('Empty key', E_USER_NOTICE);
-			return;
+			return null;
 		}
 
 		$keyParts = explode('.', $key);
 
+		$itemKey = array_shift($keyParts);
+
+		if (!array_key_exists($itemKey, $this->dataRaw)) {
+			trigger_error('Not defined value: ' . $key, E_USER_NOTICE);
+			return null;
+		}
+
 		// Storing a copy by reference which will be used
 		if ($raw) {
-			$target = &$this->dataRaw;
+			$target = &$this->dataRaw[$itemKey];
 		}
 		else {
-			$target = &$this->data;
+			if (!array_key_exists($itemKey, $this->data)) {
+				try {
+					$this->data[$itemKey] = $this->escape($this->dataRaw[$itemKey]);
+				}
+				catch (ParameterException $e) {
+					trigger_error('Tried to access the key: ' . $key . ', but it can not be escaped', E_USER_NOTICE);
+					return null;
+				}
+			}
+			$target = &$this->data[$itemKey];
+		}
+
+		if (empty($keyParts)) {
+			return $target;
 		}
 
 		// TODO: This part should be extracted [emul]
@@ -99,7 +118,7 @@ class ViewDo {
 
 		// We reached the desired depth
 		// @todo shouln'd we use array_pop here?
-		return $target[$keyParts[count($keyParts) - 1]];
+		return $target[array_pop($keyParts)];
 	}
 
 	/**
@@ -119,16 +138,10 @@ class ViewDo {
 			}
 		}
 		else {
-			if (array_key_exists($nameOrData, $this->data)) {
+			if (array_key_exists($nameOrData, $this->dataRaw)) {
 				throw new Exception('Key already exist: ' . $nameOrData);
 			}
 			$this->dataRaw[$nameOrData] = $value;
-			try {
-				$this->data[$nameOrData] = $this->escape($value);
-			} catch (ParameterException $e) {
-				// The parameter was not escaped, continue as normal without adding to the data array.
-				// These parameters can only be accessed as raw.
-			}
 		}
 	}
 
@@ -158,7 +171,7 @@ class ViewDo {
 		$keyParts = explode('.', $key);
 
 		// Storing a copy by refence which will be used
-		$target = &$this->data;
+		$target = &$this->dataRaw;
 
 		// Processing all of the keys except the last one
 		for ($i = 0; $i < count($keyParts) - 1; $i++) {
@@ -190,7 +203,7 @@ class ViewDo {
 		$keyParts = explode('.', $key);
 
 		// Storing a copy by refence which will be used
-		$target = &$this->data;
+		$target = &$this->dataRaw;
 
 		// Processing all of the keys except the last one
 		for ($i = 0; $i < count($keyParts) - 1; $i++) {
@@ -246,7 +259,7 @@ class ViewDo {
 
 			case 'array':
 				foreach ($value as $elementKey => $elementValue) {
-					$value[$elementKey] = $this->escape($elementValue);
+					$value[$elementKey] = $this->escapeForHtml($elementValue);
 				}
 				return $value;
 				break;
@@ -254,11 +267,11 @@ class ViewDo {
 			case 'object':
 				if (($value instanceof \Iterator) && ($value instanceof \ArrayAccess)) {
 					foreach ($value as $elementKey => $elementValue) {
-						$value[$elementKey] = $this->escape($elementValue);
+						$value[$elementKey] = $this->escapeForHtml($elementValue);
 					}
 					return $value;
 				} elseif (method_exists($value, '__toString')) {
-					return $this->escape((string)$value);
+					return $this->escapeForHtml((string)$value);
 				} else {
 					throw new ParameterException('Unable to escape objects');
 				}

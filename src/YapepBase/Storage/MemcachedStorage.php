@@ -100,6 +100,23 @@ class MemcachedStorage extends StorageAbstract implements IIncrementable {
 	protected $debuggerDisabled;
 
 	/**
+	 * Returns the config properties(last part of the key) used by the class.
+	 *
+	 * @return array
+	 */
+	protected function getConfigProperties() {
+		return array(
+			'host',
+			'port',
+			'keyPrefix',
+			'keySuffix',
+			'hashKey',
+			'readOnly',
+			'debuggerDisabled'
+		);
+	}
+
+	/**
 	 * Sets up the backend.
 	 *
 	 * @param array $config   The configuration data for the backend.
@@ -113,13 +130,13 @@ class MemcachedStorage extends StorageAbstract implements IIncrementable {
 		if (empty($config['host'])) {
 			throw new ConfigException('Host is not set for MemcachedStorage: ' . $this->currentConfigurationName);
 		}
-		$this->host = $config['host'];
-		$this->port = (isset($config['port']) ? (int)$config['port'] : 11211);
-		$this->keyPrefix = (isset($config['keyPrefix']) ? $config['keyPrefix'] : '');
-		$this->keySuffix = (isset($config['keySuffix']) ? $config['keySuffix'] : '');
-		$this->hashKey = (isset($config['hashKey']) ? (bool)$config['hashKey'] : false);
-		$this->readOnly = (isset($config['readOnly']) ? (bool)$config['readOnly'] : false);
-		$this->debuggerDisabled = isset($config['debuggerDisabled']) ? (bool)$config['debuggerDisabled'] : false;
+		$this->host             = $config['host'];
+		$this->port             = empty($config['port'])             ? 11211 : (int)$config['port'];
+		$this->keyPrefix        = empty($config['keyPrefix'])        ? ''    : $config['keyPrefix'];
+		$this->keySuffix        = empty($config['keySuffix'])        ? ''    : $config['keySuffix'];
+		$this->hashKey          = empty($config['hashKey'])          ? false : (bool)$config['hashKey'];
+		$this->readOnly         = empty($config['readOnly'])         ? false : (bool)$config['readOnly'];
+		$this->debuggerDisabled = empty($config['debuggerDisabled']) ? false : (bool)$config['debuggerDisabled'];
 
 		$this->memcache = Application::getInstance()->getDiContainer()->getMemcached();
 		$serverList = $this->memcache->getServerList();
@@ -302,4 +319,22 @@ class MemcachedStorage extends StorageAbstract implements IIncrementable {
 		return $this->readOnly;
 	}
 
+	/**
+	 * Returns the configuration data for the storage backend. This includes the storage type as used by
+	 * the storage factory.
+	 *
+	 * @return array
+	 */
+	public function getConfigData() {
+		return array(
+			'storageType'      => StorageFactory::TYPE_MEMCACHED,
+			'host'             => $this->host,
+			'port'             => $this->port,
+			'keyPrefix'        => $this->keyPrefix,
+			'keySuffix'        => $this->keySuffix,
+			'hashKey'          => $this->hashKey,
+			'readOnly'         => $this->readOnly,
+			'debuggerDisabled' => $this->debuggerDisabled,
+		);
+	}
 }

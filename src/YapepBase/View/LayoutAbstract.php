@@ -54,6 +54,13 @@ abstract class LayoutAbstract extends ViewAbstract {
 	protected $metas = array();
 
 	/**
+	 * Charset meta tag of the page.
+	 *
+	 * @var string
+	 */
+	protected $charset = null;
+
+	/**
 	 * HTTP meta tags of the page.
 	 *
 	 * @var array
@@ -110,7 +117,7 @@ abstract class LayoutAbstract extends ViewAbstract {
 	protected $slots = array();
 
 	/**
-	 * Sets the innner content to be decorated by the layout.
+	 * Sets the inner content to be decorated by the layout.
 	 *
 	 * @param string $content   The inner content.
 	 *
@@ -215,12 +222,28 @@ abstract class LayoutAbstract extends ViewAbstract {
 	}
 
 	/**
+	 * Sets the charset meta tag to the page.
+	 *
+	 * @param string $charset   The charset of the meta tag.
+	 *
+	 * @return void
+	 */
+	public function setCharsetMeta($charset) {
+		$this->charset = $charset;
+	}
+
+	/**
 	 * Displays the meta tags in HTML format.
 	 *
 	 * @return void
 	 */
 	protected function renderMetas() {
 		$result = '';
+
+		if (!empty($this->charset)) {
+			$result .= '<meta charset="' . $this->charset . '" />' . "\n";
+		}
+
 		foreach ($this->metas as $name => $content) {
 			$result .= '<meta name="' . $name . '" content="' . $content . '" />' . "\n";
 		}

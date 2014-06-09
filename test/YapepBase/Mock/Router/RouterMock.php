@@ -6,17 +6,19 @@ namespace YapepBase\Mock\Router;
  * @codeCoverageIgnore
  */
 class RouterMock implements \YapepBase\Router\IRouter {
+
 	/**
 	 * Returns a controller and an action for the request's target.
 	 *
-	 * @param string $controller   $he controller class name. (Outgoing parameter)
+	 * @param string $controller   The controller class name. (Outgoing parameter)
 	 * @param string $action       The action name in the controller class. (Outgoing parameter)
+	 * @param string $uri          The uri to check. If not given, the current uri will be used.
 	 *
 	 * @return string   The controller and action separated by a '/' character.
 	 *
-	 * @throws RouterException   On errors. (Includig if the route is not found)
+	 * @throws \YapepBase\Exception\RouterException   On errors. (Including if the route is not found)
 	 */
-	public function getRoute(&$controller = null, &$action = null) {
+	public function getRoute(&$controller = null, &$action = null, $uri = null) {
 		return 'NullController/null';
 	}
 
@@ -29,7 +31,7 @@ class RouterMock implements \YapepBase\Router\IRouter {
 	 *
 	 * @return string   The target.
 	 *
-	 * @throws RouterException   On errors. (Includig if the route is not found)
+	 * @throws \YapepBase\Exception\RouterException   On errors. (Including if the route is not found)
 	 */
 	public function getTargetForControllerAction($controller, $action, $params = array()) {
 		return '/';

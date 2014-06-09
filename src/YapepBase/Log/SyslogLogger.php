@@ -2,14 +2,17 @@
 /**
  * This file is part of YAPEPBase.
  *
- * @package      YapepBase
- * @subpackage   Log
- * @copyright    2011 The YAPEP Project All rights reserved.
- * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
+ * @package    YapepBase
+ * @subpackage Log
+ * @copyright  2011 The YAPEP Project All rights reserved.
+ * @license    http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
 
 namespace YapepBase\Log;
+
+
+use YapepBase\Config;
 use YapepBase\Log\Message\IMessage;
 use YapepBase\Exception\ConfigException;
 
@@ -30,6 +33,13 @@ use YapepBase\Exception\ConfigException;
 class SyslogLogger extends LoggerAbstract {
 
 	/**
+	 * Stores the configuration options
+	 *
+	 * @var array
+	 */
+	protected $configOptions;
+
+	/**
 	 * The syslog connection
 	 * @var \YapepBase\Syslog\NativeSyslogConnection
 	 */
@@ -44,7 +54,26 @@ class SyslogLogger extends LoggerAbstract {
 	 * @todo Remove the possibility to set config options. Use only the set connection [emul]
 	 */
 	public function __construct($configName, \YapepBase\Syslog\ISyslogConnection $connection = null) {
-		parent::__construct($configName);
+		$config = Config::getInstance();
+
+		$properties = array(
+			'applicationIdent',
+			'facility',
+			'includeSapiName',
+			'addPid'
+		);
+		foreach ($properties as $property) {
+			try {
+				$this->configOptions[$property] =
+					$config->get('resource.log.' . $configName . '.' . $property, false);
+
+			}
+			catch (ConfigException $e) {
+				// We just swallow this because we don't know what properties do we need in advance
+			}
+		}
+		$this->verifyConfig($configName);
+
 		if ($connection) {
 			$this->connection = $connection;
 		//@codeCoverageIgnoreStart
@@ -124,7 +153,6 @@ class SyslogLogger extends LoggerAbstract {
 	 * @throws \YapepBase\Exception\ConfigException   On configuration errors.
 	 */
 	protected function verifyConfig($configName) {
-		parent::verifyConfig($configName);
 		if (
 			!is_array($this->configOptions) || empty($this->configOptions['facility'])
 			|| empty($this->configOptions['applicationIdent'])

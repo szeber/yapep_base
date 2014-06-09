@@ -67,11 +67,13 @@ class UrlHelper extends HelperAbstract {
 				$url = $router->getTargetForControllerActionInLanguage($controller, $action, $language, $params);
 				return $url . (empty($getParams) ? '' : ('?' . http_build_query($getParams)));
 			} else {
-				throw new Exception('The router is not an instance of ILanguageReverseRouter');
+				// TODO: Replace this after we moved to PHP 5.5, and we have a final block for try-catch [emul]
+				trigger_error('The router is not an instance of ILanguageReverseRouter', E_USER_ERROR);
+				return '#';
 			}
 		} catch (\Exception $exception) {
 			trigger_error('Exception of type ' . get_class($exception) . ' occured in ' . __METHOD__
-			. '. Requested controller/action: ' . $controller . '/' . $action, E_USER_ERROR);
+				. '. Requested controller/action: ' . $controller . '/' . $action, E_USER_ERROR);
 			return '#';
 		}
 	}

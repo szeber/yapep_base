@@ -10,9 +10,8 @@
 
 namespace YapepBase\Database;
 
-use YapepBase\Database\DbConnection;
+
 use YapepBase\Database\DbFactory;
-use YapepBase\Exception\ParameterException;
 
 /**
  * Table describe base class for MySQL tables.
@@ -59,7 +58,7 @@ abstract class MysqlTable extends DbTable {
 	 * @return array   An associative array where the keys are
 	 */
 	protected function buildInsertParamListForPreparedStatement(array $data, array &$paramList) {
-		// We're providing the kiyes with a prefix in order to avoid key duplications
+		// We're providing the keys with a prefix in order to avoid key duplications
 		$keyPrefix = 'insert';
 		$result = array();
 
@@ -97,7 +96,7 @@ abstract class MysqlTable extends DbTable {
 	 * @return array   An associative array where the keys are
 	 */
 	protected function buildUpdateParamListForPreparedStatement(array $data, array &$paramList) {
-		// We're providing the kiyes with a prefix in order to avoid key duplications
+		// We're providing the keys with a prefix in order to avoid key duplications
 		$keyPrefix = 'update';
 		$result = array();
 
@@ -122,8 +121,8 @@ abstract class MysqlTable extends DbTable {
 	 *
 	 * @return array   An associative array where the keys are
 	 */
-	protected function buildConditionParamlistForPreparedStatement(array $data, array &$paramList) {
-		// We're providing the kiyes with a prefix in order to avoid key duplications
+	protected function buildConditionParamListForPreparedStatement(array $data, array &$paramList) {
+		// We're providing the keys with a prefix in order to avoid key duplications
 		$keyPrefix = 'condition';
 		$result = array();
 
@@ -234,7 +233,7 @@ abstract class MysqlTable extends DbTable {
 		$paramListUpdate = array();
 		$paramListCondition = array();
 		$params = $this->buildUpdateParamListForPreparedStatement($data, $paramListUpdate);
-		$params += $this->buildConditionParamlistForPreparedStatement($conditions, $paramListCondition);
+		$params += $this->buildConditionParamListForPreparedStatement($conditions, $paramListCondition);
 
 		return '
 			UPDATE
@@ -250,7 +249,7 @@ abstract class MysqlTable extends DbTable {
 	}
 
 	/**
-	 * Generates the query needed to delete the deired records.
+	 * Generates the query needed to delete the desired records.
 	 *
 	 * @param array $conditions   The conditions, the keys are the fields and the values are the values of the fields.
 	 * @param array $params       This will hold the params what can be passed to the query.(Outgoing Param)
@@ -259,7 +258,7 @@ abstract class MysqlTable extends DbTable {
 	 */
 	protected function buildDeleteQuery(array $conditions, array &$params) {
 		$paramList = array();
-		$params = $this->buildConditionParamlistForPreparedStatement($conditions, $paramList);
+		$params = $this->buildConditionParamListForPreparedStatement($conditions, $paramList);
 
 		return '
 			DELETE FROM
@@ -286,7 +285,7 @@ abstract class MysqlTable extends DbTable {
 	 */
 	protected function buildSelectQuery(array $conditions, $orderBy, $direction, array &$params, $limit = 0) {
 		$paramList = array();
-		$params = $this->buildConditionParamlistForPreparedStatement($conditions, $paramList);
+		$params = $this->buildConditionParamListForPreparedStatement($conditions, $paramList);
 
 		$query = '
 			SELECT

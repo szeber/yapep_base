@@ -2,18 +2,20 @@
 /**
  * This file is part of YAPEPBase.
  *
- * @package      YapepBase
- * @subpackage   Database
- * @copyright    2011 The YAPEP Project All rights reserved.
- * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
+ * @package    YapepBase
+ * @subpackage Database
+ * @copyright  2011 The YAPEP Project All rights reserved.
+ * @license    http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
 
 namespace YapepBase\Database;
 
-use YapepBase\Database\DbConnection;
-use YapepBase\Exception\DatabaseException;
+
 use YapepBase\Config;
+use YapepBase\Database\DbConnection;
+use YapepBase\Exception\ConfigException;
+use YapepBase\Exception\DatabaseException;
 
 /**
  * Factory class for database connections.
@@ -101,17 +103,41 @@ class DbFactory {
 			if (is_null(static::$paramPrefix)) {
 				static::$paramPrefix = (string)$config->get('system.database.paramPrefix', '');
 			}
-			$data = $config->get('resource.database.' . $connectionName . '.' . $connectionType . '.*', false);
 
-			if (empty($data) || !is_array($data)) {
+			$properties = array(
+				'backendType',
+				'charset',
+				'database',
+				'host',
+				'isPersistent',
+				'password',
+				'path',
+				'user',
+				'useTraditionalStrictMode',
+				'timezone'
+			);
+			$configData = array();
+			foreach ($properties as $property) {
+				try {
+					$configData[$property] =
+						$config->get('resource.database.' . $connectionName . '.' . $connectionType . '.' . $property);
+
+				}
+				catch (ConfigException $e) {
+					// We just swallow this because we don't know what properties do we need in advance
+				}
+			}
+
+			if (empty($configData)) {
 				throw new DatabaseException('Database connection configuration "' . $connectionName . '" not found');
 			}
 
-			if (!static::validateConnectionConfig($data)) {
+			if (!static::validateConnectionConfig($configData)) {
 				throw new DatabaseException('Invalid database config: ' . $connectionName);
 			}
 
-			static::$connections[$connectionName][$connectionType] = static::makeConnection($data, $connectionName);
+			static::$connections[$connectionName][$connectionType]
+				= static::makeConnection($configData, $connectionName);
 			if (self::TYPE_READ_WRITE == $connectionType
 				|| isset(static::$connections[$connectionName][self::TYPE_READ_ONLY])
 			) {
@@ -140,7 +166,7 @@ class DbFactory {
 				if (
 					empty($configuration['host'])
 					|| empty($configuration['user'])
-					|| !isset($configuration['password'])
+					|| is_null($configuration['password'])
 					|| empty($configuration['charset'])
 					|| empty($configuration['database'])
 				) {

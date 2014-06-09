@@ -167,7 +167,7 @@ class BoAbstractTest extends \YapepBase\BaseTest {
 	/**
 	 * Tests the error handling
 	 *
-	 *@return void
+	 * @return void
 	 */
 	public function testErrorHandling() {
 		$bo = new MockBo();

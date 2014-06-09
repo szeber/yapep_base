@@ -2,19 +2,19 @@
 /**
  * This file is part of YAPEPBase.
  *
- * @package      YapepBase
- * @subpackage   BusinessObject
- * @copyright    2011 The YAPEP Project All rights reserved.
- * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
+ * @package    YapepBase
+ * @subpackage BusinessObject
+ * @copyright  2011 The YAPEP Project All rights reserved.
+ * @license    http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
 namespace YapepBase\BusinessObject;
 
+
 use YapepBase\Application;
-use YapepBase\Database\DbConnection;
 use YapepBase\Config;
+use YapepBase\Database\DbConnection;
 use YapepBase\Exception\ParameterException;
-use YapepBase\Storage\IStorage;
 
 /**
  * BoAbstract class which should be extended by every Bo classes.
@@ -46,7 +46,7 @@ abstract class BoAbstract {
 	 * Constructor.
 	 *
 	 * @param string $keyPrefix   The prefix for the cache keys of the bo instance. If not set, one will be generated
-	 *                            based on the configuration and the classname.
+	 *                            based on the configuration and the class-name.
 	 */
 	public function __construct($keyPrefix = null) {
 		if (empty($keyPrefix)) {
@@ -86,13 +86,14 @@ abstract class BoAbstract {
 	 * Adds the given key to the stored list.
 	 *
 	 * @param string $key   The key.
+	 * @param int    $ttl   The expiration time in seconds.
 	 *
 	 * @return void
 	 */
-	private function addKey($key) {
+	private function addKey($key, $ttl) {
+		$expire = $ttl > 0 ? time() + $ttl : 0;
 		$keys = $this->getStorage()->get($this->getKeyForKeys());
-		$keys[] = $key;
-		$keys = array_unique($keys);
+		$keys[$key] = $expire;
 		$this->getStorage()->set($this->getKeyForKeys(), $keys, self::CACHE_KEY_FOR_KEYS_TTL);
 	}
 
@@ -149,7 +150,7 @@ abstract class BoAbstract {
 
 		$this->getStorage()->set($storageKey, $data, $ttl);
 
-		$this->addKey($key);
+		$this->addKey($key, $ttl);
 	}
 
 	/**
@@ -176,7 +177,7 @@ abstract class BoAbstract {
 		// If the given key is empty we have to purge everything
 		if (empty($key)) {
 			$keyPrefix = $this->getKeyPrefix();
-			foreach ($keysStored as $storedKey) {
+			foreach ($keysStored as $storedKey => $expire) {
 				$keysToPurge[] = $keyPrefix . $storedKey;
 			}
 			$keysStored = array();
@@ -185,22 +186,19 @@ abstract class BoAbstract {
 		elseif ('.*' == substr($key, -2, 2)) {
 			$keyPrefix = substr($key, 0, -1);
 
-			foreach ($keysStored as $index => $storedKey) {
+			foreach ($keysStored as $storedKey => $expire) {
 				// We've found a key with the given prefix
 				if (0 === strpos($storedKey, $keyPrefix)) {
 					$keysToPurge[] = $this->getKeyPrefix() . $storedKey;
-					unset($keysStored[$index]);
+					unset($keysStored[$storedKey]);
 				}
 			}
 		}
 		// The given key is an exact key
 		else {
 			$keysToPurge[] = $this->getKeyPrefix() . $key;
-			foreach ($keysStored as $index => $storedKey) {
-				if ($storedKey == $key) {
-					unset($keysStored[$index]);
-					break;
-				}
+			if (isset($keysStored[$key])) {
+				unset($keysStored[$key]);
 			}
 		}
 

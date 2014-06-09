@@ -2,21 +2,22 @@
 /**
  * This file is part of YAPEPBase.
  *
- * @package      YapepBase
- * @subpackage   Database
- * @copyright    2011 The YAPEP Project All rights reserved.
- * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
+ * @package    YapepBase
+ * @subpackage Database
+ * @copyright  2011 The YAPEP Project All rights reserved.
+ * @license    http://www.opensource.org/licenses/bsd-license.php BSD License
  */
 
 
 namespace YapepBase\Database;
 
-use YapepBase\Debugger\Item\SqlQueryItem;
-use YapepBase\Exception\DatabaseException;
+
 use \PDO;
 use \PDOException;
+
 use YapepBase\Application;
-use YapepBase\Debugger\IDebugger;
+use YapepBase\Debugger\Item\SqlQueryItem;
+use YapepBase\Exception\DatabaseException;
 
 /**
  * Base class for database connections.
@@ -34,11 +35,18 @@ abstract class DbConnection {
 	protected $connection;
 
 	/**
-	 * Stores the connedtion name
+	 * Stores the connection name
 	 *
 	 * @var string
 	 */
 	protected $connectionName;
+
+	/**
+	 * The configuration for the parameters.
+	 *
+	 * @var array
+	 */
+	protected $configuration = array();
 
 	/**
 	 * Stores the number of open transactions.
@@ -61,6 +69,7 @@ abstract class DbConnection {
 	 */
 	protected $paramPrefix = '';
 
+
 	/**
 	 * Constructor
 	 *
@@ -71,6 +80,7 @@ abstract class DbConnection {
 	 * @throws DatabaseException   On connection errors.
 	 */
 	public function __construct(array $configuration, $connectionName, $paramPrefix = '') {
+		$this->configuration = $configuration;
 		$this->connectionName = $connectionName;
 		$this->paramPrefix = $paramPrefix;
 		try {
@@ -125,6 +135,7 @@ abstract class DbConnection {
 		if (empty($this->connection)) {
 			throw new DatabaseException('Connection to the database is not established');
 		}
+
 		try {
 			$debugger = Application::getInstance()->getDiContainer()->getDebugger();
 

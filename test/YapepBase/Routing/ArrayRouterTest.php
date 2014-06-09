@@ -101,6 +101,14 @@ class ArrayRouterTest extends \YapepBase\BaseTest {
 		$route = $this->getRouter($this->routes['Simple/Post'], IRequest::METHOD_HTTP_POST)
 			->getRoute($controller, $action);
 		$this->assertEquals('Simple/Post', $route, 'The route for a POST restricted request does not match');
+
+		// Test with given URI
+		$route = $this->getRouter($this->routes['Simple/Empty'])->getRoute($controller, $action, '/normal');
+		$this->assertEquals('Simple/Normal', $route, 'The route for a normal request does not match');
+
+		$route = $this->getRouter($this->routes['Simple/Empty'], IRequest::METHOD_HTTP_POST)
+			->getRoute($controller, $action, '/method');
+		$this->assertEquals('Simple/Post', $route, 'The route for a POST restricted request does not match');
 	}
 
 	/**
@@ -144,6 +152,13 @@ class ArrayRouterTest extends \YapepBase\BaseTest {
 		$this->assertEquals('test3', $request->getParam('param3'),
 			'The complex param route third param does not match');
 		$this->assertEquals(3, count($request->getAllParams()));
+
+		// Test with given URI
+		$controller = $action = null;
+		$route = $this->getRouter('/param/simplealpha/test', IRequest::METHOD_HTTP_GET, $request)
+			->getRoute($controller, $action, '/param/simplealnum/test12');
+		$this->assertEquals('Param/SimpleAlnum', $route, 'The route for the alpha param route request does not match');
+		$this->assertEquals('test12', $request->getParam('param'), 'The alpha param route param does not match');
 	}
 
 	/**

@@ -13,10 +13,6 @@ namespace YapepBase\Storage;
 
 use YapepBase\Config;
 use YapepBase\Exception\StorageException;
-use YapepBase\Storage\DummyStorage;
-use YapepBase\Storage\MemcachedStorage;
-use YapepBase\Storage\MemcacheStorage;
-use YapepBase\Storage\FileStorage;
 
 /**
  * Factory class which returns the required Storage object by config.
@@ -66,13 +62,13 @@ class StorageFactory {
 		if (!isset(static::$storages[$configName])) {
 			$config = Config::getInstance();
 
-			$configOptions = $config->get('resource.storage.' . $configName . '.*', false);
+			$storageType = $config->get('resource.storage.' . $configName . '.storageType');
 
-			if (empty($configOptions['storageType'])) {
+			if (empty($storageType)) {
 				throw new StorageException('No storageType configured in the config: ' . $configName);
 			}
 
-			static::$storages[$configName] = static::getStorage($configName, $configOptions['storageType']);
+			static::$storages[$configName] = static::getStorage($configName, $storageType);
 
 		}
 		return static::$storages[$configName];

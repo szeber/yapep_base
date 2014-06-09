@@ -22,16 +22,26 @@ class CurlFactory {
 	/**
 	 * Returns a new CurlHttpWrapper instance.
 	 *
-	 * @param string $method              The request method {@uses self::METHOD_*}.
-	 * @param string $url                 The URL of the request.
-	 * @param array  $parameters          The GET or POST parameters for the request.
-	 * @param array  $additionalHeaders   Additional HTTP headers for the request.
-	 * @param array  $extraOptions        Extra options for the request. The options must be in an associative array,
-	 *                                    the key must be a valid CURL option name, and the value the value for that key
+	 * @param string $method                              The request method {@uses self::METHOD_*}.
+	 * @param string $url                                 The URL of the request.
+	 * @param array  $parameters                          The GET or POST parameters for the request.
+	 * @param array  $additionalHeaders                   Additional HTTP headers for the request.
+	 * @param array  $extraOptions                        Extra options for the request. The options must be in an
+	 *                                                    associative array, the key must be a valid CURL option name,
+	 *                                                    and the value the value for that key.
+	 * @param bool   $forceQueryStringFormattingForPost   If TRUE, and this is a POST request, the post data will be
+	 *                                                    formatted as a query string, instead of sending it as
+	 *                                                    multipart/form-data.
+	 * @param bool   $allowCustomPost                     If TRUE, and this is a POST request, then the custom post
+	 *                                                    fields will be set from the extra options.
 	 *
 	 * @return \YapepBase\Communication\CurlHttpWrapper
 	 */
-	public function get($method, $url, $parameters = array(), $additionalHeaders = array(), $extraOptions = array()) {
-		return new CurlHttpWrapper($method, $url, $parameters, $additionalHeaders, $extraOptions);
+	public function get(
+		$method, $url, $parameters = array(), $additionalHeaders = array(), $extraOptions = array(),
+		$forceQueryStringFormattingForPost = false, $allowCustomPost = false
+	) {
+		return new CurlHttpWrapper($method, $url, $parameters, $additionalHeaders, $extraOptions,
+			$forceQueryStringFormattingForPost, $allowCustomPost);
 	}
 }
