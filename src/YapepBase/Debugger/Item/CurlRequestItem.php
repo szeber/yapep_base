@@ -48,8 +48,6 @@ class CurlRequestItem extends ItemAbstract implements ISourceLocatable {
 	 * @param array  $headers         Extra headers.
 	 * @param array  $options         CURL options.
 	 * @param float  $executionTime   The execution time in seconds.
-	 *
-	 * @internal param string $message The message to display.
 	 */
 	public function __construct(
 		$protocol, $method, $url, array $parameters = array(), array $headers = array(), array $options = array(),

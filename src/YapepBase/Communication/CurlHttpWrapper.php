@@ -21,6 +21,8 @@ use YapepBase\Exception\CurlException;
  *
  * @package    YapepBase
  * @subpackage Communication
+ *
+ * @deprecated Will be removed in the next version, use the CurlHttpRequest class instead.
  */
 class CurlHttpWrapper {
 
