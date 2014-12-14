@@ -21,6 +21,8 @@ use YapepBase\Exception\CurlException;
  *
  * @package    YapepBase
  * @subpackage Communication
+ *
+ * @deprecated Will be removed in the next version, use the CurlHttpRequest class instead.
  */
 class CurlHttpWrapper {
 
@@ -30,6 +32,10 @@ class CurlHttpWrapper {
 	const METHOD_POST = 'POST';
 	/** PUT method */
 	const METHOD_PUT = 'PUT';
+	/** DELETE method */
+	const METHOD_DELETE = 'DELETE';
+	/** PATCH method */
+	const METHOD_PATCH = 'PATCH';
 
 	/**
 	 * The CURL connection resource
@@ -174,7 +180,9 @@ class CurlHttpWrapper {
 				break;
 
 			case self::METHOD_PUT:
-				$options[CURLOPT_CUSTOMREQUEST] = self::METHOD_PUT;
+			case self::METHOD_DELETE:
+			case self::METHOD_PATCH:
+				$options[CURLOPT_CUSTOMREQUEST] = $method;
 				if (!$allowCustomPost) {
 					if (empty($parameters)) {
 						throw new CurlException('HTTP PUT request without parameters');

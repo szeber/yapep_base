@@ -16,6 +16,8 @@ namespace YapepBase\Communication;
  *
  * @package    YapepBase
  * @subpackage Communication
+ *
+ * @deprecated Will be removed in the next version, use SystemContainer::getCurlHttpRequest() instead.
  */
 class CurlFactory {
 
@@ -36,6 +38,8 @@ class CurlFactory {
 	 *                                                    fields will be set from the extra options.
 	 *
 	 * @return \YapepBase\Communication\CurlHttpWrapper
+	 *
+	 * @deprecated Will be removed in the next version, use SystemContainer::getCurlHttpRequest() instead.
 	 */
 	public function get(
 		$method, $url, $parameters = array(), $additionalHeaders = array(), $extraOptions = array(),

@@ -12,6 +12,7 @@ namespace YapepBase\DependencyInjection;
 
 
 use YapepBase\Communication\CurlFactory;
+use YapepBase\Communication\CurlHttpRequest;
 use YapepBase\Debugger\IDebugger;
 use YapepBase\File\FileHandlerPhp;
 use YapepBase\Database\DbConnection;
@@ -65,8 +66,14 @@ class SystemContainer extends Container {
 	const KEY_FILE_HANDLER = 'fileHandler';
 	/** Key containing the command executor. */
 	const KEY_COMMAND_EXECUTOR = 'commandExecutor';
-	/** Key containing the curl factory. */
+	/**
+	 * Key containing the curl factory.
+	 *
+	 * @deprecated Use KEY_CURL_REQUEST instead
+	 */
 	const KEY_CURL_FACTORY = 'curlFactory';
+	/** Key containing the curl http request. */
+	const KEY_CURL_HTTP_REQUEST = 'curlHttpRequest';
 
 	/**
 	 * Name of the namespace which holds the controllers.
@@ -179,6 +186,10 @@ class SystemContainer extends Container {
 			return new CurlFactory();
 		};
 
+		$this[self::KEY_CURL_HTTP_REQUEST] = function($container) {
+			return new CurlHttpRequest();
+		};
+
 		$this->searchNamespaces[self::NAMESPACE_SEARCH_BO] = array();
 		$this->searchNamespaces[self::NAMESPACE_SEARCH_DAO] = array();
 		$this->searchNamespaces[self::NAMESPACE_SEARCH_VALIDATOR] = array();
@@ -233,9 +244,20 @@ class SystemContainer extends Container {
 	 * Returns a CurlFactory instance.
 	 *
 	 * @return \YapepBase\Communication\CurlFactory
+	 *
+	 * @deprecated Use getCurlRequest() instead.
 	 */
 	public function getCurlFactory() {
 		return $this[self::KEY_CURL_FACTORY];
+	}
+
+	/**
+	 * Returns a CurlHttpRequest instance.
+	 *
+	 * @return \YapepBase\Communication\CurlHttpRequest
+	 */
+	public function getCurlHttpRequest() {
+		return $this[self::KEY_CURL_HTTP_REQUEST];
 	}
 
 	/**
