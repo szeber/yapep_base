@@ -228,7 +228,9 @@ class HttpRequest implements IRequest {
 	 * @return bool
 	 */
 	public function hasFile($name) {
-		return isset($this->files[$name]);
+		return isset($this->files[$name])
+			&& isset($this->files[$name]['error'])
+			&& UPLOAD_ERR_NO_FILE != $this->files[$name]['error'];
 	}
 
 	/**
