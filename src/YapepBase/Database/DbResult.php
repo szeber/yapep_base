@@ -10,6 +10,8 @@
 
 
 namespace YapepBase\Database;
+
+
 use \PDOStatement;
 use \PDO;
 use \Iterator;
@@ -151,6 +153,30 @@ class DbResult implements Iterator {
 			$result[] = $columnValue;
 		}
 		return $result;
+	}
+
+	/**
+	 * Returns all the rows represented in the given class.
+	 *
+	 * @param string $className   Name of the class to use
+	 *
+	 * @return array
+	 */
+	public function fetchAllClass($className) {
+		$this->statement->setFetchMode(PDO::FETCH_CLASS, $className);
+		return $this->statement->fetchAll();
+	}
+
+	/**
+	 * Returns one row represented in the given class.
+	 *
+	 * @param string $className   Name of the class to use
+	 *
+	 * @return bool|Object   The instantiated class, or FALSE if empty
+	 */
+	public function fetchClass($className) {
+		$this->statement->setFetchMode(PDO::FETCH_CLASS, $className);
+		return $this->statement->fetch();
 	}
 
 	/**
