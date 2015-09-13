@@ -265,11 +265,20 @@ class ViewDo {
 				break;
 
 			case 'object':
-				if (($value instanceof \Iterator) && ($value instanceof \ArrayAccess)) {
-					foreach ($value as $elementKey => $elementValue) {
-						$value[$elementKey] = $this->escapeForHtml($elementValue);
+				if (
+					($value instanceof \ArrayAccess)
+					&&
+					(
+						($value instanceof \Iterator)
+						||
+						($value instanceof \IteratorAggregate)
+					)
+				) {
+					$clonedObject = clone($value);
+					foreach ($clonedObject as $elementKey => $elementValue) {
+						$clonedObject[$elementKey] = $this->escapeForHtml($elementValue);
 					}
-					return $value;
+					return $clonedObject;
 				} elseif (method_exists($value, '__toString')) {
 					return $this->escapeForHtml((string)$value);
 				} else {
