@@ -159,7 +159,7 @@ class ViewDoTest extends \YapepBase\BaseTest {
 	 *
 	 * @return void
 	 */
-	public function tesEscape() {
+	public function testEscape() {
 		$testString = '<a href="http://test.com/index.php?test=1&test2=2">test</a>';
 
 		$this->viewDo->set('testString', $testString);
@@ -168,5 +168,29 @@ class ViewDoTest extends \YapepBase\BaseTest {
 		$testArray = array(array($testString));
 		$this->viewDo->set('testArray', $testArray);
 		$this->assertEquals(array(array(htmlspecialchars($testString))), $this->viewDo->get('testArray'));
+	}
+
+
+	public function testToArray_whenRawRequired_shouldReturnRawData() {
+		$testString = '<a href="http://test.com/index.php?test=1&test2=2">test</a>';
+
+		$this->viewDo->set('testString', $testString);
+
+		$expected = array(
+			'testString' => $testString
+		);
+		$this->assertEquals($expected, $this->viewDo->toArray(true));
+	}
+
+
+	public function testToArray_whenEscapedRequired_shouldReturnEscapedData() {
+		$testString = '<a href="http://test.com/index.php?test=1&test2=2">test</a>';
+
+		$this->viewDo->set('testString', $testString);
+
+		$expected = array(
+			'testString' => htmlspecialchars($testString)
+		);
+		$this->assertEquals($expected, $this->viewDo->toArray());
 	}
 }

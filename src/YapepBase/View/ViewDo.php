@@ -296,4 +296,26 @@ class ViewDo {
 				break;
 		}
 	}
+
+	/**
+	 * Returns all the data set as an associative array
+	 *
+	 * @param bool   $raw   If TRUE it will return the raw (unescaped) data.
+	 *
+	 * @return array
+	 */
+	public function toArray($raw = false) {
+		$result = array();
+
+		if ($raw) {
+			$result = $this->dataRaw;
+		}
+		else {
+			foreach (array_keys($this->dataRaw) as $key) {
+				$result[$key] = $this->get($key);
+			}
+		}
+
+		return $result;
+	}
 }
