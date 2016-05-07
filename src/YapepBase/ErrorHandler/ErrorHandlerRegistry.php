@@ -229,7 +229,7 @@ class ErrorHandlerRegistry {
 	 */
 	public function handleException($exception) {
 		// @codeCoverageIgnoreStart
-		if (!($exception instanceof \Exception)) {
+		if (!($exception instanceof \Exception) && !($exception instanceof \Error)) {
 			// The error handlers can only handle exceptions that are descendants of the Exception built in class
 			trigger_error('Unable to handle exception of type: ' . get_class($exception), E_USER_ERROR);
 			return;
