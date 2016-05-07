@@ -79,12 +79,12 @@ class DebugDataCreator implements IErrorHandler  {
 	/**
 	 * Handles an uncaught exception. The exception must extend the \Exception class to be handled.
 	 *
-	 * @param \Exception $exception   The exception to handle.
-	 * @param string     $errorId     The internal ID of the error.
+	 * @param \Exception|\Throwable $exception   The exception to handle.
+	 * @param string                $errorId     The internal ID of the error.
 	 *
 	 * @return void
 	 */
-	public function handleException(\Exception $exception, $errorId) {
+	public function handleException($exception, $errorId) {
 		if (false !== $this->storage->get($errorId)) {
 			// Only save the debug info, if it's not already saved
 			return;
