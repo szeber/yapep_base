@@ -301,7 +301,7 @@ class FileHandlerPhp implements IFileHandler {
 	 *
 	 * @return string   The content of the file, or FALSE on failure.
 	 */
-	public function getAsString($path, $offset = -1, $maxLength = null) {
+	public function getAsString($path, $offset = 0, $maxLength = null) {
 		if (!$this->checkIsFile($path)) {
 			throw new Exception('The given path is not a file: ' . $path);
 		}

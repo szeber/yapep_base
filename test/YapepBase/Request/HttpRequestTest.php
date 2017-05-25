@@ -391,8 +391,8 @@ class HttpRequestTest extends \YapepBase\BaseTest {
 		$this->assertFalse($this->request->hasFile('nonExistent'),
 			'FALSE should be returned for a non-existing file upload');
 
-		$this->assertTrue($this->request->hasFile('noUploadedFile'),
-			'TRUE should be returned if the upload is specified, but no file is uploaded');
+		$this->assertFalse($this->request->hasFile('noUploadedFile'),
+			'FALSE should be returned if the upload is specified, but no file is uploaded');
 
 		$this->assertTrue($this->request->hasFile('uploadedFile'),
 			'TRUE should be returned for completed uploads.');
