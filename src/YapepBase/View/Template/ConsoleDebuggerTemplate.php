@@ -325,7 +325,7 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 	font:12px/100% Arial,sans-serif;
 	color:#000;
 	text-align:left;
-	z-index: 999;
+	z-index: 9999;
 }
 
 #yapep-debug u {
