@@ -75,7 +75,7 @@ class RestTemplate extends ViewAbstract {
 	protected function renderContent() {
 		switch ($this->contentType) {
 			case MimeType::XML:
-				return $this->getXmlFromData(array($this->rootNodeName => $this->content), true);
+				return $this->getXmlFromData(array($this->rootNodeName => $this->content));
 				break;
 
 			case MimeType::JAVASCRIPT:
@@ -84,7 +84,7 @@ class RestTemplate extends ViewAbstract {
 				break;
 
 			default:
-				throw new ViewException('Unknown content type for RestView');
+				throw new ViewException('Unknown content type for RestView: ' . $this->contentType);
 				break;
 		}
 	}
