@@ -11,6 +11,7 @@
 namespace YapepBase\Mock\BusinessObject;
 
 use YapepBase\BusinessObject\BoAbstract;
+use YapepBase\Exception\Exception;
 
 /**
  * Mock object for business objects
@@ -20,13 +21,7 @@ use YapepBase\BusinessObject\BoAbstract;
  */
 class MockBo extends BoAbstract {
 
-	protected function getKeyForKeys() {
-		return parent::getKeyForKeys();
-	}
-
-	public function getStorage() {
-		return parent::getStorage();
-	}
+	protected $currentTime;
 
 	public function getFromStorage($key) {
 		return parent::getFromStorage($key);
@@ -38,6 +33,26 @@ class MockBo extends BoAbstract {
 
 	public function deleteFromStorage($key = '') {
 		parent::deleteFromStorage($key);
+	}
+
+	public function getKeyPrefix() {
+		return parent::getKeyPrefix();
+	}
+
+	public function getKeyWithPrefix($key) {
+		return parent::getKeyWithPrefix($key);
+	}
+
+	protected function getCurrentTime() {
+		if (is_null($this->currentTime)) {
+			throw new Exception('Current Time requested but not set!');
+		}
+
+		return $this->currentTime;
+	}
+
+	public function setCurrentTime($currentTime) {
+		$this->currentTime = $currentTime;
 	}
 
 }
