@@ -43,25 +43,49 @@ abstract class BoAbstract {
 	private $keyPrefix;
 
 	/**
+	 * Indicates if the key storing mechanism is enabled.
+	 *
+	 * @var bool
+	 */
+	private $isKeyStoringEnabled = false;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param string $keyPrefix   The prefix for the cache keys of the bo instance. If not set, one will be generated
 	 *                            based on the configuration and the class-name.
 	 */
 	public function __construct($keyPrefix = null) {
+		$config = Config::getInstance();
+
 		if (empty($keyPrefix)) {
-			$keyPrefix = Config::getInstance()->get('system.project.name') . '.' . get_class($this);
+			$keyPrefix = $config->get('system.project.name') . '.' . get_class($this);
 		}
 		$this->keyPrefix = $keyPrefix;
+
+		$this->isKeyStoringEnabled = $config->get('system.storage.middleware.isKeyStoringEnabled', false);
 	}
 
 	/**
 	 * Returns the prefix of the key which should be used for caching in the BO.
 	 *
+	 * @param bool $withDotSuffix   If TRUE the "." suffix will be added.
+	 *
 	 * @return string
 	 */
-	protected function getKeyPrefix() {
-		return $this->keyPrefix . '.';
+	protected function getKeyPrefix($withDotSuffix = true) {
+		return $this->keyPrefix . ($withDotSuffix ? '.' : '');
+	}
+
+	/**
+	 * Returns the given key with the proper prefix
+	 *
+	 * @param string $key
+	 *
+	 * @return string
+	 */
+	protected function getKeyWithPrefix($key) {
+		return $this->keyPrefix . '.' . $key;
 	}
 
 	/**
@@ -70,7 +94,7 @@ abstract class BoAbstract {
 	 * @return string
 	 */
 	protected function getKeyForKeys() {
-		return $this->getKeyPrefix() . self::CACHE_KEY_FOR_KEYS_SUFFIX;
+		return $this->getKeyWithPrefix(self::CACHE_KEY_FOR_KEYS_SUFFIX);
 	}
 
 	/**
@@ -91,9 +115,14 @@ abstract class BoAbstract {
 	 * @return void
 	 */
 	private function addKey($key, $ttl) {
-		$expire = $ttl > 0 ? time() + $ttl : 0;
+		if (!$this->isKeyStoringEnabled) {
+			return;
+		}
+
+		$expire = $ttl > 0 ? $this->getCurrentTime() + $ttl : 0;
 		$keys = $this->getStorage()->get($this->getKeyForKeys());
 		$keys[$key] = $expire;
+
 		$this->getStorage()->set($this->getKeyForKeys(), $keys, self::CACHE_KEY_FOR_KEYS_TTL);
 	}
 
@@ -109,10 +138,10 @@ abstract class BoAbstract {
 	 */
 	protected function getFromStorage($key) {
 		if (empty($key)) {
-			throw new ParameterException();
+			throw new ParameterException('Given key should not be empty');
 		}
 
-		$key = $this->getKeyPrefix() . $key;
+		$key = $this->getKeyWithPrefix($key);
 
 		return $this->getStorage()->get($key);
 	}
@@ -134,11 +163,11 @@ abstract class BoAbstract {
 	 */
 	protected function setToStorage($key, $data, $ttl = 0, $forceEmptyStorage = false) {
 		if (empty($key)) {
-			throw new ParameterException();
+			throw new ParameterException('Given key should not be empty');
 		}
 
 		if (
-			// If we're not forced to store empty values, and the given values is emptys
+			// If we're not forced to store empty values, and the given value is empty
 			(!$forceEmptyStorage && empty($data))
 			// If we're forced to store empty values, we still wont store FALSE
 			|| ($forceEmptyStorage && $data === false)
@@ -146,7 +175,7 @@ abstract class BoAbstract {
 			return;
 		}
 
-		$storageKey = $this->getKeyPrefix() . $key;
+		$storageKey = $this->getKeyWithPrefix($key);
 
 		$this->getStorage()->set($storageKey, $data, $ttl);
 
@@ -164,51 +193,67 @@ abstract class BoAbstract {
 	 * @throws \YapepBase\Exception\StorageException   On error.
 	 */
 	protected function deleteFromStorage($key = '') {
-		// Get the stored keys
-		$keysStored = $this->getStorage()->get($this->getKeyForKeys());
-
-		// In case we have not stored any data yet, we do not need to delete anything
-		if (empty($keysStored)) {
+		if (!$this->isKeyStoringEnabled) {
+			$this->getStorage()->delete($this->getKeyWithPrefix($key));
 			return;
 		}
 
-		$keysToPurge = array();
+		// Get the stored keys
+		$storedKeys = $this->getStorage()->get($this->getKeyForKeys());
 
-		// If the given key is empty we have to purge everything
-		if (empty($key)) {
-			$keyPrefix = $this->getKeyPrefix();
-			foreach ($keysStored as $storedKey => $expire) {
-				$keysToPurge[] = $keyPrefix . $storedKey;
-			}
-			$keysStored = array();
+		// In case we have not stored any data yet, we do not need to delete anything
+		if (empty($storedKeys)) {
+			return;
 		}
-		// If it ends with an asterix, purge all the keys beginning with the name
-		elseif ('.*' == substr($key, -2, 2)) {
-			$keyPrefix = substr($key, 0, -1);
 
-			foreach ($keysStored as $storedKey => $expire) {
+		$keysToDelete = $this->getKeysToDelete($key, $storedKeys);
+
+		// Removing the data from the found keys
+		foreach ($keysToDelete as $keyToPurge) {
+			$this->getStorage()->delete($keyToPurge);
+		}
+		// Writing back the remaining keys
+		$this->getStorage()->set($this->getKeyForKeys(), $storedKeys, self::CACHE_KEY_FOR_KEYS_TTL);
+	}
+
+	/**
+	 * @param       $keyToDelete
+	 * @param array $storedKeys
+	 *
+	 * @return array
+	 */
+	private function getKeysToDelete($keyToDelete, array &$storedKeys)
+	{
+		$keysToDelete = array();
+
+		// If the given key is empty we have to delete everything
+		if (empty($keyToDelete)) {
+			foreach ($storedKeys as $storedKey => $expire) {
+				$keysToDelete[] = $this->getKeyWithPrefix($storedKey);
+			}
+			$storedKeys = array();
+		}
+		// If it ends with an asterix, delete all the keys beginning with the given prefix
+		elseif ('.*' == substr($keyToDelete, -2, 2)) {
+			$keyPrefix = substr($keyToDelete, 0, -1);
+
+			foreach ($storedKeys as $storedKey => $expire) {
 				// We've found a key with the given prefix
-				if (0 === strpos($storedKey, $keyPrefix)) {
-					$keysToPurge[] = $this->getKeyPrefix() . $storedKey;
-					unset($keysStored[$storedKey]);
+				if (strpos($storedKey, $keyPrefix) === 0) {
+					$keysToDelete[] = $this->getKeyWithPrefix($storedKey);
+					unset($storedKeys[$storedKey]);
 				}
 			}
 		}
 		// The given key is an exact key
 		else {
-			$keysToPurge[] = $this->getKeyPrefix() . $key;
-			if (isset($keysStored[$key])) {
-				unset($keysStored[$key]);
+			$keysToDelete[] = $this->getKeyWithPrefix($keyToDelete);
+			if (isset($storedKeys[$keyToDelete])) {
+				unset($storedKeys[$keyToDelete]);
 			}
 		}
 
-		// Removing the data from the found keys
-		foreach ($keysToPurge as $keyToPurge) {
-
-			$this->getStorage()->delete($keyToPurge);
-		}
-		// Writing back the remaining keys
-		$this->getStorage()->set($this->getKeyForKeys(), $keysStored, self::CACHE_KEY_FOR_KEYS_TTL);
+		return $keysToDelete;
 	}
 
 	/**
@@ -224,5 +269,12 @@ abstract class BoAbstract {
 	 */
 	protected function getTable($databaseNamespace, $name, DbConnection $connection = null) {
 		return Application::getInstance()->getDiContainer()->getDbTable($databaseNamespace, $name, $connection);
+	}
+
+	/**
+	 * @return int
+	 */
+	protected function getCurrentTime() {
+		return time();
 	}
 }
