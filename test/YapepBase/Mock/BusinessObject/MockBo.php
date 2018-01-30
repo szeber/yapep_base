@@ -35,8 +35,8 @@ class MockBo extends BoAbstract {
 		parent::deleteFromStorage($key);
 	}
 
-	public function getKeyPrefix() {
-		return parent::getKeyPrefix();
+	public function getKeyPrefix($withDotSuffix = true) {
+		return parent::getKeyPrefix($withDotSuffix);
 	}
 
 	public function getKeyWithPrefix($key) {

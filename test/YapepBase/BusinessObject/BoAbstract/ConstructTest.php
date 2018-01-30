@@ -20,14 +20,14 @@ class ConstructTest extends TestAbstract {
 		$this->expectProjectNameRequested();
 
 		$bo = new MockBo();
-		$keyPrefix = $bo->getKeyPrefix();
+		$keyPrefix = $bo->getKeyPrefix(false);
 
 		$this->assertEquals('test.YapepBase\Mock\BusinessObject\MockBo', $keyPrefix);
 	}
 
 	public function testWhenKeyPrefixGiven_shouldUseGivenPrefix() {
 		$bo = new MockBo('prefix');
-		$keyPrefix = $bo->getKeyPrefix();
+		$keyPrefix = $bo->getKeyPrefix(false);
 
 		$this->assertEquals('prefix', $keyPrefix);
 	}

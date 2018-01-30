@@ -63,16 +63,18 @@ abstract class BoAbstract {
 		}
 		$this->keyPrefix = $keyPrefix;
 
-		$this->isKeyStoringEnabled = $config->get('resource.storage.middleware.isKeyStoringEnabled', false);
+		$this->isKeyStoringEnabled = $config->get('system.storage.middleware.isKeyStoringEnabled', false);
 	}
 
 	/**
 	 * Returns the prefix of the key which should be used for caching in the BO.
 	 *
+	 * @param bool $withDotSuffix   If TRUE the "." suffix will be added.
+	 *
 	 * @return string
 	 */
-	protected function getKeyPrefix() {
-		return $this->keyPrefix;
+	protected function getKeyPrefix($withDotSuffix = true) {
+		return $this->keyPrefix . ($withDotSuffix ? '.' : '');
 	}
 
 	/**

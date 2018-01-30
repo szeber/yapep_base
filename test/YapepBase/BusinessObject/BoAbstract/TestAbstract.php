@@ -53,7 +53,7 @@ class TestAbstract extends \YapepBase\BaseTest {
 
 
 	protected function enableKeyStoring() {
-		Config::getInstance()->set('resource.storage.middleware.isKeyStoringEnabled', true);
+		Config::getInstance()->set('system.storage.middleware.isKeyStoringEnabled', true);
 	}
 
 
