@@ -71,9 +71,16 @@ abstract class DaoAbstract {
 	 * @param array        $conditions     Array which holds the conditions.
 	 * @param array        $queryParams    Array which holds the query params.
 	 * @param string       $tableAlias     Alias of the table which contains the given field.
+	 * @param bool         $isNegated      If TRUE, it will generate a NOT IN, with the default false it will generate an IN condition
 	 */
 	protected function getInListCondition(
-		DbConnection $dbConnection, $fieldName, array $list, array &$conditions, array &$queryParams, $tableAlias = ''
+		DbConnection $dbConnection,
+		$fieldName,
+		array $list,
+		array &$conditions,
+		array &$queryParams,
+		$tableAlias = '',
+		$isNegated = false
 	) {
 		if (empty($list)) {
 			return;
@@ -88,7 +95,9 @@ abstract class DaoAbstract {
 			$queryParams[$paramName] = $item;
 		}
 
-		$conditions[] = $this->getPrefixedField($tableAlias, $fieldName) . ' IN (' . implode(', ', $paramNames) . ')';
+		$operator = $isNegated ? 'NOT IN' : 'IN';
+
+		$conditions[] = $this->getPrefixedField($tableAlias, $fieldName) . ' ' .$operator . ' (' . implode(', ', $paramNames) . ')';
 	}
 
 	/**
