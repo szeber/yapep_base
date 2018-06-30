@@ -58,7 +58,7 @@ class MysqlConnection extends DbConnection {
 		}
 
 		if (isset($configuration['timezone'])) {
-			$this->query('SET time_zone=:_tz', array('tz' => $configuration['timezone']));
+			$this->query('SET time_zone=:' . $this->paramPrefix . 'tz', array('tz' => $configuration['timezone']));
 		}
 	}
 
