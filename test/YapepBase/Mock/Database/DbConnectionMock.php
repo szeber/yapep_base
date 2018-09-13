@@ -16,11 +16,9 @@ class DbConnectionMock extends DbConnection {
 	}
 
 	protected function connect(array $configuration) {
-		// TODO: Implement connect() method.
 	}
 
 	protected function getBackendType() {
-		// TODO: Implement getBackendType() method.
 	}
 
 	public function getParamType(&$value) {
