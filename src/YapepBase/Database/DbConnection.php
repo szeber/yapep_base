@@ -69,6 +69,22 @@ abstract class DbConnection {
 	 */
 	protected $paramPrefix = '';
 
+	/**
+	 * Opens the connection
+	 *
+	 * @param array $configuration   The configuration for the connection
+	 *
+	 * @return void
+	 */
+	abstract protected function connect(array $configuration);
+
+	/**
+	 * Returns the backend type for the given connection {@uses DbFactory::BACKEND_TYPE_*}
+	 *
+	 * @return string
+	 */
+	abstract protected function getBackendType();
+
 
 	/**
 	 * Constructor
@@ -93,15 +109,6 @@ abstract class DbConnection {
 		}
 		$this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 	}
-
-	/**
-	 * Opens the connection
-	 *
-	 * @param array $configuration   The configuration for the connection
-	 *
-	 * @return void
-	 */
-	abstract protected function connect(array $configuration);
 
 	/**
 	 * Closes the database connection.
@@ -221,7 +228,7 @@ abstract class DbConnection {
 	 * @return int   The PDO data type.
 	 */
 	protected function getParamType(&$value) {
-		if (is_integer($value) || is_float($value)) {
+		if (is_integer($value)) {
 			return PDO::PARAM_INT;
 		} elseif (is_null($value)) {
 			return PDO::PARAM_NULL;
@@ -390,11 +397,4 @@ abstract class DbConnection {
 	public function getDate($timestamp = null) {
 		return date('Y-m-d', is_null($timestamp) ? time() : $timestamp);
 	}
-
-	/**
-	 * Returns the backend type for the given conneciton {@uses DbFactory::BACKEND_TYPE_*}
-	 *
-	 * @return string
-	 */
-	abstract protected function getBackendType();
 }
