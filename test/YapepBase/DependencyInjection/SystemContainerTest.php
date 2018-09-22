@@ -149,6 +149,12 @@ class SystemContainerTest extends \YapepBase\BaseTest {
 			'The retrieved logger registry is of the wrong type');
 	}
 
+	public function testHttpStatus() {
+		$sc = new SystemContainer();
+		$this->assertInstanceOf('\Lukasoppermann\Httpstatus\Httpstatus', $sc->getHttpStatus(),
+			'The retrieved http status is of the wrong type');
+	}
+
 	public function testDebugger() {
 		$sc = new SystemContainer();
 		$this->assertFalse($sc->getDebugger(), 'The getDebugger method should return FALSE if no debugger is set');
