@@ -23,8 +23,9 @@ interface IIncrementable {
 	 *
 	 * @param string $key      The key of the item to increment.
 	 * @param int    $offset   The amount by which to increment the item's value.
+	 * @param int    $ttl      The expiration time of the data in seconds if supported by the backend.
 	 *
 	 * @return int   The changed value.
 	 */
-	public function increment($key, $offset);
+	public function increment($key, $offset, $ttl = 0);
 }
