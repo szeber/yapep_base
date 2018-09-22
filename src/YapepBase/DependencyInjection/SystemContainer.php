@@ -11,12 +11,12 @@
 namespace YapepBase\DependencyInjection;
 
 
+use Lukasoppermann\Httpstatus\Httpstatus;
 use YapepBase\Communication\CurlFactory;
 use YapepBase\Communication\CurlHttpRequest;
 use YapepBase\Debugger\IDebugger;
 use YapepBase\File\FileHandlerPhp;
 use YapepBase\Database\DbConnection;
-use YapepBase\DependencyInjection\Container;
 use YapepBase\ErrorHandler\ErrorHandlerRegistry;
 use YapepBase\Event\Event;
 use YapepBase\Event\EventHandlerRegistry;
@@ -66,6 +66,8 @@ class SystemContainer extends Container {
 	const KEY_FILE_HANDLER = 'fileHandler';
 	/** Key containing the command executor. */
 	const KEY_COMMAND_EXECUTOR = 'commandExecutor';
+	/** Key containing the HttpStatus instance */
+	const KEY_HTTP_STATUS = 'httpStatus';
 	/**
 	 * Key containing the curl factory.
 	 *
@@ -190,6 +192,10 @@ class SystemContainer extends Container {
 			return new CurlHttpRequest();
 		};
 
+		$this[self::KEY_HTTP_STATUS] = $this->share(function($container) {
+			return new Httpstatus();
+		});
+
 		$this->searchNamespaces[self::NAMESPACE_SEARCH_BO] = array();
 		$this->searchNamespaces[self::NAMESPACE_SEARCH_DAO] = array();
 		$this->searchNamespaces[self::NAMESPACE_SEARCH_VALIDATOR] = array();
@@ -258,6 +264,15 @@ class SystemContainer extends Container {
 	 */
 	public function getCurlHttpRequest() {
 		return $this[self::KEY_CURL_HTTP_REQUEST];
+	}
+
+	/**
+	 * Returns a Httpstatus instance.
+	 *
+	 * @return Httpstatus
+	 */
+	public function getHttpStatus() {
+		return $this[self::KEY_HTTP_STATUS];
 	}
 
 	/**

@@ -10,6 +10,7 @@
 
 namespace YapepBase\Mock\Communication;
 
+use Lukasoppermann\Httpstatus\Httpstatuscodes;
 use YapepBase\Communication\CurlHttpWrapper;
 
 /**
@@ -27,7 +28,7 @@ class CurlHttpWrapperMock extends CurlHttpWrapper {
 	 * @param string $errorMessage      The error message from curl. If set, an exception will be thrown during send().
 	 */
 	public function __construct(
-		$responseBody, $responseCode = 200, array $responseHeaders = array(), $errorMessage = null
+		$responseBody, $responseCode = Httpstatuscodes::HTTP_OK, array $responseHeaders = array(), $errorMessage = null
 	) {
 		$this->responseBody    = $responseBody;
 		$this->responseInfo    = array('http_code' => $responseCode);
