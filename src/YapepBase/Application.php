@@ -1,30 +1,18 @@
 <?php
-/**
- * This file is part of YAPEPBase.
- *
- * @package   YapepBase
- * @copyright 2011 The YAPEP Project All rights reserved.
- * @license   http://www.opensource.org/licenses/bsd-license.php BSD License
- */
-
+declare(strict_types = 1);
 
 namespace YapepBase;
+
 use YapepBase\Exception\RedirectException;
 use YapepBase\Event\Event;
 use YapepBase\Response\IResponse;
 use YapepBase\Request\IRequest;
-use YapepBase\ErrorHandler\IErrorHandler;
 use YapepBase\Router\IRouter;
 use YapepBase\DependencyInjection\SystemContainer;
-use YapepBase\Debugger\IDebugger;
 use YapepBase\Exception\Exception;
 use YapepBase\Exception\HttpException;
-use YapepBase\ErrorHandler\ErrorHandlerRegistry;
-use YapepBase\Request\HttpRequest;
 use YapepBase\Exception\ControllerException;
-use YapepBase\Event\EventHandlerRegistry;
 use YapepBase\Exception\RouterException;
-use YapepBase\I18n\ITranslator;
 
 /**
  * Application singleton class.
@@ -36,430 +24,373 @@ use YapepBase\I18n\ITranslator;
  * </ul>
  *
  * @package    YapepBase
- *
- * @todo debugger support
  */
-class Application {
+class Application
+{
+    /** The name of the default Error Controller. */
+    const DEFAULT_ERROR_CONTROLLER_NAME = 'Error';
 
-	/** The name of the default Error Controller. */
-	const DEFAULT_ERROR_CONTROLLER_NAME = 'Error';
+    /**
+     * Singleton instance
+     *
+     * @var \YapepBase\Application
+     */
+    protected static $instance;
 
-	/**
-	 * Singleton instance
-	 *
-	 * @var \YapepBase\Application
-	 */
-	protected static $instance;
+    /**
+     * The router instance
+     *
+     * @var \YapepBase\Router\IRouter|null
+     */
+    protected $router;
 
-	/**
-	 * The router instance
-	 *
-	 * @var \YapepBase\Router\IRouter
-	 */
-	protected $router;
+    /**
+     * The request instance for the application.
+     *
+     * @var \YapepBase\Request\IRequest|null
+     */
+    protected $request;
 
-	/**
-	 * The request instance for the application.
-	 *
-	 * @var \YapepBase\Request\IRequest
-	 */
-	protected $request;
+    /**
+     * The response instance for the application.
+     *
+     * @var \YapepBase\Response\IResponse|null
+     */
+    protected $response;
 
-	/**
-	 * The response instance for the application.
-	 *
-	 * @var \YapepBase\Response\IResponse
-	 */
-	protected $response;
+    /**
+     * The error handler container instance
+     *
+     * @var \YapepBase\ErrorHandler\ErrorHandlerRegistry||null
+     */
+    protected $errorHandlerRegistry;
 
-	/**
-	 * The configuration instance
-	 *
-	 * @var \YapepBase\Config
-	 */
-	protected $config;
+    /**
+     * Stores the system DI container
+     *
+     * @var \YapepBase\DependencyInjection\SystemContainer||null
+     */
+    protected $diContainer;
 
-	/**
-	 * The error handler container instance
-	 *
-	 * @var \YapepBase\ErrorHandler\ErrorHandlerRegistry
-	 */
-	protected $errorHandlerRegistry;
+    /**
+     * Stores the name of the currently dispatched Controller.
+     *
+     * @var string
+     */
+    protected $dispatchedController;
 
-	/**
-	 * Stores the system DI container
-	 *
-	 * @var \YapepBase\DependencyInjection\SystemContainer
-	 */
-	protected $diContainer;
+    /**
+     * Stores the name of the currently dispatched Action.
+     *
+     * @var string
+     */
+    protected $dispatchedAction;
 
-	/**
-	 * Stores the i18n translator instance
-	 *
-	 * @var \YapepBase\I18n\ITranslator
-	 */
-	protected $i18nTranslator;
+    /**
+     * Singleton constructor
+     */
+    protected function __construct()
+    {
+        // Set up error handling
+        $this->errorHandlerRegistry = $this->getDiContainer()->getErrorHandlerRegistry();
+        $this->errorHandlerRegistry->register();
+    }
 
-	/**
-	 * Stores the name of the currently dispatched Controller.
-	 *
-	 * @var string
-	 */
-	protected $dispatchedController;
+    /**
+     * Singleton __clone() method
+     */
+    protected function __clone()
+    {
+    }
 
-	/**
-	 * Stores the name of the currently dispatched Action.
-	 *
-	 * @var string
-	 */
-	protected $dispatchedAction;
+    /**
+     * Singleton getter
+     */
+    public static function getInstance(): Application
+    {
+        if (is_null(static::$instance)) {
+            static::$instance = new static();
+        }
+        return static::$instance;
+    }
 
-	/**
-	 * Singleton constructor
-	 */
-	protected function __construct() {
-		$this->config = Config::getInstance();
-		// Set up error handling
-		$this->errorHandlerRegistry = $this->getDiContainer()->getErrorHandlerRegistry();
-		$this->errorHandlerRegistry->register();
-	}
+    /**
+     * Sets the application instance.
+     *
+     * Be careful with this method, since it breaks the Singleton pattern.
+     */
+    public static function setInstance(Application $instance): void
+    {
+        static::$instance = $instance;
+    }
 
-	/**
-	 * Singleton __clone() method
-	 *
-	 * @codeCoverageIgnore
-	 */
-	protected function __clone() {}
+    /**
+     * Sets the router used by the application.
+     *
+     * @return void
+     */
+    public function setRouter(IRouter $router): void
+    {
+        $this->router = $router;
+    }
 
-	/**
-	 * Singleton getter
-	 *
-	 * @return \YapepBase\Application
-	 *
-	 * @codeCoverageIgnore
-	 */
-	public static function getInstance() {
-		if (is_null(static::$instance)) {
-			static::$instance = new static();
-		}
-		return static::$instance;
-	}
+    /**
+     * Returns the router used by the application.
+     */
+    public function getRouter(): IRouter
+    {
+        return $this->router;
+    }
 
-	/**
-	 * Sets the application instance.
-	 *
-	 * Be careful with this method, since it breaks the Singleton pattern.
-	 *
-	 * @param \YapepBase\Application $instance   The instance to use
-	 *
-	 * @return void
-	 */
-	public static function setInstance(Application $instance) {
-		static::$instance = $instance;
-	}
+    /**
+     * Sets the DI container to be used by the application
+     */
+    public function setDiContainer(SystemContainer $diContainer): void
+    {
+        $this->diContainer = $diContainer;
+    }
 
-	/**
-	 * Sets the router used by the application.
-	 *
-	 * @param \YapepBase\Router\IRouter $router   The router instance.
-	 *
-	 * @return void
-	 */
-	public function setRouter(IRouter $router) {
-		$this->router = $router;
-	}
+    /**
+     * Returns the DI container used by the application
+     */
+    public function getDiContainer(): SystemContainer
+    {
+        if (empty($this->diContainer)) {
+            $this->diContainer = new SystemContainer();
+        }
+        return $this->diContainer;
+    }
 
-	/**
-	 * Returns the router used by the application.
-	 *
-	 * @return \YapepBase\Router\IRouter
-	 */
-	public function getRouter() {
-		return $this->router;
-	}
+    /**
+     * Returns the request object used by the application.
+     */
+    public function getRequest(): ?IRequest
+    {
+        return $this->request;
+    }
 
-	/**
-	 * Sets the DI container to be used by the application
-	 *
-	 * @param \YapepBase\DependencyInjection\SystemContainer $diContainer   The DI container instance to use
-	 *
-	 * @return void
-	 */
-	public function setDiContainer(SystemContainer $diContainer) {
-		$this->diContainer = $diContainer;
-	}
+    /**
+     * Sets the request object used by the application.
+     */
+    public function setRequest(IRequest $request): void
+    {
+        $this->request = $request;
+    }
 
-	/**
-	 * Returns the DI container used by the application
-	 *
-	 * @return \YapepBase\DependencyInjection\SystemContainer
-	 */
-	public function getDiContainer() {
-		if (empty($this->diContainer)) {
-			$this->diContainer = new SystemContainer();
-		}
-		return $this->diContainer;
-	}
+    /**
+     * Returns the response object used by the application.
+     */
+    public function getResponse(): ?IResponse
+    {
+        return $this->response;
+    }
 
-	/**
-	 * Returns the request object used by the application.
-	 *
-	 * @return \YapepBase\Request\IRequest
-	 */
-	public function getRequest() {
-		return $this->request;
-	}
+    /**
+     * Sets the response object used by the application.
+     */
+    public function setResponse(IResponse $response): void
+    {
+        $this->response = $response;
+    }
 
-	/**
-	 * Sets the request object used by the application.
-	 *
-	 * @param \YapepBase\Request\IRequest $request   The request instance.
-	 *
-	 * @return void
-	 */
-	public function setRequest(IRequest $request) {
-		$this->request = $request;
-	}
+    /**
+     * Populates the name of the currently dispatched Controller and Action into the provided variables.
+     */
+    public function populateDispatchedAction(string &$controllerName, string &$actionName): void
+    {
+        $controllerName = $this->dispatchedController;
+        $actionName     = $this->dispatchedAction;
+    }
 
-	/**
-	 * Returns the response object used by the application.
-	 *
-	 * @return \YapepBase\Response\IResponse $response
-	 */
-	public function getResponse() {
-		return $this->response;
-	}
+    /**
+     * Sets the name of the currently dispatched Controller and Action.
+     */
+    public function setDispatchedAction(string $controllerName, string $actionName): void
+    {
+        $this->dispatchedController = $controllerName;
+        $this->dispatchedAction     = $actionName;
+    }
 
-	/**
-	 * Sets the response object used by the application.
-	 *
-	 * @param \YapepBase\Response\IResponse $response   The response instance
-	 *
-	 * @return void
-	 */
-	public function setResponse(IResponse $response) {
-		$this->response = $response;
-	}
+    /**
+     * Runs the request on the application
+     */
+    public function run(): void
+    {
+        $this->diContainer->getErrorHandlerRegistry()->reportApplicationRun();
 
-	/**
-	 * Returns the configured i18n translator instance, or throws an exception if none is configured.
-	 *
-	 * @return \YapepBase\I18n\ITranslator   The instance.
-	 *
-	 * @throws Exception\Exception   If no translator is configured.
-	 */
-	public function getI18nTranslator() {
-		if (empty($this->i18nTranslator)) {
-			throw new Exception('No i18n translator is configured');
-		}
-		return $this->i18nTranslator;
-	}
+        $eventHandlerRegistry = $this->diContainer->getEventHandlerRegistry();
 
-	/**
-	 * Sets the i18n translator instance to use.
-	 *
-	 * @param \YapepBase\I18n\ITranslator $translator   The instance.
-	 *
-	 * @return void
-	 */
-	public function setI18nTranslator(ITranslator $translator) {
-		$this->i18nTranslator = $translator;
-	}
+        try {
+            $eventHandlerRegistry->raise(new Event(Event::TYPE_APPLICATION_BEFORE_RUN));
+            $controllerName = '';
+            $action         = '';
+            try {
+                $this->router->getRoute($controllerName, $action);
 
-	/**
-	 * Removes the configured translator instance.
-	 *
-	 * @return void
-	 */
-	public function clearI18nTranslator() {
-		$this->i18nTranslator = null;
-	}
+                $this->dispatchedController = $controllerName;
+                $this->dispatchedAction     = $action;
+            } catch (RouterException $exception) {
+                if ($exception->getCode() == RouterException::ERR_NO_ROUTE_FOUND) {
+                    // The route was not found, generate a 404 HttpException
+                    throw new HttpException('Route not found. Controller/action: ' . $controllerName . '/' . $action, 404);
+                } else {
+                    // This was not a no route found error, re-throw the exception
+                    throw $exception;
+                }
+            }
 
-	/**
-	 * Returns the name of the currently dispatched Controller and Action.
-	 *
-	 * @param string $controllerName   The name of the Controller will be populated here (Outgoing parameter).
-	 * @param string $actionName       The name of the Action will be populated here (Outgoing parameter).
-	 *
-	 * @return void
-	 */
-	public function getDispatchedAction(&$controllerName, &$actionName) {
-		$controllerName = $this->dispatchedController;
-		$actionName = $this->dispatchedAction;
-	}
+            $this->runAction($controllerName, $action);
+            $controller = $this->diContainer->getController($controllerName, $this->request, $this->response);
 
-	/**
-	 * Sets the name of the currently dispatched Controller and Action.
-	 *
-	 * @param string $controllerName   Name of the controller.
-	 * @param string $actionName       Name of the action.
-	 *
-	 * @return void
-	 */
-	public function setDispatchedAction($controllerName, $actionName) {
-		$this->dispatchedController = $controllerName;
-		$this->dispatchedAction = $actionName;
-	}
+            $eventHandlerRegistry->raise(new Event(Event::TYPE_APPLICATION_BEFORE_CONTROLLER_RUN));
+            $controller->run($action);
+            $eventHandlerRegistry->raise(new Event(Event::TYPE_APPLICATION_AFTER_CONTROLLER_RUN));
 
-	/**
-	 * Runs the request on the application
-	 *
-	 * @return void
-	 */
-	public function run() {
-		// Inform the ErrorHandler about the run
-		$this->diContainer->getErrorHandlerRegistry()->reportApplicationRun();
+            $this->response->render();
 
-		$eventHandlerRegistry = $this->diContainer->getEventHandlerRegistry();
+            $eventHandlerRegistry->raise(new Event(Event::TYPE_APPLICATION_BEFORE_OUTPUT_SEND));
+            $this->response->send();
+            $eventHandlerRegistry->raise(new Event(Event::TYPE_APPLICATION_AFTER_OUTPUT_SEND));
+            // @codeCoverageIgnoreStart
+        } catch (HttpException $exception) {
+            $this->runErrorAction($exception->getCode());
+        } catch (RedirectException $exception) {
+            $eventHandlerRegistry->raise(new Event(Event::TYPE_APPLICATION_BEFORE_OUTPUT_SEND));
+            $this->response->send();
+            $eventHandlerRegistry->raise(new Event(Event::TYPE_APPLICATION_AFTER_OUTPUT_SEND));
+        } catch (\Exception $exception) {
+            $this->handleFatalException($exception);
+        }
+        // Check that all required events were raised
+        $requiredEventTypes = [
+            Event::TYPE_APPLICATION_BEFORE_RUN,
+            Event::TYPE_APPLICATION_BEFORE_CONTROLLER_RUN,
+            Event::TYPE_APPLICATION_AFTER_CONTROLLER_RUN,
+            Event::TYPE_APPLICATION_BEFORE_OUTPUT_SEND,
+            Event::TYPE_APPLICATION_AFTER_OUTPUT_SEND,
+        ];
 
-		try {
-			$eventHandlerRegistry->raise(new Event(Event::TYPE_APPLICATION_BEFORE_RUN));
-			$controllerName = null;
-			$action = null;
-			try {
-				$this->router->getRoute($controllerName, $action);
+        foreach ($requiredEventTypes as $eventType) {
+            $this->raiseEventIfNotRaisedYet($eventType);
+        }
 
-				$this->dispatchedController = $controllerName;
-				$this->dispatchedAction = $action;
-			} catch (RouterException $exception) {
-				if ($exception->getCode() == RouterException::ERR_NO_ROUTE_FOUND) {
-					// The route was not found, generate a 404 HttpException
-					throw new HttpException('Route not found. Controller/action: ' . $controllerName . '/' . $action,
-						404);
-				} else {
-					// This was not a no route found error, re-throw the exception
-					throw $exception;
-				}
-			}
+        $eventHandlerRegistry->raise(new Event(Event::TYPE_APPLICATION_AFTER_RUN));
+        // @codeCoverageIgnoreEnd
+    }
 
-			$controller = $this->getDiContainer()->getController($controllerName, $this->request, $this->response);
+    /**
+     * Runs the given Action on the given Controller
+     *
+     * @throws ControllerException
+     * @throws Exception
+     * @throws RedirectException
+     */
+    protected function runAction(string $controllerName, string $action): void
+    {
+        $eventHandlerRegistry = $this->diContainer->getEventHandlerRegistry();
+        $controller           = $this->diContainer->getController($controllerName, $this->request, $this->response);
 
-			$eventHandlerRegistry->raise(new Event(Event::TYPE_APPLICATION_BEFORE_CONTROLLER_RUN));
-			$controller->run($action);
-			$eventHandlerRegistry->raise(new Event(Event::TYPE_APPLICATION_AFTER_CONTROLLER_RUN));
+        $eventHandlerRegistry->raise(new Event(Event::TYPE_APPLICATION_BEFORE_CONTROLLER_RUN));
 
-			$this->response->render();
+        $controller->run($action);
 
-			$eventHandlerRegistry->raise(new Event(Event::TYPE_APPLICATION_BEFORE_OUTPUT_SEND));
-			$this->response->send();
-			$eventHandlerRegistry->raise(new Event(Event::TYPE_APPLICATION_AFTER_OUTPUT_SEND));
-			// @codeCoverageIgnoreStart
-		} catch (HttpException $exception) {
-			$this->runErrorAction($exception->getCode());
-		} catch (RedirectException $exception) {
-			$eventHandlerRegistry->raise(new Event(Event::TYPE_APPLICATION_BEFORE_OUTPUT_SEND));
-			$this->response->send();
-			$eventHandlerRegistry->raise(new Event(Event::TYPE_APPLICATION_AFTER_OUTPUT_SEND));
-		} catch (\Exception $exception) {
-			$this->handleFatalException($exception);
-		}
-		// Check that all required events were raised
-		$requiredEventTypes = array(
-			Event::TYPE_APPLICATION_BEFORE_RUN,
-			Event::TYPE_APPLICATION_BEFORE_CONTROLLER_RUN,
-			Event::TYPE_APPLICATION_AFTER_CONTROLLER_RUN,
-			Event::TYPE_APPLICATION_BEFORE_OUTPUT_SEND,
-			Event::TYPE_APPLICATION_AFTER_OUTPUT_SEND,
-		);
+        $eventHandlerRegistry->raise(new Event(Event::TYPE_APPLICATION_AFTER_CONTROLLER_RUN));
+    }
 
-		foreach ($requiredEventTypes as $eventType) {
-			$this->raiseEventIfNotRaisedYet($eventType);
-		}
+    /**
+     * Handles a fatal exception.
+     *
+     * @param \Exception $exception The exception to handle.
+     *
+     * @return void
+     *
+     * @throws \Exception   Re-throws the received exception for the exception handler to handle.
+     */
+    protected function handleFatalException(\Exception $exception)
+    {
+        if ($this->request instanceof \YapepBase\Request\HttpRequest) {
+            $this->errorHandlerRegistry->handleException($exception);
+            // We have an HTTP request, try to run
+            try {
+                $this->runErrorAction(500);
+            } catch (\Exception $exception) {
+                $this->outputError();
+            }
+        } else {
+            // Not an HTTP request, just use default error output
+            $this->outputError();
+        }
+    }
 
-		$eventHandlerRegistry->raise(new Event(Event::TYPE_APPLICATION_AFTER_RUN));
-		// @codeCoverageIgnoreEnd
-	}
+    /**
+     * Runs the error controller action for the specified HTTP error code.
+     *
+     * @param int $errorCode The error code
+     *
+     * @return void
+     */
+    protected function runErrorAction($errorCode)
+    {
+        $controllerName = $this->config->get('system.errorController', self::DEFAULT_ERROR_CONTROLLER_NAME);
 
-	/**
-	 * Handles a fatal exception.
-	 *
-	 * @param \Exception $exception   The exception to handle.
-	 *
-	 * @return void
-	 *
-	 * @throws \Exception   Re-throws the received exception for the exception handler to handle.
-	 */
-	protected function handleFatalException(\Exception $exception) {
-		if ($this->request instanceof \YapepBase\Request\HttpRequest) {
-			$this->errorHandlerRegistry->handleException($exception);
-			// We have an HTTP request, try to run
-			try {
-				$this->runErrorAction(500);
-			} catch (\Exception $exception) {
-				$this->outputError();
-			}
-		} else {
-			// Not an HTTP request, just use default error output
-			$this->outputError();
-		}
-	}
+        try {
+            try {
+                $controller = $this->diContainer->getController($controllerName, $this->request, $this->response);
+            } catch (ControllerException $exception) {
+                // No such controller, fall back to built in default
+                $controller     = $this->diContainer->getDefaultErrorController($this->request, $this->response);
+                $controllerName = self::DEFAULT_ERROR_CONTROLLER_NAME;
+            }
+        } catch (\Exception $e) {
+            $this->dispatchedController = $controllerName;
+            $this->dispatchedAction     = 500;
 
-	/**
-	 * Runs the error controller action for the specified HTTP error code.
-	 *
-	 * @param int $errorCode   The error code
-	 *
-	 * @return void
-	 */
-	protected function runErrorAction($errorCode) {
-		$controllerName = $this->config->get('system.errorController', self::DEFAULT_ERROR_CONTROLLER_NAME);
+            throw $e;
+        }
 
-		try {
-			try {
-				$controller = $this->diContainer->getController($controllerName, $this->request, $this->response);
-			} catch (ControllerException $exception) {
-				// No such controller, fall back to built in default
-				$controller = $this->diContainer->getDefaultErrorController($this->request, $this->response);
-				$controllerName = self::DEFAULT_ERROR_CONTROLLER_NAME;
-			}
-		} catch (\Exception $e) {
-			$this->dispatchedController = $controllerName;
-			$this->dispatchedAction = 500;
+        $this->dispatchedController = $controllerName;
+        $this->dispatchedAction     = $errorCode;
 
-			throw $e;
-		}
+        $this->raiseEventIfNotRaisedYet(Event::TYPE_APPLICATION_BEFORE_CONTROLLER_RUN);
+        $controller->run($errorCode);
+        $this->raiseEventIfNotRaisedYet(Event::TYPE_APPLICATION_AFTER_CONTROLLER_RUN);
 
-		$this->dispatchedController = $controllerName;
-		$this->dispatchedAction = $errorCode;
+        $this->response->render();
 
-		$this->raiseEventIfNotRaisedYet(Event::TYPE_APPLICATION_BEFORE_CONTROLLER_RUN);
-		$controller->run($errorCode);
-		$this->raiseEventIfNotRaisedYet(Event::TYPE_APPLICATION_AFTER_CONTROLLER_RUN);
+        $this->raiseEventIfNotRaisedYet(Event::TYPE_APPLICATION_BEFORE_OUTPUT_SEND);
+        $this->response->send();
+        $this->raiseEventIfNotRaisedYet(Event::TYPE_APPLICATION_AFTER_OUTPUT_SEND);
+    }
 
-		$this->response->render();
+    /**
+     * Raises an event if an event with it's type was not yet raised.
+     *
+     * @param string $eventType The event type
+     *
+     * @return void
+     */
+    protected function raiseEventIfNotRaisedYet($eventType)
+    {
+        $eventHandlerRegistry = $this->diContainer->getEventHandlerRegistry();
+        if (is_null($eventHandlerRegistry->getLastTimeForEventType($eventType))) {
+            $eventHandlerRegistry->raise(new Event($eventType));
+        }
+    }
 
-		$this->raiseEventIfNotRaisedYet(Event::TYPE_APPLICATION_BEFORE_OUTPUT_SEND);
-		$this->response->send();
-		$this->raiseEventIfNotRaisedYet(Event::TYPE_APPLICATION_AFTER_OUTPUT_SEND);
-	}
-
-	/**
-	 * Raises an event if an event with it's type was not yet raised.
-	 *
-	 * @param string $eventType   The event type
-	 *
-	 * @return void
-	 */
-	protected function raiseEventIfNotRaisedYet($eventType) {
-		$eventHandlerRegistry = $this->diContainer->getEventHandlerRegistry();
-		if (is_null($eventHandlerRegistry->getLastTimeForEventType($eventType))) {
-			$eventHandlerRegistry->raise(new Event($eventType));
-		}
-	}
-
-	/**
-	 * Sends an error to the output.
-	 *
-	 * @return void
-	 *
-	 * @codeCoverageIgnore
-	 */
-	public function outputError() {
-		try {
-			$this->response->sendError();
-		} catch (\Exception $exception) {
-			error_log('Uncaught exception during error shutdown: ' . $exception->getMessage());
-			exit;
-		}
-	}
+    /**
+     * Sends an error to the output.
+     *
+     * @return void
+     *
+     * @codeCoverageIgnore
+     */
+    public function outputError()
+    {
+        try {
+            $this->response->sendError();
+        } catch (\Exception $exception) {
+            error_log('Uncaught exception during error shutdown: ' . $exception->getMessage());
+            exit;
+        }
+    }
 }

@@ -1,13 +1,5 @@
 <?php
-/**
- * This file is part of YAPEPBase.
- *
- * @package    YapepBase
- * @subpackage Router
- * @copyright  2011 The YAPEP Project All rights reserved.
- * @license    http://www.opensource.org/licenses/bsd-license.php BSD License
- */
-
+declare(strict_types=1);
 
 namespace YapepBase\Router;
 
@@ -15,117 +7,95 @@ namespace YapepBase\Router;
 use YapepBase\Request\IRequest;
 
 /**
- * AutoRouter class.
- *
  * Generates the controller and action name based on the received target.
- *
- * @package    YapepBase
- * @subpackage Router
  */
-class AutoRouter implements IRouter {
+class AutoRouter implements IRouter
+{
+    /** @var IRequest */
+    protected $request;
 
-	/**
-	 * The request instance
-	 *
-	 * @var \YapepBase\Request\IRequest
-	 */
-	protected $request;
+    public function __construct(IRequest $request)
+    {
+        $this->request = $request;
+    }
 
-	/**
-	 * Constructor
-	 *
-	 * @param \YapepBase\Request\IRequest $request   The request instance
-	 */
-	public function __construct(IRequest $request) {
-		$this->request = $request;
-	}
+    /**
+     * @inheritdoc
+     */
+    public function getRoute(string &$controllerClassName, string &$actionName, ?string $uri = null): string
+    {
+        $uri                 = empty($uri) ? $this->request->getTarget() : $uri;
+        $uriParts            = explode('/', trim($uri, '/ '));
+        $controllerClassName = $this->getControllerClassName($uriParts);
+        $actionName          = $this->getActionName($uriParts);
 
-	/**
-	 * Returns a controller and an action for the request's target.
-	 *
-	 * @param string $controller   $he controller class name. (Outgoing parameter)
-	 * @param string $action       The action name in the controller class. (Outgoing parameter)
-	 * @param string $uri          The uri to check. If not given, the current uri will be used.
-	 *
-	 * @return string   The controller and action separated by a '/' character.
-	 *
-	 * @throws \YapepBase\Exception\RouterException   On errors. (Including if the route is not found)
-	 */
-	public function getRoute(&$controller = null, &$action = null, $uri = null) {
-		$uri = empty($uri)
-			? $this->request->getTarget()
-			: $uri;
-		$target = explode('/', trim($uri, '/ '));
-		$controller = array_shift($target);
+        foreach ($uriParts as $key => $value) {
+            $this->request->setParam($key, $value);
+        }
 
-		if (empty($controller)) {
-			$controller = 'Index';
-		} else {
-			$controller = $this->convertPathPartToName($controller);
-		}
+        return $controllerClassName . '/' . $actionName;
+    }
 
-		if (empty($target)) {
-			$action = 'Index';
-		} else {
-			$action = $this->convertPathPartToName(array_shift($target));
-		}
+    protected function getControllerClassName(array &$uriParts): string
+    {
+        $controllerClassName = array_shift($uriParts);
 
-		foreach ($target as $key => $value) {
-			$this->request->setParam($key, $value);
-		}
+        if (empty($controllerClassName)) {
+            $controllerClassName = 'Index';
+        } else {
+            $controllerClassName = $this->convertPathPartToName($controllerClassName);
+        }
 
-		return $controller . '/' . $action;
-	}
+        return $controllerClassName;
+    }
 
-	/**
-	 * Converts a path part to a controller or action name.
-	 *
-	 * @param string $string   The path.
-	 *
-	 * @return string
-	 */
-	protected function convertPathPartToName($string) {
-		$parts = preg_split('/[-_ A-Z]/', preg_replace('/[^-_a-zA-Z0-9]/', '', $string));
-		foreach ($parts as $key => $value) {
-			$parts[$key] = ucfirst($value);
-		}
-		return implode('', $parts);
-	}
+    protected function getActionName(array &$uriParts): string
+    {
+        if (empty($uriParts)) {
+            $actionName = 'Index';
+        } else {
+            $actionName = $this->convertPathPartToName(array_shift($uriParts));
+        }
 
-	/**
-	 * Converts a controller or action name to a path part
-	 *
-	 * @param string $name   The name of the controller or action.
-	 *
-	 * @return string
-	 */
-	protected function convertNameToPathPart($name) {
-		return strtolower(substr($name, 0, 1)) . substr($name, 1);
-	}
+        return $actionName;
+    }
 
-	/**
-	 * Returns the target (eg. URL) for the controller and action
-	 *
-	 * @param string $controller   The name of the controller
-	 * @param string $action       The name of the action
-	 * @param array  $params       Associative array with the route params, if they are required.
-	 *
-	 * @return string   The target.
-	 *
-	 * @throws \YapepBase\Exception\RouterException   On errors. (Including if the route is not found)
-	 */
-	public function getTargetForControllerAction($controller, $action, $params = array()) {
-		if ('Index' == $action && 'Index' == $controller && empty($params)) {
-			$path = '/';
-		} elseif ('Index' == $action && empty($params)) {
-			$path = '/' . $this->convertNameToPathPart($controller);
-		} else {
-			$path = '/' . $this->convertNameToPathPart($controller) . '/' . $this->convertNameToPathPart($action);
-		}
-		if (!empty($params)) {
-			$path .= '/' . implode('/', $params);
-		}
-		return $path;
-	}
+    /**
+     * Converts a path part to a controller or action name.
+     */
+    protected function convertPathPartToName(string $pathPart): string
+    {
+        $parts = preg_split('/[-_ A-Z]/', preg_replace('/[^-_a-zA-Z0-9]/', '', $pathPart));
+        foreach ($parts as $key => $value) {
+            $parts[$key] = ucfirst($value);
+        }
+        return implode('', $parts);
+    }
+
+    /**
+     * Converts a controller or action name to a path part
+     */
+    protected function convertNameToPathPart(string $controllerOrActionName): string
+    {
+        return strtolower(substr($controllerOrActionName, 0, 1)) . substr($controllerOrActionName, 1);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getTargetForControllerAction(string $controller, string $action, array $requestParams = []): string
+    {
+        if ('Index' == $action && 'Index' == $controller && empty($requestParams)) {
+            $path = '/';
+        } elseif ('Index' == $action && empty($requestParams)) {
+            $path = '/' . $this->convertNameToPathPart($controller);
+        } else {
+            $path = '/' . $this->convertNameToPathPart($controller) . '/' . $this->convertNameToPathPart($action);
+        }
+        if (!empty($requestParams)) {
+            $path .= '/' . implode('/', $requestParams);
+        }
+        return $path;
+    }
 
 }

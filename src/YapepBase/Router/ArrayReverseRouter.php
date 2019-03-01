@@ -1,12 +1,5 @@
 <?php
-/**
- * This file is part of YAPEPBase.
- *
- * @package      YapepBase
- * @subpackage   Router
- * @copyright    2011 The YAPEP Project All rights reserved.
- * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
- */
+declare(strict_types=1);
 
 namespace YapepBase\Router;
 
@@ -32,105 +25,82 @@ use YapepBase\Exception\RouterException;
  *                    not contain delimiters, and should be escaped for a '/' delimiter. It may not contain '{' or '}'
  *                    characters.</li>
  *     </ul>
- *
- * @package    YapepBase
- * @subpackage Router
  */
-class ArrayReverseRouter implements IReverseRouter {
+class ArrayReverseRouter implements IReverseRouter
+{
 
-	/**
-	 * The available routes
-	 *
-	 * @var array
-	 */
-	protected $routes;
+    protected $routes = [];
 
-	/**
-	 * Constructor
-	 *
-	 * @param array                       $routes    The list of available routes
-	 */
-	public function __construct(array $routes) {
-		$this->routes = $routes;
-	}
+    public function __construct(array $routes)
+    {
+        $this->routes = $routes;
+    }
 
-	/**
-	 * Returns the target (eg. URL) for the controller and action
-	 *
-	 * @param string $controller   The name of the controller
-	 * @param string $action       The name of the action
-	 * @param array  $params       Associative array with the route params, if they are required.
-	 *
-	 * @return string   The target.
-	 *
-	 * @throws RouterException   On errors. (Including if the route is not found)
-	 */
-	public function getTargetForControllerAction($controller, $action, $params = array()) {
-		$key = $controller . '/' . $action;
-		$routes = $this->getRouteArray();
-		if (!isset($routes[$key])) {
-			throw new RouterException('No route found for controller and action: ' . $controller . '/' . $action,
-				RouterException::ERR_NO_ROUTE_FOUND);
-		}
+    /**
+     * @inheritdoc
+     */
+    public function getTargetForControllerAction(string $controller, string $action, array $requestParams = []): string
+    {
+        $key = $controller . '/' . $action;
 
-		$target = false;
-		if (is_array($routes[$key])) {
-			foreach ($routes[$key] as $route) {
-				$target = $this->getParameterizedRoute($route, $params);
-				if (false !== $target) {
-					break;
-				}
-			}
-		} else {
-			$target = $this->getParameterizedRoute($routes[$key], $params);
-		}
+        if (!isset($this->routes[$key])) {
+            throw new RouterException(
+                'No route found for controller and action: ' . $controller . '/' . $action,
+                RouterException::ERR_NO_ROUTE_FOUND
+            );
+        }
 
-		if (false === $target) {
-			throw new RouterException(
-				'No exact route match for controller and action: ' . $controller . '/' . $action . ' with params: '
-					. implode(', ', array_keys($params)), RouterException::ERR_MISSING_PARAM
-			);
-		}
+        $target = null;
+        if (is_array($this->routes[$key])) {
+            foreach ($this->routes[$key] as $route) {
+                $target = $this->getParameterizedRoute($route, $requestParams);
+                if ($target !== null) {
+                    break;
+                }
+            }
+        } else {
+            $target = $this->getParameterizedRoute($this->routes[$key], $requestParams);
+        }
 
-		if ('/' != substr($target, 0, 1)) {
-			$target = '/' . $target;
-		}
-		return $target;
-	}
+        if ($target === null) {
+            throw new RouterException(
+                'No exact route match for controller and action: ' . $controller . '/' . $action
+                    . ' with params: ' . implode(', ', array_keys($requestParams)),
+                RouterException::ERR_MISSING_PARAM
+            );
+        }
 
-	/**
-	 * Returns the array of routes.
-	 *
-	 * @return array
-	 */
-	protected function getRouteArray() {
-		return $this->routes;
-	}
+        if ('/' != substr($target, 0, 1)) {
+            $target = '/' . $target;
+        }
 
-	/**
-	 * Returns the route with the parameters, or FALSE if a param is missing, or not all params are used.
-	 *
-	 * @param string $route    The route.
-	 * @param array  $params   The route parameters.
-	 *
-	 * @return bool|mixed
-	 */
-	protected function getParameterizedRoute($route, array $params) {
-		$route = preg_replace('/^\s*\[[^\]]+\]\s*/', '', $route);
-		if (strstr($route, '{')) {
-			foreach ($params as $key => $value) {
-				$count = 0;
-				$route = preg_replace('/\{' . preg_quote($key, '/') . ':[^}]+\}/', $value, $route, -1, $count);
-				if ($count < 1) {
-					return false;
-				}
-			}
-			if (strstr($route, '{')) {
-				return false;
-			}
-		} elseif (!empty($params)) {
-			return false;
-		}
-		return $route;
-	}
+        return $target;
+    }
+
+
+    /**
+     * Returns the route with the parameters
+     */
+    protected function getParameterizedRoute(string $route, array $params): ?string
+    {
+        $route = preg_replace('/^\s*\[[^\]]+\]\s*/', '', $route);
+        if (strstr($route, '{')) {
+            foreach ($params as $key => $value) {
+                $count = 0;
+                $route = preg_replace('/\{' . preg_quote($key, '/') . ':[^}]+\}/', $value, $route, -1, $count);
+
+                if ($count < 1) {
+                    return null;
+                }
+            }
+
+            if (strstr($route, '{')) {
+                return null;
+            }
+        } elseif (!empty($params)) {
+            return null;
+        }
+
+        return $route;
+    }
 }

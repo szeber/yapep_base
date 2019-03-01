@@ -151,7 +151,7 @@ class UrlHelper extends HelperAbstract {
 		// Get the current controller and action
 		$currentController = null;
 		$currentAction = null;
-		Application::getInstance()->getDispatchedAction($currentController, $currentAction);
+		Application::getInstance()->populateDispatchedAction($currentController, $currentAction);
 
 		return $currentController == $controller && $currentAction == $action;
 	}

@@ -1,23 +1,38 @@
 {
-	"name": "szeber/yapep_base",
-	"type": "library",
-	"description": "YAPEP Base framework",
-	"require": {
-		"php": ">=5.3.0",
-		"lukasoppermann/http-status": "^2.0.1"
-	},
-	"require-dev": {
-		"mikey179/vfsStream": ">=1.1.0",
-		"mockery/mockery": ">=0.7.2",
-		"phpunit/phpunit": "^5.7"
-	},
-	"autoload": {
-		"psr-0": { "YapepBase": "src/" }
-	},
-	"authors": [
-		{
-			"name": "Zsolt Szeberenyi",
-			"email": "szeber@yapep.org"
-		}
-	]
+  "name": "szeber/yapep_base",
+  "type": "library",
+  "description": "YAPEP Base framework",
+  "require": {
+    "php": ">=7.3.0",
+    "lukasoppermann/http-status": "^2.0.1",
+    "pimple/pimple": "^3.2"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^8.0",
+    "mockery/mockery": "^1.2"
+  },
+  "autoload": {
+    "psr-4": {
+      "YapepBase\\": "src",
+      "YapepBase\\Test\\": "test"
+    }
+  },
+  "repositories": {
+    "dev-package": {
+      "type": "path",
+      "url": "src/YapepBase",
+      "options": {
+        "symlink": true
+      }
+    }
+  },
+  "authors": [
+    {
+      "name": "Zsolt Szeberenyi",
+      "email": "szeber@yapep.org"
+    },
+    {
+      "name": "László Fodor (emul)"
+    }
+  ]
 }

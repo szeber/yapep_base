@@ -1,84 +1,44 @@
 <?php
-/**
- * This file is part of YAPEPBase.
- *
- * @package      YapepBase
- * @subpackage   Request
- * @copyright    2011 The YAPEP Project All rights reserved.
- * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
- */
-
+declare(strict_types=1);
 
 namespace YapepBase\Request;
 
-/**
- * Request interface
- *
- * @package    YapepBase
- * @subpackage Request
- */
-interface IRequest {
+interface IRequest
+{
+    const METHOD_CLI = 'CLI';
+    const METHOD_HTTP_GET = 'GET';
+    const METHOD_HTTP_POST = 'POST';
+    const METHOD_HTTP_PUT = 'PUT';
+    const METHOD_HTTP_HEAD = 'HEAD';
+    const METHOD_HTTP_OPTIONS = 'OPTIONS';
+    const METHOD_HTTP_DELETE = 'DELETE';
 
-	/** CLI method. Used by CLI requests. */
-	const METHOD_CLI = 'CLI';
-	/** GET HTTP method. */
-	const METHOD_HTTP_GET = 'GET';
-	/** POST HTTP method. */
-	const METHOD_HTTP_POST = 'POST';
-	/** PUT HTTP method. */
-	const METHOD_HTTP_PUT = 'PUT';
-	/** HEAD HTTP method. */
-	const METHOD_HTTP_HEAD = 'HEAD';
-	/** OPTIONS HTTP method. */
-	const METHOD_HTTP_OPTIONS = 'OPTIONS';
-	/** DELETE HTTP method. */
-	const METHOD_HTTP_DELETE = 'DELETE';
+    const PROTOCOL_HTTP = 'http';
+    const PROTOCOL_HTTPS = 'https';
+    const PROTOCOL_CLI = 'cli';
 
-	/** HTTP protocol */
-	const PROTOCOL_HTTP = 'http';
-	/** HTTPS protocol */
-	const PROTOCOL_HTTPS = 'https';
-	/** CLI request */
-	const PROTOCOL_CLI = 'cli';
+    /**
+     * Returns the target of the request. (eg the URI for HTTP requests)
+     */
+    public function getTarget(): string;
 
-	/**
-	 * Returns the target of the request. (eg the URI for HTTP requests)
-	 *
-	 * @return string   The target of the request.
-	 */
-	public function getTarget();
+    /**
+     * Returns the method of the request
+     */
+    public function getMethod(): string;
 
-	/**
-	 * Returns the method of the request
-	 *
-	 * @return string   {@uses self::METHOD_*}
-	 */
-	public function getMethod();
+    /**
+     * Returns the specified route param, or the default value if it's not set.
+     */
+    public function getParam(string $name, $default = null);
 
-	/**
-	 * Retruns the specified route param, or the default value if it's not set.
-	 *
-	 * @param string $name      The name of the cookie.
-	 * @param mixed  $default   The default value, if the parameter is not set.
-	 *
-	 * @return mixed
-	 */
-	public function getParam($name, $default = null);
+    /**
+     * Sets a route param
+     */
+    public function setParam(string $name, $value): void;
 
-	/**
-	 * Sets a route param
-	 *
-	 * @param string $name    Name of the param
-	 * @param mixed  $value   Value of the param
-	 *
-	 * @return void
-	 */
-	public function setParam($name, $value);
-
-	/**
-	 * Returns the protocol used in the request.
-	 *
-	 * @return string   The used protocol. {@uses self::PROTOCOL_*}
-	 */
-	public function getProtocol();
+    /**
+     * Returns the protocol used in the request.
+     */
+    public function getProtocol(): string;
 }
