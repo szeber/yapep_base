@@ -94,8 +94,8 @@ abstract class HttpController extends BaseController {
 	protected function redirectToRoute(
 		$controller, $action, $routeParams = array(), $getParams = array(), $anchor = '', $statusCode = 303
 	) {
-		$url = Application::getInstance()->getRouter()->getTargetForControllerAction($controller, $action,
-			$routeParams);
+		$url = Application::getInstance()->getRouter()->getPathByControllerAction($controller, $action,
+                                                                                 $routeParams);
 		if (!empty($getParams)) {
 			$url .= '?' . \http_build_query($getParams, null, '&');
 		}

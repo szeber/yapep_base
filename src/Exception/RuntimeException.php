@@ -3,9 +3,8 @@ declare(strict_types = 1);
 
 namespace YapepBase\Exception;
 
-class Exception extends \Exception implements IException
+class RuntimeException extends \RuntimeException implements IException
 {
-
     /**
      * Any debugging data.
      *
@@ -36,5 +35,4 @@ class Exception extends \Exception implements IException
     {
         return $this->data;
     }
-
 }

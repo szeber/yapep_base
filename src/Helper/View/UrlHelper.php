@@ -38,7 +38,7 @@ class UrlHelper extends HelperAbstract {
 	 */
 	public function getRouteTarget($controller, $action, array $params = array(), array $getParams = array()) {
 		try {
-			$url = Application::getInstance()->getRouter()->getTargetForControllerAction($controller, $action, $params);
+			$url = Application::getInstance()->getRouter()->getPathByControllerAction($controller, $action, $params);
 			return $url . (empty($getParams) ? '' : ('?' . http_build_query($getParams)));
 		} catch (\Exception $exception) {
 			trigger_error('Exception of type ' . get_class($exception) . ' occured in ' . __METHOD__
@@ -132,7 +132,7 @@ class UrlHelper extends HelperAbstract {
 
 		$uri = rtrim($request->getTarget(), '/');
 
-		return $uri == rtrim($router->getTargetForControllerAction($controller, $action, $params), '/');
+		return $uri == rtrim($router->getPathByControllerAction($controller, $action, $params), '/');
 	}
 
 	/**

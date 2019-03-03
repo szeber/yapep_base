@@ -1,0 +1,58 @@
+- name: foo
+  controller: Foo
+  action: Index
+  methods:
+    - GET
+    - POST
+  paths:
+    - pathPattern: /foo
+- name: bar
+  controller: Bar
+  action: Index
+  paths:
+    - pathPattern: /bar
+    - pathPattern: /bar/num/{id}
+      params:
+        - name: id
+          type: num
+    - pathPattern: /bar/alpha/{alpha}
+      params:
+        - name: alpha
+          type: alpha
+    - pathPattern: /bar/alnum/{alnum}
+      params:
+        - name: alnum
+          type: alnum
+    - pathPattern: /bar/alnumext/{alnumext}
+      params:
+        - name: alnumext
+          type: alnumext
+    - pathPattern: /bar/uuid/{uuid}
+      params:
+        - name: uuid
+          type: uuid
+    - pathPattern: /bar/regex/{regex}
+      params:
+        - name: regex
+          type: regex
+          pattern: '[a-z][a-zA-Z]+'
+    - pathPattern: /bar/{enum}
+      params:
+        - name: enum
+          type: enum
+          values: [foo, bar]
+#    - pathPattern: /bar/custom/{custom}
+#      params:
+#        - name: custom
+#          type: \YapepBase\Example\Router\CustomRouter
+#          custom1: foo
+#          custom2: bar
+    - pathPattern: /bar/multi/{id}/names/{name}
+      params:
+        - name: id
+          type: num
+        - name: name
+          type: alnumext
+  annotations:
+    \YapepBase\PermissionHandling\Permission:
+      permissions: [foo, bar]
