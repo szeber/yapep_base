@@ -9,6 +9,8 @@
  */
 
 namespace YapepBase\Event;
+
+
 use YapepBase\Exception\Exception;
 
 /**
