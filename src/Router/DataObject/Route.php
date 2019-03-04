@@ -18,16 +18,16 @@ class Route
     protected $action;
 
     /** @var string[] */
-    protected $methods;
+    protected $methods = [];
 
     /** @var string[]|null */
     protected $regexPatterns;
 
     /** @var array */
-    protected $unparsedPaths;
+    protected $unparsedPaths = [];
 
     /** @var array */
-    protected $unparsedAnnotations;
+    protected $unparsedAnnotations = [];
 
     /** @var Path[]|null */
     protected $paths;
