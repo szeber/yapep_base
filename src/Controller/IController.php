@@ -37,5 +37,5 @@ interface IController
      * @throws \YapepBase\Exception\Exception             On framework related errors.
      * @throws \Exception                                 On non-framework related errors.
      */
-    public function run($action);
+    public function run(string $action): void;
 }

@@ -4,28 +4,33 @@ declare(strict_types=1);
 namespace YapepBase\DependencyInjection;
 
 use Psr\Container\ContainerInterface;
+use YapepBase\ErrorHandler\IErrorHandlerRegistry;
+use YapepBase\Event\IEventHandlerRegistry;
+use YapepBase\File\IFileHandler;
+use YapepBase\Log\ILoggerRegistry;
+use YapepBase\Request\IRequest;
+use YapepBase\Response\IResponse;
+use YapepBase\Router\IRouter;
+use YapepBase\Session\ISessionRegistry;
+use YapepBase\Shell\ICommandExecutor;
 
 interface IContainer extends ContainerInterface
 {
-    public function getRouterId(): string;
+    public function getRouter(): IRouter;
 
-    public function getRequestId(): string;
+    public function getRequest(): IRequest;
 
-    public function getResponseId(): string;
+    public function getResponse(): IResponse;
 
-    public function getErrorLogMessageId(): string;
+    public function getErrorHandlerRegistry(): IErrorHandlerRegistry;
 
-    public function getErrorHandlerRegistryId(): string;
+    public function getEventHandlerRegistry(): IEventHandlerRegistry;
 
-    public function getEventHandlerRegistryId(): string;
+    public function getSessionRegistry(): ISessionRegistry;
 
-    public function getSessionRegistryId(): string;
+    public function getLoggerRegistry(): ILoggerRegistry;
 
-    public function getLoggerRegistryId(): string;
+    public function getFileHandler(): IFileHandler;
 
-    public function getFileHandlerId(): string;
-
-    public function getCommandExecutorId(): string;
-
-    public function getHttpStatusId(): string;
+    public function getCommandExecutor(): ICommandExecutor;
 }

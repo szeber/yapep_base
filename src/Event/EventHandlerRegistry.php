@@ -1,129 +1,73 @@
 <?php
-/**
- * This file is part of YAPEPBase.
- *
- * @package      YapepBase
- * @subpackage   Event
- * @copyright    2011 The YAPEP Project All rights reserved.
- * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
- */
+declare(strict_types=1);
 
 namespace YapepBase\Event;
 
 
-use YapepBase\Exception\Exception;
-
 /**
  * Registry class storing the registered event handlers.
- *
- * @package    YapepBase
- * @subpackage Event
  */
-class EventHandlerRegistry {
+class EventHandlerRegistry implements IEventHandlerRegistry
+{
 
-	/**
-	 * Stores the event handler instances
-	 *
-	 * @var array
-	 */
-	protected $eventHandlers = array();
+    /**
+     * @var array
+     */
+    protected $eventHandlersByType = [];
 
-	/**
-	 * Stores the timestamp with microsecond precision, that each event type was last raised in an associative array.
-	 *
-	 * @var array
-	 */
-	protected $lastTimesForEventTypes = array();
+    /**
+     * @var array
+     */
+    protected $lastRaisedByTypeInMs = [];
 
-	/**
-	 * Registers a new event handler for the given event type
-	 *
-	 * @param string                         $eventType      The event type. {@uses Event::TYPE_*}
-	 * @param \YapepBase\Event\IEventHandler $eventHandler   The event handler.
-	 *
-	 * @return void
-	 */
-	public function registerEventHandler($eventType, IEventHandler $eventHandler) {
-		if (!isset($this->eventHandlers[$eventType])) {
-			$this->eventHandlers[$eventType] = array();
-		}
-		$this->eventHandlers[$eventType][] = $eventHandler;
-	}
+    public function registerEventHandler(string $eventType, IEventHandler $eventHandler): void
+    {
+        if (!isset($this->eventHandlersByType[$eventType])) {
+            $this->eventHandlersByType[$eventType] = [];
+        }
+        $this->eventHandlersByType[$eventType][] = $eventHandler;
+    }
 
-	/**
-	 * Removes an event handler
-	 *
-	 * @param string                         $eventType      The event type. {@uses Event::TYPE_*}
-	 * @param \YapepBase\Event\IEventHandler $eventHandler   The event handler.
-	 *
-	 * @return void
-	 */
-	public function removeEventHandler($eventType, IEventHandler $eventHandler) {
-		if (
-			!empty($this->eventHandlers[$eventType])
-			&& false !== ($key = array_search($eventHandler, $this->eventHandlers[$eventType], true))
-		) {
-			unset($this->eventHandlers[$eventType][$key]);
-		}
-	}
+    public function removeEventHandler(string $eventType, IEventHandler $eventHandler): void
+    {
+        if (!empty($this->eventHandlersByType[$eventType]) && false !== ($key = array_search($eventHandler,
+                $this->eventHandlersByType[$eventType], true))) {
+            unset($this->eventHandlersByType[$eventType][$key]);
+        }
+    }
 
-	/**
-	 * Returns an array containing all the event handlers registered to the event type
-	 *
-	 * @param string $eventType   the event type. {@uses Event::TYPE_*}
-	 *
-	 * @return array
-	 */
-	public function getEventHandlers($eventType) {
-		return (isset($this->eventHandlers[$eventType]) ? $this->eventHandlers[$eventType] : array());
-	}
+    public function getEventHandlers(string $eventType): array
+    {
+        return (isset($this->eventHandlersByType[$eventType]) ? $this->eventHandlersByType[$eventType] : []);
+    }
 
-	/**
-	 * Clears all event handlers for an event type
-	 *
-	 * @param string $eventType   The event type. {@uses Event::TYPE_*}
-	 *
-	 * @return void
-	 */
-	public function clear($eventType) {
-		$this->eventHandlers[$eventType] = array();
-	}
+    public function clear(string $eventType): void
+    {
+        $this->eventHandlersByType[$eventType] = [];
+    }
 
-	/**
-	 * Clears all event handlers for all event types
-	 *
-	 * @return void
-	 */
-	public function clearAll() {
-		$this->eventHandlers = array();
-	}
+    public function clearAll(): void
+    {
+        $this->eventHandlersByType = [];
+    }
 
-	/**
-	 * Raises an event
-	 *
-	 * @param Event $event   The event to raise.
-	 *
-	 * @return void
-	 */
-	public function raise(Event $event) {
-		$type = $event->getType();
-		$this->lastTimesForEventTypes[$type] = microtime(true);
-		if (!empty($this->eventHandlers[$type])) {
-			foreach ($this->eventHandlers[$type] as $handler) {
-				/** @var \YapepBase\Event\IEventHandler $handler */
-				$handler->handleEvent($event);
-			}
-		}
-	}
+    public function raise(Event $event): void
+    {
+        $type                              = $event->getType();
+        $this->lastRaisedByTypeInMs[$type] = microtime(true);
 
-	/**
-	 * Returns the timestamp of the time the given event type was last raised.
-	 *
-	 * @param string $eventType   The event type.
-	 *
-	 * @return float|null   The timestamp with microsecond precision or NULL if the event type was never raised.
-	 */
-	public function getLastTimeForEventType($eventType) {
-		return isset($this->lastTimesForEventTypes[$eventType]) ? $this->lastTimesForEventTypes[$eventType] : null;
-	}
+        if (!empty($this->eventHandlersByType[$type])) {
+            /** @var IEventHandler $handler */
+            foreach ($this->eventHandlersByType[$type] as $handler) {
+                $handler->handleEvent($event);
+            }
+        }
+    }
+
+    public function getLastRaisedInMs(string $eventType): ?float
+    {
+        return isset($this->lastRaisedByTypeInMs[$eventType])
+            ? $this->lastRaisedByTypeInMs[$eventType]
+            : null;
+    }
 }

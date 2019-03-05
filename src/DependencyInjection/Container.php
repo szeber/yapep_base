@@ -3,95 +3,81 @@ declare(strict_types = 1);
 
 namespace YapepBase\DependencyInjection;
 
-use YapepBase\ErrorHandler\ErrorHandlerRegistry;
+use YapepBase\ErrorHandler\IErrorHandlerRegistry;
+use YapepBase\Event\IEventHandlerRegistry;
+use YapepBase\File\IFileHandler;
+use YapepBase\Log\ILoggerRegistry;
+use YapepBase\Request\IRequest;
+use YapepBase\Response\IResponse;
+use YapepBase\Router\IRouter;
+use YapepBase\Session\ISessionRegistry;
+use YapepBase\Shell\ICommandExecutor;
 
 /**
  * Generic DI container implementation used in the framework.
- *
- * @package    YapepBase
- * @subpackage DependencyInjection
  */
-class Container extends \Pimple\Container implements IContainer
+class Container implements IContainer
 {
-    const FRAMEWORK_ID_PREFIX = 'yapepBase_';
+    /** @var IContainer */
+    protected $container;
 
-    public function __construct(array $values = [])
+    public function __construct(IContainer $container)
     {
-        parent::__construct($values);
-
-        $this[$this->getErrorHandlerRegistryId()] = function () {
-            return new ErrorHandlerRegistry();
-        };
-    }
-
-
-    public function getRouterId(): string
-    {
-        return self::FRAMEWORK_ID_PREFIX . 'router';
-    }
-
-    public function getRequestId(): string
-    {
-        return self::FRAMEWORK_ID_PREFIX . 'request';
-    }
-
-    public function getResponseId(): string
-    {
-        return self::FRAMEWORK_ID_PREFIX . 'response';
-    }
-
-    public function getErrorLogMessageId(): string
-    {
-        return self::FRAMEWORK_ID_PREFIX . 'error_log_message';
-    }
-
-    public function getErrorHandlerRegistryId(): string
-    {
-        return self::FRAMEWORK_ID_PREFIX . 'error_handler_registry';
-    }
-
-    public function getEventHandlerRegistryId(): string
-    {
-        return self::FRAMEWORK_ID_PREFIX . 'event_handler_registry';
-    }
-
-    public function getSessionRegistryId(): string
-    {
-        return self::FRAMEWORK_ID_PREFIX . 'session_registry';
-    }
-
-    public function getLoggerRegistryId(): string
-    {
-        return self::FRAMEWORK_ID_PREFIX . 'logger_registry';
-    }
-
-    public function getFileHandlerId(): string
-    {
-        return self::FRAMEWORK_ID_PREFIX . 'file_handler';
-    }
-
-    public function getCommandExecutorId(): string
-    {
-        return self::FRAMEWORK_ID_PREFIX . 'command_executor';
-    }
-
-    public function getHttpStatusId(): string
-    {
-        return self::FRAMEWORK_ID_PREFIX . 'http_status';
-    }
-
-    public function getDebuggerId(): string
-    {
-        return self::FRAMEWORK_ID_PREFIX . 'debugger';
+        $this->container = $container;
     }
 
     public function get($id)
     {
-        return $this->offsetGet($id);
+        return $this->container->get($id);
     }
 
     public function has($id)
     {
-        return $this->offsetExists($id);
+        return $this->container->has($id);
+    }
+
+    public function getRouter(): IRouter
+    {
+        return $this->container->getRouter();
+    }
+
+    public function getRequest(): IRequest
+    {
+        return $this->container->getRequest();
+    }
+
+    public function getResponse(): IResponse
+    {
+        return $this->container->getResponse();
+    }
+
+    public function getErrorHandlerRegistry(): IErrorHandlerRegistry
+    {
+        return $this->container->getErrorHandlerRegistry();
+    }
+
+    public function getEventHandlerRegistry(): IEventHandlerRegistry
+    {
+        return $this->container->getEventHandlerRegistry();
+    }
+
+    public function getSessionRegistry(): ISessionRegistry
+    {
+        return $this->container->getSessionRegistry();
+    }
+
+    public function getLoggerRegistry(): ILoggerRegistry
+    {
+        return $this->container->getLoggerRegistry();
+    }
+
+    public function getFileHandler(): IFileHandler
+    {
+        return $this->container->getFileHandler();
+    }
+
+    public function getCommandExecutor(): ICommandExecutor
+    {
+        return $this->container->getCommandExecutor();
     }
 }
