@@ -8,7 +8,7 @@ use YapepBase\Exception\InvalidArgumentException;
 class Enum extends ParamAbstract
 {
     /** @var array */
-    protected $values;
+    protected $values = [];
 
     public function __construct(array $paramData)
     {
@@ -24,7 +24,7 @@ class Enum extends ParamAbstract
             );
         }
 
-        $this->values        = $paramData['values'];
+        $this->values = $paramData['values'];
     }
 
     public function getPattern(): string

@@ -13,7 +13,7 @@ class Path
     protected $pattern;
 
     /** @var IParam[] */
-    protected $params;
+    protected $params = [];
 
     public function __construct(array $path)
     {
