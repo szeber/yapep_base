@@ -20,6 +20,7 @@ $rules = [
     'blank_line_before_statement' => ['statements' => ['declare', 'return', 'throw', 'try']],
     'concat_space' => ['spacing' => 'one'],
     'declare_equal_normalize' => ['space' => 'single'],
+    'declare_strict_types' => true,
     'function_typehint_space' => true,
     'heredoc_to_nowdoc' => true,
     'include' => true,
