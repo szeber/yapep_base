@@ -4,8 +4,48 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f85844405d959389d9a2ecd2922e6760",
+    "content-hash": "d74437e36a43a75f2973082d3b58a8a2",
     "packages": [
+        {
+            "name": "emulgeator/server-superglobal-object-representation",
+            "version": "1.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/emulgeator/server_superglobal_object_representation.git",
+                "reference": "aa5b5a6c6457e2f3693115dc7aa0980634602663"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/emulgeator/server_superglobal_object_representation/zipball/aa5b5a6c6457e2f3693115dc7aa0980634602663",
+                "reference": "aa5b5a6c6457e2f3693115dc7aa0980634602663",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.2.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^8.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Emul\\Server\\": "src",
+                    "Emul\\Server\\Test\\": "test"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "László Fodor (emul)"
+                }
+            ],
+            "description": "A simple class which represents the $_SERVER super global array in PHP",
+            "homepage": "https://github.com/emulgeator/server_superglobal_object_representation",
+            "time": "2019-03-06T13:18:54+00:00"
+        },
         {
             "name": "lukasoppermann/http-status",
             "version": "2.0.1",

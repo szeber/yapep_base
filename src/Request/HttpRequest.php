@@ -3,367 +3,95 @@ declare(strict_types=1);
 
 namespace YapepBase\Request;
 
+use Emul\Server\ServerData;
+use YapepBase\Application;
 use YapepBase\DataObject\UploadedFileDo;
-use YapepBase\Helper\TextHelper;
+use YapepBase\Helper\ArrayHelper;
+use YapepBase\Request\Entity\Cookie;
+use YapepBase\Request\Entity\Env;
+use YapepBase\Request\Entity\File;
+use YapepBase\Request\Entity\Input;
+use YapepBase\Request\Entity\Post;
+use YapepBase\Request\Entity\Query;
+use YapepBase\Request\Entity\Custom;
 
 /**
  * Stores the details for the current request.
  */
 class HttpRequest implements IRequest
 {
-    /**
-     * The GET parameters received with the request.
-     */
-    protected $getParams = [];
+    const METHOD_HTTP_GET = 'GET';
+    const METHOD_HTTP_POST = 'POST';
+    const METHOD_HTTP_PUT = 'PUT';
+    const METHOD_HTTP_HEAD = 'HEAD';
+    const METHOD_HTTP_OPTIONS = 'OPTIONS';
+    const METHOD_HTTP_DELETE = 'DELETE';
 
-    /**
-     * The POST parameters received with the request.
-     */
-    protected $postParams = [];
+    const PROTOCOL_HTTP = 'http';
+    const PROTOCOL_HTTPS = 'https';
+    const PROTOCOL_CLI = 'cli';
 
-    /**
-     * The cookies received with the request.
-     */
-    protected $cookies = [];
-
-    /**
-     * The information of the files uploaded with the request.
-     */
-    protected $files = [];
-
-    /**
-     * The server array.
-     */
-    protected $server = [];
-
-    /**
-     * The environment array.
-     */
-    protected $env = [];
-
-    /**
-     * The target URI
-     *
-     * @var string
-     */
-    protected $targetUri;
-
-    /**
-     * The route params
-     */
-    protected $routeParams = [];
-
-    /**
-     * Caches the protected content types
-     *
-     * @var array
-     */
-    protected $acceptedContentTypes;
+    /** @var ServerData */
+    protected $server;
+    /** @var array */
+    protected $acceptedContentTypes = [];
+    /** @var string */
+    protected $targetUri   = '';
 
     public function __construct(
-        array $get,
-        array $post,
-        array $cookie,
+        array $queryParams,
+        array $postParams,
+        array $cookies,
         array $server,
-        array $env,
-        array $files
+        array $envParams,
+        array $files,
+        array $inputParams
     ) {
-        $this->getParams  = $get;
-        $this->postParams = $post;
-        $this->cookies    = $cookie;
-        $this->server     = $server;
-        $this->env        = $env;
-        $this->files      = $files;
+        $this->queryParams = new Query($queryParams);
+        $this->postParams  = new Post($postParams);
+        $this->cookies     = new Cookie($cookies);
+        $this->envParams   = new Env($envParams);
+        $this->inputParams = new Input($inputParams);
+        $this->files       = new File($files);
+        $this->server      = new ServerData($server);
+        $this->routeParams = new Custom([]);
 
-        list($this->targetUri) = explode('?', $this->server['REQUEST_URI'], 2);
+        list($this->targetUri) = explode('?', $this->server->getRequestUri(), 2);
     }
 
-    /**
-     * Returns the GET parameter specified, or the default value, if it's not set.
-     *
-     * @param string $name    The name of the parameter.
-     * @param mixed  $default The default value, if the parameter is not set.
-     *
-     * @return mixed
-     */
-    public function getGet($name, $default = null)
-    {
-        if (isset($this->getParams[$name])) {
-            return $this->getParams[$name];
-        }
-        return $default;
-    }
-
-    /**
-     * Returns TRUE if there is a GET parameter set in the request with the specified name.
-     *
-     * @param string $name The name of the get param.
-     *
-     * @return bool
-     */
-    public function hasGet($name)
-    {
-        return $this->has($name, 'G');
-    }
-
-    /**
-     * Returns the POST parameter specified, or the default value, if it's not set.
-     *
-     * @param string $name    The name of the parameter.
-     * @param mixed  $default The default value, if the parameter is not set.
-     *
-     * @return mixed
-     */
-    public function getPost($name, $default = null)
-    {
-        if (isset($this->postParams[$name])) {
-            return $this->postParams[$name];
-        }
-        return $default;
-    }
-
-    /**
-     * Returns TRUE if there is a POST parameter set in the request with the specified name.
-     *
-     * @param string $name Name of the post param.
-     *
-     * @return bool
-     */
-    public function hasPost($name)
-    {
-        return $this->has($name, 'P');
-    }
-
-    /**
-     * Returns the specified cookie, or the default value, if it's not set.
-     *
-     * @param string $name    The name of the cookie.
-     * @param mixed  $default The default value, if the parameter is not set.
-     *
-     * @return mixed
-     */
-    public function getCookie($name, $default = null)
-    {
-        if (isset($this->cookies[$name])) {
-            return $this->cookies[$name];
-        }
-        return $default;
-    }
-
-    /**
-     * Returns TRUE if there is a cookie set in the request with the specified name.
-     *
-     * @param string $name name of the cookie
-     *
-     * @return bool
-     */
-    public function hasCookie($name)
-    {
-        return $this->has($name, 'C');
-    }
-
-    /**
-     * Returns the UploadedFileDo representing the specified uploaded file or FALSE if it's not uploaded.
-     *
-     * @param string $name Name of the upload.
-     *
-     * @return bool|\YapepBase\DataObject\UploadedFileDo
-     */
-    public function getFile($name)
+    public function getFile(string $name): ?UploadedFileDo
     {
         if (isset($this->files[$name]) && isset($this->files[$name]['error']) && UPLOAD_ERR_NO_FILE != $this->files[$name]['error']) {
             return new UploadedFileDo($this->files[$name]);
         }
-        return false;
+
+        return null;
     }
+
+    protected function getMergedRequestParams(): array
+    {
+        return array_merge($this->inputParams, $this->postParams, $this->queryParams, $this->routeParams);
+    }
+
 
     /**
      * Returns TRUE if the specified upload is in the request.
      *
      * This method will return TRUE, if the specified upload is in the request, but there was no uploaded file sent.
-     *
-     * @param string $name Name of the upload.
-     *
-     * @return bool
      */
-    public function hasFile($name)
+    public function hasFile(string $name): bool
     {
         return isset($this->files[$name]) && isset($this->files[$name]['error']) && UPLOAD_ERR_NO_FILE != $this->files[$name]['error'];
     }
 
-    /**
-     * Returns all of the parameters received through URI.
-     *
-     * @return array
-     */
-    public function getAllUri()
-    {
-        return $this->routeParams;
-    }
-
-
-    /**
-     * Returns all of the parameters received through GET.
-     *
-     * @return array
-     */
-    public function getAllGet()
-    {
-        return $this->getParams;
-    }
-
-    /**
-     * Returns all of the parameters received through POST.
-     *
-     * @return array
-     */
-    public function getAllPost()
-    {
-        return $this->postParams;
-    }
-
-    /**
-     * Returns all of the parameters received through COOKIE.
-     *
-     * @return array
-     */
-    public function getAllCookie()
-    {
-        return $this->cookies;
-    }
-
-    /**
-     * Returns all of the server parameters.
-     *
-     * @return array
-     */
-    public function getAllServer()
-    {
-        return $this->server;
-    }
-
-    /**
-     * Retruns the specified route param, or the default value if it's not set.
-     *
-     * @param string $name    The name of the cookie.
-     * @param mixed  $default The default value, if the parameter is not set.
-     *
-     * @return mixed
-     */
-    public function getParam($name, $default = null)
-    {
-        if (isset($this->routeParams[$name])) {
-            return $this->routeParams[$name];
-        }
-        return $default;
-    }
-
-    /**
-     * Returns a value from the PHP server array.
-     *
-     * @param string $name    The key of the value to return.
-     * @param mixed  $default The default value, if the key is not set.
-     *
-     * @return mixed   The value, or the provided default, if the key is not found.
-     */
-    public function getServer($name, $default = null)
-    {
-        if (isset($this->server[$name])) {
-            return $this->server[$name];
-        }
-        return $default;
-    }
-
-    /**
-     * Returns a value from the running environment.
-     *
-     * @param string $name    The key of the value to return.
-     * @param mixed  $default The default value, if the key is not set.
-     *
-     * @return mixed   The value, or the provided default, if the key is not found.
-     */
-    public function getEnv($name, $default = null)
-    {
-        if (isset($this->env[$name])) {
-            return $this->env[$name];
-        }
-        return $default;
-    }
-
-    /**
-     * Returns the specified request parameter from the specified source, or the default value.
-     *
-     * Search order is UGPC, so a POST value will overwrite a GET value with the same name.
-     *
-     * @param string $name    The name of the param.
-     * @param mixed  $default The default value, if the parameter is not set.
-     * @param string $source  The sources of the parameter. 'U' for URI, 'G' for GET, 'P' for POST, 'C' for Cookie.
-     *
-     * @return mixed
-     */
-    public function get($name, $default = null, $source = 'UGP')
-    {
-        $source = strtoupper($source);
-        $result = $default;
-
-        if (strstr($source, 'U') && isset($this->routeParams[$name])) {
-            $result = $this->routeParams[$name];
-        }
-
-        if (strstr($source, 'G') && isset($this->getParams[$name])) {
-            $result = $this->getParams[$name];
-        }
-
-        if (strstr($source, 'P') && isset($this->postParams[$name])) {
-            $result = $this->postParams[$name];
-        }
-
-        if (strstr($source, 'C') && isset($this->cookies[$name])) {
-            $result = $this->cookies[$name];
-        }
-
-        return $result;
-    }
-
-    /**
-     * Returns TRUE if the specified request parameter from the specified source is set.
-     *
-     * @param string $name   The name of the param.
-     * @param string $source The sources of the parameter. 'U' for URI, 'G' for GET, 'P' for POST, 'C' for Cookie.
-     *
-     * @return bool
-     */
-    public function has($name, $source = 'UGP')
-    {
-        $source = strtoupper($source);
-
-        if ((strstr($source, 'U') && isset($this->routeParams[$name])) || (strstr($source,
-                    'G') && isset($this->getParams[$name])) || (strstr($source,
-                    'P') && isset($this->postParams[$name])) || (strstr($source,
-                    'C') && isset($this->cookies[$name]))) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Returns the target of the request.  (eg the URI for HTTP requests)
-     *
-     * @return string   The target of the request.
-     */
-    public function getTarget()
+    public function getTarget(): string
     {
         return $this->targetUri;
     }
 
-    /**
-     * Returns the method of the request
-     *
-     * @return string   {@uses self::METHOD_*}
-     */
-    public function getMethod()
+    public function getMethod(): string
     {
-        return $this->server['REQUEST_METHOD'];
+        return (string)$this->server->getRequestMethod();
     }
 
     /**
@@ -374,7 +102,7 @@ class HttpRequest implements IRequest
      *
      * @return void
      */
-    public function setParam($name, $value)
+    public function setParam(string $name, $value)
     {
         $this->routeParams[$name] = $value;
     }
@@ -660,4 +388,8 @@ class HttpRequest implements IRequest
         return ($this->getServer('HTTPS', 'off') == 'on' ? self::PROTOCOL_HTTPS : self::PROTOCOL_HTTP);
     }
 
+    protected function getArrayHelper(): ArrayHelper
+    {
+        return Application::getInstance()->getDiContainer()->get(ArrayHelper::class);
+    }
 }

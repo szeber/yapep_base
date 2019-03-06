@@ -96,7 +96,7 @@ class UrlHelper extends HelperAbstract {
 		$params = array();
 
 		if ($withParams) {
-			$params = $request->getAllGet();
+			$params = $request->getGetParams();
 		}
 
 		$params = array_merge($params, $extraParams);
