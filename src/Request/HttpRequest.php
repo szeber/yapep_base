@@ -5,15 +5,10 @@ namespace YapepBase\Request;
 
 use Emul\Server\ServerData;
 use YapepBase\Application;
-use YapepBase\DataObject\UploadedFileDo;
 use YapepBase\Helper\ArrayHelper;
-use YapepBase\Request\Entity\Cookie;
-use YapepBase\Request\Entity\Env;
-use YapepBase\Request\Entity\File;
-use YapepBase\Request\Entity\Input;
-use YapepBase\Request\Entity\Post;
-use YapepBase\Request\Entity\Query;
-use YapepBase\Request\Entity\Custom;
+use YapepBase\Request\Entity\IParams;
+use YapepBase\Request\Entity\IFiles;
+use YapepBase\Request\Entity\CustomParams;
 
 /**
  * Stores the details for the current request.
@@ -31,57 +26,131 @@ class HttpRequest implements IRequest
     const PROTOCOL_HTTPS = 'https';
     const PROTOCOL_CLI = 'cli';
 
+    /** @var IParams */
+    protected $queryParams;
+    /** @var IParams */
+    protected $postParams;
+    /** @var IParams */
+    protected $cookies;
+    /** @var IParams */
+    protected $envParams;
+    /** @var IParams */
+    protected $inputParams;
+    /** @var IFiles */
+    protected $files;
     /** @var ServerData */
     protected $server;
+    /** @var CustomParams */
+    protected $customParams;
     /** @var array */
     protected $acceptedContentTypes = [];
     /** @var string */
     protected $targetUri   = '';
 
     public function __construct(
-        array $queryParams,
-        array $postParams,
-        array $cookies,
-        array $server,
-        array $envParams,
-        array $files,
-        array $inputParams
+        IParams $queryParams,
+        IParams $postParams,
+        IParams $cookies,
+        IParams $envParams,
+        IParams $inputParams,
+        IFiles $files,
+        ServerData $server
     ) {
-        $this->queryParams = new Query($queryParams);
-        $this->postParams  = new Post($postParams);
-        $this->cookies     = new Cookie($cookies);
-        $this->envParams   = new Env($envParams);
-        $this->inputParams = new Input($inputParams);
-        $this->files       = new File($files);
-        $this->server      = new ServerData($server);
-        $this->routeParams = new Custom([]);
+        $this->queryParams  = $queryParams;
+        $this->postParams   = $postParams;
+        $this->cookies      = $cookies;
+        $this->envParams    = $envParams;
+        $this->inputParams  = $inputParams;
+        $this->files        = $files;
+        $this->server       = $server;
+        $this->customParams = new CustomParams([]);
 
         list($this->targetUri) = explode('?', $this->server->getRequestUri(), 2);
     }
 
-    public function getFile(string $name): ?UploadedFileDo
+    public function getQueryParams(): IParams
     {
-        if (isset($this->files[$name]) && isset($this->files[$name]['error']) && UPLOAD_ERR_NO_FILE != $this->files[$name]['error']) {
-            return new UploadedFileDo($this->files[$name]);
-        }
-
-        return null;
+        return $this->queryParams;
     }
 
-    protected function getMergedRequestParams(): array
+    public function getPostParams(): IParams
     {
-        return array_merge($this->inputParams, $this->postParams, $this->queryParams, $this->routeParams);
+        return $this->postParams;
     }
 
-
-    /**
-     * Returns TRUE if the specified upload is in the request.
-     *
-     * This method will return TRUE, if the specified upload is in the request, but there was no uploaded file sent.
-     */
-    public function hasFile(string $name): bool
+    public function getCookies(): IParams
     {
-        return isset($this->files[$name]) && isset($this->files[$name]['error']) && UPLOAD_ERR_NO_FILE != $this->files[$name]['error'];
+        return $this->cookies;
+    }
+
+    public function getEnvParams(): IParams
+    {
+        return $this->envParams;
+    }
+
+    public function getInputParams(): IParams
+    {
+        return $this->inputParams;
+    }
+
+    public function getFiles(): IFiles
+    {
+        return $this->files;
+    }
+
+    public function getServer(): ServerData
+    {
+        return $this->server;
+    }
+
+    public function getCustomParams(): CustomParams
+    {
+        return $this->customParams;
+    }
+
+    public function getRequestParamAsInt(string $name, ?int $default = null): ?int
+    {
+        $queryParam  = $this->queryParams->getAsInt($name);
+        $postParam   = $this->postParams->getAsInt($name);
+        $customParam = $this->customParams->getAsInt($name);
+
+        return $queryParam ?? $postParam ?? $customParam ?? $default;
+    }
+
+    public function getRequestParamAsString(string $name, ?string $default = null): ?string
+    {
+        $queryParam  = $this->queryParams->getAsString($name);
+        $postParam   = $this->postParams->getAsString($name);
+        $customParam = $this->customParams->getAsString($name);
+
+        return $queryParam ?? $postParam ?? $customParam ?? $default;
+    }
+
+    public function getRequestParamAsFloat(string $name, ?float $default = null): ?float
+    {
+        $queryParam  = $this->queryParams->getAsFloat($name);
+        $postParam   = $this->postParams->getAsFloat($name);
+        $customParam = $this->customParams->getAsFloat($name);
+
+        return $queryParam ?? $postParam ?? $customParam ?? $default;
+    }
+
+    public function getRequestParamAsArray(string $name, ?array $default = []): ?array
+    {
+        $queryParam  = $this->queryParams->getAsArray($name);
+        $postParam   = $this->postParams->getAsArray($name);
+        $customParam = $this->customParams->getAsArray($name);
+
+        return $queryParam ?? $postParam ?? $customParam ?? $default;
+    }
+
+    public function getRequestParamAsBool(string $name, ?bool $default = null): ?bool
+    {
+        $queryParam  = $this->queryParams->getAsBool($name);
+        $postParam   = $this->postParams->getAsBool($name);
+        $customParam = $this->customParams->getAsBool($name);
+
+        return $queryParam ?? $postParam ?? $customParam ?? $default;
     }
 
     public function getTarget(): string
@@ -92,29 +161,6 @@ class HttpRequest implements IRequest
     public function getMethod(): string
     {
         return (string)$this->server->getRequestMethod();
-    }
-
-    /**
-     * Sets a route param
-     *
-     * @param string $name  Name of the param.
-     * @param mixed  $value Value of the param.
-     *
-     * @return void
-     */
-    public function setParam(string $name, $value)
-    {
-        $this->routeParams[$name] = $value;
-    }
-
-    /**
-     * Returns TRUE if the request was made as an AJAX request.
-     *
-     * @return bool
-     */
-    public function isAjaxRequest()
-    {
-        return (!empty($this->server['HTTP_X_REQUESTED_WITH']) && 'xmlhttprequest' == strtolower($this->server['HTTP_X_REQUESTED_WITH']));
     }
 
     /**
@@ -380,12 +426,11 @@ class HttpRequest implements IRequest
         return $preferenceValue;
     }
 
-    /**
-     * @inheritdoc
-     */
     public function getProtocol(): string
     {
-        return ($this->getServer('HTTPS', 'off') == 'on' ? self::PROTOCOL_HTTPS : self::PROTOCOL_HTTP);
+        return $this->server->isHttps()
+            ? self::PROTOCOL_HTTPS
+            : self::PROTOCOL_HTTP;
     }
 
     protected function getArrayHelper(): ArrayHelper

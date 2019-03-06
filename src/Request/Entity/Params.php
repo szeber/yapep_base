@@ -6,7 +6,7 @@ namespace YapepBase\Request\Entity;
 use YapepBase\Application;
 use YapepBase\Helper\ArrayHelper;
 
-abstract class EntityAbstract implements IEntity
+class Params implements IParams
 {
     /** @var array  */
     protected $params = [];

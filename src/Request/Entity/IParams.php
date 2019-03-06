@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace YapepBase\Request\Entity;
 
-interface IEntity
+interface IParams
 {
     /**
      * Returns the original data as an associative array.

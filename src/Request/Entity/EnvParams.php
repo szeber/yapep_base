@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace YapepBase\Request\Entity;
 
 /**
- * Stores and handles the Query params
+ * Stores and handles the ENV params
  */
-class Query extends EntityAbstract
+class EnvParams extends Params
 {
 }

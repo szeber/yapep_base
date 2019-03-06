@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace YapepBase\Request;
 
-use YapepBase\Request\Entity\Custom;
+use YapepBase\Request\Entity\CustomParams;
 
 interface IRequest
 {
@@ -25,5 +25,5 @@ interface IRequest
     /**
      * Returns the Custom Param object
      */
-    public function getCustomParam(): Custom;
+    public function getCustomParam(): CustomParams;
 }
