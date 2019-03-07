@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace YapepBase\Controller;
 
 
+use YapepBase\Exception\ParameterException;
 use YapepBase\Response\IResponse;
 use YapepBase\Request\IRequest;
 
@@ -21,8 +22,14 @@ use YapepBase\Request\IRequest;
  */
 interface IController
 {
+    /**
+     * @throws ParameterException
+     */
     public function setRequest(IRequest $request): void;
 
+    /**
+     * @throws ParameterException
+     */
     public function setResponse(IResponse $response): void;
 
     /**

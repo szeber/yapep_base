@@ -18,7 +18,7 @@ use YapepBase\Exception\ControllerException;
  * @package    YapepBase
  * @subpackage Controller
  */
-abstract class ErrorControllerAbstract extends HttpController
+abstract class ErrorControllerAbstractAbstract extends HttpControllerAbstractAbstract
 {
 
 
