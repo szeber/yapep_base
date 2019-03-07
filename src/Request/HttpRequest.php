@@ -44,8 +44,6 @@ class HttpRequest implements IRequest
     protected $customParams;
     /** @var array */
     protected $acceptedContentTypes = [];
-    /** @var string */
-    protected $targetUri   = '';
 
     public function __construct(
         ISource $queryParams,
@@ -64,8 +62,6 @@ class HttpRequest implements IRequest
         $this->files        = $files;
         $this->server       = $server;
         $this->customParams = new CustomParams([]);
-
-        list($this->targetUri) = explode('?', $this->server->getRequestUri(), 2);
     }
 
     public function getQueryParams(): ISource
@@ -108,54 +104,74 @@ class HttpRequest implements IRequest
         return $this->customParams;
     }
 
-    public function getRequestParamAsInt(string $name, ?int $default = null): ?int
+    /**
+     * Returns the requested param from Customer, Query or Pos params in the mentioned order
+     */
+    public function getParamAsInt(string $name, ?int $default = null): ?int
     {
         $queryParam  = $this->queryParams->getAsInt($name);
         $postParam   = $this->postParams->getAsInt($name);
         $customParam = $this->customParams->getAsInt($name);
 
-        return $queryParam ?? $postParam ?? $customParam ?? $default;
+        return $this->getValueInOrder($customParam, $queryParam, $postParam, $default);
     }
 
-    public function getRequestParamAsString(string $name, ?string $default = null): ?string
+    /**
+     * Returns the requested param from Customer, Query or Pos params in the mentioned order
+     */
+    public function getParamAsString(string $name, ?string $default = null): ?string
     {
         $queryParam  = $this->queryParams->getAsString($name);
         $postParam   = $this->postParams->getAsString($name);
         $customParam = $this->customParams->getAsString($name);
 
-        return $queryParam ?? $postParam ?? $customParam ?? $default;
+        return $this->getValueInOrder($customParam, $queryParam, $postParam, $default);
     }
 
-    public function getRequestParamAsFloat(string $name, ?float $default = null): ?float
+    /**
+     * Returns the requested param from Customer, Query or Pos params in the mentioned order
+     */
+    public function getParamAsFloat(string $name, ?float $default = null): ?float
     {
         $queryParam  = $this->queryParams->getAsFloat($name);
         $postParam   = $this->postParams->getAsFloat($name);
         $customParam = $this->customParams->getAsFloat($name);
 
-        return $queryParam ?? $postParam ?? $customParam ?? $default;
+        return $this->getValueInOrder($customParam, $queryParam, $postParam, $default);
     }
 
-    public function getRequestParamAsArray(string $name, ?array $default = []): ?array
+    /**
+     * Returns the requested param from Customer, Query or Pos params in the mentioned order
+     */
+    public function getParamAsArray(string $name, ?array $default = []): ?array
     {
-        $queryParam  = $this->queryParams->getAsArray($name);
-        $postParam   = $this->postParams->getAsArray($name);
-        $customParam = $this->customParams->getAsArray($name);
+        $queryParam  = $this->queryParams->getAsArray($name, null);
+        $postParam   = $this->postParams->getAsArray($name, null);
+        $customParam = $this->customParams->getAsArray($name, null);
 
-        return $queryParam ?? $postParam ?? $customParam ?? $default;
+        return $this->getValueInOrder($customParam, $queryParam, $postParam, $default);
     }
 
-    public function getRequestParamAsBool(string $name, ?bool $default = null): ?bool
+    /**
+     * Returns the requested param from Customer, Query or Pos params in the mentioned order
+     */
+    public function getParamAsBool(string $name, ?bool $default = null): ?bool
     {
         $queryParam  = $this->queryParams->getAsBool($name);
         $postParam   = $this->postParams->getAsBool($name);
         $customParam = $this->customParams->getAsBool($name);
 
-        return $queryParam ?? $postParam ?? $customParam ?? $default;
+        return $this->getValueInOrder($customParam, $queryParam, $postParam, $default);
+    }
+
+    protected function getValueInOrder($customParam, $queryParam, $postParam, $default)
+    {
+        return $customParam ?? $queryParam ?? $postParam ?? $default;
     }
 
     public function getTarget(): string
     {
-        return $this->targetUri;
+        return parse_url($this->server->getRequestUri(), PHP_URL_PATH);
     }
 
     public function getMethod(): string
