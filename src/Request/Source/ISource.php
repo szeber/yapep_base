@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace YapepBase\Request\Entity;
+namespace YapepBase\Request\Source;
 
-interface IParams
+interface ISource
 {
     /**
      * Returns the original data as an associative array.

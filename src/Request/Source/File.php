@@ -1,14 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace YapepBase\Request\Entity;
+namespace YapepBase\Request\Source;
 
 use YapepBase\Application;
 
 /**
  * Data class for holding uploaded file data.
  */
-class UploadedFile
+class File
 {
     /** @var string */
     protected $filename;
@@ -39,14 +39,15 @@ class UploadedFile
     /**
      * If the filesize is smaller than 0, we have a file that's bigger than 2GB.
      */
-    protected function correctSizeIfNeeded()
+    protected function correctSizeIfNeeded(): void
     {
+        if ($this->sizeInByte > 0) {
+            return;
+        }
+
         $fileHandler = Application::getInstance()->getDiContainer()->getFileHandler();
 
-        if (
-            $this->sizeInByte < 0
-            && $fileHandler->checkIsPathExists($this->temporaryFilePath)
-        ) {
+        if ($fileHandler->checkIsPathExists($this->temporaryFilePath)) {
             $this->sizeInByte = $fileHandler->getSize($this->temporaryFilePath);
         }
     }
@@ -58,13 +59,11 @@ class UploadedFile
 
     public function getFileExtension(): ?string
     {
-        $filename = $this->getFilename();
+        $extension = pathinfo($this->getFilename(), PATHINFO_EXTENSION);
 
-        if (preg_match('/\.([a-zA-Z0-9]+)$/', $filename, $matches)) {
-            return $matches[1];
-        } else {
-            return null;
-        }
+        return empty($extension)
+            ? null
+            : $extension;
     }
 
     public function getSizeInByte(): int
@@ -87,7 +86,9 @@ class UploadedFile
 
     public function getFileContent(): string
     {
-        return file_get_contents($this->getTemporaryFilePath());
+        $fileHandler = Application::getInstance()->getDiContainer()->getFileHandler();
+
+        return $fileHandler->getAsString($this->getTemporaryFilePath());
     }
 
     /**
@@ -103,5 +104,19 @@ class UploadedFile
         return $this->errorCode === UPLOAD_ERR_OK
             ? false
             : true;
+    }
+
+    /**
+     * Returns an array in the same structure as PHP populates the $_FILES array.
+     */
+    public function toArray(): array
+    {
+        return [
+            Files::KEY_FILENAME       => $this->filename,
+            Files::KEY_SIZE           => $this->sizeInByte,
+            Files::KEY_TEMP_FILE_PATH => $this->temporaryFilePath,
+            Files::KEY_ERROR_CODE     => $this->errorCode,
+            Files::KEY_MIME_TYPE      => $this->mimeType
+        ];
     }
 }

@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace YapepBase\Request\Entity;
+namespace YapepBase\Request\Source;
 
 use YapepBase\Application;
 use YapepBase\Helper\ArrayHelper;
 
-class Params implements IParams
+class Params implements ISource
 {
     /** @var array  */
     protected $params = [];
