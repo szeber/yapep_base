@@ -15,7 +15,7 @@ use YapepBase\Application;
 use YapepBase\Response\HttpResponse;
 use YapepBase\Mime\MimeType;
 use YapepBase\View\Template\ConsoleDebuggerTemplate;
-use YapepBase\View\ViewDo;
+use YapepBase\View\Data;
 
 /**
  * Simple floating console debugger renderer, which will be injected into the generated HTML output,
@@ -55,7 +55,7 @@ class ConsoleDebuggerRenderer implements IDebuggerRenderer {
 			return;
 		}
 
-		$viewDo = new ViewDo(MimeType::HTML);
+		$viewDo = new Data(MimeType::HTML);
 
 		$viewDo->set(array(
 			'startTime'     => $startTime,

@@ -25,7 +25,7 @@ use YapepBase\Debugger\Item\TimeItem;
 use YapepBase\ErrorHandler\ErrorHandlerHelper;
 use YapepBase\Helper\FileHelper;
 use YapepBase\View\TemplateAbstract;
-use YapepBase\View\ViewDo;
+use YapepBase\View\Data;
 
 /**
  * Template for the console debugger's output
@@ -103,19 +103,19 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 	/**
 	 * Constructor
 	 *
-	 * @param ViewDo $viewDo           The ViewDo instance to use.
-	 * @param string $_startTime       Key to the start timestamp.
-	 * @param string $_runTime         Key of the run time.
-	 * @param string $_peakMemory      Key of the peak memory usage.
-	 * @param string $_items           Key to the debug items.
-	 * @param string $_serverParams    Key to the $_SERVER super global array.
-	 * @param string $_postParams      Key to the params received through post mthod.
-	 * @param string $_getParams       Key to the params received through get method.
-	 * @param string $_cookieParams    Key to the params received through cookies.
-	 * @param string $_sessionParams   Key to the Session data.
+	 * @param Data   $viewDo         The ViewDo instance to use.
+	 * @param string $_startTime     Key to the start timestamp.
+	 * @param string $_runTime       Key of the run time.
+	 * @param string $_peakMemory    Key of the peak memory usage.
+	 * @param string $_items         Key to the debug items.
+	 * @param string $_serverParams  Key to the $_SERVER super global array.
+	 * @param string $_postParams    Key to the params received through post mthod.
+	 * @param string $_getParams     Key to the params received through get method.
+	 * @param string $_cookieParams  Key to the params received through cookies.
+	 * @param string $_sessionParams Key to the Session data.
 	 */
 	public function __construct(
-		ViewDo $viewDo, $_startTime, $_runTime, $_peakMemory, $_items, $_serverParams, $_postParams, $_getParams,
+		Data $viewDo, $_startTime, $_runTime, $_peakMemory, $_items, $_serverParams, $_postParams, $_getParams,
 		$_cookieParams, $_sessionParams
 	) {
 		$this->setViewDo($viewDo);

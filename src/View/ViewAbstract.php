@@ -13,7 +13,7 @@ use YapepBase\Storage\IStorage;
 abstract class ViewAbstract
 {
 
-    /** @var ViewDo */
+    /** @var Data */
     protected $viewDo;
 
     /** @var string */
@@ -152,11 +152,11 @@ abstract class ViewAbstract
     /**
      * Sets the view DO instance used by the view.
      *
-     * @param \YapepBase\View\ViewDo $viewDo The ViewDo instance to use.
+     * @param \YapepBase\View\Data $viewDo The ViewDo instance to use.
      *
      * @return void
      */
-    protected function setViewDo(ViewDo $viewDo)
+    protected function setViewDo(Data $viewDo)
     {
         $this->viewDo = $viewDo;
     }
@@ -164,7 +164,7 @@ abstract class ViewAbstract
     /**
      * Returns the currently used view DO instance.
      *
-     * @return \YapepBase\View\ViewDo
+     * @return \YapepBase\View\Data
      */
     protected function getViewDo()
     {
