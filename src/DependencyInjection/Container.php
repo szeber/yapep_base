@@ -1,143 +1,83 @@
 <?php
-/**
- * This file is part of YAPEPBase.
- *
- * @package      YapepBase
- * @subpackage   DependencyInjection
- * @copyright    2011 The YAPEP Project All rights reserved.
- * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
- */
+declare(strict_types = 1);
 
 namespace YapepBase\DependencyInjection;
 
-use YapepBase\Exception\ParameterException;
+use YapepBase\ErrorHandler\IErrorHandlerRegistry;
+use YapepBase\Event\IEventHandlerRegistry;
+use YapepBase\File\IFileHandler;
+use YapepBase\Log\ILoggerRegistry;
+use YapepBase\Request\IRequest;
+use YapepBase\Response\IResponse;
+use YapepBase\Router\IRouter;
+use YapepBase\Session\ISessionRegistry;
+use YapepBase\Shell\ICommandExecutor;
 
 /**
- * Container main class.
- *
- * @package      YapepBase
- * @subpackage   DependencyInjection
+ * Generic DI container implementation used in the framework.
  */
-class Container implements \ArrayAccess {
+class Container implements IContainer
+{
+    /** @var IContainer */
+    protected $container;
 
-	/**
-	 * The stored values.
-	 *
-	 * @var array
-	 */
-	private $values;
+    public function __construct(IContainer $container)
+    {
+        $this->container = $container;
+    }
 
-	/**
-	 * Constructor
-	 *
-	 * @param array $values   The parameters or objects.
-	 */
-	public function __construct(array $values = array()) {
-		$this->values = $values;
-	}
+    public function get($id)
+    {
+        return $this->container->get($id);
+    }
 
-	/**
-	 * Sets a parameter or an object.
-	 *
-	 * @param string $key     The unique key for the parameter or object.
-	 * @param mixed  $value   The value of the parameter or a closure to defined an object.
-	 *
-	 * @return void
-	 */
-	public function offsetSet($key, $value) {
-		$this->values[$key] = $value;
-	}
+    public function has($id)
+    {
+        return $this->container->has($id);
+    }
 
-	/**
-	 * Gets a parameter or an object.
-	 *
-	 * @param string $key   The key of the parameter or object.
-	 *
-	 * @return mixed   The value of the parameter or an object
-	 *
-	 * @throws \YapepBase\Exception\ParameterException   If the key is not defined
-	 */
-	public function offsetGet($key) {
-		if (!array_key_exists($key, $this->values)) {
-			throw new ParameterException('Unknown key: ' . $key);
-		}
+    public function getRouter(): IRouter
+    {
+        return $this->container->getRouter();
+    }
 
-		return $this->values[$key] instanceof \Closure
-			? $this->values[$key]($this)
-			: $this->values[$key];
-	}
+    public function getRequest(): IRequest
+    {
+        return $this->container->getRequest();
+    }
 
-	/**
-	 * Checks if a parameter or an object is set.
-	 *
-	 * @param string $key   The key of the parameter or object.
-	 *
-	 * @return bool
-	 */
-	public function offsetExists($key) {
-		return isset($this->values[$key]);
-	}
+    public function getResponse(): IResponse
+    {
+        return $this->container->getResponse();
+    }
 
-	/**
-	 * Unsets a parameter or an object.
-	 *
-	 * @param string $key   The key of the parameter or object.
-	 *
-	 * @return void
-	 */
-	public function offsetUnset($key) {
-		unset($this->values[$key]);
-	}
+    public function getErrorHandlerRegistry(): IErrorHandlerRegistry
+    {
+        return $this->container->getErrorHandlerRegistry();
+    }
 
-	/**
-	 * Returns a closure that stores the result of the given closure for
-	 * uniqueness in the scope of this instance of Container.
-	 *
-	 * @param \Closure $callable   A closure to wrap for uniqueness
-	 *
-	 * @return \Closure   The wrapped closure
-	 */
-	public function share(\Closure $callable) {
-		return function ($innerCallable) use ($callable) {
-			static $object;
+    public function getEventHandlerRegistry(): IEventHandlerRegistry
+    {
+        return $this->container->getEventHandlerRegistry();
+    }
 
-			if (is_null($object)) {
-				$object = $callable($innerCallable);
-			}
+    public function getSessionRegistry(): ISessionRegistry
+    {
+        return $this->container->getSessionRegistry();
+    }
 
-			return $object;
-		};
-	}
+    public function getLoggerRegistry(): ILoggerRegistry
+    {
+        return $this->container->getLoggerRegistry();
+    }
 
-	/**
-	 * Protects a callable from being interpreted as a service.
-	 *
-	 * This is useful when you want to store a callable as a parameter.
-	 *
-	 * @param \Closure $callable   A closure to protect from being evaluated.
-	 *
-	 * @return \Closure   The protected closure.
-	 */
-	public function protect(\Closure $callable) {
-		return function () use ($callable) {
-			return $callable;
-		};
-	}
+    public function getFileHandler(): IFileHandler
+    {
+        return $this->container->getFileHandler();
+    }
 
-	/**
-	 * Gets a parameter as it, without evaluating it.
-	 *
-	 * @param string $key   The of the parameter or object.
-	 *
-	 * @return mixed   The value of the parameter or the closure defining an object.
-	 *
-	 * @throws ParameterException   If the key is not defined.
-	 */
-	public function getRaw($key) {
-		if (!array_key_exists($key, $this->values)) {
-			throw new ParameterException('Unknown key: ' . $key);
-		}
-
-		return $this->values[$key];
-	}
+    public function getCommandExecutor(): ICommandExecutor
+    {
+        return $this->container->getCommandExecutor();
+    }
 }

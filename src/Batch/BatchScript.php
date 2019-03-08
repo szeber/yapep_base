@@ -14,7 +14,7 @@ declare(ticks = 1);
 namespace YapepBase\Batch;
 
 use YapepBase\Application;
-use YapepBase\DependencyInjection\SystemContainer;
+use YapepBase\DependencyInjection\Container;
 use YapepBase\ErrorHandler\ITerminatable;
 use YapepBase\Event\Event;
 use YapepBase\Exception\ParameterException;
@@ -157,9 +157,9 @@ abstract class BatchScript implements ITerminatable {
 	 * @return void
 	 */
 	protected function runBefore() {
-		$application = Application::getInstance();
-		$container = $application->getDiContainer();
-		$container[SystemContainer::KEY_VIEW_DO] = $container->share(function($container) {
+		$application                       = Application::getInstance();
+		$container                         = $application->getDiContainer();
+		$container[Container::KEY_VIEW_DO] = $container->share(function($container) {
 			return new ViewDo(MimeType::PLAINTEXT);
 		});
 

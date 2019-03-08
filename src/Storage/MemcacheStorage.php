@@ -15,7 +15,7 @@ use YapepBase\Application;
 use YapepBase\Debugger\Item\StorageItem;
 use YapepBase\Exception\StorageException;
 use YapepBase\Exception\ConfigException;
-use YapepBase\DependencyInjection\SystemContainer;
+use YapepBase\DependencyInjection\Container;
 
 /**
  * MemcacheStorage class
