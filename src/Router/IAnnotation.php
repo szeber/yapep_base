@@ -8,7 +8,18 @@ use YapepBase\Exception\InvalidArgumentException;
 interface IAnnotation
 {
     /**
+     * @param array $annotation
+     *
+     * @return static
+     *
      * @throws InvalidArgumentException
      */
-    public function __construct(array $annotation);
+    public static function createFromArray(array $annotation);
+
+    /**
+     * @param $state
+     *
+     * @return static
+     */
+    public static function __set_state($state);
 }

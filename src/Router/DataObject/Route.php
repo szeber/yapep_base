@@ -3,12 +3,18 @@ declare(strict_types=1);
 
 namespace YapepBase\Router\DataObject;
 
-use YapepBase\Exception\IException;
 use YapepBase\Exception\InvalidArgumentException;
 use YapepBase\Router\IAnnotation;
 
 class Route
 {
+    public const KEY_PATHS          = 'paths';
+    public const KEY_REGEX_PATTERNS = 'regexPatterns';
+    public const KEY_METHODS        = 'methods';
+    public const KEY_ACTION         = 'action';
+    public const KEY_CONTROLLER     = 'controller';
+    public const KEY_NAME           = 'name';
+    public const KEY_ANNOTATIONS    = 'annotations';
 
     /** @var string|null */
     protected $name;
@@ -25,65 +31,107 @@ class Route
     /** @var string[]|null */
     protected $regexPatterns;
 
-    /** @var array */
-    protected $unparsedPaths = [];
-
-    /** @var array */
-    protected $unparsedAnnotations = [];
-
     /** @var Path[]|null */
     protected $paths;
 
     /** @var IAnnotation[]|null */
     protected $annotations;
 
-    public function __construct(array $route, bool $validate = true)
-    {
-        if ($validate) {
-            $this->validate($route);
-        }
-
-        $this->name                = $route['name'] ?? null;
-        $this->controller          = $route['controller'] ?? '';
-        $this->action              = $route['action'] ?? '';
-        $this->methods             = $route['methods'] ?? [];
-        $this->regexPatterns       = $route['regexPatterns'] ?? null;
-        $this->unparsedPaths       = $route['paths'] ?? [];
-        $this->unparsedAnnotations = $route['annotations'] ?? [];
+    public function __construct(
+        string $controller,
+        string $action,
+        ?string $name,
+        array $methods,
+        array $regexPatterns,
+        array $paths,
+        array $annotations
+    ) {
+        $this->name          = $name;
+        $this->controller    = $controller;
+        $this->action        = $action;
+        $this->methods       = $methods;
+        $this->regexPatterns = $regexPatterns;
+        $this->paths         = $paths;
+        $this->annotations   = $annotations;
     }
 
-    private function validate(array $route): void
+    /**
+     * @param array $state
+     *
+     * @return static
+     */
+    public static function __set_state($state): self
+    {
+        return new static(
+            $state[self::KEY_CONTROLLER],
+            $state[self::KEY_ACTION],
+            $state[self::KEY_NAME],
+            $state[self::KEY_METHODS],
+            $state[self::KEY_REGEX_PATTERNS],
+            $state[self::KEY_PATHS],
+            $state[self::KEY_ANNOTATIONS]
+        );
+    }
+
+    /**
+     * @param array $route
+     *
+     * @return static
+     */
+    public static function createFromArray(array $route): self
+    {
+        static::validate($route);
+
+        $paths       = static::parsePaths($route[self::KEY_PATHS]);
+        $annotations = static::parseAnnotations($route[self::KEY_ANNOTATIONS] ?? []);
+
+        $regexPatterns = array_map(
+            function (Path $path) {
+                return $path->getRegexPattern();
+            },
+            $paths
+        );
+
+        return new static(
+            $route[self::KEY_CONTROLLER],
+            $route[self::KEY_ACTION],
+            $route[self::KEY_NAME] ?? null,
+            $route[self::KEY_METHODS] ?? [],
+            $regexPatterns,
+            $paths,
+            $annotations
+        );
+    }
+
+    private static function validate(array $route): void
     {
         if (empty($route)) {
             throw new InvalidArgumentException('The route array is empty');
         }
 
-        if (empty($route['controller'])) {
+        if (empty($route[self::KEY_CONTROLLER])) {
             throw new InvalidArgumentException('No controller is specified for route');
         }
 
-        if (empty($route['action'])) {
+        if (empty($route[self::KEY_ACTION])) {
             throw new InvalidArgumentException('No action is specified for route');
         }
 
-        if (isset($route['methods']) && !is_array($route['methods'])) {
+        if (isset($route[self::KEY_METHODS]) && !is_array($route[self::KEY_METHODS])) {
             throw new InvalidArgumentException('The methods should be an array in the route');
         }
 
-        if (isset($route['regexPatterns']) && !is_array($route['regexPatterns'])) {
+        if (isset($route[self::KEY_REGEX_PATTERNS]) && !is_array($route[self::KEY_REGEX_PATTERNS])) {
             throw new InvalidArgumentException('The regexPatters should be an array in the route');
         }
 
-        if (!isset($route['paths']) || !is_array($route['paths'])) {
+        if (!isset($route[self::KEY_PATHS]) || !is_array($route[self::KEY_PATHS])) {
             throw new InvalidArgumentException('No paths specified or the paths is not an array for route');
         }
 
-        if (isset($route['annotations']) && !is_array($route['annotations'])) {
+        if (isset($route[self::KEY_ANNOTATIONS]) && !is_array($route[self::KEY_ANNOTATIONS])) {
             throw new InvalidArgumentException('No annotations should be an array in the route');
         }
-
-        $this->parsePaths($route['paths']);
-        $this->parseAnnotations($route['annotations'] ?? []);
     }
 
     public function getName(): ?string
@@ -119,23 +167,6 @@ class Route
      */
     public function getPaths(): array
     {
-        if (null !== $this->paths) {
-            return $this->paths;
-        }
-
-        try {
-            $this->paths = $this->parsePaths($this->unparsedPaths);
-        } catch (IException $e) {
-            $exceptionClass = get_class($e);
-
-            throw new $exceptionClass(
-                'Exception while processing paths for route ' . $this->getControllerAction() . '. Error: '
-                    . $e->getMessage(),
-                $e->getCode(),
-                $e
-            );
-        }
-
         return $this->paths;
     }
 
@@ -144,14 +175,6 @@ class Route
      */
     public function getRegexPatterns(): array
     {
-        if (null === $this->regexPatterns) {
-            $this->regexPatterns = [];
-
-            foreach ($this->getPaths() as $path) {
-                $this->regexPatterns[] = $path->getRegexPattern();
-            }
-        }
-
         return $this->regexPatterns;
     }
 
@@ -160,37 +183,7 @@ class Route
      */
     public function getAnnotations(): array
     {
-        if (null !== $this->annotations) {
-            return $this->annotations;
-        }
-
-        try {
-            $this->annotations = $this->parseAnnotations($this->unparsedAnnotations);
-        } catch (IException $e) {
-            $exceptionClass = get_class($e);
-
-            throw new $exceptionClass(
-                'Exception while processing annotations for route ' . $this->getControllerAction() . '. Error: '
-                . $e->getMessage(),
-                $e->getCode(),
-                $e
-            );
-        }
-
         return $this->annotations;
-    }
-
-    public function toArray(): array
-    {
-        return [
-            'name'          => $this->name,
-            'controller'    => $this->controller,
-            'action'        => $this->action,
-            'methods'       => $this->methods,
-            'regexPatterns' => $this->getRegexPatterns(),
-            'paths'         => $this->unparsedPaths,
-            'annotations'   => $this->unparsedAnnotations,
-        ];
     }
 
     public function matchMethodAndPath(string $method, string $path): ?ControllerAction
@@ -230,12 +223,12 @@ class Route
      *
      * @return Path[]
      */
-    public function parsePaths(array $paths): array
+    private static function parsePaths(array $paths): array
     {
         $parsedPaths = [];
 
         foreach ($paths as $path) {
-            $parsedPaths[] = new Path($path);
+            $parsedPaths[] = Path::createFromArray($path);
         }
 
         return $parsedPaths;
@@ -246,7 +239,7 @@ class Route
      *
      * @return IAnnotation[]
      */
-    public function parseAnnotations(array $annotations): array
+    private static function parseAnnotations(array $annotations): array
     {
         $parsedAnnotations = [];
 
@@ -261,7 +254,8 @@ class Route
                 );
             }
 
-            $parsedAnnotations[] = new $annotationClass($annotation);
+            /** @var IAnnotation $annotationClass */
+            $parsedAnnotations[] = $annotationClass::createFromArray($annotation);
         }
 
         return $parsedAnnotations;

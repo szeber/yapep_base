@@ -19,7 +19,7 @@ class YamlCollector implements IRouteCollector
         $parsed = Yaml::parse(file_get_contents($path));
 
         foreach ($parsed as $parsedRoute) {
-            $this->routes[] = new Route($parsedRoute, true);
+            $this->routes[] = Route::createFromArray($parsedRoute);
         }
     }
 

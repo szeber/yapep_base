@@ -36,9 +36,7 @@ class CacheCreator
         $routes = [];
 
         foreach ($this->collectors as $collector) {
-            foreach ($collector->getCollectedRoutes() as $route) {
-                $routes[] = $route->toArray();
-            }
+            $routes = array_merge($routes, $collector->getCollectedRoutes());
         }
 
         // TODO figure out if it's worth using the file handler or switching to Flysystem or something else for file handling

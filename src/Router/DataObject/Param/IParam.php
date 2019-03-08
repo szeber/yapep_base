@@ -24,7 +24,19 @@ interface IParam
         self::TYPE_ENUM                   => Enum::class,
     ];
 
-    public function __construct(array $paramData);
+    /**
+     * @param array $paramData
+     *
+     * @return static
+     */
+    public static function createFromArray(array $paramData);
+
+    /**
+     * @param array $state
+     *
+     * @return static
+     */
+    public static function __set_state($state);
 
     public function getName(): string;
 

@@ -10,13 +10,17 @@ trait TRouteDataParser
     /** @var Route[] */
     protected $routesByControllerAction;
 
+    /**
+     * @param Route[] $routeData
+     *
+     * @return void
+     */
     protected function populateRoutes(array $routeData)
     {
         $this->routesByControllerAction = [];
 
         foreach ($routeData as $route) {
-            $routeObject                                                         = new Route($route);
-            $this->routesByControllerAction[$routeObject->getControllerAction()] = $routeObject;
+            $this->routesByControllerAction[$route->getControllerAction()] = $route;
         }
 
     }

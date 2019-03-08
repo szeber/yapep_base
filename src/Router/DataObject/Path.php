@@ -15,7 +15,35 @@ class Path
     /** @var IParam[] */
     protected $params = [];
 
-    public function __construct(array $path)
+    /**
+     * @param string   $pattern
+     * @param IParam[] $params
+     */
+    public function __construct(string $pattern, array $params)
+    {
+        $this->pattern = $pattern;
+        $this->params  = $params;
+    }
+
+    /**
+     * @param $state array
+     *
+     * @return static
+     */
+    public static function __set_state($state): self
+    {
+        return new static(
+            $state['pattern'],
+            $state['params']
+        );
+    }
+
+    /**
+     * @param array $path
+     *
+     * @return Path
+     */
+    public static function createFromArray(array $path): self
     {
         if (!isset($path['pathPattern'])) {
             throw new InvalidArgumentException('No path pattern set for path');
@@ -27,14 +55,12 @@ class Path
             );
         }
 
-        $this->pattern = '/' . trim($path['pathPattern'], "/ \r\n\t\0");
-        $this->params = [];
-
-        // TODO the parsing the params is not required for reverse routing, but the path itself is. Figure out if it makes sense to only parse the params if needed
+        $pattern = '/' . trim($path['pathPattern'], "/ \r\n\t\0");
+        $params = [];
 
         foreach ($path['params'] ?? [] as $index => $paramData) {
             if (empty($paramData['type'])) {
-                throw new InvalidArgumentException('No type set for path ' . $this->pattern . ' param ' . $index);
+                throw new InvalidArgumentException('No type set for path ' . $pattern . ' param ' . $index);
             }
 
             $type = $paramData['type'];
@@ -55,11 +81,11 @@ class Path
                 );
             }
 
-            /** @var IParam $param */
-            $param = new $paramClass($paramData);
-
-            $this->params[] = $param;
+            /** @var IParam $paramClass */
+            $params[] = $paramClass::createFromArray($paramData);
         }
+
+        return new static($pattern, $params);
     }
 
     public function getRegexPattern(): string
