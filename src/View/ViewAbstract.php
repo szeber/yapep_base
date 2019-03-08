@@ -1,16 +1,7 @@
 <?php
-/**
- * This file is part of YAPEPBase.
- *
- * @package    YapepBase
- * @subpackage View
- * @copyright  2011 The YAPEP Project All rights reserved.
- * @license    http://www.opensource.org/licenses/bsd-license.php BSD License
- */
-
+declare(strict_types=1);
 
 namespace YapepBase\View;
-
 
 use YapepBase\Application;
 use YapepBase\Exception\Exception;
@@ -18,25 +9,14 @@ use YapepBase\Storage\IStorage;
 
 /**
  * ViewAbstract class what should be extended by every View class.
- *
- * @package    YapepBase
- * @subpackage View
  */
 abstract class ViewAbstract
 {
 
-    /**
-     * The ViewDo instance used by the view
-     *
-     * @var \YapepBase\View\ViewDo
-     */
+    /** @var ViewDo */
     protected $viewDo;
 
-    /**
-     * Stores the content type
-     *
-     * @var string
-     */
+    /** @var string */
     protected $contentType;
 
     /**
@@ -262,20 +242,5 @@ abstract class ViewAbstract
         }
 
         return $this->storage->get($this->storageKey);
-    }
-
-    /**
-     * Translates the specified string.
-     *
-     * @param string $string     The string.
-     * @param array  $parameters The parameters for the translation.
-     * @param string $language   The language.
-     *
-     * @return string
-     */
-    protected function _($string, $parameters = [], $language = null)
-    {
-        return Application::getInstance()->getI18nTranslator()->translate(get_class($this), $string, $parameters,
-            $language);
     }
 }
