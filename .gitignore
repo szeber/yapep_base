@@ -7,3 +7,4 @@ vendor
 composer.phar
 .DS_Store
 .phpunit.result.cache
+/.php_cs.cache
