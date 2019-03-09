@@ -25,7 +25,7 @@ use YapepBase\View\RestTemplate;
  * @package    YapepBase
  * @subpackage Controller
  */
-abstract class RestControllerAbstract extends HttpControllerAbstractAbstract {
+abstract class RestControllerAbstract extends HttpControllerAbstract {
 
 	/**
 	 * Returns the controller specific prefix

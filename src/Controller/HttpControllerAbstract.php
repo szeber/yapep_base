@@ -14,7 +14,7 @@ use YapepBase\Request\IRequest;
 /**
  * Base class for HTTP controllers.
  */
-abstract class HttpControllerAbstractAbstract extends ControllerAbstract
+abstract class HttpControllerAbstract extends ControllerAbstract
 {
     /**
      * The request instance

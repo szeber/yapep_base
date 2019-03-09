@@ -16,7 +16,7 @@ namespace YapepBase\Controller;
  * @package    YapepBase
  * @subpackage Controller
  */
-class DefaultErrorController extends ErrorControllerAbstractAbstract {
+class DefaultErrorController extends ErrorControllerAbstract {
 	/**
 	 * Runs on page not found (404) errors
 	 *
