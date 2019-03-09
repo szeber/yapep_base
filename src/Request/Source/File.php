@@ -32,24 +32,6 @@ class File
         $this->temporaryFilePath = $tempFilePath;
         $this->mimeType          = $mimeType;
         $this->errorCode         = $errorCode;
-
-        $this->correctSizeIfNeeded();
-    }
-
-    /**
-     * If the filesize is smaller than 0, we have a file that's bigger than 2GB.
-     */
-    protected function correctSizeIfNeeded(): void
-    {
-        if ($this->sizeInByte > 0) {
-            return;
-        }
-
-        $fileHandler = Application::getInstance()->getDiContainer()->getFileHandler();
-
-        if ($fileHandler->checkIsPathExists($this->temporaryFilePath)) {
-            $this->sizeInByte = $fileHandler->getSize($this->temporaryFilePath);
-        }
     }
 
     public function getFilename(): string

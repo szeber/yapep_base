@@ -20,9 +20,10 @@ class ArrayHelperTest extends TestAbstract
     public function intProvider()
     {
         return [
-            'int exists'     => [['exists' => 1],   'exists',    null, 1],
-            'int not exists' => [['exists' => 1],   'notExists', null, null],
-            'string exists'  => [['exists' => '1'], 'exists',    null, 1],
+            'null exists'    => [['exists' => null], 'exists',    null, null],
+            'int exists'     => [['exists' => 1],    'exists',    null, 1],
+            'int not exists' => [['exists' => 1],    'notExists', null, null],
+            'string exists'  => [['exists' => '1'],  'exists',    null, 1],
         ];
     }
 

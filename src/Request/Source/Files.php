@@ -40,7 +40,7 @@ class Files implements IFiles
     }
 
     /**
-     * PHP is indexing the $_FILES array in a very screwed up way when someone uploads multiple files with the same name.
+     * Though PHPs $_FILES indexing for multiple upload is just awesome and logical, it's easier to process if it's restructured
      *
      * This method replaces the original structure (For example  $_FILES['image'][0]['name'])
      * to  $_FILES['image']['name'][0].

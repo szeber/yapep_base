@@ -27,17 +27,6 @@ class FileTest extends TestAbstract
         parent::setUp();
     }
 
-    public function testConstruct_shouldGetActualFilesizeIsNegative()
-    {
-        $expectedSizeInByte = 24;
-        $this->expectGetFileSize($expectedSizeInByte);
-
-        $file = new File($this->filename, -1, $this->tempFilePath, $this->errorCode, $this->mimeType);
-        $sizeInByte = $file->getSizeInByte();
-
-        $this->assertSame($expectedSizeInByte, $sizeInByte);
-    }
-
     public function testGetExtension_shouldReturnFileExtension()
     {
         $extension = $this->getFile()->getFileExtension();
@@ -129,23 +118,6 @@ class FileTest extends TestAbstract
     protected function getFile(): File
     {
         return new File($this->filename, $this->sizeInByte, $this->tempFilePath, $this->errorCode, $this->mimeType);
-    }
-
-    protected function expectGetFileSize(int $expectedSize)
-    {
-        $fileHandlerMock = Mockery::mock(IFileHandler::class)
-            ->shouldReceive('checkIsPathExists')
-                ->once()
-                ->with($this->tempFilePath)
-                ->andReturn(true)
-                ->getMock()
-            ->shouldReceive('getSize')
-                ->once()
-                ->with($this->tempFilePath)
-                ->andReturn($expectedSize)
-                ->getMock();
-
-        $this->pimpleContainer->setFileHandler($fileHandlerMock);
     }
 
     protected function expectGetFileContent(string $expectedContent)
