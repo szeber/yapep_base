@@ -43,7 +43,7 @@ abstract class ComponentAbstract extends BlockAbstract {
 	 * @return void
 	 */
 	public function set($key, $value) {
-		$this->getViewDo()->set($this->getKey($key), $value);
+		$this->getData()->set($this->getKey($key), $value);
 	}
 
 	/**

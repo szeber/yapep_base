@@ -11,8 +11,14 @@ use YapepBase\View\Escape\IEscape;
  */
 class Data
 {
+    const ESCAPED_KEY_HTML       = 'html';
+    const ESCAPED_KEY_JAVASCRIPT = 'javascript';
+
     /** @var array */
     protected $dataRaw = [];
+
+    /** @var array */
+    protected $dataEscaped = [];
 
     /** @var IEscape */
     protected $htmlEscaper;
@@ -57,7 +63,14 @@ class Data
      */
     public function getForHtml(string $key)
     {
-        return $this->htmlEscaper->__escape($this->getRaw($key));
+        if (isset($this->dataEscaped[self::ESCAPED_KEY_HTML][$key])) {
+            return $this->dataEscaped[self::ESCAPED_KEY_HTML][$key];
+        }
+
+        $result = $this->htmlEscaper->__escape($this->getRaw($key));
+        $this->dataEscaped[self::ESCAPED_KEY_HTML][$key] = $result;
+
+        return $result;
     }
 
     /**
@@ -65,7 +78,14 @@ class Data
      */
     public function getForJavascript(string $key)
     {
-        return $this->javascriptEscaper->__escape($this->getRaw($key));
+        if (isset($this->dataEscaped[self::ESCAPED_KEY_JAVASCRIPT][$key])) {
+            return $this->dataEscaped[self::ESCAPED_KEY_JAVASCRIPT][$key];
+        }
+
+        $result = $this->javascriptEscaper->__escape($this->getRaw($key));
+        $this->dataEscaped[self::ESCAPED_KEY_JAVASCRIPT][$key] = $result;
+
+        return $result;
     }
 
     /**

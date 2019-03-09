@@ -96,6 +96,17 @@ class DataTest extends TestAbstract
         $this->assertSame($this->escapedValue, $result);
     }
 
+    public function testGetForHtml_shouldCacheEscapedValue()
+    {
+        $this->viewData->set($this->key, $this->value);
+        $this->expectEscapeHtml();
+
+        $this->viewData->getForHtml($this->key);
+        $result = $this->viewData->getForHtml($this->key);
+
+        $this->assertSame($this->escapedValue, $result);
+    }
+
     public function testGetForJavascriptWhenKeyNotExist_shouldThrowException()
     {
         $this->expectException(ParameterException::class);
@@ -107,6 +118,17 @@ class DataTest extends TestAbstract
         $this->viewData->set($this->key, $this->value);
         $this->expectEscapeJavascript();
 
+        $result = $this->viewData->getForJavascript($this->key);
+
+        $this->assertSame($this->escapedValue, $result);
+    }
+
+    public function testGetForJavascript_shouldCacheEscapedValue()
+    {
+        $this->viewData->set($this->key, $this->value);
+        $this->expectEscapeJavascript();
+
+        $this->viewData->getForJavascript($this->key);
         $result = $this->viewData->getForJavascript($this->key);
 
         $this->assertSame($this->escapedValue, $result);

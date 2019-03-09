@@ -118,7 +118,7 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 		Data $viewDo, $_startTime, $_runTime, $_peakMemory, $_items, $_serverParams, $_postParams, $_getParams,
 		$_cookieParams, $_sessionParams
 	) {
-		$this->setViewDo($viewDo);
+		$this->setData($viewDo);
 
 		$this->startTime     = $this->get($_startTime);
 		$this->runTime       = $this->get($_runTime);
@@ -179,13 +179,13 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 		}
 
 		$errorData = $error->getData();
-		$file = $this->viewDo->escape($errorData[ErrorItem::FIELD_FILE]);
-		$line = $this->viewDo->escape($errorData[ErrorItem::FIELD_LINE]);
+		$file = $this->data->escape($errorData[ErrorItem::FIELD_FILE]);
+		$line = $this->data->escape($errorData[ErrorItem::FIELD_LINE]);
 
-		$id = uniqid($this->viewDo->escape($errorData[ErrorItem::LOCAL_FIELD_ID]));
-		$message = '[' . $this->viewDo->escape(
+		$id = uniqid($this->data->escape($errorData[ErrorItem::LOCAL_FIELD_ID]));
+		$message = '[' . $this->data->escape(
 			$errorHandlerHelper->getPhpErrorLevelDescription($errorData[ErrorItem::LOCAL_FIELD_CODE]))
-			. '] ' . $this->viewDo->escape($errorData[ErrorItem::LOCAL_FIELD_MESSAGE]);
+			. '] ' . $this->data->escape($errorData[ErrorItem::LOCAL_FIELD_MESSAGE]);
 		$source = FileHelper::getEnvironment($file, $line, 5);
 		$firstLine = key($source);
 
@@ -212,16 +212,16 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 			if ($line > $lineNumber) {
 				foreach ($errorData[ErrorItem::LOCAL_FIELD_CONTEXT] as $varName => $value) {
 					if (is_scalar($value) || is_array($value)) {
-						$tooltip = $this->viewDo->escape(gettype($value) . ': ' . print_r($value, true));
+						$tooltip = $this->data->escape(gettype($value) . ': ' . print_r($value, true));
 					}
 					elseif ($value instanceof Exception) {
-						$tooltip = $this->viewDo->escape(get_class($value) . ': ' . $value->getMessage());
+						$tooltip = $this->data->escape(get_class($value) . ': ' . $value->getMessage());
 					}
 					elseif (is_object($value) && method_exists($value, '__toString')) {
-						$tooltip = $this->viewDo->escape(get_class($value) . ': ' . $value->__toString());
+						$tooltip = $this->data->escape(get_class($value) . ': ' . $value->__toString());
 					}
 					else {
-						$tooltip = $this->viewDo->escape(strtoupper(gettype($value)));
+						$tooltip = $this->data->escape(strtoupper(gettype($value)));
 					}
 
 					$codeLine = preg_replace('#(?<!::)\$' . $varName . '\b#',
@@ -680,7 +680,7 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 		<?php
 			foreach ($messages as $message):
 				/** @var \YapepBase\Debugger\Item\MessageItem $message */
-				$messageData = $this->viewDo->escape($message->getData());
+				$messageData = $this->data->escape($message->getData());
 		?>
 			<?php if (is_string($messageData[MessageItem::LOCAL_FIELD_MESSAGE])): ?>
 				<p>
@@ -724,7 +724,7 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 					<table>
 						<tr><th>Source</th><th>Count</th></tr>
 					<?php foreach($locationIdCount as $source => $count): ?>
-						<tr><td><?= $this->viewDo->escape($source) ?></td><td><?=$count?></td></tr>
+						<tr><td><?= $this->data->escape($source) ?></td><td><?=$count?></td></tr>
 					<?php endforeach; ?>
 					</table>
 				</div>
@@ -778,7 +778,7 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 					<table>
 						<tr><th>Source</th><th>Count</th></tr>
 					<?php foreach($locationIdCount as $source => $count): ?>
-						<tr><td><?= $this->viewDo->escape($source) ?></td><td><?=$count?></td></tr>
+						<tr><td><?= $this->data->escape($source) ?></td><td><?=$count?></td></tr>
 					<?php endforeach; ?>
 					</table>
 				</div>
@@ -795,10 +795,10 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 						</tr>
 						<?php foreach($connectionStat as $name => $data): ?>
 						<tr>
-							<td><label for="yapep-debug-db-connection-toggle-<?= $this->viewDo->escape($name) ?>"><?= $this->viewDo->escape($name) ?></label></td>
+							<td><label for="yapep-debug-db-connection-toggle-<?= $this->data->escape($name) ?>"><?= $this->data->escape($name) ?></label></td>
 							<td><?= $data['count'] ?></td>
 							<td><?= sprintf('%.4f', $data['time']) ?></td>
-							<td><input type="checkbox" id="yapep-debug-db-connection-toggle-<?= $name ?>" checked="checked" onchange="Yapep.toggleClassByCheckboxStatus(this)" rel="yapep-debug-db-connection-<?= $this->viewDo->escape($name) ?>"/> </td>
+							<td><input type="checkbox" id="yapep-debug-db-connection-toggle-<?= $name ?>" checked="checked" onchange="Yapep.toggleClassByCheckboxStatus(this)" rel="yapep-debug-db-connection-<?= $this->data->escape($name) ?>"/> </td>
 						</tr>
 						<?php endforeach; ?>
 					</table>
@@ -810,8 +810,8 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 		<?php
 			foreach ($sqlQueries as $index => $query):
 				/** @var \YapepBase\Debugger\Item\SqlQueryItem $query */
-				$queryData = $this->viewDo->escape($query->getData());
-				$queryCleared = $this->viewDo->escape($this->formatSqlQuery($queryData[SqlQueryItem::LOCAL_FIELD_QUERY],
+				$queryData = $this->data->escape($query->getData());
+				$queryCleared = $this->data->escape($this->formatSqlQuery($queryData[SqlQueryItem::LOCAL_FIELD_QUERY],
 					$queryData[SqlQueryItem::LOCAL_FIELD_PARAMS]));
 		?>
 			<div class="yapep-debug-error-item yapep-debug-collapse-all yapep-debug-db-connection-<?= $queryData[SqlQueryItem::LOCAL_FIELD_CONNECTION_NAME] ?>">
@@ -873,7 +873,7 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 					<table>
 						<tr><th>Source</th><th>Count</th></tr>
 						<?php foreach($locationIdCount as $source => $count): ?>
-						<tr><td><?= $this->viewDo->escape($source) ?></td><td><?=$count?></td></tr>
+						<tr><td><?= $this->data->escape($source) ?></td><td><?=$count?></td></tr>
 						<?php endforeach; ?>
 					</table>
 				</div>
@@ -890,10 +890,10 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 						</tr>
 						<?php foreach($connectionStat as $name => $data): ?>
 						<tr>
-							<td><label for="yapep-debug-cache-connection-toggle-<?= $this->viewDo->escape($name) ?>"><?= $this->viewDo->escape($name) ?></label></td>
+							<td><label for="yapep-debug-cache-connection-toggle-<?= $this->data->escape($name) ?>"><?= $this->data->escape($name) ?></label></td>
 							<td><?= $data['count'] ?></td>
 							<td><?= sprintf('%.4f', $data['time']) ?></td>
-							<td><input type="checkbox" id="yapep-debug-cache-connection-toggle-<?= $name ?>" checked="checked" onchange="Yapep.toggleClassByCheckboxStatus(this)" rel="yapep-debug-cache-connection-<?= $this->viewDo->escape($name) ?>"/> </td>
+							<td><input type="checkbox" id="yapep-debug-cache-connection-toggle-<?= $name ?>" checked="checked" onchange="Yapep.toggleClassByCheckboxStatus(this)" rel="yapep-debug-cache-connection-<?= $this->data->escape($name) ?>"/> </td>
 						</tr>
 						<?php endforeach; ?>
 					</table>
@@ -905,7 +905,7 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 		<?php
 			foreach ($cacheRequests as $index => $request):
 				/** @var \YapepBase\Debugger\Item\StorageItem $request */
-				$requestData = $this->viewDo->escape($request->getData());
+				$requestData = $this->data->escape($request->getData());
 		?>
 			<div class="yapep-debug-error-item yapep-debug-cache-connection-<?= $requestData[StorageItem::LOCAL_FIELD_CONNECTION_NAME] ?>">
 				<p class="yapep-debug-clickable" onclick="Yapep.toggle('CACHE<?= $index ?>'); return false;">
@@ -970,7 +970,7 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 						<tr><th>Source</th><th>Count</th></tr>
 					<?php foreach($locationIdCount as $source => $count): ?>
 						<tr>
-							<td><?= $this->viewDo->escape($source) ?></td>
+							<td><?= $this->data->escape($source) ?></td>
 							<td><?= $count ?></td>
 						</tr>
 					<?php endforeach; ?>
@@ -989,10 +989,10 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 						</tr>
 						<?php foreach($hostStat as $name => $data): ?>
 						<tr>
-							<td><label for="yapep-debug-curl-connection-toggle-<?= $this->viewDo->escape($name) ?>"><?= $this->viewDo->escape($name) ?></label></td>
+							<td><label for="yapep-debug-curl-connection-toggle-<?= $this->data->escape($name) ?>"><?= $this->data->escape($name) ?></label></td>
 							<td><?= $data['count'] ?></td>
 							<td><?= sprintf('%.4f', $data['time']) ?></td>
-							<td><input type="checkbox" id="yapep-debug-curl-connection-toggle-<?= $name ?>" checked="checked" onchange="Yapep.toggleClassByCheckboxStatus(this)" rel="yapep-debug-curl-connection-<?= $this->viewDo->escape($name) ?>"/> </td>
+							<td><input type="checkbox" id="yapep-debug-curl-connection-toggle-<?= $name ?>" checked="checked" onchange="Yapep.toggleClassByCheckboxStatus(this)" rel="yapep-debug-curl-connection-<?= $this->data->escape($name) ?>"/> </td>
 						</tr>
 						<?php endforeach; ?>
 					</table>
@@ -1004,7 +1004,7 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 		<?php
 			foreach ($curlRequests as $index => $request):
 				/** @var \YapepBase\Debugger\Item\CurlRequestItem $requestData */
-				$requestData = $this->viewDo->escape($request->getData());
+				$requestData = $this->data->escape($request->getData());
 		?>
 			<div class="yapep-debug-error-item yapep-debug-curl-connection-<?= (string)$requestData[CurlRequestItem::LOCAL_FIELD_HOST] ?>"">
 				<p class="yapep-debug-clickable" onclick="Yapep.toggle('CURL<?= $index ?>'); return false;">
@@ -1042,7 +1042,7 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 				<?php
 					foreach ($timeMilestones as $milestone):
 						/** @var \YapepBase\Debugger\Item\TimeItem $milestone */
-						$milestoneData = $this->viewDo->escape($milestone->getData());
+						$milestoneData = $this->data->escape($milestone->getData());
 				?>
 					<tr>
 						<th><?= $milestoneData[TimeItem::FIELD_NAME] ?></th>
@@ -1068,7 +1068,7 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 				<?php
 					foreach ($memoryMilestones as $milestone):
 						/** @var \YapepBase\Debugger\Item\MemoryUsageItem $milestone */
-						$milestoneData = $this->viewDo->escape($milestone->getData());
+						$milestoneData = $this->data->escape($milestone->getData());
 				?>
 					<tr>
 						<th><?= $milestoneData[MemoryUsageItem::FIELD_NAME] ?></th>

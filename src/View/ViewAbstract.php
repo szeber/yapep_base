@@ -3,102 +3,43 @@ declare(strict_types=1);
 
 namespace YapepBase\View;
 
-use YapepBase\Application;
-use YapepBase\Exception\Exception;
-use YapepBase\Storage\IStorage;
-
 /**
  * ViewAbstract class what should be extended by every View class.
  */
 abstract class ViewAbstract
 {
-
     /** @var Data */
-    protected $viewDo;
-
-    /** @var string */
-    protected $contentType;
-
-    /**
-     * Storage object which will be used for caching the rendered view object.
-     *
-     * @var \YapepBase\Storage\IStorage
-     */
-    private $storage;
-
-    /**
-     * The key which will be used for storing the rendered view object.
-     *
-     * @var string
-     */
-    private $storageKey;
-
-    /**
-     * Time to leave in seconds for storing the view object.
-     *
-     * @var int
-     */
-    private $storageTtl;
+    private $data;
 
     /**
      * Does the actual rendering.
-     *
-     * @return void
      */
-    abstract protected function renderContent();
+    abstract protected function renderContent(): void;
 
     /**
      * Renders the view and prints it.
-     *
-     * @return void
      */
-    protected function render()
+    protected function render(): void
     {
         $this->renderContent();
     }
 
     /**
      * Returns the rendered content.
-     *
-     * It returns the same as the {@link render()} prints.
-     *
-     * @return string
      */
-    public function toString()
+    public function toString(): string
     {
-        $result = $this->getFromStorage();
+        ob_start();
+        $this->render();
+        $result = ob_get_clean();
 
-        if ($result === false) {
-            ob_start();
-            $this->render();
-            $result = ob_get_clean();
-
-            // If an exception occurs, we don't want to cache the output.
-            $this->setToStorage($result);
-        }
         return $result;
     }
 
     /**
-     * Sets the contentType of the View.
-     *
-     * @param string $contentType {@uses \YapepBase\Mime\MimeType::*}
-     *
-     * @return void
+     * Renders the given block
      */
-    public function setContentType($contentType)
-    {
-        $this->contentType = $contentType;
-    }
-
-    /**
-     * Displays the given block
-     *
-     * @param \YapepBase\View\BlockAbstract $block The block.
-     *
-     * @return void
-     */
-    protected function renderBlock(BlockAbstract $block)
+    protected function renderBlock(BlockAbstract $block): void
     {
         // The View Object can have a layout, so we give it to the block as well to provide access
         if ($this instanceof IHasLayout && $this->checkHasLayout()) {
@@ -111,136 +52,13 @@ abstract class ViewAbstract
         echo $block->toString();
     }
 
-    /**
-     * Returns the the value registered to the given key.
-     *
-     * @param string $key The name of the key.
-     * @param bool   $raw if TRUE it will return the raw (unescaped) data.
-     *
-     * @return mixed   The data stored with the given key.
-     */
-    public function get($key, $raw = false)
+    public function setData(Data $data): void
     {
-        return $this->getViewDo()->get($key, $raw);
+        $this->data = $data;
     }
 
-    /**
-     * Checks the given key if it has a value.
-     *
-     * @param string $key        The name of the key.
-     * @param bool   $checkIsSet If TRUE it checks the existense of the key.
-     *
-     * @return bool   FALSE if it has a value/exist, TRUE if not.
-     */
-    public function checkIsEmpty($key, $checkIsSet = false)
+    protected function getData(): Data
     {
-        return $this->getViewDo()->checkIsEmpty($key, $checkIsSet);
-    }
-
-    /**
-     * Checks if the value is an array.
-     *
-     * @param string $key The name of the key.
-     *
-     * @return bool   TRUE if its an array, FALSE if not.
-     */
-    public function checkIsArray($key)
-    {
-        return $this->getViewDo()->checkIsArray($key);
-    }
-
-    /**
-     * Sets the view DO instance used by the view.
-     *
-     * @param \YapepBase\View\Data $viewDo The ViewDo instance to use.
-     *
-     * @return void
-     */
-    protected function setViewDo(Data $viewDo)
-    {
-        $this->viewDo = $viewDo;
-    }
-
-    /**
-     * Returns the currently used view DO instance.
-     *
-     * @return \YapepBase\View\Data
-     */
-    protected function getViewDo()
-    {
-        if (empty($this->viewDo)) {
-            $this->viewDo = Application::getInstance()->getDiContainer()->getViewDo();
-        }
-        return $this->viewDo;
-    }
-
-    /**
-     * Sets the storage object which will be used for cacheing the rendered view.
-     *
-     * @param \YapepBase\Storage\IStorage $storage        The object for caching.
-     * @param array                       $keyModifiers   Associative array which holds the keys and values,
-     *                                                    what will take into consideration in the caching process.
-     * @param int                         $ttl            Time to leave in seconds.
-     *
-     * @return void
-     *
-     * @throws \YapepBase\Exception\Exception   If the storage has benn already set.
-     */
-    protected function setStorage(IStorage $storage, array $keyModifiers, $ttl)
-    {
-        if ($this->storage !== null) {
-            throw new Exception('Storage already set');
-        }
-
-        $this->storage    = $storage;
-        $this->storageKey = $this->generateKeyForStorage($keyModifiers);
-        $this->storageTtl = $ttl;
-    }
-
-    /**
-     * Generates the key for storing the rendered view.
-     *
-     * @param array $keyModifiers   Associative array which holds the keys and values,
-     *                              what will take into consideration in the caching process.
-     *
-     * @return string   The generated key.
-     */
-    private function generateKeyForStorage(array $keyModifiers)
-    {
-        $modifiers = [];
-        foreach ($keyModifiers as $fieldName => $value) {
-            $modifiers[] = $fieldName . '=' . $value;
-        }
-        return get_called_class() . '.' . implode('.', $modifiers);
-    }
-
-    /**
-     * Stores the given data
-     *
-     * @param string $data The data should be stored.
-     *
-     * @return void
-     */
-    private function setToStorage($data)
-    {
-        if ($this->storage === null) {
-            return;
-        }
-
-        $this->storage->set($this->storageKey, (string)$data, $this->storageTtl);
-    }
-
-    /**
-     * Returns the stored data.
-     *
-     * @return string|bool   The stored data or FALSE if its not stored.
-     */
-    private function getFromStorage()
-    {
-        if ($this->storage === null) {
-            return false;
-        }
-
-        return $this->storage->get($this->storageKey);
+        return $this->data;
     }
 }

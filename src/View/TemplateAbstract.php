@@ -9,36 +9,26 @@ namespace YapepBase\View;
 abstract class TemplateAbstract extends ViewAbstract implements IHasLayout
 {
     /**
-     * @var LayoutAbstract
+     * @var LayoutAbstract|null
      */
-    protected $layout = null;
+    protected $layout;
 
     public function setLayout(LayoutAbstract $layout): void
     {
         $this->layout = $layout;
     }
 
-    public function getLayout(): LayoutAbstract
+    public function getLayout(): ?LayoutAbstract
     {
         return $this->layout;
     }
 
-    /**
-     * Checks if the object has a layout set.
-     *
-     * @return bool   TRUE if it has, FALSE otherwise.
-     */
-    public function checkHasLayout()
+    public function checkHasLayout(): bool
     {
         return !is_null($this->layout);
     }
 
-    /**
-     * Renders the view and prints it.
-     *
-     * @return void
-     */
-    public function render()
+    public function render(): void
     {
         if ($this->layout !== null) {
             ob_start();
