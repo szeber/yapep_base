@@ -34,7 +34,7 @@ use YapepBase\View\ViewAbstract;
  * @package    YapepBase
  * @subpackage Controller
  */
-abstract class BaseController implements IController
+abstract class ControllerAbstract implements IController
 {
 
     /** @var IRequest */

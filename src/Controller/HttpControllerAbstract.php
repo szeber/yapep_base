@@ -1,33 +1,21 @@
 <?php
-/**
- * This file is part of YAPEPBase.
- *
- * @package      YapepBase
- * @subpackage   Controller
- * @copyright    2011 The YAPEP Project All rights reserved.
- * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
- */
+declare(strict_types=1);
 
 namespace YapepBase\Controller;
 
 use YapepBase\Application;
 
+use YapepBase\Exception\ParameterException;
 use YapepBase\Response\HttpResponse;
-use YapepBase\Exception\ControllerException;
 use YapepBase\Request\HttpRequest;
 use YapepBase\Response\IResponse;
 use YapepBase\Request\IRequest;
-use YapepBase\Mime\MimeType;
 
 /**
  * Base class for HTTP controllers.
- *
- * @package    YapepBase
- * @subpackage Controller
  */
-abstract class HttpController extends BaseController
+abstract class HttpControllerAbstract extends ControllerAbstract
 {
-
     /**
      * The request instance
      *
@@ -42,25 +30,20 @@ abstract class HttpController extends BaseController
      */
     protected $response;
 
-    /**
-     * Constructor.
-     *
-     * @param \YapepBase\Request\HttpRequest   $request  The request object. Must be a HttpRequest or descendant.
-     * @param \YapepBase\Response\HttpResponse $response The response object. Must be a HttpResponse or descendant.
-     *
-     * @throws \YapepBase\Exception\ControllerException   On error. (eg. incompatible request or response object)
-     */
-    public function __construct(IRequest $request, IResponse $response)
+    public function setRequest(IRequest $request): void
     {
         if (!($request instanceof HttpRequest)) {
-            throw new ControllerException('The specified request is not a HttpRequest',
-                ControllerException::ERR_INCOMPATIBLE_REQUEST);
+            throw new ParameterException('Http Controller should only use Http request');
         }
+        parent::setRequest($request);
+    }
+
+    public function setResponse(IResponse $response): void
+    {
         if (!($response instanceof HttpResponse)) {
-            throw new ControllerException('The specified response is not a HttpResponse',
-                ControllerException::ERR_INCOMPATIBLE_RESPONSE);
+            throw new ParameterException('Http Controller should only use Http response');
         }
-        parent::__construct($request, $response);
+        parent::setResponse($response);
     }
 
     /**

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace YapepBase\Test\Unit;
 
 
+use Server\ServerData;
 use YapepBase\Application;
 use Mockery;
 use Mockery\MockInterface;
