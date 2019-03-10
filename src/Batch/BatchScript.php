@@ -19,7 +19,7 @@ use YapepBase\ErrorHandler\ITerminatable;
 use YapepBase\Event\Event;
 use YapepBase\Exception\ParameterException;
 use YapepBase\Mime\MimeType;
-use YapepBase\View\Data;
+use YapepBase\View\Data\Data;
 
 /**
  * Base class for batch scripts.

@@ -8,11 +8,13 @@ use YapepBase\Exception\ParameterException;
 use YapepBase\View\Block\BlockAbstract;
 use YapepBase\View\Block\Html\CharsetMeta;
 use YapepBase\View\Block\Html\CssFile;
+use YapepBase\View\Block\Html\HttpMeta;
 use YapepBase\View\Block\Html\JavaScriptFile;
 use YapepBase\View\Block\Html\Condition;
 use YapepBase\View\Block\Html\Link;
 use YapepBase\View\Block\Html\Meta;
 use YapepBase\View\Block\Html\Title;
+use YapepBase\View\IRenderable;
 use YapepBase\View\ViewAbstract;
 
 /**
@@ -32,7 +34,7 @@ abstract class LayoutAbstract extends ViewAbstract
     /** @var Meta[] */
     protected $metas = [];
 
-    /** @var Meta[] */
+    /** @var HttpMeta[] */
     protected $httpMetas = [];
 
     /** @var Link[] */
@@ -47,7 +49,7 @@ abstract class LayoutAbstract extends ViewAbstract
     /** @var Condition[] */
     protected $cssFiles = [];
 
-    /** @var BlockAbstract[][] */
+    /** @var IRenderable[][] */
     protected $slotsByName = [];
 
     public function __construct()
@@ -96,10 +98,10 @@ abstract class LayoutAbstract extends ViewAbstract
         }
     }
 
-    public function addHttpMeta(Meta $meta, bool $overwrite = true)
+    public function addHttpMeta(HttpMeta $meta, bool $overwrite = true)
     {
         $metaName = $meta->getName();
-        if ($overwrite || !isset($this->metas[$meta->getName()])) {
+        if ($overwrite || !isset($this->httpMetas[$meta->getName()])) {
             $this->httpMetas[$metaName] = $meta;
         } else {
             $this->httpMetas[$metaName]->appendContent($meta->getContent());
@@ -163,18 +165,23 @@ abstract class LayoutAbstract extends ViewAbstract
         }
     }
 
-    protected function addConditionalFile(array &$files, BlockAbstract $fileBlock, string $condition = ''): void
+    /**
+     * @param Condition[]   $files
+     * @param BlockAbstract $fileBlock
+     * @param string        $condition
+     */
+    protected function addConditionalFile(array &$files, IRenderable $fileBlock, string $condition = ''): void
     {
         if (!isset($files[$condition])) {
-            $conditionObject = new Condition();
+            $conditionObject = new Condition($condition);
 
             $files[$condition] = $conditionObject;
         }
 
-        $files[$condition]->addFile($fileBlock);
+        $files[$condition]->addElement($fileBlock);
     }
 
-    public function addToSlot(string $name, BlockAbstract $slot): void
+    public function addToSlot(string $name, IRenderable $slot): void
     {
         $this->slotsByName[$name][] = $slot;
     }
@@ -182,14 +189,14 @@ abstract class LayoutAbstract extends ViewAbstract
     /**
      * @throws ParameterException   If the given slot does not exist.
      */
-    public function renderSlot(string $name): void
+    protected function renderSlot(string $name): void
     {
         if (!isset($this->slotsByName[$name])) {
             throw new ParameterException('Slot not defined: ' . $name);
         }
 
-        foreach ($this->slotsByName[$name] as $block) {
-            $block->render();
+        foreach ($this->slotsByName[$name] as $renderable) {
+            $renderable->render();
         }
     }
 }

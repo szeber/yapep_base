@@ -1,14 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace YapepBase\Test\Unit\View;
+namespace YapepBase\Test\Unit\View\Data;
 
 use YapepBase\Exception\ParameterException;
 use YapepBase\Test\Unit\TestAbstract;
 use Mockery;
 use Mockery\MockInterface;
 use YapepBase\View\Escape\IEscape;
-use YapepBase\View\Data;
+use YapepBase\View\Data\Data;
 
 class DataTest extends TestAbstract
 {

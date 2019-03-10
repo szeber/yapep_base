@@ -37,13 +37,17 @@ class Link extends BlockAbstract
 ?>
 <link
     rel="<?= $this->relationship ?>"
-    href="<?= $this->href ?>"
-<?php if (empty($this->type)): ?>
+<?php if (!empty($this->type)): ?>
     type="<?= $this->type ?>"
 <?php endif; ?>
-<?php if (empty($this->title)): ?>
+    href="<?= $this->href ?>"
+<?php if (!empty($this->title)): ?>
     title="<?= $this->title ?>"
 <?php endif; ?>
+<?php if (!empty($this->media)): ?>
+    media="<?= $this->media ?>"
+<?php endif; ?>
+/>
 
 <?php
 // ----------- /HTML ------------

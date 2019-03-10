@@ -3,32 +3,13 @@ declare(strict_types=1);
 
 namespace YapepBase\View\Block;
 
-
-use YapepBase\View\IHasLayout;
-use YapepBase\View\Layout\LayoutAbstract;
 use YapepBase\View\ViewAbstract;
 
 /**
- * BlockAbstract class, should be extended by every Block.
+ * Common ancestor of blocks.
+ *
+ * A block is a usually well defined part of a page what can be reused on other pages as well.
  */
-abstract class BlockAbstract extends ViewAbstract implements IHasLayout
+abstract class BlockAbstract extends ViewAbstract
 {
-
-    /** @var LayoutAbstract|null */
-    protected $layout;
-
-    public function setLayout(LayoutAbstract $layout): void
-    {
-        $this->layout = $layout;
-    }
-
-    public function getLayout(): LayoutAbstract
-    {
-        return $this->layout;
-    }
-
-    public function checkHasLayout(): bool
-    {
-        return !is_null($this->layout);
-    }
 }

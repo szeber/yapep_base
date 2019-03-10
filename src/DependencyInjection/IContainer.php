@@ -13,6 +13,7 @@ use YapepBase\Response\IResponse;
 use YapepBase\Router\IRouter;
 use YapepBase\Session\ISessionRegistry;
 use YapepBase\Shell\ICommandExecutor;
+use YapepBase\View\Data\Data;
 
 interface IContainer extends ContainerInterface
 {
@@ -33,4 +34,6 @@ interface IContainer extends ContainerInterface
     public function getFileHandler(): IFileHandler;
 
     public function getCommandExecutor(): ICommandExecutor;
+
+    public function getViewData(): Data;
 }

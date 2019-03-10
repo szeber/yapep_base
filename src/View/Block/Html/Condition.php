@@ -4,13 +4,14 @@ declare(strict_types=1);
 namespace YapepBase\View\Block\Html;
 
 use YapepBase\View\Block\BlockAbstract;
+use YapepBase\View\IRenderable;
 
 class Condition extends BlockAbstract
 {
     /** @var ?string */
     protected $condition;
 
-    /** @var BlockAbstract[] */
+    /** @var IRenderable[] */
     protected $elements = [];
 
     public function __construct(?string $condition = null)
@@ -24,44 +25,45 @@ class Condition extends BlockAbstract
     }
 
     /**
-     * @return BlockAbstract[]
+     * @return IRenderable[]
      */
     public function getElements(): array
     {
         return $this->elements;
     }
 
-    public function addElement(BlockAbstract $file): void
+    public function addElement(IRenderable $element): void
     {
-        $this->elements[] = $file;
+        $this->elements[] = $element;
     }
 
     protected function renderContent(): void
     {
         if (empty($this->condition)) {
-            $this->renderFiles();
+            $this->renderElements();
         }
         else {
-            $this->renderFilesInCondition();
+            $this->renderElementsInCondition();
         }
     }
 
-    protected function renderFilesInCondition()
+    protected function renderElementsInCondition()
     {
 // ----------- HTML ------------
 ?>
 <!--[if <?=$this->condition ?>]>
-    <?php $this->renderFiles(); ?>
+    <?php $this->renderElements(); ?>
+
 <![endif]-->
 <?php
 // ----------- /HTML ------------
 
     }
 
-    protected function renderFiles(): void
+    protected function renderElements(): void
     {
-        foreach ($this->elements as $file) {
-            $file->render();
+        foreach ($this->elements as $element) {
+            $element->render();
         }
     }
 }

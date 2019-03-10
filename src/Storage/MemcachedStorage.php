@@ -163,16 +163,16 @@ class MemcachedStorage extends StorageAbstract implements IIncrementable {
 	/**
 	 * Stores data the specified key
 	 *
-	 * @param string $key    The key to be used to store the data.
-	 * @param mixed  $data   The data to store.
-	 * @param int    $ttl    The expiration time of the data in seconds if supported by the backend.
+	 * @param string $key          The key to be used to store the data.
+	 * @param mixed  $data         The data to store.
+	 * @param int    $ttlInSeconds The expiration time of the data in seconds if supported by the backend.
 	 *
 	 * @return void
 	 *
 	 * @throws \YapepBase\Exception\StorageException      On error.
 	 * @throws \YapepBase\Exception\ParameterException    If TTL is set and not supported by the backend.
 	 */
-	public function set($key, $data, $ttl = 0) {
+	public function set($key, $data, $ttlInSeconds = 0) {
 		if ($this->readOnly) {
 			throw new StorageException('Trying to write to a read only storage');
 		}
@@ -180,7 +180,7 @@ class MemcachedStorage extends StorageAbstract implements IIncrementable {
 
 		$startTime = microtime(true);
 
-		if (!$this->memcache->set($this->makeKey($key), $data, $ttl)) {
+		if (!$this->memcache->set($this->makeKey($key), $data, $ttlInSeconds)) {
 			$code = $this->memcache->getResultCode();
 			if (\Memcached::RES_NOTSTORED !== $code) {
 				throw new StorageException('Unable to store value in memcache. Error: '
@@ -191,7 +191,7 @@ class MemcachedStorage extends StorageAbstract implements IIncrementable {
 		// If we have a debugger, we have to log the request
 		if (!$this->debuggerDisabled && $debugger !== false) {
 			$debugger->addItem(new StorageItem('memcached', 'memcached.' . $this->currentConfigurationName,
-				StorageItem::METHOD_SET . ' ' . $key . ' for ' . $ttl, $data, microtime(true) - $startTime));
+				StorageItem::METHOD_SET . ' ' . $key . ' for ' . $ttlInSeconds, $data, microtime(true) - $startTime));
 		}
 	}
 

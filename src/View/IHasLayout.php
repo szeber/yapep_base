@@ -12,7 +12,7 @@ interface IHasLayout
 {
     public function setLayout(LayoutAbstract $layout): void;
 
-    public function getLayout(): LayoutAbstract;
+    public function getLayout(): ?LayoutAbstract;
 
-    public function checkHasLayout(): bool;
+    public function hasLayout(): bool;
 }

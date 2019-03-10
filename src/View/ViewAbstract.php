@@ -3,12 +3,15 @@ declare(strict_types=1);
 
 namespace YapepBase\View;
 
+use YapepBase\Application;
+use YapepBase\View\Data\ICanEscape;
+
 /**
  * ViewAbstract class what should be extended by every View class.
  */
-abstract class ViewAbstract
+abstract class ViewAbstract implements IRenderable
 {
-    /** @var Data */
+    /** @var ICanEscape */
     private $data;
 
     /**
@@ -16,18 +19,12 @@ abstract class ViewAbstract
      */
     abstract protected function renderContent(): void;
 
-    /**
-     * Renders the view and prints it.
-     */
-    protected function render(): void
+    public function render(): void
     {
         $this->renderContent();
     }
 
-    /**
-     * Returns the rendered content.
-     */
-    public function toString(): string
+    public function __toString(): string
     {
         ob_start();
         $this->render();
@@ -36,29 +33,16 @@ abstract class ViewAbstract
         return $result;
     }
 
-    /**
-     * Renders the given block
-     */
-    protected function renderBlock(BlockAbstract $block): void
-    {
-        // The View Object can have a layout, so we give it to the block as well to provide access
-        if ($this instanceof IHasLayout && $this->checkHasLayout()) {
-            $block->setLayout($this->getLayout());
-        } // The current View Object is a Layout, so we pass it to the block as well
-        elseif ($this instanceof LayoutAbstract) {
-            $block->setLayout($this);
-        }
-
-        echo $block->toString();
-    }
-
-    public function setData(Data $data): void
+    protected function setData(ICanEscape $data): void
     {
         $this->data = $data;
     }
 
-    protected function getData(): Data
+    protected function getData(): ICanEscape
     {
+        if (empty($this->data)) {
+            $this->data = Application::getInstance()->getDiContainer()->getViewData();
+        }
         return $this->data;
     }
 }

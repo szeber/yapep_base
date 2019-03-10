@@ -1,7 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace YapepBase\View;
+namespace YapepBase\View\Template;
+
+use YapepBase\View\IHasLayout;
+use YapepBase\View\Layout\LayoutAbstract;
+use YapepBase\View\ViewAbstract;
 
 /**
  * Template class. Represents the content of the page.
@@ -23,14 +27,14 @@ abstract class TemplateAbstract extends ViewAbstract implements IHasLayout
         return $this->layout;
     }
 
-    public function checkHasLayout(): bool
+    public function hasLayout(): bool
     {
         return !is_null($this->layout);
     }
 
     public function render(): void
     {
-        if ($this->layout !== null) {
+        if ($this->hasLayout()) {
             ob_start();
             parent::render();
             $content = ob_get_clean();

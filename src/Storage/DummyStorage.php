@@ -42,19 +42,19 @@ class DummyStorage extends StorageAbstract {
 	/**
 	 * Stores data the specified key
 	 *
-	 * @param string $key    The key to be used to store the data.
-	 * @param mixed  $data   The data to store.
-	 * @param int    $ttl    The expiration time of the data in seconds if supported by the backend.
+	 * @param string $key          The key to be used to store the data.
+	 * @param mixed  $data         The data to store.
+	 * @param int    $ttlInSeconds The expiration time of the data in seconds if supported by the backend.
 	 *
 	 * @return void
 	 */
-	public function set($key, $data, $ttl = 0) {
+	public function set($key, $data, $ttlInSeconds = 0) {
 		$debugger = Application::getInstance()->getDiContainer()->getDebugger();
 
 		// If we have a debugger, we have to log the query
 		if (!$this->debuggerDisabled && $debugger !== false) {
 			$debugger->addItem(new StorageItem('dummy', 'dummy.' . $this->currentConfigurationName,
-				StorageItem::METHOD_SET . ' ' . $key . ' for ' . $ttl, $data, 0));
+				StorageItem::METHOD_SET . ' ' . $key . ' for ' . $ttlInSeconds, $data, 0));
 		}
 	}
 

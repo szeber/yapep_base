@@ -32,6 +32,11 @@ class Title extends BlockAbstract
         return $this->separator;
     }
 
+    public function setSeparator(string $separator): void
+    {
+        $this->separator = $separator;
+    }
+
     public function prependToTitle(string $titlePart): void
     {
         array_unshift($this->titleParts, $titlePart);
@@ -44,10 +49,13 @@ class Title extends BlockAbstract
 
     protected function renderContent(): void
     {
+        if (empty($this->titleParts)) {
+            return;
+        }
 // ----------- HTML ------------
 ?>
 
-<title><?=$this->getTitle() ?></title>;
+<title><?=$this->getTitle() ?></title>
 
 <?php
 // ----------- /HTML ------------

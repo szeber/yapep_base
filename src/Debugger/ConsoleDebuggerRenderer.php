@@ -15,7 +15,7 @@ use YapepBase\Application;
 use YapepBase\Response\HttpResponse;
 use YapepBase\Mime\MimeType;
 use YapepBase\View\Template\ConsoleDebuggerTemplate;
-use YapepBase\View\Data;
+use YapepBase\View\Data\Data;
 
 /**
  * Simple floating console debugger renderer, which will be injected into the generated HTML output,
