@@ -32,7 +32,7 @@ class BasicReverseRouter implements IReverseRouter, IRouteGetter
         return $this->routesByControllerAction;
     }
 
-    public function getPathByControllerAction(string $controller, string $action, array $routeParams = []): string
+    public function getPathByControllerAndAction(string $controller, string $action, array $routeParams = []): string
     {
         $controllerAction = $controller . '/' . $action;
 

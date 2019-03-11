@@ -28,14 +28,14 @@ class Route
     /** @var string[] */
     protected $methods = [];
 
-    /** @var string[]|null */
-    protected $regexPatterns;
+    /** @var string[] */
+    protected $regexPatterns = [];
 
-    /** @var Path[]|null */
-    protected $paths;
+    /** @var Path[] */
+    protected $paths = [];
 
-    /** @var IAnnotation[]|null */
-    protected $annotations;
+    /** @var IAnnotation[] */
+    protected $annotations = [];
 
     public function __construct(
         string $controller,
@@ -60,7 +60,7 @@ class Route
      *
      * @return static
      */
-    public static function __set_state($state): self
+    public static function __set_state(array $state): self
     {
         return new static(
             $state[self::KEY_CONTROLLER],

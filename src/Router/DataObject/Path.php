@@ -63,29 +63,34 @@ class Path
                 throw new InvalidArgumentException('No type set for path ' . $pattern . ' param ' . $index);
             }
 
-            $type = $paramData['type'];
-
-            if (isset(IParam::BUILT_IN_TYPE_MAP[$type])) {
-                $paramClass = IParam::BUILT_IN_TYPE_MAP[$type];
-            } else {
-                $paramClass = $type;
-            }
-
-            if (!class_exists($paramClass, true)) {
-                throw new InvalidArgumentException('Class ' . $paramClass . ' not found for path parameter');
-            }
-
-            if (!in_array(IParam::class, class_implements($paramClass, false))) {
-                throw new InvalidArgumentException(
-                    'Invalid path param class: ' . $paramClass . '. It should implement ' . IParam::class
-                );
-            }
-
             /** @var IParam $paramClass */
+            $paramClass = static::getParamClass($paramData['type']);
+
             $params[] = $paramClass::createFromArray($paramData);
         }
 
         return new static($pattern, $params);
+    }
+
+    protected static function getParamClass(string $type): string
+    {
+        if (isset(IParam::BUILT_IN_TYPE_MAP[$type])) {
+            $paramClass = IParam::BUILT_IN_TYPE_MAP[$type];
+        } else {
+            $paramClass = $type;
+        }
+
+        if (!class_exists($paramClass, true)) {
+            throw new InvalidArgumentException('Class ' . $paramClass . ' not found for path parameter');
+        }
+
+        if (!in_array(IParam::class, class_implements($paramClass, false))) {
+            throw new InvalidArgumentException(
+                'Invalid path param class: ' . $paramClass . '. It should implement ' . IParam::class
+            );
+        }
+
+        return $paramClass;
     }
 
     public function getRegexPattern(): string

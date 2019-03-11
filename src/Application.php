@@ -113,7 +113,7 @@ class Application
             $action         = '';
 
             try {
-                $this->diContainer->getRouter()->getRoute($controllerName, $action);
+                $this->diContainer->getRouter()->getControllerActionByMethodAndPath($controllerName, $action);
 
             } catch (RouterException $exception) {
                 if ($exception->getCode() == RouterException::ERR_NO_ROUTE_FOUND) {

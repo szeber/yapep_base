@@ -5,46 +5,86 @@ namespace YapepBase\Router;
 
 use YapepBase\Request\IRequest;
 use YapepBase\Router\DataObject\ControllerAction;
+use YapepBase\Router\DataObject\Route;
 use YapepBase\Router\Exception\RouteNotFoundException;
 
 class BasicRouter implements IRouter
 {
-    use TRouteDataParser;
 
-    /** @var IReverseRouter  */
-    protected $reverseRouter;
+    /** @var Route[] */
+    protected $routesByControllerAction = [];
 
-    // TODO consider removing reverse routers all together, as the request is no longer set to the router, so it can be used as the reverse router
+    /** @var Route[] */
+    protected $routesByName = [];
 
-    public function __construct(array $routeData, ?IReverseRouter $reverseRouter = null)
+    /**
+     * @param Route[] $routes
+     */
+    public function __construct(array $routes)
     {
-        if (null === $reverseRouter) {
-            $reverseRouter = new BasicReverseRouter($routeData);
-        }
+        $this->routesByControllerAction = [];
+        $this->routesByName = [];
 
-        if ($reverseRouter instanceof IRouteGetter) {
-            $this->routesByControllerAction = $reverseRouter->getRoutesByControllerAction();
-        }
+        foreach ($routes as $route) {
+            $this->routesByControllerAction[$route->getControllerAction()] = $route;
 
-        $this->reverseRouter = $reverseRouter;
+            if ($route->getName()) {
+                $this->routesByName[$route->getName()] = $route;
+            }
+        }
     }
 
-    public function getPathByControllerAction(string $controller, string $action, array $routeParams = []): string
+    /**
+     * @return Route[]
+     */
+    public function getRoutesByControllerAction(): array
     {
-        return $this->reverseRouter->getPathByControllerAction($controller, $action, $routeParams);
+        return $this->routesByControllerAction;
+    }
+
+    public function getPathByControllerAndAction(string $controller, string $action, array $routeParams = []): string
+    {
+        $controllerAction = $controller . '/' . $action;
+
+        if (!isset($this->routesByControllerAction[$controllerAction])) {
+            throw new RouteNotFoundException('No route found for controller ' . $controller . ' and action ' . $action);
+        }
+
+        return $this->getParameterisedPathFromRoute($this->routesByControllerAction[$controllerAction], $routeParams);
     }
 
     public function getPathByName(string $name, array $routeParams = []): string
     {
-        return $this->reverseRouter->getPathByName($name, $routeParams);
+        if (!isset($this->routesByName[$name])) {
+            throw new RouteNotFoundException('No route found for name ' . $name);
+        }
+
+        return $this->getParameterisedPathFromRoute($this->routesByName[$name], $routeParams);
     }
 
-    public function getRouteByRequest(IRequest $request): ControllerAction
+    /**
+     * @throws RouteNotFoundException
+     */
+    protected function getParameterisedPathFromRoute(Route $route, array $routeParams): string
     {
-        return $this->getRoute($request->getMethod(), $request->getTarget());
+        $path = $route->getParameterisedPath($routeParams);
+
+        if (null === $path) {
+            throw new RouteNotFoundException(
+                'No patterns found for controller/action ' . $route->getControllerAction() . ' with parameter list: '
+                . json_encode($routeParams)
+            );
+        }
+
+        return $path;
     }
 
-    public function getRoute(string $method, string $path): ControllerAction
+    public function getControllerActionByRequest(IRequest $request): ControllerAction
+    {
+        return $this->getControllerActionByMethodAndPath($request->getMethod(), $request->getTarget());
+    }
+
+    public function getControllerActionByMethodAndPath(string $method, string $path): ControllerAction
     {
         // Normalise the path to start with a single slash and not have a trailing slash
         $path = '/' . trim($path, '/');

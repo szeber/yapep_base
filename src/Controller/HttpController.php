@@ -102,7 +102,7 @@ abstract class HttpController extends BaseController
         $anchor = '',
         $statusCode = 303
     ) {
-        $url = Application::getInstance()->getDiContainer()->getRouter()->getPathByControllerAction($controller, $action,
+        $url = Application::getInstance()->getDiContainer()->getRouter()->getPathByControllerAndAction($controller, $action,
             $routeParams);
         if (!empty($getParams)) {
             $url .= '?' . \http_build_query($getParams, null, '&');

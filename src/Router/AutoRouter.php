@@ -12,27 +12,18 @@ use YapepBase\Router\Exception\FunctionNotSupportedException;
  */
 class AutoRouter implements IRouter
 {
-    /** @var IRequest */
-    protected $request;
-
-    public function __construct(IRequest $request)
+    public function getControllerActionByRequest(IRequest $request): ControllerAction
     {
-        $this->request = $request;
+        return $this->getControllerActionByMethodAndPath($request->getMethod(), $request->getTarget());
     }
 
-    public function getRouteByRequest(IRequest $request): ControllerAction
+    public function getControllerActionByMethodAndPath(string $method, string $path): ControllerAction
     {
-        return $this->getRoute($request->getMethod(), $request->getTarget());
-    }
+        $pathParts           = explode('/', trim($path, '/ '));
+        $controllerClassName = $this->getControllerClassName($pathParts);
+        $actionName          = $this->getActionName($pathParts);
 
-    public function getRoute(string $method, string $path): ControllerAction
-    {
-        $uri                 = empty($uri) ? $this->request->getTarget() : $uri;
-        $uriParts            = explode('/', trim($uri, '/ '));
-        $controllerClassName = $this->getControllerClassName($uriParts);
-        $actionName          = $this->getActionName($uriParts);
-
-        return new ControllerAction($controllerClassName, $actionName, $uriParts);
+        return new ControllerAction($controllerClassName, $actionName, $pathParts);
     }
 
     protected function getControllerClassName(array &$uriParts): string
@@ -82,7 +73,7 @@ class AutoRouter implements IRouter
     /**
      * @inheritdoc
      */
-    public function getPathByControllerAction(string $controller, string $action, array $routeParams = []): string
+    public function getPathByControllerAndAction(string $controller, string $action, array $routeParams = []): string
     {
         if ('Index' == $action && 'Index' == $controller && empty($routeParams)) {
             $path = '/';

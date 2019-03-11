@@ -13,7 +13,7 @@ interface IReverseRouter
      * @throws RouteNotFoundException
      * @throws RouterException
      */
-    public function getPathByControllerAction(string $controller, string $action, array $routeParams = []): string;
+    public function getPathByControllerAndAction(string $controller, string $action, array $routeParams = []): string;
 
     /**
      * @throws RouteNotFoundException
