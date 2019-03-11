@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace YapepBase\DependencyInjection;
 
 use Psr\Container\ContainerInterface;
+use YapepBase\Debug\IDataHandlerRegistry;
 use YapepBase\ErrorHandler\IErrorHandlerRegistry;
 use YapepBase\Event\IEventHandlerRegistry;
 use YapepBase\File\IFileHandler;
@@ -25,6 +26,8 @@ interface IContainer extends ContainerInterface
     public function getErrorHandlerRegistry(): IErrorHandlerRegistry;
 
     public function getEventHandlerRegistry(): IEventHandlerRegistry;
+
+    public function getDebugDataHandlerRegistry(): IDataHandlerRegistry;
 
     public function getSessionRegistry(): ISessionRegistry;
 

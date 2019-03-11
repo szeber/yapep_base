@@ -19,9 +19,10 @@ trait THasExecutionTime
         $this->startTime = $this->getDateHelper()->getCurrentTimestampMs();
     }
 
-    public function setFinished(): void
+    public function setFinished(): self
     {
         $this->finishTime = $this->getDateHelper()->getCurrentTimestampMs();
+        return $this;
     }
 
     public function getStartTime(): float

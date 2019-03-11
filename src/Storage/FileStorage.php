@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace YapepBase\Storage;
 
 use YapepBase\Application;
+use YapepBase\Debug\Item\Storage;
 use YapepBase\Exception\File\Exception as FileException;
 use YapepBase\Exception\File\NotFoundException;
 use YapepBase\Exception\ParameterException;
@@ -120,7 +121,12 @@ class FileStorage extends StorageAbstract
         $fullPath = $this->getFullPath($key);
 
         try {
+            $item = (new Storage(Storage::METHOD_SET, $key, $data));
+
             $this->fileHandler->write($fullPath, $this->prepareDataToStore($data, $ttlInSeconds));
+
+            $item->setFinished();
+            $this->getDebugDataHandlerRegistry()->addStorage($item);
         } catch (FileException $e) {
             throw new StorageException('Unable to write data to FileStorage (file: ' . $fullPath . ' )', 0, $e);
         }
@@ -136,32 +142,37 @@ class FileStorage extends StorageAbstract
      */
     public function get(string $key)
     {
+        $item = (new Storage(Storage::METHOD_GET, $key));
+
         $fileName = $this->getFullPath($key);
         $data     = null;
 
-        if (!$this->fileHandler->checkIsPathExists($fileName)) {
-            return null;
-        }
+        if ($this->fileHandler->checkIsPathExists($fileName)) {
 
-        if (
-            !$this->fileHandler->checkIsReadable($fileName)
-            || ($contents = $this->fileHandler->getAsString($fileName)) === false
-        ) {
-            throw new StorageException('Unable to read file: ' . $fileName);
-        }
+            if (
+                !$this->fileHandler->checkIsReadable($fileName)
+                || ($contents = $this->fileHandler->getAsString($fileName)) === false
+            ) {
+                throw new StorageException('Unable to read file: ' . $fileName);
+            }
 
-        $file = $this->readData($contents);
+            $file = $this->readData($contents);
 
-        if ($this->isExpired($file)) {
-            try {
-                $this->fileHandler->remove($fileName);
-            } catch (FileException $e) {
-                throw new StorageException('Unable to remove empty file: ' . $fileName, 0, $e);
+            if ($this->isExpired($file)) {
+                try {
+                    $this->fileHandler->remove($fileName);
+                } catch (FileException $e) {
+                    throw new StorageException('Unable to remove empty file: ' . $fileName, 0, $e);
+                }
+            }
+            else {
+                $data = $file->data;
             }
         }
-        else {
-            $data = $file->data;
-        }
+        else
+
+        $item->setData($data)->setFinished();
+        $this->getDebugDataHandlerRegistry()->addStorage($item);
 
         return $data;
     }
@@ -232,6 +243,8 @@ class FileStorage extends StorageAbstract
      */
     public function delete(string $key): void
     {
+        $item = (new Storage(Storage::METHOD_DELETE, $key));
+
         $this->protectWhenReadOnly();
 
         $fileName = $this->getFullPath($key);
@@ -242,6 +255,9 @@ class FileStorage extends StorageAbstract
         } catch (FileException $e) {
             throw new StorageException('Unable to remove the file: ' . $fileName, 0, $e);
         }
+
+        $item->setFinished();
+        $this->getDebugDataHandlerRegistry()->addStorage($item);
     }
 
     /**
@@ -251,6 +267,8 @@ class FileStorage extends StorageAbstract
      */
     public function clear(): void
     {
+        $item = (new Storage(Storage::METHOD_CLEAR));
+
         $this->protectWhenReadOnly();
 
         try {
@@ -258,6 +276,9 @@ class FileStorage extends StorageAbstract
         } catch (FileException $e) {
             throw new StorageException('Unable to remove the directory: ' . $this->path, 0, $e);
         }
+
+        $item->setFinished();
+        $this->getDebugDataHandlerRegistry()->addStorage($item);
     }
 
     public function isPersistent(): bool

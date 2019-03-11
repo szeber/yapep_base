@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace YapepBase\Storage;
 
+use YapepBase\Debug\Item\Storage;
 use YapepBase\Exception\ParameterException;
 use YapepBase\Exception\StorageException;
 use Memcached;
@@ -91,6 +92,8 @@ class MemcachedStorage extends StorageAbstract implements IIncrementable
      */
     public function set(string $key, $data, int $ttlInSecondsInSecondsInSeconds = 0): void
     {
+        $item = (new Storage(Storage::METHOD_SET, $key, $data));
+
         $this->protectWhenReadOnly();
 
         $fullKey  = $this->getFullKey($key);
@@ -104,6 +107,9 @@ class MemcachedStorage extends StorageAbstract implements IIncrementable
                     $resultCode);
             }
         }
+
+        $item->setFinished();
+        $this->getDebugDataHandlerRegistry()->addStorage($item);
     }
 
     /**
@@ -113,6 +119,8 @@ class MemcachedStorage extends StorageAbstract implements IIncrementable
      */
     public function get(string $key)
     {
+        $item = (new Storage(Storage::METHOD_GET, $key));
+
         $fullKey = $this->getFullKey($key);
         $result  = $this->connection->get($fullKey);
 
@@ -124,6 +132,9 @@ class MemcachedStorage extends StorageAbstract implements IIncrementable
             }
         }
 
+        $item->setData($result)->setFinished();
+        $this->getDebugDataHandlerRegistry()->addStorage($item);
+
         return $result;
     }
 
@@ -134,10 +145,15 @@ class MemcachedStorage extends StorageAbstract implements IIncrementable
      */
     public function delete(string $key): void
     {
+        $item = (new Storage(Storage::METHOD_DELETE, $key));
+
         $this->protectWhenReadOnly();
 
         $fullKey = $this->getFullKey($key);
         $this->connection->delete($fullKey);
+
+        $item->setFinished();
+        $this->getDebugDataHandlerRegistry()->addStorage($item);
     }
 
     /**
@@ -147,18 +163,28 @@ class MemcachedStorage extends StorageAbstract implements IIncrementable
      */
     public function clear(): void
     {
+        $item = (new Storage(Storage::METHOD_CLEAR));
+
         $this->protectWhenReadOnly();
         $this->connection->flush();
+
+        $item->setFinished();
+        $this->getDebugDataHandlerRegistry()->addStorage($item);
     }
 
     public function increment(string $key, int $offset, int $ttlInSeconds = 0): int
     {
+        $item = (new Storage(Storage::METHOD_SET, $key, $offset));
+
         $fullKey = $this->getFullKey($key);
         $result  = $this->connection->increment($fullKey, $offset, 0, $ttlInSeconds);
 
         if ($result === false) {
             throw new StorageException('Failed to increment key ' . $key);
         }
+
+        $item->setFinished();
+        $this->getDebugDataHandlerRegistry()->addStorage($item);
 
         return $result;
     }

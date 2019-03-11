@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace YapepBase\DependencyInjection;
 
+use YapepBase\Debug\IDataHandlerRegistry;
 use YapepBase\ErrorHandler\IErrorHandlerRegistry;
 use YapepBase\Event\IEventHandlerRegistry;
 use YapepBase\File\IFileHandler;
@@ -51,6 +52,11 @@ class PimpleContainer extends \Pimple\Container implements IContainer
     public function getEventHandlerRegistry(): IEventHandlerRegistry
     {
         return $this->get(IEventHandlerRegistry::class);
+    }
+
+    public function getDebugDataHandlerRegistry(): IDataHandlerRegistry
+    {
+        return $this->get(IDataHandlerRegistry::class);
     }
 
     public function getSessionRegistry(): ISessionRegistry
@@ -121,6 +127,16 @@ class PimpleContainer extends \Pimple\Container implements IContainer
     public function setEventHandlerRegistryAsFactory(string $eventHandlerRegistryClass): self
     {
         return $this->setFactory(IEventHandlerRegistry::class, $eventHandlerRegistryClass);
+    }
+
+    public function setDebugDataHandlerRegistry(IEventHandlerRegistry $debugDataHandlerRegistry): self
+    {
+        return $this->setInstance(IDataHandlerRegistry::class, $debugDataHandlerRegistry);
+    }
+
+    public function setDebugDataHandlerRegistryAsFactory(string $debugDataHandlerRegistry): self
+    {
+        return $this->setFactory(IDataHandlerRegistry::class, $debugDataHandlerRegistry);
     }
 
     public function setSessionRegistry(ISessionRegistry $sessionRegistry): self

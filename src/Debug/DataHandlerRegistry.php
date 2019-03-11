@@ -17,7 +17,7 @@ use YapepBase\Helper\DateHelper;
 /**
  * Registry class for Debuggers
  */
-class DataHandlerRegistry implements ICanStoreItems
+class DataHandlerRegistry implements IDataHandlerRegistry
 {
     /** @var float */
     protected $initiatedAt;

@@ -23,12 +23,12 @@ class Storage extends ItemAbstract
 
     /** @var string */
     protected $method;
-    /** @var string */
+    /** @var string|null */
     protected $key;
     /** @var mixed */
     protected $data;
 
-    public function __construct(string $method, string $key, $data = null)
+    public function __construct(string $method, ?string $key = null, $data = null)
     {
         $this->setMethod($method);
 
@@ -43,9 +43,15 @@ class Storage extends ItemAbstract
         return $this->method;
     }
 
-    public function getKey(): string
+    public function getKey(): ?string
     {
         return $this->key;
+    }
+
+    public function setData($data): self
+    {
+        $this->data = $data;
+        return $this;
     }
 
     public function getData()
