@@ -1,10 +1,10 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\Router;
 
-use YapepBase\Exception\RouterException;
 use YapepBase\Config;
+use YapepBase\Exception\RouterException;
 use YapepBase\Request\IRequest;
 
 /**
@@ -16,7 +16,6 @@ use YapepBase\Request\IRequest;
  */
 class ConfigRouter extends ArrayRouter
 {
-
     /**
      * @param IRequest       $request       The request instance
      * @param string         $configName    The name of the configuration where the routes are stored.
@@ -37,5 +36,4 @@ class ConfigRouter extends ArrayRouter
 
         parent::__construct($request, $routes, $reverseRouter);
     }
-
 }

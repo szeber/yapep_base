@@ -1,13 +1,11 @@
 <?php
+declare(strict_types = 1);
 /**
  * This file is part of YAPEPBase.
  *
- * @package      YapepBase
- * @subpackage   Debugger
  * @copyright    2011 The YAPEP Project All rights reserved.
  * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
  */
-
 namespace YapepBase\Debugger;
 
 /**
@@ -71,30 +69,35 @@ namespace YapepBase\Debugger;
  *     </li>
  *
  * </ul>
- *
- * @package    YapepBase
- * @subpackage Debugger
  */
-interface IDebuggerRenderer {
-
-	/**
-	 * Renders the output.
-	 *
-	 * @param float $startTime       The unix timestamp of the application start with microseconds.
-	 * @param float $runTime         The number of seconds with microseconds, the application run for.
-	 * @param int   $currentMemory   The current memory usage in bytes.
-	 * @param int   $peakMemory      The peak memory usage in bytes.
-	 * @param array $items           2 dimensional array of the debug items, where the 1st dimension's key is the type.
-	 * @param array $serverParams    Params of the $_SERVER superglobal.
-	 * @param array $postParams      Params what received through post method.
-	 * @param array $getParams       Params what received through get method.
-	 * @param array $cookieParams    Params what received through cookies.
-	 * @param array $sessionParams   Data what stored in the session.
-	 *
-	 * @return void
-	 */
-	public function render(
-		$startTime, $runTime, $currentMemory, $peakMemory, array $items, array $serverParams, array $postParams,
-		array $getParams, array $cookieParams, array $sessionParams
-	);
+interface IDebuggerRenderer
+{
+    /**
+     * Renders the output.
+     *
+     * @param float $startTime       The unix timestamp of the application start with microseconds.
+     * @param float $runTime         The number of seconds with microseconds, the application run for.
+     * @param int   $currentMemory   The current memory usage in bytes.
+     * @param int   $peakMemory      The peak memory usage in bytes.
+     * @param array $items           2 dimensional array of the debug items, where the 1st dimension's key is the type.
+     * @param array $serverParams    Params of the $_SERVER superglobal.
+     * @param array $postParams      Params what received through post method.
+     * @param array $getParams       Params what received through get method.
+     * @param array $cookieParams    Params what received through cookies.
+     * @param array $sessionParams   Data what stored in the session.
+     *
+     * @return void
+     */
+    public function render(
+        $startTime,
+        $runTime,
+        $currentMemory,
+        $peakMemory,
+        array $items,
+        array $serverParams,
+        array $postParams,
+        array $getParams,
+        array $cookieParams,
+        array $sessionParams
+    );
 }

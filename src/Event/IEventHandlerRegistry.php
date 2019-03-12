@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\Event;
 
@@ -10,7 +10,6 @@ namespace YapepBase\Event;
  */
 interface IEventHandlerRegistry
 {
-
     /**
      * Registers a new event handler for the given event type
      */

@@ -1,8 +1,7 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\Router;
-
 
 use YapepBase\Request\IRequest;
 
@@ -20,7 +19,7 @@ class AutoRouter implements IRouter
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getRoute(string &$controllerClassName, string &$actionName, ?string $uri = null): string
     {
@@ -69,6 +68,7 @@ class AutoRouter implements IRouter
         foreach ($parts as $key => $value) {
             $parts[$key] = ucfirst($value);
         }
+
         return implode('', $parts);
     }
 
@@ -81,7 +81,7 @@ class AutoRouter implements IRouter
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getTargetForControllerAction(string $controller, string $action, array $requestParams = []): string
     {
@@ -95,7 +95,7 @@ class AutoRouter implements IRouter
         if (!empty($requestParams)) {
             $path .= '/' . implode('/', $requestParams);
         }
+
         return $path;
     }
-
 }

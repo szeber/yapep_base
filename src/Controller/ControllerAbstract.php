@@ -1,22 +1,19 @@
 <?php
+declare(strict_types = 1);
 /**
  * This file is part of YAPEPBase.
  *
- * @package      YapepBase
- * @subpackage   Controller
  * @copyright    2011 The YAPEP Project All rights reserved.
  * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
  */
-
 namespace YapepBase\Controller;
-
 
 use YapepBase\Application;
 use YapepBase\Config;
-use YapepBase\Exception\RedirectException;
 use YapepBase\Exception\ControllerException;
-use YapepBase\Response\IResponse;
+use YapepBase\Exception\RedirectException;
 use YapepBase\Request\IRequest;
+use YapepBase\Response\IResponse;
 use YapepBase\View\ViewAbstract;
 
 /**
@@ -30,13 +27,9 @@ use YapepBase\View\ViewAbstract;
  *                                                           can cause errors, and will somewhat impact the performance.
  *                                                           Optional, defaults to FALSE.</li>
  * </ul>
- *
- * @package    YapepBase
- * @subpackage Controller
  */
-abstract class BaseController implements IController
+abstract class ControllerAbstract implements IController
 {
-
     /** @var IRequest */
     protected $request;
 
@@ -57,7 +50,6 @@ abstract class BaseController implements IController
     {
         $this->response = $response;
     }
-
 
     /**
      * Runs before the action.
@@ -118,22 +110,28 @@ abstract class BaseController implements IController
     {
         $methodName = $this->getActionPrefix() . $action;
         if (!method_exists($this, $methodName)) {
-            throw new ControllerException('Action ' . $methodName . ' does not exist in ' . get_class($this),
-                ControllerException::ERR_ACTION_NOT_FOUND);
+            throw new ControllerException(
+                'Action ' . $methodName . ' does not exist in ' . get_class($this),
+                ControllerException::ERR_ACTION_NOT_FOUND
+            );
         }
         if (Config::getInstance()->get('system.performStrictControllerActionNameValidation', false)) {
             $reflection = new \ReflectionClass($this);
             $method     = $reflection->getMethod($methodName);
             if ($method->name != $methodName) {
-                throw new ControllerException('Invalid case when running action ' . $methodName . ' in ' . get_class($this) . '. The valid case is: ' . $method->name,
-                    ControllerException::ERR_ACTION_NOT_FOUND);
+                throw new ControllerException(
+                    'Invalid case when running action ' . $methodName . ' in ' . get_class($this) . '. The valid case is: ' . $method->name,
+                    ControllerException::ERR_ACTION_NOT_FOUND
+                );
             }
         }
         $this->before();
         $result = $this->runAction($methodName);
         if (!empty($result) && !is_string($result) && !($result instanceof ViewAbstract)) {
-            throw new ControllerException('Result of the action (' . get_class($this) . '/' . $action . ') is not an instance of ViewAbstract or string',
-                ControllerException::ERR_INVALID_ACTION_RESULT);
+            throw new ControllerException(
+                'Result of the action (' . get_class($this) . '/' . $action . ') is not an instance of ViewAbstract or string',
+                ControllerException::ERR_INVALID_ACTION_RESULT
+            );
         }
 
         // We called the run method, but we did not rendered the output yet
@@ -177,9 +175,13 @@ abstract class BaseController implements IController
     protected function internalRedirect(string $controllerName, string $action): void
     {
         Application::getInstance()->setDispatchedAction($controllerName, $action);
-        $controller = Application::getInstance()->getDiContainer()->getController($controllerName, $this->request,
-            $this->response);
+        $controller = Application::getInstance()->getDiContainer()->getController(
+            $controllerName,
+            $this->request,
+            $this->response
+        );
         $controller->run($action);
+
         throw new RedirectException($controllerName . '/' . $action, RedirectException::TYPE_INTERNAL);
     }
 

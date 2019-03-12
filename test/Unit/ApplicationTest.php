@@ -1,12 +1,11 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\Test\Unit;
 
-
-use YapepBase\Application;
 use Mockery;
 use Mockery\MockInterface;
+use YapepBase\Application;
 use YapepBase\Controller\IController;
 use YapepBase\Event\Event;
 use YapepBase\Event\EventHandlerRegistry;
@@ -130,7 +129,6 @@ class ApplicationTest extends TestAbstract
         $this->application->run();
     }
 
-
     protected function setErrorController()
     {
         $this->application->setErrorController($this->errorControllerName);
@@ -166,10 +164,12 @@ class ApplicationTest extends TestAbstract
             ->with(
                 Mockery::on(function (&$controller) {
                     $controller = $this->controllerName;
+
                     return true;
                 }),
                 Mockery::on(function (&$action) {
                     $action = $this->actionName;
+
                     return true;
                 })
             )

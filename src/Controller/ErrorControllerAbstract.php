@@ -1,27 +1,20 @@
 <?php
+declare(strict_types = 1);
 /**
  * This file is part of YAPEPBase.
  *
- * @package      YapepBase
- * @subpackage   Controller
  * @copyright    2011 The YAPEP Project All rights reserved.
  * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
  */
-
 namespace YapepBase\Controller;
 
 use YapepBase\Exception\ControllerException;
 
 /**
  * Base class for error controllers.
- *
- * @package    YapepBase
- * @subpackage Controller
  */
-abstract class ErrorControllerAbstract extends HttpController
+abstract class ErrorControllerAbstract extends HttpControllerAbstract
 {
-
-
     /**
      * Runs before the action.
      *
@@ -77,5 +70,4 @@ abstract class ErrorControllerAbstract extends HttpController
             $this->run(500);
         }
     }
-
 }

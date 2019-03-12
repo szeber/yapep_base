@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\Session;
 
@@ -37,6 +37,7 @@ class SessionRegistry implements ISessionRegistry
         foreach ($this->namespaces as $namespace => $data) {
             $result[$namespace] = $data->getData();
         }
+
         return $result;
     }
 }

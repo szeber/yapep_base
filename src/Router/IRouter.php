@@ -1,15 +1,13 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\Router;
-
 
 /**
  * Router interface
  */
 interface IRouter extends IReverseRouter
 {
-
     /**
      * Returns a controller and an action for the request's target.
      *
