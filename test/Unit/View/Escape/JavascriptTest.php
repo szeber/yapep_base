@@ -37,7 +37,7 @@ class JavascriptTest extends TestAbstract
      */
     public function testEscapeWhenPrimitiveGiven_shouldJsonEncode($value)
     {
-        $result = $this->javascript->__escape($value);
+        $result = $this->javascript->_escape($value);
 
         $this->assertSame(json_encode($value), $result);
     }
@@ -46,7 +46,7 @@ class JavascriptTest extends TestAbstract
     {
         $string = 'ű';
         $object = $this->expectMethodCalledOnObject('test', $string);
-        $result = $this->javascript->__escape($object)->test();
+        $result = $this->javascript->_escape($object)->test();
 
         $this->assertSame(json_encode($string), $result);
     }

@@ -54,7 +54,7 @@ class Data implements ICanEscape
             return $this->dataEscaped[self::ESCAPED_KEY_HTML][$key];
         }
 
-        $result = $this->htmlEscaper->__escape($this->getRaw($key));
+        $result = $this->htmlEscaper->_escape($this->getRaw($key));
         $this->dataEscaped[self::ESCAPED_KEY_HTML][$key] = $result;
 
         return $result;
@@ -66,7 +66,7 @@ class Data implements ICanEscape
             return $this->dataEscaped[self::ESCAPED_KEY_JAVASCRIPT][$key];
         }
 
-        $result = $this->javascriptEscaper->__escape($this->getRaw($key));
+        $result = $this->javascriptEscaper->_escape($this->getRaw($key));
         $this->dataEscaped[self::ESCAPED_KEY_JAVASCRIPT][$key] = $result;
 
         return $result;

@@ -8,5 +8,5 @@ interface IEscape
     /**
      * Escapes the given value if possible and returns it
      */
-    public function __escape($value);
+    public function _escape($value);
 }

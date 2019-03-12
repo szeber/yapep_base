@@ -177,7 +177,7 @@ class DataTest extends TestAbstract
     protected function expectEscapeHtml()
     {
         $this->htmlEscaper
-            ->shouldReceive('__escape')
+            ->shouldReceive('_escape')
             ->once()
             ->with($this->value)
             ->andReturn($this->escapedValue);
@@ -186,7 +186,7 @@ class DataTest extends TestAbstract
     protected function expectEscapeJavascript()
     {
         $this->javascriptEscaper
-            ->shouldReceive('__escape')
+            ->shouldReceive('_escape')
             ->once()
             ->with($this->value)
             ->andReturn($this->escapedValue);

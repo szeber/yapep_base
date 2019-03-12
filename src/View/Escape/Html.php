@@ -33,7 +33,7 @@ class Html extends EscapeAbstract
     protected function escapeArray(array $value)
     {
         foreach ($value as $elementKey => $elementValue) {
-            $value[$elementKey] = $this->__escape($elementValue);
+            $value[$elementKey] = $this->_escape($elementValue);
         }
         return $value;
     }

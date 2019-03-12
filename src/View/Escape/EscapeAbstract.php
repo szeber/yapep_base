@@ -24,7 +24,7 @@ abstract class EscapeAbstract implements IEscape
 
     abstract protected function escapeNull();
 
-    public function __escape($value)
+    public function _escape($value)
     {
         switch (gettype($value)) {
             case 'boolean':
@@ -75,6 +75,6 @@ abstract class EscapeAbstract implements IEscape
 
     public function __call(string $methodName, array $arguments)
     {
-        return $this->__escape(call_user_func_array([$this->objectToEscape, $methodName], $arguments));
+        return $this->_escape(call_user_func_array([$this->objectToEscape, $methodName], $arguments));
     }
 }

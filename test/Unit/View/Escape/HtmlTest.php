@@ -25,7 +25,7 @@ class HtmlTest extends TestAbstract
     public function testEscapeWhenStringGiven_shouldReturnEscapedString()
     {
         $string = '<div>';
-        $result = $this->html->__escape($string);
+        $result = $this->html->_escape($string);
 
         $this->assertSame(htmlspecialchars($string), $result);
     }
@@ -50,7 +50,7 @@ class HtmlTest extends TestAbstract
             ]
         ];
 
-        $result = $this->html->__escape($array);
+        $result = $this->html->_escape($array);
 
         $this->assertSame($expectedResult, $result);
     }
@@ -70,7 +70,7 @@ class HtmlTest extends TestAbstract
      */
     public function testEscapeWhenNonEscapableGiven_shouldReturnPassedValue($value)
     {
-        $result = $this->html->__escape($value);
+        $result = $this->html->_escape($value);
 
         $this->assertSame($value, $result);
     }
@@ -81,13 +81,13 @@ class HtmlTest extends TestAbstract
         $object->public = 'public';
 
         $this->expectException(ParameterException::class);
-        $this->html->__escape($object);
+        $this->html->_escape($object);
     }
 
     public function testEscapeWhenObjectMethodCalled_shouldReturnMethodCallsResultEscaped()
     {
         $object = $this->expectMethodCalledOnObject('test', '<div>');
-        $result = $this->html->__escape($object)->test();
+        $result = $this->html->_escape($object)->test();
 
         $this->assertSame(htmlspecialchars('<div>'), $result);
     }
@@ -95,7 +95,7 @@ class HtmlTest extends TestAbstract
     public function testEscapeWhenObjectHasSameMethodAsEscapeClass_testEscapeWhenObjectMethodCalled_shouldReturnMethodCallsResultEscaped()
     {
         $object = $this->expectMethodCalledOnObject('escapeFloat', '<div>');
-        $result = $this->html->__escape($object)->escapeFloat();
+        $result = $this->html->_escape($object)->escapeFloat();
 
         $this->assertSame(htmlspecialchars('<div>'), $result);
     }
