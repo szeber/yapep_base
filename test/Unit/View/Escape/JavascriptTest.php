@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\Test\Unit\View\Escape;
 
@@ -28,7 +28,7 @@ class JavascriptTest extends TestAbstract
             'float'  => [12.23],
             'array'  => ['a' => 'c'],
             'null'   => [null],
-            'bool'   => [false]
+            'bool'   => [false],
         ];
     }
 

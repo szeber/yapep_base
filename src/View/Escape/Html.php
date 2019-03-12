@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\View\Escape;
 
@@ -35,6 +35,7 @@ class Html extends EscapeAbstract
         foreach ($value as $elementKey => $elementValue) {
             $value[$elementKey] = $this->_escape($elementValue);
         }
+
         return $value;
     }
 }

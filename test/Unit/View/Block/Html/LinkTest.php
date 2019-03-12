@@ -1,10 +1,9 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\Test\Unit\View\Block\Html;
 
 use YapepBase\Test\Unit\TestAbstract;
-use YapepBase\View\Block\Html\CssFile;
 use YapepBase\View\Block\Html\Link;
 
 class LinkTest extends TestAbstract

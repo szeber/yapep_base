@@ -1,32 +1,25 @@
 <?php
+declare(strict_types = 1);
 /**
  * This file is part of YAPEPBase.
  *
- * @package      YapepBase
- * @subpackage   Debugger
  * @copyright    2011 The YAPEP Project All rights reserved.
  * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
  */
-
 namespace YapepBase\Debugger;
 
-
 use YapepBase\Application;
-use YapepBase\Response\HttpResponse;
 use YapepBase\Mime\MimeType;
-use YapepBase\View\Template\ConsoleDebuggerTemplate;
+use YapepBase\Response\HttpResponse;
 use YapepBase\View\Data\Data;
+use YapepBase\View\Template\ConsoleDebuggerTemplate;
 
 /**
  * Simple floating console debugger renderer, which will be injected into the generated HTML output,
  * so the developer can see useful information about the generation process.
- *
- * @package    YapepBase
- * @subpackage Debugger
  */
 class ConsoleDebuggerRenderer implements IDebuggerRenderer
 {
-
     /**
      * Renders the output.
      *
@@ -57,8 +50,10 @@ class ConsoleDebuggerRenderer implements IDebuggerRenderer
     ) {
         $response = Application::getInstance()->getResponse();
         /** @var \YapepBase\Response\HttpResponse $response */
-        if (!($response instanceof HttpResponse) || !in_array($response->getContentType(),
-                [MimeType::HTML, MimeType::XHTML])) {
+        if (!($response instanceof HttpResponse) || !in_array(
+            $response->getContentType(),
+            [MimeType::HTML, MimeType::XHTML]
+        )) {
             // This renderer only works for HTTP transport and HTML content type
             return;
         }
@@ -66,19 +61,29 @@ class ConsoleDebuggerRenderer implements IDebuggerRenderer
         $viewDo = new Data(MimeType::HTML);
 
         $viewDo->set([
-            'startTime' => $startTime,
-            'runTime' => $runTime,
-            'peakMemory' => $peakMemory,
-            'items' => $items,
-            'serverParams' => $serverParams,
-            'postParams' => $postParams,
-            'getParams' => $getParams,
-            'cookieParams' => $cookieParams,
+            'startTime'     => $startTime,
+            'runTime'       => $runTime,
+            'peakMemory'    => $peakMemory,
+            'items'         => $items,
+            'serverParams'  => $serverParams,
+            'postParams'    => $postParams,
+            'getParams'     => $getParams,
+            'cookieParams'  => $cookieParams,
             'sessionParams' => $sessionParams,
         ]);
 
-        $template = new ConsoleDebuggerTemplate($viewDo, 'startTime', 'runTime', 'peakMemory', 'items', 'serverParams',
-            'postParams', 'getParams', 'cookieParams', 'sessionParams');
+        $template = new ConsoleDebuggerTemplate(
+            $viewDo,
+            'startTime',
+            'runTime',
+            'peakMemory',
+            'items',
+            'serverParams',
+            'postParams',
+            'getParams',
+            'cookieParams',
+            'sessionParams'
+        );
 
         $template->render();
     }

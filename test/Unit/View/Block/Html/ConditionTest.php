@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\Test\Unit\View\Block\Html;
 
@@ -11,7 +11,7 @@ class ConditionTest extends TestAbstract
 {
     public function testWhenNoConditionGiven_shouldJustRenderAddedElements()
     {
-        $element1 = new ViewStub();
+        $element1          = new ViewStub();
         $element1->content = '<br />';
 
         $condition = new Condition();
@@ -22,10 +22,10 @@ class ConditionTest extends TestAbstract
 
     public function testWhenConditionGiven_shouldRenderElementsInCondition()
     {
-        $element1 = new ViewStub();
+        $element1          = new ViewStub();
         $element1->content = '<br />';
 
-        $element2 = new ViewStub();
+        $element2          = new ViewStub();
         $element2->content = '<var />';
 
         $condition = new Condition('1=1');

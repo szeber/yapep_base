@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\View\Block\Html;
 
@@ -46,7 +46,7 @@ class Meta extends BlockAbstract
 
     protected function renderContent(): void
     {
-// ----------- HTML ------------
+        // ----------- HTML ------------
 ?>
 
 <meta name="<?=$this->name ?>" content="<?=$this->content ?>" />
@@ -54,6 +54,4 @@ class Meta extends BlockAbstract
 <?php
 // ----------- /HTML ------------
     }
-
-
 }

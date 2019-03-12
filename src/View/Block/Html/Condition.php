@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\View\Block\Html;
 
@@ -41,15 +41,14 @@ class Condition extends BlockAbstract
     {
         if (empty($this->condition)) {
             $this->renderElements();
-        }
-        else {
+        } else {
             $this->renderElementsInCondition();
         }
     }
 
     protected function renderElementsInCondition()
     {
-// ----------- HTML ------------
+        // ----------- HTML ------------
 ?>
 <!--[if <?=$this->condition ?>]>
     <?php $this->renderElements(); ?>
@@ -57,7 +56,6 @@ class Condition extends BlockAbstract
 <![endif]-->
 <?php
 // ----------- /HTML ------------
-
     }
 
     protected function renderElements(): void

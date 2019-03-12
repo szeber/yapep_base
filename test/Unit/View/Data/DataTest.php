@@ -1,14 +1,14 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\Test\Unit\View\Data;
 
-use YapepBase\Exception\ParameterException;
-use YapepBase\Test\Unit\TestAbstract;
 use Mockery;
 use Mockery\MockInterface;
-use YapepBase\View\Escape\IEscape;
+use YapepBase\Exception\ParameterException;
+use YapepBase\Test\Unit\TestAbstract;
 use YapepBase\View\Data\Data;
+use YapepBase\View\Escape\IEscape;
 
 class DataTest extends TestAbstract
 {
@@ -60,19 +60,18 @@ class DataTest extends TestAbstract
 
         $mass = [
             'another'   => 1,
-            $this->key => 'new'
+            $this->key  => 'new',
         ];
 
         $this->expectException(ParameterException::class);
         $this->viewData->setMass($mass);
     }
 
-
     public function testSetMass_shouldStoreGivenValues()
     {
         $mass = [
             'first'  => 1,
-            'second' => 2
+            'second' => 2,
         ];
         $this->viewData->setMass($mass);
 

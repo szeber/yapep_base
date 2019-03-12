@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\Test\Unit\View\Escape;
 
@@ -37,8 +37,8 @@ class HtmlTest extends TestAbstract
             [
                 '<div>',
                 1.1,
-                null
-            ]
+                null,
+            ],
         ];
 
         $expectedResult = [
@@ -46,8 +46,8 @@ class HtmlTest extends TestAbstract
             [
                 htmlspecialchars('<div>'),
                 1.1,
-                null
-            ]
+                null,
+            ],
         ];
 
         $result = $this->html->_escape($array);
@@ -61,7 +61,7 @@ class HtmlTest extends TestAbstract
             'int'   => [1],
             'float' => [1.1],
             'bool'  => [true],
-            'null'  => [null]
+            'null'  => [null],
         ];
     }
 
@@ -77,7 +77,7 @@ class HtmlTest extends TestAbstract
 
     public function testEscapeWhenObjectGivenWithPublicProperties_shouldThrowException()
     {
-        $object = new \stdClass();
+        $object         = new \stdClass();
         $object->public = 'public';
 
         $this->expectException(ParameterException::class);

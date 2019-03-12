@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\View\Block\Html;
 
@@ -52,7 +52,7 @@ class Title extends BlockAbstract
         if (empty($this->titleParts)) {
             return;
         }
-// ----------- HTML ------------
+        // ----------- HTML ------------
 ?>
 
 <title><?=$this->getTitle() ?></title>
@@ -60,5 +60,4 @@ class Title extends BlockAbstract
 <?php
 // ----------- /HTML ------------
     }
-
 }

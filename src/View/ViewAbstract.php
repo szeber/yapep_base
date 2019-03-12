@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\View;
 
@@ -43,6 +43,7 @@ abstract class ViewAbstract implements IRenderable
         if (empty($this->data)) {
             $this->data = Application::getInstance()->getDiContainer()->getViewData();
         }
+
         return $this->data;
     }
 }

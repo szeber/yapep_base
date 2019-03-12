@@ -1,8 +1,9 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\Test\Unit\View\Layout;
 
+use Mockery;
 use YapepBase\Exception\ParameterException;
 use YapepBase\Test\Unit\TestAbstract;
 use YapepBase\View\Block\Html\Condition;
@@ -12,14 +13,13 @@ use YapepBase\View\Block\Html\JavaScriptFile;
 use YapepBase\View\Block\Html\Link;
 use YapepBase\View\Block\Html\Meta;
 use YapepBase\View\IRenderable;
-use Mockery;
 
 class LayoutAbstractTest extends TestAbstract
 {
     /** @var LayoutStub */
     protected $layout;
 
-    /** @var string  */
+    /** @var string */
     protected $metaName = 'meta';
 
     protected function setUp(): void

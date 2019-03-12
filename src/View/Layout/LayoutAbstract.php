@@ -1,16 +1,15 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\View\Layout;
-
 
 use YapepBase\Exception\ParameterException;
 use YapepBase\View\Block\BlockAbstract;
 use YapepBase\View\Block\Html\CharsetMeta;
+use YapepBase\View\Block\Html\Condition;
 use YapepBase\View\Block\Html\CssFile;
 use YapepBase\View\Block\Html\HttpMeta;
 use YapepBase\View\Block\Html\JavaScriptFile;
-use YapepBase\View\Block\Html\Condition;
 use YapepBase\View\Block\Html\Link;
 use YapepBase\View\Block\Html\Meta;
 use YapepBase\View\Block\Html\Title;

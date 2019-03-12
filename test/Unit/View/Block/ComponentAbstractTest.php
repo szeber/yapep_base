@@ -1,12 +1,12 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\Test\Unit\View\Block;
 
-use YapepBase\Storage\IStorage;
-use YapepBase\Test\Unit\TestAbstract;
 use Mockery;
 use Mockery\MockInterface;
+use YapepBase\Storage\IStorage;
+use YapepBase\Test\Unit\TestAbstract;
 
 class ComponentAbstractTest extends TestAbstract
 {
@@ -39,7 +39,6 @@ class ComponentAbstractTest extends TestAbstract
         $this->expectOutputString($this->component->content);
         $this->component->render();
     }
-
 
     public function testRenderWhenStored_shouldReturnWhatStored()
     {

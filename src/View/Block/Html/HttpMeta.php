@@ -1,14 +1,13 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\View\Block\Html;
-
 
 class HttpMeta extends Meta
 {
     protected function renderContent(): void
     {
-// ----------- HTML ------------
+        // ----------- HTML ------------
 ?>
 
 <meta http-equiv="<?=$this->name ?>" content="<?=$this->content ?>" />
@@ -16,6 +15,4 @@ class HttpMeta extends Meta
 <?php
 // ----------- /HTML ------------
     }
-
-
 }

@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\View\Block;
 
@@ -35,11 +35,9 @@ abstract class ComponentAbstract extends BlockAbstract
             }
 
             echo $result;
-        }
-        else {
+        } else {
             parent::render();
         }
-
     }
 
     private function hasStorage(): bool

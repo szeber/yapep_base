@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\Test\Unit\View\Layout;
 
@@ -23,6 +23,4 @@ class LayoutStub extends LayoutAbstract
     {
         parent::renderSlot($name);
     }
-
-
 }

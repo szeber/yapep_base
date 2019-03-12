@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\View\Block\Html;
 
@@ -17,7 +17,7 @@ class CharsetMeta extends BlockAbstract
 
     protected function renderContent(): void
     {
-// ----------- HTML ------------
+        // ----------- HTML ------------
 ?>
 
 <meta charset="<?=$this->charset ?>" />
@@ -25,6 +25,4 @@ class CharsetMeta extends BlockAbstract
 <?php
 // ----------- /HTML ------------
     }
-
-
 }

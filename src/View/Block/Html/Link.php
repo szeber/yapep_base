@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\View\Block\Html;
 
@@ -33,7 +33,7 @@ class Link extends BlockAbstract
 
     protected function renderContent(): void
     {
-// ----------- HTML ------------
+        // ----------- HTML ------------
 ?>
 <link
     rel="<?= $this->relationship ?>"
@@ -61,6 +61,7 @@ class Link extends BlockAbstract
     public function setHref(?string $href): self
     {
         $this->href = $href;
+
         return $this;
     }
 
@@ -72,6 +73,7 @@ class Link extends BlockAbstract
     public function setRelationship(string $relationship): self
     {
         $this->relationship = $relationship;
+
         return $this;
     }
 
@@ -83,6 +85,7 @@ class Link extends BlockAbstract
     public function setMedia(?string $media): self
     {
         $this->media = $media;
+
         return $this;
     }
 
@@ -94,6 +97,7 @@ class Link extends BlockAbstract
     public function setType(string $type): self
     {
         $this->type = $type;
+
         return $this;
     }
 
@@ -105,6 +109,7 @@ class Link extends BlockAbstract
     public function setTitle(string $title): self
     {
         $this->title = $title;
+
         return $this;
     }
 }
