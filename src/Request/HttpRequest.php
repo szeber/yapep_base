@@ -1,30 +1,30 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\Request;
 
 use Emul\Server\ServerData;
 use YapepBase\Application;
 use YapepBase\Helper\ArrayHelper;
-use YapepBase\Request\Source\ISource;
-use YapepBase\Request\Source\IFiles;
 use YapepBase\Request\Source\CustomParams;
+use YapepBase\Request\Source\IFiles;
+use YapepBase\Request\Source\ISource;
 
 /**
  * Stores the details for the current request.
  */
 class HttpRequest implements IRequest
 {
-    const METHOD_HTTP_GET = 'GET';
-    const METHOD_HTTP_POST = 'POST';
-    const METHOD_HTTP_PUT = 'PUT';
-    const METHOD_HTTP_HEAD = 'HEAD';
+    const METHOD_HTTP_GET     = 'GET';
+    const METHOD_HTTP_POST    = 'POST';
+    const METHOD_HTTP_PUT     = 'PUT';
+    const METHOD_HTTP_HEAD    = 'HEAD';
     const METHOD_HTTP_OPTIONS = 'OPTIONS';
-    const METHOD_HTTP_DELETE = 'DELETE';
+    const METHOD_HTTP_DELETE  = 'DELETE';
 
-    const PROTOCOL_HTTP = 'http';
+    const PROTOCOL_HTTP  = 'http';
     const PROTOCOL_HTTPS = 'https';
-    const PROTOCOL_CLI = 'cli';
+    const PROTOCOL_CLI   = 'cli';
 
     /** @var ISource */
     protected $queryParams;

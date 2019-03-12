@@ -1,19 +1,15 @@
 <?php
+declare(strict_types = 1);
 /**
  * This file is part of YAPEPBase.
  *
- * @package      YapepBase
- * @subpackage   Response
  * @copyright    2011 The YAPEP Project All rights reserved.
  * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
  */
-
-
 namespace YapepBase\Response;
 
 use Lukasoppermann\Httpstatus\Httpstatus;
 use Lukasoppermann\Httpstatus\Httpstatuscodes;
-use YapepBase\Application;
 use YapepBase\Config;
 use YapepBase\Exception\Exception;
 use YapepBase\Exception\ParameterException;
@@ -30,17 +26,13 @@ use YapepBase\View\ViewAbstract;
  *                                                    Only used for HTML content types.</li>
  *         <li>system.response.defaultCookieDomain:   The default domain for the cookies.</li>
  *     </ul>
- *
- * @package    YapepBase
- * @subpackage Response
  */
 class HttpResponse implements IResponse
 {
-
     /**
      * The response body.
      *
-     * @var \YapepBase\View\ViewAbstract $body
+     * @var \YapepBase\View\ViewAbstract
      */
     protected $body;
 
@@ -367,6 +359,7 @@ class HttpResponse implements IResponse
         if (empty($this->body) || is_string($this->body)) {
             return (string)$this->body;
         }
+
         return $this->body->toString();
     }
 
@@ -533,6 +526,7 @@ class HttpResponse implements IResponse
         if (!$this->hasHeader($header)) {
             throw new \YapepBase\Exception\IndexOutOfBoundsException($header);
         }
+
         return $this->headers[$header];
     }
 
@@ -564,6 +558,7 @@ class HttpResponse implements IResponse
     {
         $this->setStatusCode($statusCode);
         $this->setHeader('Location', $url);
+
         throw new RedirectException($url, RedirectException::TYPE_EXTERNAL);
     }
 
@@ -635,13 +630,13 @@ class HttpResponse implements IResponse
 
         if ($this->isBufferingEnabled) {
             $this->cookies[$name] = [
-                'name' => $name,
-                'value' => $value,
+                'name'       => $name,
+                'value'      => $value,
                 'expiration' => $expiration,
-                'path' => $path,
-                'domain' => $domain,
-                'secure' => $secure,
-                'httpOnly' => $httpOnly,
+                'path'       => $path,
+                'domain'     => $domain,
+                'secure'     => $secure,
+                'httpOnly'   => $httpOnly,
             ];
         } else {
             $this->output->setCookie($name, $value, $expiration, $path, $domain, $secure, $httpOnly);
@@ -687,9 +682,15 @@ class HttpResponse implements IResponse
             }
         }
         foreach ($this->cookies as $cookie) {
-            $this->output->setCookie($cookie['name'], $cookie['value'], $cookie['expiration'], $cookie['path'],
-                $cookie['domain'], $cookie['secure'], $cookie['httpOnly']);
+            $this->output->setCookie(
+                $cookie['name'],
+                $cookie['value'],
+                $cookie['expiration'],
+                $cookie['path'],
+                $cookie['domain'],
+                $cookie['secure'],
+                $cookie['httpOnly']
+            );
         }
     }
-
 }

@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\Router;
 
@@ -8,7 +8,6 @@ namespace YapepBase\Router;
  */
 interface IReverseRouter
 {
-
     /**
      * Returns the target (eg. URL) for the controller and action
      *

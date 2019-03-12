@@ -1,25 +1,20 @@
 <?php
-/**
- * @package    YapepBase
- * @subpackage DataObject
- */
+declare(strict_types = 1);
 
 namespace YapepBase\DataObject;
 
-
 /**
  * Class which represents a value what has never been set.
- *
- * @package    YapepBase
- * @subpackage DataObject
  */
-class NotSetValue implements \JsonSerializable {
+class NotSetValue implements \JsonSerializable
+{
+    public function jsonSerialize()
+    {
+        return null;
+    }
 
-	public function jsonSerialize() {
-		return null;
-	}
-
-	public function __toString() {
-		return '';
-	}
+    public function __toString()
+    {
+        return '';
+    }
 }

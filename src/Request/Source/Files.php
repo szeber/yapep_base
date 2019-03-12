@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\Request\Source;
 
@@ -63,8 +63,7 @@ class Files implements IFiles
 
                     $filesByNameAndIndex[$name][$index] = $transformedFile;
                 }
-            }
-            else {
+            } else {
                 $filesByNameAndIndex[$name][0] = $file;
             }
         }
@@ -110,6 +109,7 @@ class Files implements IFiles
         if (!$this->has($name)) {
             throw new ParameterException('File ' . $name . ' does not exist');
         }
+
         return count($this->fileObjectsByNameAndIndex[$name]) > 1;
     }
 

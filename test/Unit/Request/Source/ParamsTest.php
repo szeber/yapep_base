@@ -1,8 +1,7 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\Test\Unit\Request\Source;
-
 
 use YapepBase\Helper\ArrayHelper;
 use YapepBase\Request\Source\Params;
@@ -15,7 +14,6 @@ class ParamsTest extends TestAbstract
         parent::setUp();
         $this->pimpleContainer[ArrayHelper::class] = new ArrayHelper();
     }
-
 
     public function hasProvider()
     {

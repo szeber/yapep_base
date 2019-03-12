@@ -1,13 +1,13 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\Test\Unit;
 
+use Mockery;
 use PHPUnit\Framework\TestCase;
 use YapepBase\Application;
 use YapepBase\DependencyInjection\Container;
 use YapepBase\DependencyInjection\PimpleContainer;
-use Mockery;
 
 abstract class TestAbstract extends TestCase
 {

@@ -1,15 +1,13 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\Event;
-
 
 /**
  * Registry class storing the registered event handlers.
  */
 class EventHandlerRegistry implements IEventHandlerRegistry
 {
-
     /**
      * @var array
      */
@@ -30,15 +28,18 @@ class EventHandlerRegistry implements IEventHandlerRegistry
 
     public function removeEventHandler(string $eventType, IEventHandler $eventHandler): void
     {
-        if (!empty($this->eventHandlersByType[$eventType]) && false !== ($key = array_search($eventHandler,
-                $this->eventHandlersByType[$eventType], true))) {
+        if (!empty($this->eventHandlersByType[$eventType]) && false !== ($key = array_search(
+            $eventHandler,
+            $this->eventHandlersByType[$eventType],
+            true
+        ))) {
             unset($this->eventHandlersByType[$eventType][$key]);
         }
     }
 
     public function getEventHandlers(string $eventType): array
     {
-        return (isset($this->eventHandlersByType[$eventType]) ? $this->eventHandlersByType[$eventType] : []);
+        return isset($this->eventHandlersByType[$eventType]) ? $this->eventHandlersByType[$eventType] : [];
     }
 
     public function clear(string $eventType): void
