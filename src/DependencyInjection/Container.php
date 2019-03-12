@@ -12,6 +12,7 @@ use YapepBase\Response\IResponse;
 use YapepBase\Router\IRouter;
 use YapepBase\Session\ISessionRegistry;
 use YapepBase\Shell\ICommandExecutor;
+use YapepBase\View\Data\Data;
 
 /**
  * Generic DI container implementation used in the framework.
@@ -79,5 +80,10 @@ class Container implements IContainer
     public function getCommandExecutor(): ICommandExecutor
     {
         return $this->container->getCommandExecutor();
+    }
+
+    public function getViewData(): Data
+    {
+        return $this->container->getViewData();
     }
 }

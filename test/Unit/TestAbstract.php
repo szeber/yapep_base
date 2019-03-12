@@ -1,13 +1,14 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace YapepBase\Test\Unit;
 
-use Mockery;
 use PHPUnit\Framework\TestCase;
 use YapepBase\Application;
 use YapepBase\DependencyInjection\Container;
 use YapepBase\DependencyInjection\PimpleContainer;
+use Mockery;
+use YapepBase\Helper\TextHelper;
 
 abstract class TestAbstract extends TestCase
 {
@@ -45,5 +46,14 @@ abstract class TestAbstract extends TestCase
         $this->pimpleContainer = new PimpleContainer();
         $this->diContainer     = new Container($this->pimpleContainer);
         Application::getInstance()->setDiContainer($this->diContainer);
+    }
+
+    protected function assertSameHtmlStructure(string $expectedHtml, string $actualHtml)
+    {
+        $textHelper   = new TextHelper();
+        $expectedHtml = $textHelper->stripWhitespaceDuplicates($expectedHtml);
+        $actualHtml   = $textHelper->stripWhitespaceDuplicates($actualHtml);
+
+        $this->assertSame($expectedHtml, $actualHtml);
     }
 }

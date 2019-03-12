@@ -20,15 +20,6 @@
       "YapepBase\\Test\\": "test"
     }
   },
-  "repositories": {
-    "dev-package": {
-      "type": "path",
-      "url": "src/YapepBase",
-      "options": {
-        "symlink": true
-      }
-    }
-  },
   "authors": [
     {
       "name": "Zsolt Szeberenyi",

@@ -1,12 +1,16 @@
 <?php
-declare(strict_types = 1);
 /**
  * This file is part of YAPEPBase.
  *
+ * @package    YapepBase
+ * @subpackage Storage
  * @copyright  2011 The YAPEP Project All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php BSD License
  */
+
+
 namespace YapepBase\Storage;
+
 
 use YapepBase\Application;
 use YapepBase\Debugger\Item\StorageItem;
@@ -41,460 +45,423 @@ use YapepBase\File\FileHandlerPhp;
  *                               sent to the client it can cause problems. Optional, defaults to FALSE.
  *     </ul>
  *
+ * @package    YapepBase
+ * @subpackage Storage
  * @todo locking
  */
-class FileStorage extends StorageAbstract
-{
-    /**
-     * The path to use for the file storage.
-     *
-     * @var string
-     */
-    protected $path;
+class FileStorage extends StorageAbstract {
 
-    /**
-     * TRUE if the backend is only capable of storing plain text data.
-     *
-     * @var bool
-     */
-    protected $storePlainText;
+	/**
+	 * The path to use for the file storage.
+	 *
+	 * @var string
+	 */
+	protected $path;
 
-    /**
-     * The prefix for the files.
-     *
-     * @var string
-     */
-    protected $filePrefix;
+	/**
+	 * TRUE if the backend is only capable of storing plain text data.
+	 *
+	 * @var bool
+	 */
+	protected $storePlainText;
 
-    /**
-     * The suffix for the files.
-     *
-     * @var string
-     */
-    protected $fileSuffix;
+	/**
+	 * The prefix for the files.
+	 *
+	 * @var string
+	 */
+	protected $filePrefix;
 
-    /**
-     * The mode of the files.
-     *
-     * Octal number.
-     *
-     * @var int
-     */
-    protected $fileMode;
+	/**
+	 * The suffix for the files.
+	 *
+	 * @var string
+	 */
+	protected $fileSuffix;
 
-    /**
-     * If TRUE, the keys will be hashed before being used as the filename.
-     *
-     * @var bool
-     */
-    protected $hashKey;
+	/**
+	 * The mode of the files.
+	 *
+	 * Octal number.
+	 *
+	 * @var int
+	 */
+	protected $fileMode;
 
-    /**
-     * If TRUE, the storage will be read only.
-     *
-     * @var bool
-     */
-    protected $readOnly = false;
+	/**
+	 * If TRUE, the keys will be hashed before being used as the filename.
+	 *
+	 * @var bool
+	 */
+	protected $hashKey;
 
-    /**
-     * If TRUE, no debug items are created by this storage.
-     *
-     * @var bool
-     */
-    protected $debuggerDisabled;
+	/**
+	 * If TRUE, the storage will be read only.
+	 *
+	 * @var bool
+	 */
+	protected $readOnly = false;
 
-    /**
-     * The File handler object.
-     *
-     * @var \YapepBase\File\FileHandlerPhp
-     */
-    protected $fileHandler;
+	/**
+	 * If TRUE, no debug items are created by this storage.
+	 *
+	 * @var bool
+	 */
+	protected $debuggerDisabled;
 
-    /**
-     * Constructor.
-     *
-     * @param string $configName   The name of the configuration to use.
-     *
-     * @throws \YapepBase\Exception\ConfigException    On configuration errors.
-     * @throws \YapepBase\Exception\StorageException   On storage errors.
-     */
-    public function __construct($configName)
-    {
-        // This is needed to be able to mock the used file handler easily
-        if (empty($this->fileHandler)) {
-            $this->fileHandler = new FileHandlerPhp();
-        }
+	/**
+	 * The File handler object.
+	 *
+	 * @var \YapepBase\File\FileHandlerPhp
+	 */
+	protected $fileHandler;
 
-        parent::__construct($configName);
-    }
+	/**
+	 * Constructor.
+	 *
+	 * @param string $configName   The name of the configuration to use.
+	 *
+	 * @throws \YapepBase\Exception\ConfigException    On configuration errors.
+	 * @throws \YapepBase\Exception\StorageException   On storage errors.
+	 */
+	public function __construct($configName) {
+		// This is needed to be able to mock the used file handler easily
+		if (empty($this->fileHandler)) {
+			$this->fileHandler = new FileHandlerPhp();
+		}
 
-    /**
-     * Returns the config properties(last part of the key) used by the class.
-     *
-     * @return array
-     */
-    protected function getConfigProperties()
-    {
-        return [
-            'path',
-            'storePlainText',
-            'filePrefix',
-            'fileSuffix',
-            'fileMode',
-            'hashKey',
-            'readOnly',
-            'debuggerDisabled',
-        ];
-    }
+		parent::__construct($configName);
+	}
 
-    /**
-     * Sets up the backend.
-     *
-     * @param array $config   The configuration data for the backend.
-     *
-     * @return void
-     *
-     * @throws \YapepBase\Exception\ConfigException    On configuration errors.
-     * @throws \YapepBase\Exception\StorageException   On storage errors.
-     * @throws \YapepBase\Exception\File\Exception     On filesystem errors.
-     */
-    protected function setupConfig(array $config)
-    {
-        if (empty($config['path'])) {
-            throw new ConfigException('Path is not set for FileStorage config ('
-                . $this->currentConfigurationName . ')');
-        }
-        $this->path = $config['path'];
-        if (!in_array(substr($this->path, -1, 1), ['/', '\\'])) {
-            $this->path .= DIRECTORY_SEPARATOR;
-        }
+	/**
+	 * Returns the config properties(last part of the key) used by the class.
+	 *
+	 * @return array
+	 */
+	protected function getConfigProperties() {
+		return array(
+			'path',
+			'storePlainText',
+			'filePrefix',
+			'fileSuffix',
+			'fileMode',
+			'hashKey',
+			'readOnly',
+			'debuggerDisabled'
+		);
+	}
 
-        $this->storePlainText   = empty($config['storePlainText']) ? false : (bool)$config['storePlainText'];
-        $this->filePrefix       = empty($config['filePrefix']) ? '' : $config['filePrefix'];
-        $this->fileSuffix       = empty($config['fileSuffix']) ? '' : $config['fileSuffix'];
-        $this->fileMode         = empty($config['fileMode']) ? 0644 : $config['fileMode'];
-        $this->hashKey          = empty($config['hashKey']) ? false : (bool)$config['hashKey'];
-        $this->readOnly         = empty($config['readOnly']) ? false : (bool)$config['readOnly'];
-        $this->debuggerDisabled = empty($config['debuggerDisabled']) ? false : (bool)$config['debuggerDisabled'];
+	/**
+	 * Sets up the backend.
+	 *
+	 * @param array $config   The configuration data for the backend.
+	 *
+	 * @return void
+	 *
+	 * @throws \YapepBase\Exception\ConfigException    On configuration errors.
+	 * @throws \YapepBase\Exception\StorageException   On storage errors.
+	 * @throws \YapepBase\Exception\File\Exception     On filesystem errors.
+	 */
+	protected function setupConfig(array $config) {
+		if (empty($config['path'])) {
+			throw new ConfigException('Path is not set for FileStorage config ('
+				. $this->currentConfigurationName . ')');
+		}
+		$this->path = $config['path'];
+		if (!in_array(substr($this->path, -1, 1), array('/', '\\'))) {
+			$this->path .= DIRECTORY_SEPARATOR;
+		}
 
-        // If the given path does not exist
-        if (!$this->fileHandler->checkIsPathExists($this->path)) {
-            try {
-                // Create the path
-                $this->fileHandler->makeDirectory($this->path, ($this->fileMode | 0111), true);
-            } catch (FileException $e) {
-                throw new StorageException('Can not create directory for FileStorage: ' . $this->path, 0, $e);
-            }
-            // If the given path is not a directory
-        } elseif (!$this->fileHandler->checkIsDirectory(rtrim($this->path, '/'))) {
-            throw new StorageException('Path is not a directory for FileStorage: ' . $this->path);
-        }
+		$this->storePlainText   = empty($config['storePlainText'])   ? false : (bool)$config['storePlainText'];
+		$this->filePrefix       = empty($config['filePrefix'])       ? ''    : $config['filePrefix'];
+		$this->fileSuffix       = empty($config['fileSuffix'])       ? ''    : $config['fileSuffix'];
+		$this->fileMode         = empty($config['fileMode'])         ? 0644  : $config['fileMode'];
+		$this->hashKey          = empty($config['hashKey'])          ? false : (bool)$config['hashKey'];
+		$this->readOnly         = empty($config['readOnly'])         ? false : (bool)$config['readOnly'];
+		$this->debuggerDisabled = empty($config['debuggerDisabled']) ? false : (bool)$config['debuggerDisabled'];
 
-        // If this is not a readonly storage and a given path is not writable
-        if (!$this->readOnly && !$this->fileHandler->checkIsWritable($this->path)) {
-            throw new StorageException('Path is not writable for FileStorage: ' . $this->path);
-        }
-    }
+		// If the given path does not exist
+		if (!$this->fileHandler->checkIsPathExists($this->path)) {
+			try {
+				// Create the path
+				$this->fileHandler->makeDirectory($this->path, ($this->fileMode | 0111), true);
+			}
+			catch (FileException $e) {
+				throw new StorageException('Can not create directory for FileStorage: ' . $this->path, 0, $e);
+			}
+		// If the given path is not a directory
+		} elseif (!$this->fileHandler->checkIsDirectory(rtrim($this->path, '/'))) {
+			throw new StorageException('Path is not a directory for FileStorage: ' . $this->path);
+		}
 
-    /**
-     * Returns the full path for the specified filename
-     *
-     * @param string $fileName   The file name.
-     *
-     * @return string
-     *
-     * @throws StorageException   On invalid filename.
-     */
-    protected function makeFullPath($fileName)
-    {
-        $fileName = $this->filePrefix . $fileName . $this->fileSuffix;
-        if ($this->hashKey) {
-            $fileName = md5($fileName);
-        }
-        if (!preg_match('/^[-_.a-zA-Z0-9]+$/', $fileName)) {
-            throw new StorageException('Invalid filename: ' . $fileName);
-        }
+		// If this is not a readonly storage and a given path is not writable
+		if (!$this->readOnly && !$this->fileHandler->checkIsWritable($this->path)) {
+			throw new StorageException('Path is not writable for FileStorage: ' . $this->path);
+		}
+	}
 
-        return $this->path . $fileName;
-    }
+	/**
+	 * Returns the full path for the specified filename
+	 *
+	 * @param string $fileName   The file name.
+	 *
+	 * @return string
+	 *
+	 * @throws StorageException   On invalid filename.
+	 */
+	protected function makeFullPath($fileName) {
+		$fileName = $this->filePrefix . $fileName  . $this->fileSuffix;
+		if ($this->hashKey) {
+			$fileName = md5($fileName);
+		}
+		if (!preg_match('/^[-_.a-zA-Z0-9]+$/', $fileName)) {
+			throw new StorageException('Invalid filename: ' . $fileName);
+		}
+		return $this->path . $fileName;
+	}
 
-    /**
-     * Stores data the specified key
-     *
-     * @param string $key    The key to be used to store the data.
-     * @param mixed  $data   The data to store.
-     * @param int    $ttl    The expiration time of the data in seconds if supported by the backend.
-     *
-     * @throws \YapepBase\Exception\StorageException      On error.
-     * @throws \YapepBase\Exception\ParameterException    If TTL is set and not supported by the backend.
-     *
-     * @return void
-     */
-    public function set($key, $data, $ttl = 0)
-    {
-        if ($this->readOnly) {
-            throw new StorageException('Trying to write to a read only storage');
-        }
-        $startTime = microtime(true);
-        $fileName  = $this->makeFullPath($key);
+	/**
+	 * Stores data the specified key
+	 *
+	 * @param string $key          The key to be used to store the data.
+	 * @param mixed  $data         The data to store.
+	 * @param int    $ttlInSeconds The expiration time of the data in seconds if supported by the backend.
+	 *
+	 * @throws \YapepBase\Exception\StorageException      On error.
+	 * @throws \YapepBase\Exception\ParameterException    If TTL is set and not supported by the backend.
+	 *
+	 * @return void
+	 */
+	public function set($key, $data, $ttlInSeconds = 0) {
+		if ($this->readOnly) {
+			throw new StorageException('Trying to write to a read only storage');
+		}
+		$startTime = microtime(true);
+		$fileName = $this->makeFullPath($key);
 
-        try {
-            $this->fileHandler->write($fileName, $this->prepareData($key, $data, $ttl));
-        } catch (FileException $e) {
-            throw new StorageException('Unable to write data to FileStorage (file: ' . $fileName . ' )', 0, $e);
-        }
+		try {
+			$this->fileHandler->write($fileName, $this->prepareData($key, $data, $ttlInSeconds));
+		}
+		catch (FileException $e) {
+			throw new StorageException('Unable to write data to FileStorage (file: ' . $fileName . ' )', 0, $e);
+		}
 
-        // Disable potential warnings if unit testing with vfsStream
-        $this->fileHandler->changeMode($fileName, $this->fileMode);
+		// Disable potential warnings if unit testing with vfsStream
+		$this->fileHandler->changeMode($fileName, $this->fileMode);
 
-        $debugger = Application::getInstance()->getDiContainer()->getDebugger();
-        if (!$this->debuggerDisabled && $debugger !== false) {
-            $debugger->addItem(new StorageItem(
-                'file',
-                'file.' . $this->currentConfigurationName,
-                StorageItem::METHOD_SET . ' ' . $key . ' for ' . $ttl,
-                $data,
-                microtime(true) - $startTime
-            ));
-        }
-    }
+		$debugger = Application::getInstance()->getDiContainer()->getDebugger();
+		if (!$this->debuggerDisabled && $debugger !== false) {
+			$debugger->addItem(new StorageItem('file', 'file.' . $this->currentConfigurationName,
+				StorageItem::METHOD_SET . ' ' . $key . ' for ' . $ttlInSeconds, $data, microtime(true) - $startTime));
+		}
+	}
 
-    /**
-     * Returns the data prepared to be written.
-     *
-     * @param string $key    The key.
-     * @param mixed  $data   The data to save.
-     * @param int    $ttl    The TTL.
-     *
-     * @return string
-     *
-     * @throws \YapepBase\Exception\ParameterException   If TTL is not supported by the backend.
-     */
-    protected function prepareData($key, $data, $ttl = 0)
-    {
-        if ($ttl != 0 && $this->storePlainText) {
-            throw new ParameterException('TTL option is set for FileStorage with storePlainText config option.');
-        }
-        if ($this->storePlainText) {
-            return (string)$data;
-        }
-        $time = time();
+	/**
+	 * Returns the data prepared to be written.
+	 *
+	 * @param string $key    The key.
+	 * @param mixed  $data   The data to save.
+	 * @param int    $ttl    The TTL.
+	 *
+	 * @return string
+	 *
+	 * @throws \YapepBase\Exception\ParameterException   If TTL is not supported by the backend.
+	 */
+	protected function prepareData($key, $data, $ttl = 0) {
+		if ($ttl != 0 && $this->storePlainText) {
+			throw new ParameterException('TTL option is set for FileStorage with storePlainText config option.');
+		}
+		if ($this->storePlainText) {
+			return (string)$data;
+		}
+		$time = time();
 
-        // 0 TTL means the data should not expire.
-        if (0 == $ttl) {
-            $expiresAt = 0;
-        } else {
-            $expiresAt = $time + $ttl;
-        }
+		// 0 TTL means the data should not expire.
+		if (0 == $ttl) {
+			$expiresAt = 0;
+		} else {
+			$expiresAt = $time + $ttl;
+		}
+		return serialize(array('createdAt' => $time, 'expiresAt' => $expiresAt, 'data' => $data, 'key' => $key));
+	}
 
-        return serialize(['createdAt' => $time, 'expiresAt' => $expiresAt, 'data' => $data, 'key' => $key]);
-    }
+	/**
+	 * Processes the data read from the file
+	 *
+	 * @param string $data   The data.
+	 *
+	 * @return mixed
+	 *
+	 * @throws StorageException   On unserialization errors.
+	 */
+	protected function readData($data) {
+		if ($this->storePlainText) {
+			return $data;
+		}
+		// Unserialization errors handled via exception
+		$data = @unserialize($data);
+		if (!is_array($data) || !isset($data['expiresAt']) || !isset($data['data'])) {
+			throw new StorageException('Unable to unserialize stored data');
+		}
 
-    /**
-     * Processes the data read from the file
-     *
-     * @param string $data   The data.
-     *
-     * @return mixed
-     *
-     * @throws StorageException   On unserialization errors.
-     */
-    protected function readData($data)
-    {
-        if ($this->storePlainText) {
-            return $data;
-        }
-        // Unserialization errors handled via exception
-        $data = @unserialize($data);
-        if (!is_array($data) || !isset($data['expiresAt']) || !isset($data['data'])) {
-            throw new StorageException('Unable to unserialize stored data');
-        }
+		// If the expiresAt is empty, the data does not expire.
+		if (!empty($data['expiresAt']) && $data['expiresAt'] < time()) {
+			return false;
+		}
+		return $data['data'];
+	}
 
-        // If the expiresAt is empty, the data does not expire.
-        if (!empty($data['expiresAt']) && $data['expiresAt'] < time()) {
-            return false;
-        }
+	/**
+	 * Retrieves data from the cache identified by the specified key
+	 *
+	 * @param string $key   The key.
+	 *
+	 * @return mixed
+	 *
+	 * @throws \YapepBase\Exception\StorageException   On error.
+	 */
+	public function get($key) {
+		$startTime = microtime(true);
+		$fileName = $this->makeFullPath($key);
+		$data = false;
 
-        return $data['data'];
-    }
+		if ($this->fileHandler->checkIsPathExists($fileName)) {
+			if (
+				!$this->fileHandler->checkIsReadable($fileName)
+				|| ($contents = $this->fileHandler->getAsString($fileName)) === false
+			) {
+				throw new StorageException('Unable to read file: ' . $fileName);
+			}
 
-    /**
-     * Retrieves data from the cache identified by the specified key
-     *
-     * @param string $key   The key.
-     *
-     * @return mixed
-     *
-     * @throws \YapepBase\Exception\StorageException   On error.
-     */
-    public function get($key)
-    {
-        $startTime = microtime(true);
-        $fileName  = $this->makeFullPath($key);
-        $data      = false;
+			$data = $this->readData($contents);
+			if (false === $data) {
+				try {
+					$this->fileHandler->remove($fileName);
+				}
+				catch (FileException $e) {
+					throw new StorageException('Unable to remove empty file: ' . $fileName, 0, $e);
+				}
+			}
+		}
 
-        if ($this->fileHandler->checkIsPathExists($fileName)) {
-            if (
-                !$this->fileHandler->checkIsReadable($fileName)
-                || ($contents = $this->fileHandler->getAsString($fileName)) === false
-            ) {
-                throw new StorageException('Unable to read file: ' . $fileName);
-            }
+		$debugger = Application::getInstance()->getDiContainer()->getDebugger();
+		if (!$this->debuggerDisabled && $debugger !== false) {
+			$debugger->addItem(new StorageItem('file', 'file.' . $this->currentConfigurationName,
+				StorageItem::METHOD_GET . ' ' . $key, $data, microtime(true) - $startTime));
+		}
 
-            $data = $this->readData($contents);
-            if (false === $data) {
-                try {
-                    $this->fileHandler->remove($fileName);
-                } catch (FileException $e) {
-                    throw new StorageException('Unable to remove empty file: ' . $fileName, 0, $e);
-                }
-            }
-        }
+		return $data;
+	}
 
-        $debugger = Application::getInstance()->getDiContainer()->getDebugger();
-        if (!$this->debuggerDisabled && $debugger !== false) {
-            $debugger->addItem(new StorageItem(
-                'file',
-                'file.' . $this->currentConfigurationName,
-                StorageItem::METHOD_GET . ' ' . $key,
-                $data,
-                microtime(true) - $startTime
-            ));
-        }
+	/**
+	 * Deletes the data specified by the key
+	 *
+	 * @param string $key   The ket.
+	 *
+	 * @throws \YapepBase\Exception\StorageException   If the Storage is read only.
+	 *
+	 * @return void
+	 */
+	public function delete($key) {
+		if ($this->readOnly) {
+			throw new StorageException('Trying to write to a read only storage');
+		}
 
-        return $data;
-    }
+		$startTime = microtime(true);
+		$fileName = $this->makeFullPath($key);
 
-    /**
-     * Deletes the data specified by the key
-     *
-     * @param string $key   The ket.
-     *
-     * @throws \YapepBase\Exception\StorageException   If the Storage is read only.
-     *
-     * @return void
-     */
-    public function delete($key)
-    {
-        if ($this->readOnly) {
-            throw new StorageException('Trying to write to a read only storage');
-        }
+		try {
+			$this->fileHandler->remove($fileName);
+		}
+		catch (NotFoundException $e) {
+		}
+		catch (FileException $e) {
+			throw new StorageException('Unable to remove the file: ' . $fileName, 0, $e);
+		}
 
-        $startTime = microtime(true);
-        $fileName  = $this->makeFullPath($key);
+		$debugger = Application::getInstance()->getDiContainer()->getDebugger();
+		if (!$this->debuggerDisabled && $debugger !== false) {
+			$debugger->addItem(new StorageItem('file', 'file.' . $this->currentConfigurationName,
+				StorageItem::METHOD_DELETE . ' ' . $key, null, microtime(true) - $startTime));
+		}
+	}
 
-        try {
-            $this->fileHandler->remove($fileName);
-        } catch (NotFoundException $e) {
-        } catch (FileException $e) {
-            throw new StorageException('Unable to remove the file: ' . $fileName, 0, $e);
-        }
+	/**
+	 * Deletes every data in the storage.
+	 *
+	 * @throws \YapepBase\Exception\StorageException   If the Storage is read only.
+	 *
+	 * @return void
+	 */
+	public function clear() {
+		if ($this->readOnly) {
+			throw new StorageException('Trying to write to a read only storage');
+		}
 
-        $debugger = Application::getInstance()->getDiContainer()->getDebugger();
-        if (!$this->debuggerDisabled && $debugger !== false) {
-            $debugger->addItem(new StorageItem(
-                'file',
-                'file.' . $this->currentConfigurationName,
-                StorageItem::METHOD_DELETE . ' ' . $key,
-                null,
-                microtime(true) - $startTime
-            ));
-        }
-    }
+		$startTime = microtime(true);
 
-    /**
-     * Deletes every data in the storage.
-     *
-     * @throws \YapepBase\Exception\StorageException   If the Storage is read only.
-     *
-     * @return void
-     */
-    public function clear()
-    {
-        if ($this->readOnly) {
-            throw new StorageException('Trying to write to a read only storage');
-        }
+		try {
+			$this->fileHandler->removeDirectory($this->path, true);
+		}
+		catch (FileException $e) {
+			throw new StorageException('Unable to remove the directory: ' . $this->path, 0, $e);
+		}
 
-        $startTime = microtime(true);
+		$debugger = Application::getInstance()->getDiContainer()->getDebugger();
+		if (!$this->debuggerDisabled && $debugger !== false) {
+			$debugger->addItem(new StorageItem('file', 'file.' . $this->currentConfigurationName,
+				StorageItem::METHOD_CLEAR, null, microtime(true) - $startTime));
+		}
+	}
 
-        try {
-            $this->fileHandler->removeDirectory($this->path, true);
-        } catch (FileException $e) {
-            throw new StorageException('Unable to remove the directory: ' . $this->path, 0, $e);
-        }
+	/**
+	 * Returns if the backend is persistent or volatile.
+	 *
+	 * If the backend is volatile a system or service restart may destroy all the stored data.
+	 *
+	 * @return bool
+	 */
+	public function isPersistent() {
+		// File storage is always persistent.
+		return true;
+	}
 
-        $debugger = Application::getInstance()->getDiContainer()->getDebugger();
-        if (!$this->debuggerDisabled && $debugger !== false) {
-            $debugger->addItem(new StorageItem(
-                'file',
-                'file.' . $this->currentConfigurationName,
-                StorageItem::METHOD_CLEAR,
-                null,
-                microtime(true) - $startTime
-            ));
-        }
-    }
+	/**
+	 * Returns whether the TTL functionality is supported by the backend.
+	 *
+	 * @return bool
+	 */
+	public function isTtlSupported() {
+		// If the storePlainText option is set to false, we support TTL functionality.
+		return !$this->storePlainText;
+	}
 
-    /**
-     * Returns if the backend is persistent or volatile.
-     *
-     * If the backend is volatile a system or service restart may destroy all the stored data.
-     *
-     * @return bool
-     */
-    public function isPersistent()
-    {
-        // File storage is always persistent.
-        return true;
-    }
+	/**
+	 * Returns TRUE if the storage backend is read only, FALSE otherwise.
+	 *
+	 * @return bool
+	 */
+	public function isReadOnly() {
+		return $this->readOnly;
+	}
 
-    /**
-     * Returns whether the TTL functionality is supported by the backend.
-     *
-     * @return bool
-     */
-    public function isTtlSupported()
-    {
-        // If the storePlainText option is set to false, we support TTL functionality.
-        return !$this->storePlainText;
-    }
-
-    /**
-     * Returns TRUE if the storage backend is read only, FALSE otherwise.
-     *
-     * @return bool
-     */
-    public function isReadOnly()
-    {
-        return $this->readOnly;
-    }
-
-    /**
-     * Returns the configuration data for the storage backend. This includes the storage type as used by
-     * the storage factory.
-     *
-     * @return array
-     */
-    public function getConfigData()
-    {
-        return [
-            'storageType'      => StorageFactory::TYPE_FILE,
-            'path'             => $this->path,
-            'storePlainText'   => $this->storePlainText,
-            'filePrefix'       => $this->filePrefix,
-            'fileSuffix'       => $this->fileSuffix,
-            'fileMode'         => $this->fileMode,
-            'hashKey'          => $this->hashKey,
-            'readOnly'         => $this->readOnly,
-            'debuggerDisabled' => $this->debuggerDisabled,
-        ];
-        //			'path',
-//			'storePlainText',
-//			'filePrefix',
-//			'fileSuffix',
-//			'fileMode',
-//			'hashKey',
-//			'readOnly',
-//			'debuggerDisabled'
-    }
+	/**
+	 * Returns the configuration data for the storage backend. This includes the storage type as used by
+	 * the storage factory.
+	 *
+	 * @return array
+	 */
+	public function getConfigData() {
+		return array(
+			'storageType'      => StorageFactory::TYPE_FILE,
+			'path'             => $this->path,
+			'storePlainText'   => $this->storePlainText,
+			'filePrefix'       => $this->filePrefix,
+			'fileSuffix'       => $this->fileSuffix,
+			'fileMode'         => $this->fileMode,
+			'hashKey'          => $this->hashKey,
+			'readOnly'         => $this->readOnly,
+			'debuggerDisabled' => $this->debuggerDisabled,
+		);
+	}
 }
