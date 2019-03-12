@@ -13,6 +13,8 @@ use YapepBase\Response\IResponse;
 use YapepBase\Router\IRouter;
 use YapepBase\Session\ISessionRegistry;
 use YapepBase\Shell\ICommandExecutor;
+use YapepBase\View\Data\Data;
+use YapepBase\View\Data\ICanEscape;
 
 /**
  * Generic DI container implementation used in the framework.
@@ -77,6 +79,11 @@ class PimpleContainer extends \Pimple\Container implements IContainer
     public function getCommandExecutor(): ICommandExecutor
     {
         return $this->get(ICommandExecutor::class);
+    }
+
+    public function getViewData(): Data
+    {
+        return $this->get(Data::class);
     }
 
     public function setRouter(IRouter $router): self
@@ -177,6 +184,11 @@ class PimpleContainer extends \Pimple\Container implements IContainer
     public function setCommandExecutorAsFactory(string $commandExecutorClass): self
     {
         return $this->setFactory(ICommandExecutor::class, $commandExecutorClass);
+    }
+
+    public function setViewData(ICanEscape $data): self
+    {
+        return $this->setInstance(Data::class, $data);
     }
 
     protected function setInstance(string $id, $object): self
