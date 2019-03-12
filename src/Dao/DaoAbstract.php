@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\Dao;
 
@@ -64,8 +64,8 @@ abstract class DaoAbstract
 
         $operator = $isNegated ? 'NOT IN' : 'IN';
 
-        $conditions[] = $this->getPrefixedField($tableAlias, $fieldName) . ' ' . $operator . ' (' . implode(', ',
-                $paramNames) . ')';
+        $conditions[] = $this->getPrefixedField($tableAlias, $fieldName)
+            . ' ' . $operator . ' (' . implode(', ', $paramNames) . ')';
     }
 
     /**

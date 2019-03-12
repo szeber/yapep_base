@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\Debug\Item;
 
@@ -34,6 +34,7 @@ class MemoryUsage extends ItemAbstract
     {
         return $this->current;
     }
+
     /**
      * @codeCoverageIgnore
      */
@@ -47,7 +48,7 @@ class MemoryUsage extends ItemAbstract
         return [
             'name'    => $this->name,
             'current' => $this->current,
-            'peak'    => $this->peak
+            'peak'    => $this->peak,
         ];
     }
 }

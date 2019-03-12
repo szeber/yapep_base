@@ -1,11 +1,12 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\Debug;
 
 use YapepBase\Debug\Item\CurlRequest;
 use YapepBase\Debug\Item\Error;
 use YapepBase\Debug\Item\Event;
+use YapepBase\Debug\Item\General;
 use YapepBase\Debug\Item\MemoryUsage;
 use YapepBase\Debug\Item\SqlQuery;
 use YapepBase\Debug\Item\Storage;
@@ -26,4 +27,6 @@ interface ICanStoreItems
     public function addStorage(Storage $item): void;
 
     public function addTime(Time $item): void;
+
+    public function addGeneral(General $item): void;
 }

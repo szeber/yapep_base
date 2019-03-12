@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\Helper;
 
@@ -10,7 +10,7 @@ class DateHelper extends HelperAbstract
         return time();
     }
 
-    public function getCurrentTimestampMs(): float
+    public function getCurrentTimestampUs(): float
     {
         return microtime(true);
     }

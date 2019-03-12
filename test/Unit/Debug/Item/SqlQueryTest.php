@@ -1,12 +1,12 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\Test\Unit\Debug\Item;
 
+use Mockery;
 use YapepBase\Debug\Item\SqlQuery;
 use YapepBase\Helper\DateHelper;
 use YapepBase\Test\Unit\TestAbstract;
-use Mockery;
 
 class SqlQueryTest extends TestAbstract
 {
@@ -34,7 +34,7 @@ class SqlQueryTest extends TestAbstract
     protected function expectGetCurrentTime()
     {
         $dateHelper = Mockery::mock(DateHelper::class)
-            ->shouldReceive('getCurrentTimestampMs')
+            ->shouldReceive('getCurrentTimestampUs')
             ->once()
             ->andReturn($this->currentTime)
             ->getMock();

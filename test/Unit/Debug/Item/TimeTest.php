@@ -1,12 +1,12 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\Test\Unit\Debug\Item;
 
+use Mockery;
 use YapepBase\Debug\Item\Time;
 use YapepBase\Helper\DateHelper;
 use YapepBase\Test\Unit\TestAbstract;
-use Mockery;
 
 class TimeTest extends TestAbstract
 {
@@ -20,7 +20,7 @@ class TimeTest extends TestAbstract
         $this->expectGetCurrentTime();
         $time = new Time($this->name);
 
-        $this->assertSame($this->name,        $time->getName());
+        $this->assertSame($this->name, $time->getName());
         $this->assertSame($this->currentTime, $time->getInstantiatedAt());
     }
 
@@ -37,7 +37,7 @@ class TimeTest extends TestAbstract
     protected function expectGetCurrentTime()
     {
         $dateHelper = Mockery::mock(DateHelper::class)
-            ->shouldReceive('getCurrentTimestampMs')
+            ->shouldReceive('getCurrentTimestampUs')
             ->once()
             ->andReturn($this->currentTime)
             ->getMock();

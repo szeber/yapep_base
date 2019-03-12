@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\Test\Unit\Debug;
 
@@ -7,6 +7,7 @@ use YapepBase\Debug\DefaultDataHandler;
 use YapepBase\Debug\Item\CurlRequest;
 use YapepBase\Debug\Item\Error;
 use YapepBase\Debug\Item\Event;
+use YapepBase\Debug\Item\General;
 use YapepBase\Debug\Item\MemoryUsage;
 use YapepBase\Debug\Item\SqlQuery;
 use YapepBase\Debug\Item\Storage;
@@ -80,6 +81,14 @@ class DefaultDataHandlerTest extends TestAbstract
         $this->dataHandler->addTime($item);
 
         $this->assertGivenItemStoredOnly($this->dataHandler->getTimeItems(), $item);
+    }
+
+    public function testAddGeneral_shouldStoreGivenItem()
+    {
+        $item = new General('name');
+        $this->dataHandler->addGeneral($item);
+
+        $this->assertGivenItemStoredOnly($this->dataHandler->getGeneralItems(), $item);
     }
 
     protected function assertGivenItemStoredOnly(array $items, $item)

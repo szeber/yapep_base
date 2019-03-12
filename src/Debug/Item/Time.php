@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\Debug\Item;
 
@@ -16,7 +16,7 @@ class Time extends ItemAbstract
     public function __construct(string $name)
     {
         $this->name           = $name;
-        $this->instantiatedAt = $this->getDateHelper()->getCurrentTimestampMs();
+        $this->instantiatedAt = $this->getDateHelper()->getCurrentTimestampUs();
     }
 
     public function getTimeElapsedSinceInitiated(float $dataHandlerInitiatedAt): float
@@ -38,7 +38,7 @@ class Time extends ItemAbstract
     {
         return [
             'name'           => $this->name,
-            'instantiatedAt' => $this->instantiatedAt
+            'instantiatedAt' => $this->instantiatedAt,
         ];
     }
 }

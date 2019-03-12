@@ -1,9 +1,8 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\Storage;
 
-use YapepBase\Application;
 use YapepBase\Debug\Item\Storage;
 use YapepBase\Exception\File\Exception as FileException;
 use YapepBase\Exception\File\NotFoundException;
@@ -20,7 +19,6 @@ use YapepBase\Helper\DateHelper;
  */
 class FileStorage extends StorageAbstract
 {
-
     /** @var string */
     protected $path;
 
@@ -45,13 +43,17 @@ class FileStorage extends StorageAbstract
     /** @var FileHandlerPhp */
     protected $fileHandler;
 
+    /** @var DateHelper */
+    protected $dateHelper;
+
     /**
      * @throws ParameterException
      * @throws StorageException
      */
-    public function __construct(IFileHandler $fileHandler, string $path, bool $readOnly = false)
+    public function __construct(IFileHandler $fileHandler, DateHelper $dateHelper, string $path, bool $readOnly = false)
     {
         $this->fileHandler = $fileHandler;
+        $this->dateHelper  = $dateHelper;
         $this->readOnly    = $readOnly;
 
         $this->setPath($path);
@@ -111,6 +113,7 @@ class FileStorage extends StorageAbstract
         if (!preg_match('/^[-_.a-zA-Z0-9]+$/', $fileName)) {
             throw new StorageException('Invalid filename: ' . $fileName);
         }
+
         return $this->path . $fileName;
     }
 
@@ -148,7 +151,6 @@ class FileStorage extends StorageAbstract
         $data     = null;
 
         if ($this->fileHandler->checkIsPathExists($fileName)) {
-
             if (
                 !$this->fileHandler->checkIsReadable($fileName)
                 || ($contents = $this->fileHandler->getAsString($fileName)) === false
@@ -164,14 +166,12 @@ class FileStorage extends StorageAbstract
                 } catch (FileException $e) {
                     throw new StorageException('Unable to remove empty file: ' . $fileName, 0, $e);
                 }
-            }
-            else {
+            } else {
                 $data = $file->data;
             }
+        } else {
+            $item->setData($data)->setFinished();
         }
-        else
-
-        $item->setData($data)->setFinished();
         $this->getDebugDataHandlerRegistry()->addStorage($item);
 
         return $data;
@@ -192,7 +192,7 @@ class FileStorage extends StorageAbstract
             return (string)$data;
         }
 
-        $createdAt = $this->getDateHelper()->getCurrentTimestamp();
+        $createdAt = $this->dateHelper->getCurrentTimestamp();
         $expiresAt = 0;
 
         if ($ttlInSeconds > 0) {
@@ -227,7 +227,7 @@ class FileStorage extends StorageAbstract
 
     protected function isExpired(File $file): bool
     {
-        $currentTime = $this->getDateHelper()->getCurrentTimestamp();
+        $currentTime = $this->dateHelper->getCurrentTimestamp();
 
         if (!empty($file->expiresAt) && $file->expiresAt < $currentTime) {
             return true;
@@ -298,7 +298,7 @@ class FileStorage extends StorageAbstract
         return $this->readOnly;
     }
 
-    public function isCanOnlyStorePlainText(): bool
+    public function canOnlyStorePlainText(): bool
     {
         return $this->canOnlyStorePlainText;
     }
@@ -306,6 +306,7 @@ class FileStorage extends StorageAbstract
     public function setCanOnlyStorePlainText(bool $canOnlyStorePlainText): self
     {
         $this->canOnlyStorePlainText = $canOnlyStorePlainText;
+
         return $this;
     }
 
@@ -317,6 +318,7 @@ class FileStorage extends StorageAbstract
     public function setFilenamePrefix(string $filenamePrefix): self
     {
         $this->filenamePrefix = $filenamePrefix;
+
         return $this;
     }
 
@@ -328,6 +330,7 @@ class FileStorage extends StorageAbstract
     public function setFilenameSuffix(string $filenameSuffix): self
     {
         $this->filenameSuffix = $filenameSuffix;
+
         return $this;
     }
 
@@ -339,10 +342,11 @@ class FileStorage extends StorageAbstract
     public function setFileModeOctal(int $fileModeOctal): self
     {
         $this->fileModeOctal = $fileModeOctal;
+
         return $this;
     }
 
-    public function isHashKey(): bool
+    public function isKeyHashed(): bool
     {
         return $this->hashKey;
     }
@@ -350,16 +354,12 @@ class FileStorage extends StorageAbstract
     public function setHashKey(bool $hashKey): self
     {
         $this->hashKey = $hashKey;
+
         return $this;
     }
 
     public function getFileHandler(): FileHandlerPhp
     {
         return $this->fileHandler;
-    }
-
-    protected function getDateHelper(): DateHelper
-    {
-        return Application::getInstance()->getDiContainer()->get(DateHelper::class);
     }
 }

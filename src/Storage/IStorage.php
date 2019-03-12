@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\Storage;
 
@@ -11,7 +11,6 @@ use YapepBase\Exception\StorageException;
  */
 interface IStorage
 {
-
     /**
      * Stores data under the specified key
      *

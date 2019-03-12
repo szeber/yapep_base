@@ -1,12 +1,12 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\Test\Unit\Debug\Item;
 
+use Mockery;
 use YapepBase\Debug\Item\CurlRequest;
 use YapepBase\Helper\DateHelper;
 use YapepBase\Test\Unit\TestAbstract;
-use Mockery;
 
 class CurlRequestTest extends TestAbstract
 {
@@ -37,7 +37,7 @@ class CurlRequestTest extends TestAbstract
     protected function expectGetCurrentTime()
     {
         $dateHelper = Mockery::mock(DateHelper::class)
-            ->shouldReceive('getCurrentTimestampMs')
+            ->shouldReceive('getCurrentTimestampUs')
             ->once()
             ->andReturn($this->currentTime)
             ->getMock();

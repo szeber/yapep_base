@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\Test\Unit\Debug;
 
@@ -10,6 +10,7 @@ use YapepBase\Debug\ICanReturnItems;
 use YapepBase\Debug\Item\CurlRequest;
 use YapepBase\Debug\Item\Error;
 use YapepBase\Debug\Item\Event;
+use YapepBase\Debug\Item\General;
 use YapepBase\Debug\Item\MemoryUsage;
 use YapepBase\Debug\Item\SqlQuery;
 use YapepBase\Debug\Item\Storage;
@@ -47,7 +48,7 @@ class DataHandlerRegistryTest extends TestAbstract
     protected function expectSetInitiatedAt()
     {
         $dateHelper = Mockery::mock(DateHelper::class)
-            ->shouldReceive('getCurrentTimestampMs')
+            ->shouldReceive('getCurrentTimestampUs')
             ->andReturn($this->initiatedAt)
             ->getMock();
 
@@ -149,6 +150,15 @@ class DataHandlerRegistryTest extends TestAbstract
 
         $this->expectAddItemCalledOnHandlers('addTime', $item);
         $this->registry->addTime($item);
+    }
+
+    public function testAddGeneral_shouldAddToAllHandlers()
+    {
+        $this->registerHandlers();
+        $item = new General('name');
+
+        $this->expectAddItemCalledOnHandlers('addGeneral', $item);
+        $this->registry->addGeneral($item);
     }
 
     protected function registerHandlers()

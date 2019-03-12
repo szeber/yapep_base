@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\Debug\Item;
 
@@ -51,6 +51,7 @@ class Storage extends ItemAbstract
     public function setData($data): self
     {
         $this->data = $data;
+
         return $this;
     }
 
@@ -78,7 +79,6 @@ class Storage extends ItemAbstract
 
         $this->method = $method;
     }
-
 
     public function jsonSerialize()
     {

@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\Debug\Item;
 
@@ -19,7 +19,7 @@ class Event extends ItemAbstract
     {
         $this->name        = $name;
         $this->data        = $data;
-        $this->triggeredAt = $this->getDateHelper()->getCurrentTimestampMs();
+        $this->triggeredAt = $this->getDateHelper()->getCurrentTimestampUs();
     }
 
     public function getName(): string
@@ -42,7 +42,7 @@ class Event extends ItemAbstract
         return [
             'name'        => $this->name,
             'data'        => $this->data,
-            'triggeredAt' => $this->triggeredAt
+            'triggeredAt' => $this->triggeredAt,
         ];
     }
 }

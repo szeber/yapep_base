@@ -1,12 +1,12 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\Storage;
 
+use Memcached;
 use YapepBase\Debug\Item\Storage;
 use YapepBase\Exception\ParameterException;
 use YapepBase\Exception\StorageException;
-use Memcached;
 
 /**
  * Memcached storage
@@ -41,6 +41,7 @@ class MemcachedStorage extends StorageAbstract implements IIncrementable
     public function setKeyPrefix(string $keyPrefix): self
     {
         $this->keyPrefix = $keyPrefix;
+
         return $this;
     }
 
@@ -52,6 +53,7 @@ class MemcachedStorage extends StorageAbstract implements IIncrementable
     public function setKeySuffix(string $keySuffix): self
     {
         $this->keySuffix = $keySuffix;
+
         return $this;
     }
 
@@ -63,12 +65,14 @@ class MemcachedStorage extends StorageAbstract implements IIncrementable
     public function setHashKey(bool $hashKey): self
     {
         $this->hashKey = $hashKey;
+
         return $this;
     }
 
     public function setReadOnly(bool $readOnly): self
     {
         $this->readOnly = $readOnly;
+
         return $this;
     }
 
@@ -81,6 +85,7 @@ class MemcachedStorage extends StorageAbstract implements IIncrementable
         if ($this->hashKey) {
             $key = md5($key);
         }
+
         return $key;
     }
 
@@ -103,8 +108,10 @@ class MemcachedStorage extends StorageAbstract implements IIncrementable
             $resultCode = $this->connection->getResultCode();
 
             if (Memcached::RES_NOTSTORED !== $resultCode) {
-                throw new StorageException('Unable to store value in memcache. Error: ' . $this->connection->getResultMessage(),
-                    $resultCode);
+                throw new StorageException(
+                    'Unable to store value in memcache. Error: ' . $this->connection->getResultMessage(),
+                    $resultCode
+                );
             }
         }
 
@@ -127,8 +134,10 @@ class MemcachedStorage extends StorageAbstract implements IIncrementable
         if (false === $result) {
             $resultCode = $this->connection->getResultCode();
             if (Memcached::RES_NOTFOUND !== $resultCode && Memcached::RES_SUCCESS !== $resultCode) {
-                throw new StorageException('Unable to get value in memcache. Error: ' . $this->connection->getResultMessage(),
-                    $resultCode);
+                throw new StorageException(
+                    'Unable to get value in memcache. Error: ' . $this->connection->getResultMessage(),
+                    $resultCode
+                );
             }
         }
 

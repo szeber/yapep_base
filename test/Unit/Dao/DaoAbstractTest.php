@@ -1,12 +1,12 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\Test\Unit\Dao;
 
-use YapepBase\Database\DbConnection;
-use YapepBase\Test\Unit\TestAbstract;
 use Mockery;
 use Mockery\MockInterface;
+use YapepBase\Database\DbConnection;
+use YapepBase\Test\Unit\TestAbstract;
 
 class DaoAbstractTest extends TestAbstract
 {
@@ -29,7 +29,7 @@ class DaoAbstractTest extends TestAbstract
     {
         return [
             'empty string considered empty' => ['', false],
-            'null considered empty'         => [null, true]
+            'null considered empty'         => [null, true],
         ];
     }
 
@@ -52,7 +52,7 @@ class DaoAbstractTest extends TestAbstract
         $this->expectGetParamPrefix('_');
         $this->dao->setEqualityCondition($conditions, $queryParams, 'field', true);
 
-        $expectedConditions = ['field = :_field'];
+        $expectedConditions  = ['field = :_field'];
         $expectedQueryParams = ['field' => 1];
 
         $this->assertSame($expectedConditions, $conditions);
@@ -66,7 +66,7 @@ class DaoAbstractTest extends TestAbstract
         $this->expectGetParamPrefix('_');
         $this->dao->setEqualityCondition($conditions, $queryParams, 'field', 1, 'A');
 
-        $expectedConditions = ['A.field = :_A_field'];
+        $expectedConditions  = ['A.field = :_A_field'];
         $expectedQueryParams = ['A_field' => 1];
 
         $this->assertSame($expectedConditions, $conditions);
@@ -80,7 +80,7 @@ class DaoAbstractTest extends TestAbstract
         $this->expectGetParamPrefix('_');
         $this->dao->setEqualityCondition($conditions, $queryParams, 'field', 0, '', true);
 
-        $expectedConditions = ['field = :_field'];
+        $expectedConditions  = ['field = :_field'];
         $expectedQueryParams = ['field' => 0];
 
         $this->assertSame($expectedConditions, $conditions);
@@ -102,7 +102,7 @@ class DaoAbstractTest extends TestAbstract
         $this->expectGetParamPrefix('');
         $this->dao->setInListCondition($conditions, $queryParams, 'field', [1, 2]);
 
-        $expectedConditions = ['field IN (:field_0, :field_1)'];
+        $expectedConditions  = ['field IN (:field_0, :field_1)'];
         $expectedQueryParams = ['field_0' => 1, 'field_1' => 2];
 
         $this->assertSame($expectedConditions, $conditions);
@@ -115,7 +115,7 @@ class DaoAbstractTest extends TestAbstract
         $this->expectGetParamPrefix('');
         $this->dao->setInListCondition($conditions, $queryParams, 'field', [1, 2], 'A');
 
-        $expectedConditions = ['A.field IN (:A_field_0, :A_field_1)'];
+        $expectedConditions  = ['A.field IN (:A_field_0, :A_field_1)'];
         $expectedQueryParams = ['A_field_0' => 1, 'A_field_1' => 2];
 
         $this->assertSame($expectedConditions, $conditions);
@@ -128,7 +128,7 @@ class DaoAbstractTest extends TestAbstract
         $this->expectGetParamPrefix('');
         $this->dao->setInListCondition($conditions, $queryParams, 'field', [1, 2], '', true);
 
-        $expectedConditions = ['field NOT IN (:field_0, :field_1)'];
+        $expectedConditions  = ['field NOT IN (:field_0, :field_1)'];
         $expectedQueryParams = ['field_0' => 1, 'field_1' => 2];
 
         $this->assertSame($expectedConditions, $conditions);
@@ -138,6 +138,7 @@ class DaoAbstractTest extends TestAbstract
     public function prefixProvider(): array
     {
         $fieldName = 'field';
+
         return [
             'empty alias'     => ['', $fieldName, $fieldName],
             'not empty alias' => ['A', $fieldName, 'A.field'],
@@ -157,6 +158,7 @@ class DaoAbstractTest extends TestAbstract
     public function paramNameProvider(): array
     {
         $fieldName = 'field';
+
         return [
             'just field given'  => [$fieldName, '',  null, $fieldName],
             'table alias given' => [$fieldName, 'A', null, 'A_field'],

@@ -4,34 +4,27 @@ declare(strict_types = 1);
 namespace YapepBase\Test\Unit\Debug\Item;
 
 use Mockery;
-use YapepBase\Debug\Item\Storage;
-use YapepBase\Exception\ParameterException;
+use YapepBase\Debug\Item\General;
 use YapepBase\Helper\DateHelper;
 use YapepBase\Test\Unit\TestAbstract;
 
-class StorageTest extends TestAbstract
+class GeneralTest extends TestAbstract
 {
     /** @var float */
     protected $currentTime = 1.2;
 
     public function testConstructor_shouldStoreGivenValues()
     {
-        $method = Storage::METHOD_GET;
-        $key    = 'key';
-        $data   = ['test' => 1];
+        $name = 'name1';
+        $data = ['test' => 1];
 
         $this->expectGetCurrentTime();
-        $storage = new Storage($method, $key, $data);
+        $general = new General($name, $data);
 
-        $this->assertSame($method, $storage->getMethod());
-        $this->assertSame($key, $storage->getKey());
-        $this->assertSame($data, $storage->getData());
-    }
-
-    public function testConstructorWhenInvalidMethodGiven_shouldThrowException()
-    {
-        $this->expectException(ParameterException::class);
-        new Storage('invalid', 'key');
+        $this->assertSame($name, $general->getName());
+        $this->assertSame($data, $general->getData());
+        $this->assertSame($this->currentTime, $general->getStartTime());
+        $this->assertSame(null, $general->getFinishTime());
     }
 
     protected function expectGetCurrentTime()

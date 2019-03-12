@@ -1,11 +1,12 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\Debug;
 
 use YapepBase\Debug\Item\CurlRequest;
 use YapepBase\Debug\Item\Error;
 use YapepBase\Debug\Item\Event;
+use YapepBase\Debug\Item\General;
 use YapepBase\Debug\Item\MemoryUsage;
 use YapepBase\Debug\Item\SqlQuery;
 use YapepBase\Debug\Item\Storage;
@@ -27,6 +28,8 @@ class DefaultDataHandler implements ICanReturnItems
     protected $storageItems     = [];
     /** @var Time[] */
     protected $timeItems        = [];
+    /** @var General[] */
+    protected $generalItems     = [];
 
     public function addCurlRequest(CurlRequest $item): void
     {
@@ -63,59 +66,48 @@ class DefaultDataHandler implements ICanReturnItems
         $this->timeItems[] = $item;
     }
 
-    /**
-     * @return CurlRequest[]
-     */
+    public function addGeneral(General $item): void
+    {
+        $this->generalItems[] = $item;
+    }
+
     public function getCurlRequestItems(): array
     {
         return $this->curlRequestItems;
     }
 
-    /**
-     * @return Error[]
-     */
     public function getErrorItems(): array
     {
         return $this->errorItems;
     }
 
-    /**
-     * @return Event[]
-     */
     public function getEventItems(): array
     {
         return $this->eventItems;
     }
 
-    /**
-     * @return MemoryUsage[]
-     */
     public function getMemoryUsageItems(): array
     {
         return $this->memoryUsageItems;
     }
 
-    /**
-     * @return SqlQuery[]
-     */
     public function getSqlQueryItems(): array
     {
         return $this->sqlQueryItems;
     }
 
-    /**
-     * @return Storage[]
-     */
     public function getStorageItems(): array
     {
         return $this->storageItems;
     }
 
-    /**
-     * @return Time[]
-     */
     public function getTimeItems(): array
     {
         return $this->timeItems;
+    }
+
+    public function getGeneralItems(): array
+    {
+        return $this->generalItems;
     }
 }

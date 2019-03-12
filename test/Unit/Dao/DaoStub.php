@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\Test\Unit\Dao;
 
@@ -52,6 +52,4 @@ class DaoStub extends DaoAbstract
     {
         return parent::getParamName($fieldName, $tableAlias, $index);
     }
-
-
 }

@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\Debug;
 
@@ -7,6 +7,7 @@ use YapepBase\Application;
 use YapepBase\Debug\Item\CurlRequest;
 use YapepBase\Debug\Item\Error;
 use YapepBase\Debug\Item\Event;
+use YapepBase\Debug\Item\General;
 use YapepBase\Debug\Item\MemoryUsage;
 use YapepBase\Debug\Item\SqlQuery;
 use YapepBase\Debug\Item\Storage;
@@ -30,7 +31,7 @@ class DataHandlerRegistry implements IDataHandlerRegistry
         /** @var DateHelper $dateHelper */
         $dateHelper = Application::getInstance()->getDiContainer()->get(DateHelper::class);
 
-        $this->initiatedAt = $dateHelper->getCurrentTimestampMs();
+        $this->initiatedAt = $dateHelper->getCurrentTimestampUs();
     }
 
     public function register(string $name, ICanReturnItems $dataHandler): void
@@ -113,4 +114,10 @@ class DataHandlerRegistry implements IDataHandlerRegistry
         }
     }
 
+    public function addGeneral(General $item): void
+    {
+        foreach ($this->dataHandlers as $dataHandler) {
+            $dataHandler->addGeneral($item);
+        }
+    }
 }

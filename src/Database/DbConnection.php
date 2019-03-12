@@ -1,19 +1,15 @@
 <?php
+declare(strict_types = 1);
 /**
  * This file is part of YAPEPBase.
  *
- * @package    YapepBase
- * @subpackage Database
  * @copyright  2011 The YAPEP Project All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php BSD License
  */
-
-
 namespace YapepBase\Database;
 
-
-use \PDO;
-use \PDOException;
+use PDO;
+use PDOException;
 
 use YapepBase\Application;
 use YapepBase\Debugger\Item\SqlQueryItem;
@@ -21,13 +17,9 @@ use YapepBase\Exception\DatabaseException;
 
 /**
  * Base class for database connections.
- *
- * @package    YapepBase
- * @subpackage Database
  */
 abstract class DbConnection
 {
-
     /**
      * Stores the connection instance
      *
@@ -86,7 +78,6 @@ abstract class DbConnection
      */
     abstract protected function getBackendType();
 
-
     /**
      * Constructor
      *
@@ -101,12 +92,14 @@ abstract class DbConnection
         $this->configuration  = $configuration;
         $this->connectionName = $connectionName;
         $this->paramPrefix    = $paramPrefix;
+
         try {
             $this->connect($configuration);
         } catch (PDOException $exception) {
             $message = null;
             $code    = 0;
             $this->parsePdoException($exception, $message, $code);
+
             throw new DatabaseException($message, $code, $exception);
         }
         $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -148,7 +141,7 @@ abstract class DbConnection
             throw new DatabaseException('Connection to the database is not established');
         }
 
-        $backtrace    = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS,2);
+        $backtrace    = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
         $callerClass  = null;
         $callerMethod = null;
         if (isset($backtrace[1])) {
@@ -166,8 +159,12 @@ abstract class DbConnection
                 foreach ($params as $paramName => $paramValue) {
                     $paramsQuoted[$paramName] = $this->quote($paramValue);
                 }
-                $debugItem = new SqlQueryItem($this->getBackendType(),
-                    $this->getBackendType() . '.' . $this->connectionName, $query, $paramsQuoted);
+                $debugItem = new SqlQueryItem(
+                    $this->getBackendType(),
+                    $this->getBackendType() . '.' . $this->connectionName,
+                    $query,
+                    $paramsQuoted
+                );
                 $debugger->addItem($debugItem);
                 $startTime = microtime(true);
             }
@@ -189,6 +186,7 @@ abstract class DbConnection
             $message                 = null;
             $code                    = 0;
             $this->parsePdoException($exception, $message, $code);
+
             throw new DatabaseException($message, $code, $exception);
         }
     }
@@ -226,8 +224,8 @@ abstract class DbConnection
 
         if ($itemCount !== false) {
             $itemCount = (int)$this->query('SELECT FOUND_ROWS()')->fetchColumn();
-
         }
+
         return $result;
     }
 
@@ -250,6 +248,7 @@ abstract class DbConnection
             return PDO::PARAM_BOOL;
         } else {
             $value = (string)$value;
+
             return PDO::PARAM_STR;
         }
     }
@@ -272,6 +271,7 @@ abstract class DbConnection
             $this->connection->beginTransaction();
             $this->transactionFailed = false;
         }
+
         return ++$this->transactionCount;
     }
 
@@ -295,11 +295,13 @@ abstract class DbConnection
         if (0 == $this->transactionCount) {
             if ($this->transactionFailed) {
                 $this->connection->rollBack();
+
                 return false;
             } else {
                 return $this->connection->commit();
             }
         }
+
         return $this->transactionFailed;
     }
 
@@ -329,6 +331,7 @@ abstract class DbConnection
         if (empty($this->connection)) {
             throw new DatabaseException('Connection to the database is not established');
         }
+
         return $this->connection->quote($value, $this->getParamType($value));
     }
 
@@ -348,12 +351,14 @@ abstract class DbConnection
         if (empty($this->connection)) {
             throw new DatabaseException('Connection to the database is not established');
         }
+
         try {
             return $this->connection->lastInsertId($name);
         } catch (PDOException $exception) {
             $message = null;
             $code    = 0;
             $this->parsePdoException($exception, $message, $code);
+
             throw new DatabaseException($message, $code, $exception);
         }
     }
@@ -393,8 +398,11 @@ abstract class DbConnection
      */
     public function escapeWildcards($string, $escapeCharacter = '\\')
     {
-        return preg_replace('/([_%' . preg_quote($escapeCharacter, '/') . '])/',
-            addcslashes($escapeCharacter, '$\\') . '$1', $string);
+        return preg_replace(
+            '/([_%' . preg_quote($escapeCharacter, '/') . '])/',
+            addcslashes($escapeCharacter, '$\\') . '$1',
+            $string
+        );
     }
 
     /**

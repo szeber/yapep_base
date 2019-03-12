@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\Debug\Item;
 
@@ -16,12 +16,13 @@ trait THasExecutionTime
 
     protected function setStartTime()
     {
-        $this->startTime = $this->getDateHelper()->getCurrentTimestampMs();
+        $this->startTime = $this->getDateHelper()->getCurrentTimestampUs();
     }
 
     public function setFinished(): self
     {
-        $this->finishTime = $this->getDateHelper()->getCurrentTimestampMs();
+        $this->finishTime = $this->getDateHelper()->getCurrentTimestampUs();
+
         return $this;
     }
 

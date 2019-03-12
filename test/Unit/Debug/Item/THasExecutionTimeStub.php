@@ -1,12 +1,12 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\Test\Unit\Debug\Item;
 
-use YapepBase\Debug\Item\THasExecutionTime;
-use YapepBase\Helper\DateHelper;
 use Mockery;
 use Mockery\MockInterface;
+use YapepBase\Debug\Item\THasExecutionTime;
+use YapepBase\Helper\DateHelper;
 
 class THasExecutionTimeStub
 {

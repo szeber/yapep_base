@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\Storage;
 
@@ -10,7 +10,6 @@ use YapepBase\Exception\StorageException;
  */
 interface IIncrementable
 {
-
     /**
      * Increments (or decreases) the value of the key with the given offset.
      *

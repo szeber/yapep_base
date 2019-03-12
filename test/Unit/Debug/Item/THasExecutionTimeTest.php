@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\Test\Unit\Debug\Item;
 
@@ -69,7 +69,7 @@ class THasExecutionTimeTest extends TestAbstract
     protected function expectGetCurrentTime($expectedResult)
     {
         $this->trait->dateHelper
-            ->shouldReceive('getCurrentTimestampMs')
+            ->shouldReceive('getCurrentTimestampUs')
             ->once()
             ->andReturn($expectedResult)
             ->getMock();
