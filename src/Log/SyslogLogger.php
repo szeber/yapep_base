@@ -1,20 +1,16 @@
 <?php
+declare(strict_types = 1);
 /**
  * This file is part of YAPEPBase.
  *
- * @package    YapepBase
- * @subpackage Log
  * @copyright  2011 The YAPEP Project All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php BSD License
  */
-
-
 namespace YapepBase\Log;
 
-
 use YapepBase\Config;
-use YapepBase\Log\Message\IMessage;
 use YapepBase\Exception\ConfigException;
+use YapepBase\Log\Message\IMessage;
 
 /**
  * SyslogLogger class
@@ -26,139 +22,138 @@ use YapepBase\Exception\ConfigException;
  *         <li>includeSapiName: If TRUE, the SAPI's name will be appended to the applicationIdent. Optional.</li>
  *         <li>addPid: If TRUE, the current PID will be logged too. Optional.</li>
  *     </ul>
- *
- * @package    YapepBase
- * @subpackage Log
  */
-class SyslogLogger extends LoggerAbstract {
+class SyslogLogger extends LoggerAbstract
+{
+    /**
+     * Stores the configuration options
+     *
+     * @var array
+     */
+    protected $configOptions;
 
-	/**
-	 * Stores the configuration options
-	 *
-	 * @var array
-	 */
-	protected $configOptions;
+    /**
+     * The syslog connection
+     * @var \YapepBase\Syslog\NativeSyslogConnection
+     */
+    protected $connection;
 
-	/**
-	 * The syslog connection
-	 * @var \YapepBase\Syslog\NativeSyslogConnection
-	 */
-	protected $connection;
+    /**
+     * Creates a syslog connection.
+     *
+     * @param string                              $configName   The name of the configuration to use.
+     * @param \YapepBase\Syslog\ISyslogConnection $connection   The Syslog connection to use.
+     *
+     * @todo Remove the possibility to set config options. Use only the set connection [emul]
+     */
+    public function __construct($configName, \YapepBase\Syslog\ISyslogConnection $connection = null)
+    {
+        $config = Config::getInstance();
 
-	/**
-	 * Creates a syslog connection.
-	 *
-	 * @param string                              $configName   The name of the configuration to use.
-	 * @param \YapepBase\Syslog\ISyslogConnection $connection   The Syslog connection to use.
-	 *
-	 * @todo Remove the possibility to set config options. Use only the set connection [emul]
-	 */
-	public function __construct($configName, \YapepBase\Syslog\ISyslogConnection $connection = null) {
-		$config = Config::getInstance();
+        $properties = [
+            'applicationIdent',
+            'facility',
+            'includeSapiName',
+            'addPid',
+        ];
+        foreach ($properties as $property) {
+            try {
+                $this->configOptions[$property] =
+                    $config->get('resource.log.' . $configName . '.' . $property, false);
+            } catch (ConfigException $e) {
+                // We just swallow this because we don't know what properties do we need in advance
+            }
+        }
+        $this->verifyConfig($configName);
 
-		$properties = array(
-			'applicationIdent',
-			'facility',
-			'includeSapiName',
-			'addPid'
-		);
-		foreach ($properties as $property) {
-			try {
-				$this->configOptions[$property] =
-					$config->get('resource.log.' . $configName . '.' . $property, false);
+        if ($connection) {
+            $this->connection = $connection;
+        //@codeCoverageIgnoreStart
+        } elseif (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            $this->connection = new \YapepBase\Syslog\LegacySyslogConnection();
+        } else {
+            $this->connection = new \YapepBase\Syslog\NativeSyslogConnection();
+        }
+        //@codeCoverageIgnoreEnd
+        $ident = $this->configOptions['applicationIdent'];
+        if (isset($this->configOptions['includeSapiName']) && $this->configOptions['includeSapiName']) {
+            $ident .= '-' . PHP_SAPI;
+        }
 
-			}
-			catch (ConfigException $e) {
-				// We just swallow this because we don't know what properties do we need in advance
-			}
-		}
-		$this->verifyConfig($configName);
+        // TODO: Can be dangerous as it can override an already set value [emul]
+        $this->connection->setIdent($ident);
 
-		if ($connection) {
-			$this->connection = $connection;
-		//@codeCoverageIgnoreStart
-		} elseif (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-			$this->connection = new \YapepBase\Syslog\LegacySyslogConnection();
-		} else {
-			$this->connection = new \YapepBase\Syslog\NativeSyslogConnection();
-		}
-		//@codeCoverageIgnoreEnd
-		$ident = $this->configOptions['applicationIdent'];
-		if (isset($this->configOptions['includeSapiName']) && $this->configOptions['includeSapiName']) {
-			$ident .= '-' . PHP_SAPI;
-		}
+        $this->connection->setFacility($this->configOptions['facility']);
 
-		// TODO: Can be dangerous as it can override an already set value [emul]
-		$this->connection->setIdent($ident);
+        $options = 0;
+        if (isset($this->configOptions['addPid']) && $this->configOptions['addPid']) {
+            $options += \YapepBase\Syslog\ISyslogConnection::LOG_PID;
+        }
+        $this->connection->setOptions($options);
+        $this->connection->open();
+    }
 
-		$this->connection->setFacility($this->configOptions['facility']);
+    /**
+     * Closes the syslog connection.
+     *
+     * @return void
+     */
+    public function __destruct()
+    {
+        $this->connection->close();
+    }
 
-		$options = 0;
-		if (isset($this->configOptions['addPid']) && $this->configOptions['addPid']) {
-			$options += \YapepBase\Syslog\ISyslogConnection::LOG_PID;
-		}
-		$this->connection->setOptions($options);
-		$this->connection->open();
-	}
+    /**
+     * Logs the message
+     *
+     * @param \YapepBase\Log\Message\IMessage $message   The message to log.
+     *
+     * @return void
+     */
+    protected function logMessage(IMessage $message)
+    {
+        $this->connection->log($message->getPriority(), $this->getLogMessage($message));
+    }
 
-	/**
-	 * Closes the syslog connection.
-	 *
-	 * @return void
-	 */
-	public function __destruct() {
-		$this->connection->close();
-	}
+    /**
+     * Returns the log message prepared from the message
+     *
+     * @param \YapepBase\Log\Message\IMessage $message   The message to log.
+     *
+     * @return string
+     */
+    protected function getLogMessage(IMessage $message)
+    {
+        $fields = $message->getFields();
 
-	/**
-	 * Logs the message
-	 *
-	 * @param \YapepBase\Log\Message\IMessage $message   The message to log.
-	 *
-	 * @return void
-	 */
-	protected function logMessage(IMessage $message) {
-		$this->connection->log($message->getPriority(), $this->getLogMessage($message));
-	}
+        $logMessage = '[' . $message->getTag() . ']|';
 
-	/**
-	 * Returns the log message prepared from the message
-	 *
-	 * @param \YapepBase\Log\Message\IMessage $message   The message to log.
-	 *
-	 * @return string
-	 */
-	protected function getLogMessage(IMessage $message) {
-		$fields = $message->getFields();
+        foreach ($fields as $key => $value) {
+            $logMessage .= $key . '=' . $value . '|';
+        }
 
-		$logMessage = '[' . $message->getTag() . ']|';
+        // We have to remove the line breaks, because syslog will create new log entry after every linebreak.
+        $message = str_replace(PHP_EOL, '', $logMessage . 'message=' . $message->getMessage());
 
-		foreach ($fields as $key => $value) {
-			$logMessage .= $key . '=' . $value . '|';
-		}
+        return $message;
+    }
 
-		// We have to remove the line breaks, because syslog will create new log entry after every linebreak.
-		$message = str_replace(PHP_EOL, '', $logMessage . 'message=' . $message->getMessage());
-
-		return $message;
-	}
-
-	/**
-	 * Verifies the configuration. If there is an error with the config, it throws an exception.
-	 *
-	 * @param string $configName   The name of the configuration to validate.
-	 *
-	 * @return void
-	 *
-	 * @throws \YapepBase\Exception\ConfigException   On configuration errors.
-	 */
-	protected function verifyConfig($configName) {
-		if (
-			!is_array($this->configOptions) || empty($this->configOptions['facility'])
-			|| empty($this->configOptions['applicationIdent'])
-		) {
-			throw new ConfigException('Configuration invalid for syslog: ' . $configName);
-		}
-	}
-
+    /**
+     * Verifies the configuration. If there is an error with the config, it throws an exception.
+     *
+     * @param string $configName   The name of the configuration to validate.
+     *
+     * @return void
+     *
+     * @throws \YapepBase\Exception\ConfigException   On configuration errors.
+     */
+    protected function verifyConfig($configName)
+    {
+        if (
+            !is_array($this->configOptions) || empty($this->configOptions['facility'])
+            || empty($this->configOptions['applicationIdent'])
+        ) {
+            throw new ConfigException('Configuration invalid for syslog: ' . $configName);
+        }
+    }
 }

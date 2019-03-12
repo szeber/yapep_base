@@ -1,26 +1,21 @@
-<?php
+<?php declare(strict_types = 1);
 /**
  * This file is part of YAPEPBase.
  *
- * @package      YapepBase
- * @subpackage   View\Template
  * @copyright    2011 The YAPEP Project All rights reserved.
  * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
  */
-
 namespace YapepBase\View\Template;
-
 
 use Exception;
 
-use YapepBase\Application;
-use YapepBase\Debugger\Item\MemoryUsageItem;
-use YapepBase\Debugger\Item\MessageItem;
-use YapepBase\Debugger\Item\StorageItem;
 use YapepBase\Debugger\Item\CurlRequestItem;
 use YapepBase\Debugger\Item\ErrorItem;
 use YapepBase\Debugger\Item\IDebugItem;
+use YapepBase\Debugger\Item\MemoryUsageItem;
+use YapepBase\Debugger\Item\MessageItem;
 use YapepBase\Debugger\Item\SqlQueryItem;
+use YapepBase\Debugger\Item\StorageItem;
 use YapepBase\Debugger\Item\TimeItem;
 use YapepBase\ErrorHandler\ErrorHandlerHelper;
 use YapepBase\Helper\FileHelper;
@@ -29,292 +24,300 @@ use YapepBase\View\ViewDo;
 
 /**
  * Template for the console debugger's output
- *
- * @package    YapepBase
- * @subpackage View\Template
  */
-class ConsoleDebuggerTemplate extends TemplateAbstract {
+class ConsoleDebuggerTemplate extends TemplateAbstract
+{
+    /**
+     * The time the request was started.
+     *
+     * @var int
+     */
+    protected $startTime;
 
-	/**
-	 * The time the request was started.
-	 *
-	 * @var int
-	 */
-	protected $startTime;
+    /**
+     * The run time.
+     *
+     * @var float
+     */
+    protected $runTime;
 
-	/**
-	 * The run time.
-	 *
-	 * @var float
-	 */
-	protected $runTime;
+    /**
+     * Peak memory usage in bytes.
+     *
+     * @var int
+     */
+    protected $peakMemory;
 
-	/**
-	 * Peak memory usage in bytes.
-	 *
-	 * @var int
-	 */
-	protected $peakMemory;
+    /**
+     * Time debug items.
+     *
+     * These items have NOT been escaped by the view DO, so all values must be separately escaped.
+     *
+     * @var array
+     */
+    protected $items;
 
-	/**
-	 * Time debug items.
-	 *
-	 * These items have NOT been escaped by the view DO, so all values must be separately escaped.
-	 *
-	 * @var array
-	 */
-	protected $items;
+    /**
+     * Content of the $_SERVER superglobal array.
+     *
+     * @var array
+     */
+    protected $serverParams;
 
-	/**
-	 * Content of the $_SERVER superglobal array.
-	 *
-	 * @var array
-	 */
-	protected $serverParams;
+    /**
+     * Params received through post method.
+     *
+     * @var array
+     */
+    protected $postParams;
 
-	/**
-	 * Params received through post method.
-	 *
-	 * @var array
-	 */
-	protected $postParams;
+    /**
+     * Params received through get method.
+     *
+     * @var array
+     */
+    protected $getParams;
 
-	/**
-	 * Params received through get method.
-	 *
-	 * @var array
-	 */
-	protected $getParams;
+    /**
+     * Params received through cookies.
+     *
+     * @var array
+     */
+    protected $cookieParams;
 
-	/**
-	 * Params received through cookies.
-	 *
-	 * @var array
-	 */
-	protected $cookieParams;
+    /**
+     * Params stored in the session.
+     *
+     * @var array
+     */
+    protected $sessionParams;
 
-	/**
-	 * Params stored in the session.
-	 *
-	 * @var array
-	 */
-	protected $sessionParams;
+    /**
+     * Constructor
+     *
+     * @param ViewDo $viewDo           The ViewDo instance to use.
+     * @param string $_startTime       Key to the start timestamp.
+     * @param string $_runTime         Key of the run time.
+     * @param string $_peakMemory      Key of the peak memory usage.
+     * @param string $_items           Key to the debug items.
+     * @param string $_serverParams    Key to the $_SERVER super global array.
+     * @param string $_postParams      Key to the params received through post mthod.
+     * @param string $_getParams       Key to the params received through get method.
+     * @param string $_cookieParams    Key to the params received through cookies.
+     * @param string $_sessionParams   Key to the Session data.
+     */
+    public function __construct(
+        ViewDo $viewDo,
+        $_startTime,
+        $_runTime,
+        $_peakMemory,
+        $_items,
+        $_serverParams,
+        $_postParams,
+        $_getParams,
+        $_cookieParams,
+        $_sessionParams
+    ) {
+        $this->setViewDo($viewDo);
 
-	/**
-	 * Constructor
-	 *
-	 * @param ViewDo $viewDo           The ViewDo instance to use.
-	 * @param string $_startTime       Key to the start timestamp.
-	 * @param string $_runTime         Key of the run time.
-	 * @param string $_peakMemory      Key of the peak memory usage.
-	 * @param string $_items           Key to the debug items.
-	 * @param string $_serverParams    Key to the $_SERVER super global array.
-	 * @param string $_postParams      Key to the params received through post mthod.
-	 * @param string $_getParams       Key to the params received through get method.
-	 * @param string $_cookieParams    Key to the params received through cookies.
-	 * @param string $_sessionParams   Key to the Session data.
-	 */
-	public function __construct(
-		ViewDo $viewDo, $_startTime, $_runTime, $_peakMemory, $_items, $_serverParams, $_postParams, $_getParams,
-		$_cookieParams, $_sessionParams
-	) {
-		$this->setViewDo($viewDo);
+        $this->startTime     = $this->get($_startTime);
+        $this->runTime       = $this->get($_runTime);
+        $this->peakMemory    = $this->get($_peakMemory);
+        $this->items         = $this->get($_items, true);
+        $this->serverParams  = $this->get($_serverParams);
+        $this->postParams    = $this->get($_postParams);
+        $this->getParams     = $this->get($_getParams);
+        $this->cookieParams  = $this->get($_cookieParams);
+        $this->sessionParams = $this->get($_sessionParams);
+    }
 
-		$this->startTime     = $this->get($_startTime);
-		$this->runTime       = $this->get($_runTime);
-		$this->peakMemory    = $this->get($_peakMemory);
-		$this->items         = $this->get($_items, true);
-		$this->serverParams  = $this->get($_serverParams);
-		$this->postParams    = $this->get($_postParams);
-		$this->getParams     = $this->get($_getParams);
-		$this->cookieParams  = $this->get($_cookieParams);
-		$this->sessionParams = $this->get($_sessionParams);
-	}
+    /**
+     * Shapes the given SQL query in a displayable form.
+     *
+     * @param string $query    The queryString.
+     * @param array  $params   The parameters to the given query.
+     *
+     * @return string   The displayable query.
+     */
+    protected function formatSqlQuery($query, array $params)
+    {
+        // Removing the indentations
+        $matches = [];
+        preg_match('/^\s*/', $query, $matches);
+        if (isset($matches[0])) {
+            $query = str_replace($matches[0], "\n", trim($query));
+        }
+        $query = preg_replace('/\t/', '    ', $query);
 
-	/**
-	 * Shapes the given SQL query in a displayable form.
-	 *
-	 * @param string $query    The queryString.
-	 * @param array  $params   The parameters to the given query.
-	 *
-	 * @return string   The displayable query.
-	 */
-	protected function formatSqlQuery($query, array $params) {
-		// Removing the indentations
-		$matches = array();
-		preg_match('/^\s*/', $query, $matches);
-		if (isset($matches[0])) {
-			$query = str_replace($matches[0], "\n", trim($query));
-		}
-		$query = preg_replace('/\t/', '    ', $query);
+        // Replacing the parameters of the query
+        foreach ($params as $paramLabel => $paramValue) {
+            if (is_int($paramLabel)) {
+                $firstParamPosition = strpos($query, '?');
+                if ($firstParamPosition !== false) {
+                    $query = substr_replace($query, $paramValue, $firstParamPosition, 1);
+                }
+            } else {
+                $query = str_replace(':_' . $paramLabel, $paramValue, $query);
+            }
+        }
 
-		// Replacing the parameters of the query
-		foreach ($params as $paramLabel => $paramValue) {
-			if (is_int($paramLabel)) {
-				$firstParamPosition = strpos($query, '?');
-				if ($firstParamPosition !== false) {
-					$query = substr_replace($query, $paramValue, $firstParamPosition, 1);
-				}
-			}
-			else {
-				$query = str_replace(':_' . $paramLabel, $paramValue, $query);
-			}
-		}
+        return $query;
+    }
 
-		return $query;
-	}
+    /**
+     * Creates a displayable HTML from the given error, and stores it.
+     *
+     * @param \YapepBase\Debugger\Item\ErrorItem $error   The error item.
+     *
+     * @return string
+     */
+    public function getFormattedError(ErrorItem $error)
+    {
+        static $errorHandlerHelper;
 
-	/**
-	 * Creates a displayable HTML from the given error, and stores it.
-	 *
-	 * @param \YapepBase\Debugger\Item\ErrorItem $error   The error item.
-	 *
-	 * @return string
-	 */
-	public function getFormattedError(ErrorItem $error) {
-		static $errorHandlerHelper;
+        if (empty($errorHandlerHelper)) {
+            $errorHandlerHelper = new ErrorHandlerHelper;
+        }
 
-		if (empty($errorHandlerHelper)) {
-			$errorHandlerHelper = new ErrorHandlerHelper;
-		}
+        $errorData = $error->getData();
+        $file      = $this->viewDo->escape($errorData[ErrorItem::FIELD_FILE]);
+        $line      = $this->viewDo->escape($errorData[ErrorItem::FIELD_LINE]);
 
-		$errorData = $error->getData();
-		$file = $this->viewDo->escape($errorData[ErrorItem::FIELD_FILE]);
-		$line = $this->viewDo->escape($errorData[ErrorItem::FIELD_LINE]);
+        $id      = uniqid($this->viewDo->escape($errorData[ErrorItem::LOCAL_FIELD_ID]));
+        $message = '[' . $this->viewDo->escape(
+            $errorHandlerHelper->getPhpErrorLevelDescription($errorData[ErrorItem::LOCAL_FIELD_CODE])
+        )
+            . '] ' . $this->viewDo->escape($errorData[ErrorItem::LOCAL_FIELD_MESSAGE]);
+        $source    = FileHelper::getEnvironment($file, $line, 5);
+        $firstLine = key($source);
 
-		$id = uniqid($this->viewDo->escape($errorData[ErrorItem::LOCAL_FIELD_ID]));
-		$message = '[' . $this->viewDo->escape(
-			$errorHandlerHelper->getPhpErrorLevelDescription($errorData[ErrorItem::LOCAL_FIELD_CODE]))
-			. '] ' . $this->viewDo->escape($errorData[ErrorItem::LOCAL_FIELD_MESSAGE]);
-		$source = FileHelper::getEnvironment($file, $line, 5);
-		$firstLine = key($source);
-
-		$errorHtml = '
+        $errorHtml = '
 			<div class="yapep-debug-error-item">
 				<p class="yapep-debug-clickable" onclick="Yapep.toggle(\'error-' . $id . '\'); return false;">
 					' . $message . '<br/>
 					in <var>' . $file . '</var>, <u>line ' . $line . '</u>
 				</p>
 			';
-		if (!empty($errorData[ErrorItem::LOCAL_FIELD_DEBUG_DATA_URL])) {
-			$errorHtml .= '<p><a href="' . $errorData[ErrorItem::LOCAL_FIELD_DEBUG_DATA_URL]
-				. '" target="_blank">Debug data</a></p>';
-		}
-		$errorHtml .= '<div class="yapep-debug-container" id="yapep-debug-error-' . $id . '">
+        if (!empty($errorData[ErrorItem::LOCAL_FIELD_DEBUG_DATA_URL])) {
+            $errorHtml .= '<p><a href="' . $errorData[ErrorItem::LOCAL_FIELD_DEBUG_DATA_URL]
+                . '" target="_blank">Debug data</a></p>';
+        }
+        $errorHtml .= '<div class="yapep-debug-container" id="yapep-debug-error-' . $id . '">
 					<h3>Source code</h3>
 					<ol start="' . $firstLine . '" class="yapep-debug-code">
 		';
-		foreach ($source as $lineNumber => $codeLine) {
-			if ($codeLine === '') {
-				$codeLine = ' ';
-			}
-			$codeLine = str_replace('&lt;?php&nbsp;', '', highlight_string('<?php '.$codeLine, true));
-			if ($line > $lineNumber) {
-				foreach ($errorData[ErrorItem::LOCAL_FIELD_CONTEXT] as $varName => $value) {
-					if (is_scalar($value) || is_array($value)) {
-						$tooltip = $this->viewDo->escape(gettype($value) . ': ' . print_r($value, true));
-					}
-					elseif ($value instanceof Exception) {
-						$tooltip = $this->viewDo->escape(get_class($value) . ': ' . $value->getMessage());
-					}
-					elseif (is_object($value) && method_exists($value, '__toString')) {
-						$tooltip = $this->viewDo->escape(get_class($value) . ': ' . $value->__toString());
-					}
-					else {
-						$tooltip = $this->viewDo->escape(strtoupper(gettype($value)));
-					}
+        foreach ($source as $lineNumber => $codeLine) {
+            if ($codeLine === '') {
+                $codeLine = ' ';
+            }
+            $codeLine = str_replace('&lt;?php&nbsp;', '', highlight_string('<?php ' . $codeLine, true));
+            if ($line > $lineNumber) {
+                foreach ($errorData[ErrorItem::LOCAL_FIELD_CONTEXT] as $varName => $value) {
+                    if (is_scalar($value) || is_array($value)) {
+                        $tooltip = $this->viewDo->escape(gettype($value) . ': ' . print_r($value, true));
+                    } elseif ($value instanceof Exception) {
+                        $tooltip = $this->viewDo->escape(get_class($value) . ': ' . $value->getMessage());
+                    } elseif (is_object($value) && method_exists($value, '__toString')) {
+                        $tooltip = $this->viewDo->escape(get_class($value) . ': ' . $value->__toString());
+                    } else {
+                        $tooltip = $this->viewDo->escape(strtoupper(gettype($value)));
+                    }
 
-					$codeLine = preg_replace('#(?<!::)\$' . $varName . '\b#',
-						'<var title="' . htmlspecialchars($tooltip) . '">' . '$' . $varName . '</var>', $codeLine);
-				}
-			}
-			$errorHtml .= '<li class="'.($lineNumber % 2 ? 'odd ' : '')
-				. ($lineNumber == $line ? 'yapep-debug-code-highlight' : '') . '">' . $codeLine . '</li>';
-		}
-		$errorHtml .= '</ol>';
+                    $codeLine = preg_replace(
+                        '#(?<!::)\$' . $varName . '\b#',
+                        '<var title="' . htmlspecialchars($tooltip) . '">' . '$' . $varName . '</var>',
+                        $codeLine
+                    );
+                }
+            }
+            $errorHtml .= '<li class="' . ($lineNumber % 2 ? 'odd ' : '')
+                . ($lineNumber == $line ? 'yapep-debug-code-highlight' : '') . '">' . $codeLine . '</li>';
+        }
+        $errorHtml .= '</ol>';
 
-		$errorHtml .= '</div>';
-		$errorHtml .= '</div>';
+        $errorHtml .= '</div>';
+        $errorHtml .= '</div>';
 
-		return $errorHtml;
-	}
+        return $errorHtml;
+    }
 
-	/**
-	 * Does the actual rendering.
-	 *
-	 * @return void
-	 */
-	protected function renderContent() {
-		$messages = array();
-		$errors = array();
-		$sqlQueries = array();
-		$sqlQueryTimes = 0;
-		$cacheRequests = array();
-		$cacheTimes = 0;
-		$storageRequests = array();
-		$storageTimes = 0;
-		$curlRequests = array();
-		$curlTimes = 0;
-		$timeMilestones = array();
-		$memoryMilestones = array();
-		$resources = array();
+    /**
+     * Does the actual rendering.
+     *
+     * @return void
+     */
+    protected function renderContent()
+    {
+        $messages         = [];
+        $errors           = [];
+        $sqlQueries       = [];
+        $sqlQueryTimes    = 0;
+        $cacheRequests    = [];
+        $cacheTimes       = 0;
+        $storageRequests  = [];
+        $storageTimes     = 0;
+        $curlRequests     = [];
+        $curlTimes        = 0;
+        $timeMilestones   = [];
+        $memoryMilestones = [];
+        $resources        = [];
 
-		$cacheBackendTypes = array('memcache', 'memcached', 'dummy');
-		foreach ($this->items as $type => $items) {
-			switch ($type) {
-				case IDebugItem::DEBUG_ITEM_MESSAGE:
-					$messages = $items;
-					break;
+        $cacheBackendTypes = ['memcache', 'memcached', 'dummy'];
+        foreach ($this->items as $type => $items) {
+            switch ($type) {
+                case IDebugItem::DEBUG_ITEM_MESSAGE:
+                    $messages = $items;
+                    break;
 
-				case IDebugItem::DEBUG_ITEM_ERROR:
-					$errors = $items;
-					break;
+                case IDebugItem::DEBUG_ITEM_ERROR:
+                    $errors = $items;
+                    break;
 
-				case IDebugItem::DEBUG_ITEM_SQL_QUERY:
-					$sqlQueries = $items;
-					foreach ($items as $item) {
-						/** @var \YapepBase\Debugger\Item\IDebugItem $item */
-						$data = $item->getData();
-						$sqlQueryTimes += $data[SqlQueryItem::LOCAL_FIELD_EXECUTION_TIME];
-					}
-					break;
+                case IDebugItem::DEBUG_ITEM_SQL_QUERY:
+                    $sqlQueries = $items;
+                    foreach ($items as $item) {
+                        /** @var \YapepBase\Debugger\Item\IDebugItem $item */
+                        $data = $item->getData();
+                        $sqlQueryTimes += $data[SqlQueryItem::LOCAL_FIELD_EXECUTION_TIME];
+                    }
+                    break;
 
-				case IDebugItem::DEBUG_ITEM_STORAGE:
-					$storageRequests = $items;
-					foreach ($items as $item) {
-						/** @var \YapepBase\Debugger\Item\IDebugItem $item */
-						$data = $item->getData();
-						$storageTimes += $data[StorageItem::LOCAL_FIELD_EXECUTION_TIME];
-						if (in_array($data[StorageItem::LOCAL_FIELD_BACKEND_TYPE], $cacheBackendTypes)) {
-							$cacheRequests[] = $item;
-							$cacheTimes += $data[StorageItem::LOCAL_FIELD_EXECUTION_TIME];
-						}
-					}
-					break;
+                case IDebugItem::DEBUG_ITEM_STORAGE:
+                    $storageRequests = $items;
+                    foreach ($items as $item) {
+                        /** @var \YapepBase\Debugger\Item\IDebugItem $item */
+                        $data = $item->getData();
+                        $storageTimes += $data[StorageItem::LOCAL_FIELD_EXECUTION_TIME];
+                        if (in_array($data[StorageItem::LOCAL_FIELD_BACKEND_TYPE], $cacheBackendTypes)) {
+                            $cacheRequests[] = $item;
+                            $cacheTimes += $data[StorageItem::LOCAL_FIELD_EXECUTION_TIME];
+                        }
+                    }
+                    break;
 
-				case IDebugItem::DEBUG_ITEM_CURL_REQUEST:
-					$curlRequests = $items;
-					foreach ($items as $item) {
-						/** @var \YapepBase\Debugger\Item\IDebugItem $item */
-						$data = $item->getData();
-						$curlTimes += $data[CurlRequestItem::LOCAL_FIELD_EXECUTION_TIME];
-					}
-					break;
+                case IDebugItem::DEBUG_ITEM_CURL_REQUEST:
+                    $curlRequests = $items;
+                    foreach ($items as $item) {
+                        /** @var \YapepBase\Debugger\Item\IDebugItem $item */
+                        $data = $item->getData();
+                        $curlTimes += $data[CurlRequestItem::LOCAL_FIELD_EXECUTION_TIME];
+                    }
+                    break;
 
-				case IDebugItem::DEBUG_ITEM_TIME_MILESTONE:
-					$timeMilestones = $items;
-					break;
+                case IDebugItem::DEBUG_ITEM_TIME_MILESTONE:
+                    $timeMilestones = $items;
+                    break;
 
-				case IDebugItem::DEBUG_ITEM_MEMORY_USAGE_MILESTONE:
-					$memoryMilestones = $items;
-					break;
+                case IDebugItem::DEBUG_ITEM_MEMORY_USAGE_MILESTONE:
+                    $memoryMilestones = $items;
+                    break;
 
-				default:
-					$resources[$type] = $items;
-					break;
-			}
-		}
-// -------------------- HTML ------------------- ?>
+                default:
+                    $resources[$type] = $items;
+                    break;
+            }
+        }
+        // -------------------- HTML -------------------?>
 
 <style type="text/css">
 #yapep-debug {
@@ -630,14 +633,14 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 			<br style="clear: both;"/>
 			<h2>Log</h2>
 
-		<?php foreach (array_filter(array(
-				'server'  => $this->serverParams,
-				'cookies' => $this->cookieParams,
-				'get'     => $this->getParams,
-				'post'    => $this->postParams,
-				'session' => $this->sessionParams
-			)) as $name => $var):
-		?>
+		<?php foreach (array_filter([
+                'server'  => $this->serverParams,
+                'cookies' => $this->cookieParams,
+                'get'     => $this->getParams,
+                'post'    => $this->postParams,
+                'session' => $this->sessionParams,
+            ]) as $name => $var):
+        ?>
 			<h3 class="yapep-debug-clickable" onclick="Yapep.toggle('panel-log-<?= $name ?>', []); return false;">
 				<?= strtoupper($name) ?>
 			</h3>
@@ -646,7 +649,8 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 				<tr><th>Variable name</th><th>Value</th></tr>
 				</thead>
 				<tbody>
-				<?php $i = 0; foreach ($var as $key => $value): ?>
+				<?php $i = 0;
+        foreach ($var as $key => $value): ?>
 					<tr class="<?= (++$i % 2 ? 'odd' : '') ?>">
 					<th><var><?= $key ?></var></th>
 					<td>
@@ -661,7 +665,7 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 						</table>
 					<?php else: ?>
 						<pre><?= print_r($value, true) ?></pre>
-					<?php endif;?>
+					<?php endif; ?>
 					</td>
 					</tr>
 				<?php endforeach; ?>
@@ -678,10 +682,9 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 			<br style="clear: both;"/>
 			<h2>Messages</h2>
 		<?php
-			foreach ($messages as $message):
-				/** @var \YapepBase\Debugger\Item\MessageItem $message */
-				$messageData = $this->viewDo->escape($message->getData());
-		?>
+            foreach ($messages as $message):
+                /** @var \YapepBase\Debugger\Item\MessageItem $message */
+                $messageData = $this->viewDo->escape($message->getData()); ?>
 			<?php if (is_string($messageData[MessageItem::LOCAL_FIELD_MESSAGE])): ?>
 				<p>
 					<code>"<?= $messageData[MessageItem::LOCAL_FIELD_MESSAGE] ?>"</code>
@@ -704,32 +707,31 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 			<br style="clear: both;"/>
 			<h2>Error</h2>
 		<?php
-			if (!empty($errors)):
-				$locationIdCount = array();
-				foreach ($errors as $error) {
-					/** @var \YapepBase\Debugger\Item\ErrorItem $error */
-					$locationId = $error->getLocationId();
-					if (isset($locationIdCount[$locationId])) {
-						$locationIdCount[$locationId]++;
-					} else {
-						$locationIdCount[$locationId] = 1;
-					}
-				}
-				array_multisort($locationIdCount);
-				$locationIdCount = array_reverse($locationIdCount, true);
-		?>
+            if (!empty($errors)):
+                $locationIdCount = [];
+        foreach ($errors as $error) {
+            /** @var \YapepBase\Debugger\Item\ErrorItem $error */
+            $locationId = $error->getLocationId();
+            if (isset($locationIdCount[$locationId])) {
+                $locationIdCount[$locationId]++;
+            } else {
+                $locationIdCount[$locationId] = 1;
+            }
+        }
+        array_multisort($locationIdCount);
+        $locationIdCount = array_reverse($locationIdCount, true); ?>
 			<div class="yapep-debug-error-item">
 				<h3 class="yapep-debug-clickable" onclick="Yapep.toggle('ERRORSUMMARY'); return false;">Summary</h3>
 				<div class="yapep-debug-panel-inner-summary" id="yapep-debug-ERRORSUMMARY">
 					<table>
 						<tr><th>Source</th><th>Count</th></tr>
-					<?php foreach($locationIdCount as $source => $count): ?>
+					<?php foreach ($locationIdCount as $source => $count): ?>
 						<tr><td><?= $this->viewDo->escape($source) ?></td><td><?=$count?></td></tr>
 					<?php endforeach; ?>
 					</table>
 				</div>
 			</div>
-		<?php endif;?>
+		<?php endif; ?>
 
 			<p class="yapep-debug-clickable yapep-debug-collapse-all" onclick="Yapep.collapseAll(event); return false;">Collapse all</p>
 			<?php foreach ($errors as $error): ?>
@@ -746,38 +748,37 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 			<h2>SQL</h2>
 
 			<?php
-				if (!empty($sqlQueries)):
-					$locationIdCount = array();
-					$connectionStat = array();
-					foreach ($sqlQueries as $query) {
-						/** @var \YapepBase\Debugger\Item\SqlQueryItem $query */
-						$locationId = $query->getLocationId();
-						if (isset($locationIdCount[$locationId])) {
-							$locationIdCount[$locationId]++;
-						} else {
-							$locationIdCount[$locationId] = 1;
-						}
-						$connectionName = $query->getField(SqlQueryItem::LOCAL_FIELD_CONNECTION_NAME);
-						if (isset($connectionStat[$connectionName])) {
-							$connectionStat[$connectionName]['time'] +=
-								$query->getField(SqlQueryItem::LOCAL_FIELD_EXECUTION_TIME);
-							$connectionStat[$connectionName]['count']++;
-						} else {
-							$connectionStat[$connectionName] = array(
-								'time'  => $query->getField(SqlQueryItem::LOCAL_FIELD_EXECUTION_TIME),
-								'count' => 1,
-							);
-						}
-					}
-					array_multisort($locationIdCount);
-					$locationIdCount = array_reverse($locationIdCount, true);
-			?>
+                if (!empty($sqlQueries)):
+                    $locationIdCount = [];
+        $connectionStat              = [];
+        foreach ($sqlQueries as $query) {
+            /** @var \YapepBase\Debugger\Item\SqlQueryItem $query */
+            $locationId = $query->getLocationId();
+            if (isset($locationIdCount[$locationId])) {
+                $locationIdCount[$locationId]++;
+            } else {
+                $locationIdCount[$locationId] = 1;
+            }
+            $connectionName = $query->getField(SqlQueryItem::LOCAL_FIELD_CONNECTION_NAME);
+            if (isset($connectionStat[$connectionName])) {
+                $connectionStat[$connectionName]['time'] +=
+                                $query->getField(SqlQueryItem::LOCAL_FIELD_EXECUTION_TIME);
+                $connectionStat[$connectionName]['count']++;
+            } else {
+                $connectionStat[$connectionName] = [
+                                'time'  => $query->getField(SqlQueryItem::LOCAL_FIELD_EXECUTION_TIME),
+                                'count' => 1,
+                            ];
+            }
+        }
+        array_multisort($locationIdCount);
+        $locationIdCount = array_reverse($locationIdCount, true); ?>
 			<div class="yapep-debug-error-item">
 				<h3 class="yapep-debug-clickable" onclick="Yapep.toggle('DBSUMMARY'); return false;">Summary</h3>
 				<div class="yapep-debug-panel-inner-summary" id="yapep-debug-DBSUMMARY">
 					<table>
 						<tr><th>Source</th><th>Count</th></tr>
-					<?php foreach($locationIdCount as $source => $count): ?>
+					<?php foreach ($locationIdCount as $source => $count): ?>
 						<tr><td><?= $this->viewDo->escape($source) ?></td><td><?=$count?></td></tr>
 					<?php endforeach; ?>
 					</table>
@@ -793,7 +794,7 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 							<th>Total time</th>
 							<th>Visible</th>
 						</tr>
-						<?php foreach($connectionStat as $name => $data): ?>
+						<?php foreach ($connectionStat as $name => $data): ?>
 						<tr>
 							<td><label for="yapep-debug-db-connection-toggle-<?= $this->viewDo->escape($name) ?>"><?= $this->viewDo->escape($name) ?></label></td>
 							<td><?= $data['count'] ?></td>
@@ -804,16 +805,17 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 					</table>
 				</div>
 			</div>
-			<?php endif;?>
+			<?php endif; ?>
 
 			<p class="yapep-debug-clickable yapep-debug-collapse-all" onclick="Yapep.collapseAll(event); return false;">Collapse all</p>
 		<?php
-			foreach ($sqlQueries as $index => $query):
-				/** @var \YapepBase\Debugger\Item\SqlQueryItem $query */
-				$queryData = $this->viewDo->escape($query->getData());
-				$queryCleared = $this->viewDo->escape($this->formatSqlQuery($queryData[SqlQueryItem::LOCAL_FIELD_QUERY],
-					$queryData[SqlQueryItem::LOCAL_FIELD_PARAMS]));
-		?>
+            foreach ($sqlQueries as $index => $query):
+                /** @var \YapepBase\Debugger\Item\SqlQueryItem $query */
+                $queryData = $this->viewDo->escape($query->getData());
+        $queryCleared      = $this->viewDo->escape($this->formatSqlQuery(
+                    $queryData[SqlQueryItem::LOCAL_FIELD_QUERY],
+                    $queryData[SqlQueryItem::LOCAL_FIELD_PARAMS]
+                )); ?>
 			<div class="yapep-debug-error-item yapep-debug-collapse-all yapep-debug-db-connection-<?= $queryData[SqlQueryItem::LOCAL_FIELD_CONNECTION_NAME] ?>">
 				<p class="yapep-debug-clickable" onclick="Yapep.toggle('SQL<?= $index ?>'); return false;">
 					<?= (isset($queryData[SqlQueryItem::LOCAL_FIELD_EXECUTION_TIME]) ? sprintf('%.4f', $queryData[SqlQueryItem::LOCAL_FIELD_EXECUTION_TIME]) : '') ?> sec in
@@ -841,38 +843,37 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 			<h2>CACHE</h2>
 
 		<?php
-			if (!empty($cacheRequests)):
-				$locationIdCount = array();
-				$connectionStat = array();
-				foreach ($cacheRequests as $request) {
-					/** @var \YapepBase\Debugger\Item\StorageItem $request */
-					$locationId = $request->getLocationId();
-					if (isset($locationIdCount[$locationId])) {
-						$locationIdCount[$locationId]++;
-					} else {
-						$locationIdCount[$locationId] = 1;
-					}
-					$connectionName = $request->getField(SqlQueryItem::LOCAL_FIELD_CONNECTION_NAME);
-					if (isset($connectionStat[$connectionName])) {
-						$connectionStat[$connectionName]['time'] +=
-							$request->getField(SqlQueryItem::LOCAL_FIELD_EXECUTION_TIME);
-						$connectionStat[$connectionName]['count']++;
-					} else {
-						$connectionStat[$connectionName] = array(
-							'time'  => $request->getField(SqlQueryItem::LOCAL_FIELD_EXECUTION_TIME),
-							'count' => 1,
-						);
-					}
-				}
-				array_multisort($locationIdCount);
-				$locationIdCount = array_reverse($locationIdCount, true);
-		?>
+            if (!empty($cacheRequests)):
+                $locationIdCount = [];
+        $connectionStat          = [];
+        foreach ($cacheRequests as $request) {
+            /** @var \YapepBase\Debugger\Item\StorageItem $request */
+            $locationId = $request->getLocationId();
+            if (isset($locationIdCount[$locationId])) {
+                $locationIdCount[$locationId]++;
+            } else {
+                $locationIdCount[$locationId] = 1;
+            }
+            $connectionName = $request->getField(SqlQueryItem::LOCAL_FIELD_CONNECTION_NAME);
+            if (isset($connectionStat[$connectionName])) {
+                $connectionStat[$connectionName]['time'] +=
+                            $request->getField(SqlQueryItem::LOCAL_FIELD_EXECUTION_TIME);
+                $connectionStat[$connectionName]['count']++;
+            } else {
+                $connectionStat[$connectionName] = [
+                            'time'  => $request->getField(SqlQueryItem::LOCAL_FIELD_EXECUTION_TIME),
+                            'count' => 1,
+                        ];
+            }
+        }
+        array_multisort($locationIdCount);
+        $locationIdCount = array_reverse($locationIdCount, true); ?>
 			<div class="yapep-debug-error-item">
 				<h3 class="yapep-debug-clickable" onclick="Yapep.toggle('CACHESUMMARY'); return false;">Summary</h3>
 				<div class="yapep-debug-panel-inner-summary" id="yapep-debug-CACHESUMMARY">
 					<table>
 						<tr><th>Source</th><th>Count</th></tr>
-						<?php foreach($locationIdCount as $source => $count): ?>
+						<?php foreach ($locationIdCount as $source => $count): ?>
 						<tr><td><?= $this->viewDo->escape($source) ?></td><td><?=$count?></td></tr>
 						<?php endforeach; ?>
 					</table>
@@ -888,7 +889,7 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 							<th>Total time</th>
 							<th>Visible</th>
 						</tr>
-						<?php foreach($connectionStat as $name => $data): ?>
+						<?php foreach ($connectionStat as $name => $data): ?>
 						<tr>
 							<td><label for="yapep-debug-cache-connection-toggle-<?= $this->viewDo->escape($name) ?>"><?= $this->viewDo->escape($name) ?></label></td>
 							<td><?= $data['count'] ?></td>
@@ -899,14 +900,13 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 					</table>
 				</div>
 			</div>
-			<?php endif;?>
+			<?php endif; ?>
 
 			<p class="yapep-debug-clickable yapep-debug-collapse-all" onclick="Yapep.collapseAll(event); return false;">Collapse all</p>
 		<?php
-			foreach ($cacheRequests as $index => $request):
-				/** @var \YapepBase\Debugger\Item\StorageItem $request */
-				$requestData = $this->viewDo->escape($request->getData());
-		?>
+            foreach ($cacheRequests as $index => $request):
+                /** @var \YapepBase\Debugger\Item\StorageItem $request */
+                $requestData = $this->viewDo->escape($request->getData()); ?>
 			<div class="yapep-debug-error-item yapep-debug-cache-connection-<?= $requestData[StorageItem::LOCAL_FIELD_CONNECTION_NAME] ?>">
 				<p class="yapep-debug-clickable" onclick="Yapep.toggle('CACHE<?= $index ?>'); return false;">
 					<b><?= $requestData[StorageItem::LOCAL_FIELD_QUERY] ?></b> ->
@@ -917,9 +917,9 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 				</p>
 				<ol class="yapep-debug-code yapep-debug-copyable" title="Double-click to copy content" id="yapep-debug-CACHE<?= $index ?>" ondblclick="Yapep.copyToClipboard(this); return false;">
 				<?php
-					$value = var_export($requestData[StorageItem::LOCAL_FIELD_PARAMS], true);
-					foreach (explode("\n", $value) as $paramIndex => $line):
-				?>
+                    $value = var_export($requestData[StorageItem::LOCAL_FIELD_PARAMS], true);
+        foreach (explode("\n", $value) as $paramIndex => $line):
+                ?>
 					<li class="<?= ($paramIndex % 2 ? 'odd' : '') ?>">
 						<?= $line ?>
 					</li>
@@ -940,35 +940,34 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 			<div class="yapep-debug-error-item">
 				<h3 class="yapep-debug-clickable" onclick="Yapep.toggle('CURLSUMMARY'); return false;">Summary</h3>
 				<?php
-					$locationIdCount = array();
-					$hostStat = array();
-					foreach ($curlRequests as $request) {
-						/** @var \YapepBase\Debugger\Item\CurlRequestItem $request */
-						$locationId = $request->getLocationId();
-						if (isset($locationIdCount[$locationId])) {
-							$locationIdCount[$locationId]++;
-						} else {
-							$locationIdCount[$locationId] = 1;
-						}
-						$hostName = (string)$request->getField(CurlRequestItem::LOCAL_FIELD_HOST);
-						if (isset($hostStat[$hostName])) {
-							$hostStat[$hostName]['time'] +=
-								$request->getField(SqlQueryItem::LOCAL_FIELD_EXECUTION_TIME);
-							$hostStat[$hostName]['count']++;
-						} else {
-							$hostStat[$hostName] = array(
-								'time'  => $request->getField(SqlQueryItem::LOCAL_FIELD_EXECUTION_TIME),
-								'count' => 1,
-							);
-						}
-					}
-					array_multisort($locationIdCount);
-					$locationIdCount = array_reverse($locationIdCount, true);
-				?>
+                    $locationIdCount = [];
+        $hostStat                    = [];
+        foreach ($curlRequests as $request) {
+            /** @var \YapepBase\Debugger\Item\CurlRequestItem $request */
+            $locationId = $request->getLocationId();
+            if (isset($locationIdCount[$locationId])) {
+                $locationIdCount[$locationId]++;
+            } else {
+                $locationIdCount[$locationId] = 1;
+            }
+            $hostName = (string)$request->getField(CurlRequestItem::LOCAL_FIELD_HOST);
+            if (isset($hostStat[$hostName])) {
+                $hostStat[$hostName]['time'] +=
+                                $request->getField(SqlQueryItem::LOCAL_FIELD_EXECUTION_TIME);
+                $hostStat[$hostName]['count']++;
+            } else {
+                $hostStat[$hostName] = [
+                                'time'  => $request->getField(SqlQueryItem::LOCAL_FIELD_EXECUTION_TIME),
+                                'count' => 1,
+                            ];
+            }
+        }
+        array_multisort($locationIdCount);
+        $locationIdCount = array_reverse($locationIdCount, true); ?>
 				<div class="yapep-debug-panel-inner-summary" id="yapep-debug-CURLSUMMARY">
 					<table>
 						<tr><th>Source</th><th>Count</th></tr>
-					<?php foreach($locationIdCount as $source => $count): ?>
+					<?php foreach ($locationIdCount as $source => $count): ?>
 						<tr>
 							<td><?= $this->viewDo->escape($source) ?></td>
 							<td><?= $count ?></td>
@@ -987,7 +986,7 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 							<th>Total time</th>
 							<th>Visible</th>
 						</tr>
-						<?php foreach($hostStat as $name => $data): ?>
+						<?php foreach ($hostStat as $name => $data): ?>
 						<tr>
 							<td><label for="yapep-debug-curl-connection-toggle-<?= $this->viewDo->escape($name) ?>"><?= $this->viewDo->escape($name) ?></label></td>
 							<td><?= $data['count'] ?></td>
@@ -998,14 +997,13 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 					</table>
 				</div>
 			</div>
-			<?php endif;?>
+			<?php endif; ?>
 
 			<p class="yapep-debug-clickable yapep-debug-collapse-all" onclick="Yapep.collapseAll(event); return false;">Collapse all</p>
 		<?php
-			foreach ($curlRequests as $index => $request):
-				/** @var \YapepBase\Debugger\Item\CurlRequestItem $requestData */
-				$requestData = $this->viewDo->escape($request->getData());
-		?>
+            foreach ($curlRequests as $index => $request):
+                /** @var \YapepBase\Debugger\Item\CurlRequestItem $requestData */
+                $requestData = $this->viewDo->escape($request->getData()); ?>
 			<div class="yapep-debug-error-item yapep-debug-curl-connection-<?= (string)$requestData[CurlRequestItem::LOCAL_FIELD_HOST] ?>"">
 				<p class="yapep-debug-clickable" onclick="Yapep.toggle('CURL<?= $index ?>'); return false;">
 					<b><?= $requestData[CurlRequestItem::LOCAL_FIELD_PROTOCOL] ?> <?= $requestData[CurlRequestItem::LOCAL_FIELD_METHOD] ?>: <?= $requestData[CurlRequestItem::LOCAL_FIELD_URL] ?></b> -&gt;
@@ -1015,9 +1013,9 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 				</p>
 				<ol class="yapep-debug-code yapep-debug-copyable" title="Double-click to copy content" id="yapep-debug-CURL<?= $index ?>" ondblclick="Yapep.copyToClipboard(this); return false;">
 				<?php
-					$value = var_export($requestData[CurlRequestItem::LOCAL_FIELD_PARAMETERS], true);
-					foreach (explode("\n", $value) as $valueIndex => $line):
-				?>
+                    $value = var_export($requestData[CurlRequestItem::LOCAL_FIELD_PARAMETERS], true);
+        foreach (explode("\n", $value) as $valueIndex => $line):
+                ?>
 					<li class="<?= ($valueIndex % 2 ? 'odd' : '') ?>">
 						<pre><?= $line ?></pre>
 					</li>
@@ -1040,10 +1038,9 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 				</thead>
 				<tbody>
 				<?php
-					foreach ($timeMilestones as $milestone):
-						/** @var \YapepBase\Debugger\Item\TimeItem $milestone */
-						$milestoneData = $this->viewDo->escape($milestone->getData());
-				?>
+                    foreach ($timeMilestones as $milestone):
+                        /** @var \YapepBase\Debugger\Item\TimeItem $milestone */
+                        $milestoneData = $this->viewDo->escape($milestone->getData()); ?>
 					<tr>
 						<th><?= $milestoneData[TimeItem::FIELD_NAME] ?></th>
 						<td><?= sprintf('%.2f', ($milestoneData[TimeItem::LOCAL_FIELD_ELAPSED_TIME]) * 1000) ?> ms</td>
@@ -1066,10 +1063,9 @@ class ConsoleDebuggerTemplate extends TemplateAbstract {
 				</thead>
 				<tbody>
 				<?php
-					foreach ($memoryMilestones as $milestone):
-						/** @var \YapepBase\Debugger\Item\MemoryUsageItem $milestone */
-						$milestoneData = $this->viewDo->escape($milestone->getData());
-				?>
+                    foreach ($memoryMilestones as $milestone):
+                        /** @var \YapepBase\Debugger\Item\MemoryUsageItem $milestone */
+                        $milestoneData = $this->viewDo->escape($milestone->getData()); ?>
 					<tr>
 						<th><?= $milestoneData[MemoryUsageItem::FIELD_NAME] ?></th>
 						<td><?= sprintf('%.2f', ($milestoneData[MemoryUsageItem::LOCAL_FIELD_CURRENT]) / 1024) ?> KB</td>
@@ -1338,6 +1334,5 @@ Yapep.init();
 </script>
 
 <?php // ------------------------ /HTML ---------------------
-	}
-
+    }
 }

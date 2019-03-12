@@ -1,14 +1,13 @@
 <?php
+declare(strict_types = 1);
 /**
  * This file is part of YAPEPBase.
  *
- * @package      YapepBase
- * @subpackage   Batch
  * @copyright    2011 The YAPEP Project All rights reserved.
  * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
  */
-
 namespace YapepBase\Batch;
+
 use YapepBase\Exception\Exception;
 
 /**
@@ -86,435 +85,462 @@ use YapepBase\Exception\Exception;
  *   -v, --verbose     Be verbose
  *       --example     The printed example
  * </code>
- *
- * @package    YapepBase
- * @subpackage Batch
  */
-class CliUserInterfaceHelper {
+class CliUserInterfaceHelper
+{
+    /** Maximum line length */
+    const MAX_LINE_LENGTH = 75;
 
-	/** Maximum line length */
-	const MAX_LINE_LENGTH = 75;
+    /** Number of spaces used for 1 level of indentation */
+    const INDENT_SPACE_COUNT = 4;
 
-	/** Number of spaces used for 1 level of indentation */
-	const INDENT_SPACE_COUNT = 4;
+    /** The key of the all usages subarray in the usage switches array. */
+    const ALL_USAGE_KEY = 'all';
 
-	/** The key of the all usages subarray in the usage switches array. */
-	const ALL_USAGE_KEY = 'all';
+    /**
+     * Name of the script
+     *
+     * @var string
+     */
+    protected $scriptName;
 
-	/**
-	 * Name of the script
-	 *
-	 * @var string
-	 */
-	protected $scriptName;
+    /**
+     * Error message that should be printed
+     *
+     * @var string
+     */
+    protected $errorMessage;
 
-	/**
-	 * Error message that should be printed
-	 *
-	 * @var string
-	 */
-	protected $errorMessage;
+    /**
+     * All of the switches for the script.
+     *
+     * @var array
+     */
+    protected $switches = [];
 
-	/**
-	 * All of the switches for the script.
-	 *
-	 * @var array
-	 */
-	protected $switches = array();
+    /**
+     * All usage methods for the script.
+     *
+     * @var array
+     */
+    protected $usages = [];
 
-	/**
-	 * All usage methods for the script.
-	 *
-	 * @var array
-	 */
-	protected $usages = array();
+    /**
+     * Switches for each usage.
+     *
+     * @var array
+     */
+    protected $usageSwitches = [self::ALL_USAGE_KEY => []];
 
-	/**
-	 * Switches for each usage.
-	 *
-	 * @var array
-	 */
-	protected $usageSwitches = array(self::ALL_USAGE_KEY => array());
+    /**
+     * Operands for each usage.
+     *
+     * @var array
+     */
+    protected $usageOperands = [self::ALL_USAGE_KEY => []];
 
-	/**
-	 * Operands for each usage.
-	 *
-	 * @var array
-	 */
-	protected $usageOperands = array(self::ALL_USAGE_KEY => array());
+    /**
+     * Description of the script.
+     *
+     * @var string
+     */
+    protected $description;
 
-	/**
-	 * Description of the script.
-	 *
-	 * @var string
-	 */
-	protected $description;
+    /**
+     * The length of the longest allowed long switch's name in characters.
+     *
+     * @var int
+     */
+    protected $longestSwitchNameLength = 0;
 
-	/**
-	 * The length of the longest allowed long switch's name in characters.
-	 *
-	 * @var int
-	 */
-	protected $longestSwitchNameLength = 0;
+    /**
+     * Array containing all the already set short switches.
+     *
+     * @var array
+     */
+    protected $shortSwitches = [];
 
-	/**
-	 * Array containing all the already set short switches.
-	 *
-	 * @var array
-	 */
-	protected $shortSwitches = array();
+    /**
+     * Array containing all the already set long switches.
+     *
+     * @var array
+     */
+    protected $longSwitches = [];
 
-	/**
-	 * Array containing all the already set long switches.
-	 *
-	 * @var array
-	 */
-	protected $longSwitches = array();
+    /**
+    /**
+     * The argument parser instance.
+     *
+     * @var CliArgumentParser
+     */
+    protected $argumentParser;
 
-	/**
-	/**
-	 * The argument parser instance.
-	 *
-	 * @var CliArgumentParser
-	 */
-	protected $argumentParser;
+    /**
+     * Constructor.
+     *
+     * @param string $description   Description of the script. All newlines are converted to spaces in it, and multiple
+     *                              spaces are replaced with a single space in it.
+     * @param string $scriptName    Filename of the script.
+     */
+    public function __construct($description, $scriptName = null)
+    {
+        $this->description    = preg_replace('/\s{2,}/', ' ', str_replace(["\n", "\r"], ' ', trim($description)));
+        $this->scriptName     = (empty($scriptName) ? basename($_SERVER['argv'][0]) : $scriptName);
+        $this->argumentParser = new CliArgumentParser();
+    }
 
-	/**
-	 * Constructor.
-	 *
-	 * @param string $description   Description of the script. All newlines are converted to spaces in it, and multiple
-	 *                              spaces are replaced with a single space in it.
-	 * @param string $scriptName    Filename of the script.
-	 */
-	public function __construct($description, $scriptName = null) {
-		$this->description = preg_replace('/\s{2,}/', ' ', str_replace(array("\n", "\r"), ' ', trim($description)));
-		$this->scriptName = (empty($scriptName) ? basename($_SERVER['argv'][0]) : $scriptName);
-		$this->argumentParser = new CliArgumentParser();
-	}
+    /**
+     * Adds a new usage method to the script.
+     *
+     * @param string $description   Description of the usage method.
+     *
+     * @return int
+     */
+    public function addUsage($description)
+    {
+        $this->usages[] = $description;
+        end($this->usages);
+        $usageIndex                       = key($this->usages);
+        $this->usageSwitches[$usageIndex] = [];
+        $this->usageOperands[$usageIndex] = [];
 
-	/**
-	 * Adds a new usage method to the script.
-	 *
-	 * @param string $description   Description of the usage method.
-	 *
-	 * @return int
-	 */
-	public function addUsage($description) {
-		$this->usages[] = $description;
-		end($this->usages);
-		$usageIndex = key($this->usages);
-		$this->usageSwitches[$usageIndex] = array();
-		$this->usageOperands[$usageIndex] = array();
-		return $usageIndex;
-	}
+        return $usageIndex;
+    }
 
-	/**
-	 * Adds a new switch to the script.
-	 *
-	 * @param string    $shortName         Short name of the switch.
-	 * @param string    $longName          Long name of the switch.
-	 * @param string    $description       Description of the switch.
-	 * @param int|array $usageIndexes      An array containing the usage indexes for the switch, or optionally an int
-	 *                                     if the switch is only valid for one usage method. If set to NULL, it will be
-	 *                                     added to all usages.{@see self::addUsage()}
-	 * @param bool      $isOptional        If TRUE, the switch is not required.
-	 * @param null      $paramName         Name of the switch parameter to display.
-	 * @param bool      $paramIsOptional   If TRUE, the switch parameter is treated as optional.
-	 *
-	 * @return void
-	 *
-	 * @throws \YapepBase\Exception\Exception
-	 */
-	public function addSwitch(
-		$shortName, $longName, $description, $usageIndexes, $isOptional = false, $paramName = null,
-		$paramIsOptional = false
-	) {
-		$description = preg_replace('/\s{2,}/', ' ', str_replace(array("\n", "\r"), ' ', trim($description)));
+    /**
+     * Adds a new switch to the script.
+     *
+     * @param string    $shortName         Short name of the switch.
+     * @param string    $longName          Long name of the switch.
+     * @param string    $description       Description of the switch.
+     * @param int|array $usageIndexes      An array containing the usage indexes for the switch, or optionally an int
+     *                                     if the switch is only valid for one usage method. If set to NULL, it will be
+     *                                     added to all usages.{@see self::addUsage()}
+     * @param bool      $isOptional        If TRUE, the switch is not required.
+     * @param null      $paramName         Name of the switch parameter to display.
+     * @param bool      $paramIsOptional   If TRUE, the switch parameter is treated as optional.
+     *
+     * @return void
+     *
+     * @throws \YapepBase\Exception\Exception
+     */
+    public function addSwitch(
+        $shortName,
+        $longName,
+        $description,
+        $usageIndexes,
+        $isOptional = false,
+        $paramName = null,
+        $paramIsOptional = false
+    ) {
+        $description = preg_replace('/\s{2,}/', ' ', str_replace(["\n", "\r"], ' ', trim($description)));
 
-		$switchData = array(
-			'shortName'       => $shortName,
-			'longName'        => $longName,
-			'description'     => $description,
-			'isOptional'      => $isOptional,
-			'paramName'       => $paramName,
-			'paramIsOptional' => $paramIsOptional,
-		);
+        $switchData = [
+            'shortName'       => $shortName,
+            'longName'        => $longName,
+            'description'     => $description,
+            'isOptional'      => $isOptional,
+            'paramName'       => $paramName,
+            'paramIsOptional' => $paramIsOptional,
+        ];
 
-		if (empty($shortName) && empty($longName)) {
-			throw new Exception('Neither short, nor long name given for the switch');
-		}
+        if (empty($shortName) && empty($longName)) {
+            throw new Exception('Neither short, nor long name given for the switch');
+        }
 
-		if (!empty($shortName)) {
-			if (in_array($shortName, $this->shortSwitches)) {
-				throw new Exception('Short switch already added: ' . $shortName);
-			} else {
-				$this->shortSwitches[] = $shortName;
-			}
-		}
+        if (!empty($shortName)) {
+            if (in_array($shortName, $this->shortSwitches)) {
+                throw new Exception('Short switch already added: ' . $shortName);
+            } else {
+                $this->shortSwitches[] = $shortName;
+            }
+        }
 
-		if (!empty($longName)) {
-			if (in_array($longName, $this->longSwitches)) {
-				throw new Exception('Long switch already added: ' . $longName);
-			} else {
-				$this->longSwitches[] = $longName;
-			}
-		}
+        if (!empty($longName)) {
+            if (in_array($longName, $this->longSwitches)) {
+                throw new Exception('Long switch already added: ' . $longName);
+            } else {
+                $this->longSwitches[] = $longName;
+            }
+        }
 
-		if (mb_strlen($longName, 'UTF-8') > $this->longestSwitchNameLength) {
-			$this->longestSwitchNameLength = mb_strlen($longName, 'UTF-8');
-		}
+        if (mb_strlen($longName, 'UTF-8') > $this->longestSwitchNameLength) {
+            $this->longestSwitchNameLength = mb_strlen($longName, 'UTF-8');
+        }
 
-		$this->switches[] = $switchData;
-		if (is_null($usageIndexes)) {
-			$this->usageSwitches[self::ALL_USAGE_KEY][] = $switchData;
-		} elseif (is_array($usageIndexes)) {
-			foreach ($usageIndexes as $index) {
-				if (!isset($this->usageSwitches[$index])) {
-					throw new Exception('The specified usage index is not set: ' . $index);
-				}
-				$this->usageSwitches[$index][] = $switchData;
-			}
-		} elseif (is_numeric($usageIndexes) && isset($this->usageSwitches[$usageIndexes])) {
-			$this->usageSwitches[$usageIndexes][] = $switchData;
-		} else {
-			throw new Exception('The specified usage index is not set: ' . $usageIndexes);
-		}
+        $this->switches[] = $switchData;
+        if (is_null($usageIndexes)) {
+            $this->usageSwitches[self::ALL_USAGE_KEY][] = $switchData;
+        } elseif (is_array($usageIndexes)) {
+            foreach ($usageIndexes as $index) {
+                if (!isset($this->usageSwitches[$index])) {
+                    throw new Exception('The specified usage index is not set: ' . $index);
+                }
+                $this->usageSwitches[$index][] = $switchData;
+            }
+        } elseif (is_numeric($usageIndexes) && isset($this->usageSwitches[$usageIndexes])) {
+            $this->usageSwitches[$usageIndexes][] = $switchData;
+        } else {
+            throw new Exception('The specified usage index is not set: ' . $usageIndexes);
+        }
 
-		$this->argumentParser->addSwitch($shortName, $longName, !empty($paramName), $paramIsOptional);
-	}
+        $this->argumentParser->addSwitch($shortName, $longName, !empty($paramName), $paramIsOptional);
+    }
 
-	/**
-	 * Adds an operand to the list of operands.
-	 *
-	 * @param string    $name              The name of the operand.
-	 * @param int|array $usageIndexes      An array containing the usage indexes for the switch, or optionally an int
-	 *                                     if the switch is only valid for one usage method. If set to NULL, it will be
-	 *                                     added to all usages.{@see self::addUsage()}
-	 * @param bool      $isOptional        If TRUE, the operand is optional.
-	 * @param bool      $treatAsLiteral    If TRUE, the name is treated as a literal, not the name of a parameter.
-	 *
-	 * @return void
-	 * @throws \YapepBase\Exception\Exception
-	 */
-	public function addOperand($name, $usageIndexes, $isOptional = false, $treatAsLiteral = false) {
-		$operandData = array(
-			'name'           => $name,
-			'isOptional'     => $isOptional,
-			'treatAsLiteral' => $treatAsLiteral,
-		);
+    /**
+     * Adds an operand to the list of operands.
+     *
+     * @param string    $name              The name of the operand.
+     * @param int|array $usageIndexes      An array containing the usage indexes for the switch, or optionally an int
+     *                                     if the switch is only valid for one usage method. If set to NULL, it will be
+     *                                     added to all usages.{@see self::addUsage()}
+     * @param bool      $isOptional        If TRUE, the operand is optional.
+     * @param bool      $treatAsLiteral    If TRUE, the name is treated as a literal, not the name of a parameter.
+     *
+     * @return void
+     * @throws \YapepBase\Exception\Exception
+     */
+    public function addOperand($name, $usageIndexes, $isOptional = false, $treatAsLiteral = false)
+    {
+        $operandData = [
+            'name'           => $name,
+            'isOptional'     => $isOptional,
+            'treatAsLiteral' => $treatAsLiteral,
+        ];
 
-		if (is_null($usageIndexes)) {
-			$this->usageOperands[self::ALL_USAGE_KEY][] = $operandData;
-		} elseif (is_array($usageIndexes)) {
-			foreach ($usageIndexes as $index) {
-				if (!isset($this->usageOperands[$index])) {
-					throw new Exception('The specified usage index is not set: ' . $index);
-				}
-				$this->usageOperands[$index][] = $operandData;
-			}
-		} elseif (is_numeric($usageIndexes) && isset($this->usageOperands[$usageIndexes])) {
-			$this->usageOperands[$usageIndexes][] = $operandData;
-		} else {
-			throw new Exception('The specified usage index is not set: ' . $usageIndexes);
-		}
+        if (is_null($usageIndexes)) {
+            $this->usageOperands[self::ALL_USAGE_KEY][] = $operandData;
+        } elseif (is_array($usageIndexes)) {
+            foreach ($usageIndexes as $index) {
+                if (!isset($this->usageOperands[$index])) {
+                    throw new Exception('The specified usage index is not set: ' . $index);
+                }
+                $this->usageOperands[$index][] = $operandData;
+            }
+        } elseif (is_numeric($usageIndexes) && isset($this->usageOperands[$usageIndexes])) {
+            $this->usageOperands[$usageIndexes][] = $operandData;
+        } else {
+            throw new Exception('The specified usage index is not set: ' . $usageIndexes);
+        }
+    }
 
-	}
+    /**
+     * Sets the error message
+     *
+     * @param string $message   The error message.
+     *
+     * @return void
+     */
+    public function setErrorMessage($message)
+    {
+        $this->errorMessage = $message;
+    }
 
-	/**
-	 * Sets the error message
-	 *
-	 * @param string $message   The error message.
-	 *
-	 * @return void
-	 */
-	public function setErrorMessage($message) {
-		$this->errorMessage = $message;
-	}
+    /**
+     * Returns the usage output, optionally with the help message.
+     *
+     * @param bool $showHelp   If TRUE, the usage output will also contain the help (switch list and explanation).
+     *
+     * @return string   The formatted usage output.
+     *
+     * @throws \YapepBase\Exception\Exception   If no usages are defined for the script.
+     */
+    public function getUsageOutput($showHelp = false)
+    {
+        if (empty($this->usages)) {
+            throw new Exception('Tried to get usage output without any defined usages');
+        }
+        $message = '';
+        if (!$showHelp) {
+            $errorLine = $this->getIndentedBlock(
+                (empty($this->errorMessage) ? 'A required parameter is missing.' : $this->errorMessage),
+                1
+            );
+            $message .= "Error:\n" . $errorLine . "\n\n";
+        }
+        $message .= (count($this->usages) > 1 ? 'Usages:' : 'Usage:') . "\n\n";
+        foreach ($this->usages as $index => $usage) {
+            $message .= $this->getUsageWithSwitches(
+                $usage,
+                array_merge($this->usageSwitches[self::ALL_USAGE_KEY], $this->usageSwitches[$index]),
+                array_merge($this->usageOperands[self::ALL_USAGE_KEY], $this->usageOperands[$index])
+            );
+        }
 
-	/**
-	 * Returns the usage output, optionally with the help message.
-	 *
-	 * @param bool $showHelp   If TRUE, the usage output will also contain the help (switch list and explanation).
-	 *
-	 * @return string   The formatted usage output.
-	 *
-	 * @throws \YapepBase\Exception\Exception   If no usages are defined for the script.
-	 */
-	public function getUsageOutput($showHelp = false) {
-		if (empty($this->usages)) {
-			throw new Exception('Tried to get usage output without any defined usages');
-		}
-		$message = '';
-		if (!$showHelp) {
-			$errorLine = $this->getIndentedBlock(
-				(empty($this->errorMessage) ? 'A required parameter is missing.' : $this->errorMessage),
-				1
-			);
-			$message .= "Error:\n" . $errorLine . "\n\n";
-		}
-		$message .= (count($this->usages) > 1 ? 'Usages:' : 'Usage:') . "\n\n";
-		foreach ($this->usages as $index => $usage) {
-			$message .= $this->getUsageWithSwitches($usage,
-				array_merge($this->usageSwitches[self::ALL_USAGE_KEY], $this->usageSwitches[$index]),
-				array_merge($this->usageOperands[self::ALL_USAGE_KEY], $this->usageOperands[$index]));
-		}
+        if ($showHelp) {
+            $message .= $this->getHelp();
+        }
 
-		if ($showHelp) {
-			$message .= $this->getHelp();
-		}
+        return $message;
+    }
 
-		return $message;
-	}
+    /**
+     * Returns the formatted help output (script description, switch list with explanation)
+     *
+     * @return string
+     */
+    protected function getHelp()
+    {
+        $message     = "\n\n" . $this->getIndentedBlock($this->description, 0) . "\n";
+        $indentCount = ceil((10 + $this->longestSwitchNameLength) / self::INDENT_SPACE_COUNT);
+        $linePad     = $indentCount * self::INDENT_SPACE_COUNT;
 
-	/**
-	 * Returns the formatted help output (script description, switch list with explanation)
-	 *
-	 * @return string
-	 */
-	protected function getHelp() {
-		$message = "\n\n" . $this->getIndentedBlock($this->description, 0) . "\n";
-		$indentCount = ceil((10 + $this->longestSwitchNameLength) / self::INDENT_SPACE_COUNT);
-		$linePad = $indentCount * self::INDENT_SPACE_COUNT;
+        if (!empty($this->switches)) {
+            foreach ($this->switches as $switchData) {
+                $shortName = (empty($switchData['shortName']) ? '  ' : '-' . $switchData['shortName']);
 
-		if (!empty($this->switches)) {
-			foreach ($this->switches as $switchData) {
+                $switchLine = str_pad(
+                    '  ' . $shortName
+                    . (empty($switchData['shortName']) || empty($switchData['longName']) ? '  ' : ', ')
+                    . (empty($switchData['longName']) ? '' : '--'
+                    . str_pad($switchData['longName'], $this->longestSwitchNameLength, ' ', STR_PAD_RIGHT)),
+                    $linePad,
+                    ' ',
+                    STR_PAD_RIGHT
+                ) . $switchData['description'];
 
-				$shortName = (empty($switchData['shortName']) ? '  ' : '-' . $switchData['shortName']);
+                $fistSwitchLine = $this->getWrappedString($switchLine, $linePad);
 
-				$switchLine = str_pad('  ' . $shortName
-					. (empty($switchData['shortName']) || empty($switchData['longName']) ? '  ' : ', ')
-					. (empty($switchData['longName']) ? '' : '--'
-					. str_pad($switchData['longName'], $this->longestSwitchNameLength, ' ', STR_PAD_RIGHT)),
-					$linePad, ' ', STR_PAD_RIGHT) . $switchData['description'];
+                if (strlen($switchLine)) {
+                    $fistSwitchLine .= "\n" . $this->getIndentedBlock($switchLine, $indentCount);
+                } else {
+                    $fistSwitchLine .= "\n";
+                }
+                $message .= $fistSwitchLine;
+            }
+        }
 
-				$fistSwitchLine = $this->getWrappedString($switchLine, $linePad);
+        return $message . "\n\n";
+    }
 
-				if (strlen($switchLine)) {
-					$fistSwitchLine .= "\n" . $this->getIndentedBlock($switchLine, $indentCount);
-				} else {
-					$fistSwitchLine .= "\n";
-				}
-				$message .= $fistSwitchLine;
-			}
-		}
-		return $message . "\n\n";
-	}
+    /**
+     * Returns a formatted usage output with the switches that are valid for the usage.
+     *
+     * @param string $description   Description of the usage method.
+     * @param array  $switches      Array containing all the switches that are valid for the given usage.
+     * @param array  $operands      Array containing all the operands that are valid for the given usage.
+     *
+     * @return string
+     */
+    protected function getUsageWithSwitches($description, array $switches, array $operands)
+    {
+        $commandFormat = $this->scriptName;
+        foreach ($switches as $switchData) {
+            $commandFormat .= ' ';
 
-	/**
-	 * Returns a formatted usage output with the switches that are valid for the usage.
-	 *
-	 * @param string $description   Description of the usage method.
-	 * @param array  $switches      Array containing all the switches that are valid for the given usage.
-	 * @param array  $operands      Array containing all the operands that are valid for the given usage.
-	 *
-	 * @return string
-	 */
-	protected function getUsageWithSwitches($description, array $switches, array $operands) {
-		$commandFormat = $this->scriptName;
-		foreach ($switches as $switchData) {
-			$commandFormat .= ' ';
+            $switchVersions = [];
+            if (!empty($switchData['shortName'])) {
+                $switchVersion = '-' . $switchData['shortName'];
+                if (!empty($switchData['paramName'])) {
+                    $switchVersion .= (
+                        $switchData['paramIsOptional']
+                        ? '[=<' . $switchData['paramName'] . '>]'
+                        : '=<' . $switchData['paramName'] . '>'
+                    );
+                }
+                $switchVersions[] = $switchVersion;
+            }
+            if (!empty($switchData['longName'])) {
+                $switchVersion = '--' . $switchData['longName'];
+                if (!empty($switchData['paramName'])) {
+                    $switchVersion .= (
+                        $switchData['paramIsOptional']
+                        ? '[=<' . $switchData['paramName'] . '>]'
+                        : '=<' . $switchData['paramName'] . '>'
+                    );
+                }
+                $switchVersions[] = $switchVersion;
+            }
 
-			$switchVersions = array();
-			if (!empty($switchData['shortName'])) {
-				$switchVersion = '-' . $switchData['shortName'];
-				if (!empty($switchData['paramName'])) {
-					$switchVersion .= (
-						$switchData['paramIsOptional']
-						? '[=<' . $switchData['paramName'] . '>]'
-						: '=<' . $switchData['paramName'] . '>'
-					);
-				}
-				$switchVersions[] = $switchVersion;
-			}
-			if (!empty($switchData['longName'])) {
-				$switchVersion = '--' . $switchData['longName'];
-				if (!empty($switchData['paramName'])) {
-					$switchVersion .= (
-					$switchData['paramIsOptional']
-						? '[=<' . $switchData['paramName'] . '>]'
-						: '=<' . $switchData['paramName'] . '>'
-					);
-				}
-				$switchVersions[] = $switchVersion;
-			}
+            $commandFormat .= ' ' . ($switchData['isOptional'] ? '[' : '') . implode('|', $switchVersions)
+                . ($switchData['isOptional'] ? ']' : '');
+        }
+        foreach ($operands as $operandData) {
+            $commandFormat .= ' '
+                . ($operandData['isOptional'] ? '[' : '')
+                . ($operandData['treatAsLiteral'] ? '' : '<')
+                . $operandData['name']
+                . ($operandData['treatAsLiteral'] ? '' : '>')
+                . ($operandData['isOptional'] ? ']' : '');
+        }
 
-			$commandFormat .= ' ' . ($switchData['isOptional'] ? '[' : '') . implode('|', $switchVersions)
-				. ($switchData['isOptional'] ? ']' : '');
-		}
-		foreach ($operands as $operandData) {
-			$commandFormat .= ' '
-				. ($operandData['isOptional'] ? '[' : '')
-				. ($operandData['treatAsLiteral'] ? '' : '<')
-				. $operandData['name']
-				. ($operandData['treatAsLiteral'] ? '' : '>')
-				. ($operandData['isOptional'] ? ']' : '');
-		}
+        return $this->getIndentedBlock($description . ':', 1) . $this->getIndentedBlock($commandFormat, 2) . "\n";
+    }
 
-		return $this->getIndentedBlock($description . ':', 1) . $this->getIndentedBlock($commandFormat, 2) . "\n";
-	}
+    /**
+     * Returns the provided string indented by the specified amount and wrapped to the max line length.
+     *
+     * @param string $string     The string to format.
+     * @param int    $indentBy   The number of indentation blocks to indent by. {@see self::INDENT_SPACE_COUNT}
+     *
+     * @return string
+     */
+    protected function getIndentedBlock($string, $indentBy = 1)
+    {
+        $indentLength = $indentBy * self::INDENT_SPACE_COUNT;
+        $string       = trim($string);
+        $lines        = [];
+        while (strlen($string) > 0) {
+            $string  = str_pad('', $indentLength, ' ') . $string;
+            $lines[] = $this->getWrappedString($string, $indentLength + 5);
+        }
 
-	/**
-	 * Returns the provided string indented by the specified amount and wrapped to the max line length.
-	 *
-	 * @param string $string     The string to format.
-	 * @param int    $indentBy   The number of indentation blocks to indent by. {@see self::INDENT_SPACE_COUNT}
-	 *
-	 * @return string
-	 */
-	protected function getIndentedBlock($string, $indentBy = 1) {
-		$indentLength = $indentBy * self::INDENT_SPACE_COUNT;
-		$string = trim($string);
-		$lines = array();
-		while (strlen($string) > 0) {
-			$string = str_pad('', $indentLength, ' ') . $string;
-			$lines[] = $this->getWrappedString($string, $indentLength + 5);
-		}
-		return implode("\n", $lines) . "\n";
-	}
+        return implode("\n", $lines) . "\n";
+    }
 
-	/**
-	 * Returns the provided string wrapped to the maximum line length.
-	 *
-	 * @param string $string        The string to format.
-	 * @param int    $minSpacePos   If the last space in the line would occur before this character, the line will
-	 *                              not be wrapped at a space, but exactly at the maximum line length.
-	 *
-	 * @return string
-	 */
-	protected function getWrappedString(&$string, $minSpacePos = 0) {
-		$line = mb_substr($string, 0, (self::MAX_LINE_LENGTH + 1), 'UTF-8');
-		$lastSpace = mb_strrpos($line, ' ', null, 'UTF-8');
-		if (mb_strlen($line, 'UTF-8') <= self::MAX_LINE_LENGTH || $lastSpace <= $minSpacePos) {
-			$line = rtrim(mb_substr($line, 0, self::MAX_LINE_LENGTH, 'UTF-8'));
-		} else {
-			$line = rtrim(mb_substr($line, 0, $lastSpace, 'UTF-8'));
-		}
-		$string = trim(mb_substr($string, mb_strlen($line, 'UTF-8'),
-			mb_strlen($string, 'UTF-8'), 'UTF-8'));
-		return $line;
-	}
+    /**
+     * Returns the provided string wrapped to the maximum line length.
+     *
+     * @param string $string        The string to format.
+     * @param int    $minSpacePos   If the last space in the line would occur before this character, the line will
+     *                              not be wrapped at a space, but exactly at the maximum line length.
+     *
+     * @return string
+     */
+    protected function getWrappedString(&$string, $minSpacePos = 0)
+    {
+        $line      = mb_substr($string, 0, (self::MAX_LINE_LENGTH + 1), 'UTF-8');
+        $lastSpace = mb_strrpos($line, ' ', null, 'UTF-8');
+        if (mb_strlen($line, 'UTF-8') <= self::MAX_LINE_LENGTH || $lastSpace <= $minSpacePos) {
+            $line = rtrim(mb_substr($line, 0, self::MAX_LINE_LENGTH, 'UTF-8'));
+        } else {
+            $line = rtrim(mb_substr($line, 0, $lastSpace, 'UTF-8'));
+        }
+        $string = trim(mb_substr(
+            $string,
+            mb_strlen($line, 'UTF-8'),
+            mb_strlen($string, 'UTF-8'),
+            'UTF-8'
+        ));
 
-	/**
-	 * Returns the arguments that have been parsed.
-	 *
-	 * @return array
-	 *
-	 * @throws \YapepBase\Exception\Exception   If the parsing failed.
-	 */
-	public function getParsedArgs() {
-		$this->argumentParser->parse();
-		return $this->argumentParser->getParsedSwitches();
-	}
+        return $line;
+    }
 
-	/**
-	 * Returns the operands that were parsed.
-	 *
-	 * These are the arguments after the switches.
-	 *
-	 * @return array
-	 */
-	public function getParsedOperands() {
-		$this->argumentParser->parse();
-		return $this->argumentParser->getParsedOperands();
-	}
+    /**
+     * Returns the arguments that have been parsed.
+     *
+     * @return array
+     *
+     * @throws \YapepBase\Exception\Exception   If the parsing failed.
+     */
+    public function getParsedArgs()
+    {
+        $this->argumentParser->parse();
+
+        return $this->argumentParser->getParsedSwitches();
+    }
+
+    /**
+     * Returns the operands that were parsed.
+     *
+     * These are the arguments after the switches.
+     *
+     * @return array
+     */
+    public function getParsedOperands()
+    {
+        $this->argumentParser->parse();
+
+        return $this->argumentParser->getParsedOperands();
+    }
 }

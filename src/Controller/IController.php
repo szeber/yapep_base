@@ -1,11 +1,11 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\Controller;
 
-
-use YapepBase\Response\IResponse;
+use YapepBase\Exception\ParameterException;
 use YapepBase\Request\IRequest;
+use YapepBase\Response\IResponse;
 
 /**
  * Controller interface
@@ -21,8 +21,14 @@ use YapepBase\Request\IRequest;
  */
 interface IController
 {
+    /**
+     * @throws ParameterException
+     */
     public function setRequest(IRequest $request): void;
 
+    /**
+     * @throws ParameterException
+     */
     public function setResponse(IResponse $response): void;
 
     /**

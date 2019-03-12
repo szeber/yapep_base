@@ -3,7 +3,6 @@ declare(strict_types = 1);
 
 namespace YapepBase\Log;
 
-
 use YapepBase\Exception\Log\LoggerNotFoundException;
 use YapepBase\Log\Message\IMessage;
 
@@ -12,7 +11,6 @@ use YapepBase\Log\Message\IMessage;
  */
 class LoggerRegistry implements ILoggerRegistry
 {
-
     /**
      * @var ILogger[]
      */
