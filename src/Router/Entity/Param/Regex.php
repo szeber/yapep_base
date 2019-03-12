@@ -1,7 +1,7 @@
 <?php
 declare(strict_types = 1);
 
-namespace YapepBase\Router\DataObject\Param;
+namespace YapepBase\Router\Entity\Param;
 
 use YapepBase\Exception\InvalidArgumentException;
 
@@ -26,27 +26,25 @@ class Regex extends ParamAbstract
         }
     }
 
-    /**
-     * @param array $paramData
-     *
-     * @return static
-     */
     public static function createFromArray(array $paramData)
     {
         static::validateParamData($paramData);
 
         return new static(
-            (string) $paramData['name'],
-            (string) $paramData['pattern']
+            (string)$paramData['name'],
+            (string)$paramData['pattern']
         );
     }
 
-    /**
-     * @param array $state
-     *
-     * @return static
-     */
-    public static function __set_state($state)
+    public function toArray(): array
+    {
+        return [
+            'name'    => $this->name,
+            'pattern' => $this->pattern
+        ];
+    }
+
+    public static function __set_state(array $state)
     {
         return new static(
             $state['name'],

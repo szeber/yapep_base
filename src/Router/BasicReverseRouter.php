@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace YapepBase\Router;
 
-use YapepBase\Router\DataObject\Route;
+use YapepBase\Router\Entity\Route;
 use YapepBase\Router\Exception\RouteNotFoundException;
 
 class BasicReverseRouter implements IReverseRouter, IRouteGetter

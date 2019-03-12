@@ -1,9 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace YapepBase\Router\DataObject\Param;
+namespace YapepBase\Router\Entity\Param;
 
-interface IParam
+use YapepBase\Exception\InvalidArgumentException;
+
+/**
+ * Maps the param types to their representation class
+ */
+class Mapper
 {
 
     public const TYPE_NUMERIC                = 'num';
@@ -14,7 +19,7 @@ interface IParam
     public const TYPE_REGEX                  = 'regex';
     public const TYPE_ENUM                   = 'enum';
 
-    public const BUILT_IN_TYPE_MAP = [
+    protected const BUILT_IN_TYPE_MAP = [
         self::TYPE_NUMERIC                => Numeric::class,
         self::TYPE_ALPHA                  => Alpha::class,
         self::TYPE_ALPHA_NUMERIC          => AlphaNumeric::class,
@@ -25,20 +30,27 @@ interface IParam
     ];
 
     /**
-     * @param array $paramData
-     *
-     * @return static
+     * @throws InvalidArgumentException
      */
-    public static function createFromArray(array $paramData);
+    public static function getClassByType(string $type): string
+    {
+        if (!isset(self::BUILT_IN_TYPE_MAP[$type])) {
+            throw new InvalidArgumentException('Type ' . $type . ' is not mapped to a Class');
+        }
+        return self::BUILT_IN_TYPE_MAP[$type];
+    }
 
     /**
-     * @param array $state
-     *
-     * @return static
+     * @throws InvalidArgumentException
      */
-    public static function __set_state($state);
+    public static function getTypeByClass(string $class): string
+    {
+        $result = array_search($class, self::BUILT_IN_TYPE_MAP);
 
-    public function getName(): string;
+        if ($result === false) {
+            throw new InvalidArgumentException('Class ' . $class . ' is not mapped to a type');
+        }
 
-    public function getPattern(): string;
+        return $result;
+    }
 }

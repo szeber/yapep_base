@@ -3,7 +3,7 @@ declare(strict_types = 1);
 
 namespace YapepBase\Router\Caching;
 
-use YapepBase\Router\DataObject\Route;
+use YapepBase\Router\Entity\Route;
 
 interface IRouteCollector
 {

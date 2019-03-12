@@ -1,7 +1,7 @@
 <?php
 declare(strict_types = 1);
 
-namespace YapepBase\Router\DataObject;
+namespace YapepBase\Router\Entity;
 
 use YapepBase\Router\IAnnotation;
 

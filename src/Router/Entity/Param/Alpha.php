@@ -1,7 +1,7 @@
 <?php
 declare(strict_types = 1);
 
-namespace YapepBase\Router\DataObject\Param;
+namespace YapepBase\Router\Entity\Param;
 
 class Alpha extends ParamAbstract
 {

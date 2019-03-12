@@ -4,7 +4,7 @@ declare(strict_types = 1);
 namespace YapepBase\Router\Caching;
 
 use Symfony\Component\Yaml\Yaml;
-use YapepBase\Router\DataObject\Route;
+use YapepBase\Router\Entity\Route;
 
 class YamlCollector implements IRouteCollector
 {

@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace YapepBase\Router\DataObject;
+namespace YapepBase\Router\Entity;
 
 use YapepBase\Exception\InvalidArgumentException;
 use YapepBase\Router\IAnnotation;
@@ -103,6 +103,28 @@ class Route
         );
     }
 
+    public function toArray(): array
+    {
+        $pathsArray = [];
+        foreach ($this->paths as $annotation) {
+            $pathsArray[] = $annotation->toArray();
+        }
+        $annotationsArray = [];
+        foreach ($this->annotations as $annotation) {
+            $annotationsArray[get_class($annotation)] = $annotation->toArray();
+        }
+
+        return [
+            self::KEY_CONTROLLER     => $this->controller,
+            self::KEY_ACTION         => $this->action,
+            self::KEY_NAME           => $this->name,
+            self::KEY_METHODS        => $this->methods,
+            self::KEY_REGEX_PATTERNS => $this->regexPatterns,
+            self::KEY_PATHS          => $pathsArray,
+            self::KEY_ANNOTATIONS    => $annotationsArray
+        ];
+    }
+
     private static function validate(array $route): void
     {
         if (empty($route)) {
@@ -122,7 +144,7 @@ class Route
         }
 
         if (isset($route[self::KEY_REGEX_PATTERNS]) && !is_array($route[self::KEY_REGEX_PATTERNS])) {
-            throw new InvalidArgumentException('The regexPatters should be an array in the route');
+            throw new InvalidArgumentException('The regexPatterns should be an array in the route');
         }
 
         if (!isset($route[self::KEY_PATHS]) || !is_array($route[self::KEY_PATHS])) {
@@ -130,7 +152,7 @@ class Route
         }
 
         if (isset($route[self::KEY_ANNOTATIONS]) && !is_array($route[self::KEY_ANNOTATIONS])) {
-            throw new InvalidArgumentException('No annotations should be an array in the route');
+            throw new InvalidArgumentException('Annotations should be an array in the route');
         }
     }
 

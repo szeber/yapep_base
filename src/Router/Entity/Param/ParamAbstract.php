@@ -1,7 +1,7 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
 
-namespace YapepBase\Router\DataObject\Param;
+namespace YapepBase\Router\Entity\Param;
 
 use YapepBase\Exception\InvalidArgumentException;
 
@@ -15,16 +15,16 @@ abstract class ParamAbstract implements IParam
         $this->name = $name;
     }
 
-    /**
-     * @param array $paramData
-     *
-     * @return static
-     */
     public static function createFromArray(array $paramData)
     {
         static::validateParamData($paramData);
 
-        return new static((string) $paramData['name']);
+        return new static((string)$paramData['name']);
+    }
+
+    public function toArray(): array
+    {
+        return ['name' => $this->name];
     }
 
     protected static function validateParamData(array $paramData): void
@@ -34,16 +34,9 @@ abstract class ParamAbstract implements IParam
         }
     }
 
-    /**
-     * @param array $state
-     *
-     * @return static
-     */
-    public static function __set_state($state)
+    public static function __set_state(array $state)
     {
-        return new static(
-            $state['name']
-        );
+        return new static($state['name']);
     }
 
     public function getName(): string

@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace YapepBase\Router;
 
 use YapepBase\Request\IRequest;
-use YapepBase\Router\DataObject\ControllerAction;
-use YapepBase\Router\DataObject\Route;
+use YapepBase\Router\Entity\ControllerAction;
+use YapepBase\Router\Entity\Route;
 use YapepBase\Router\Exception\RouteNotFoundException;
 
 class BasicRouter implements IRouter

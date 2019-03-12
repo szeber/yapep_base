@@ -5,7 +5,7 @@ namespace YapepBase\Router;
 
 
 use YapepBase\Request\IRequest;
-use YapepBase\Router\DataObject\ControllerAction;
+use YapepBase\Router\Entity\ControllerAction;
 use YapepBase\Router\Exception\RouteNotFoundException;
 use YapepBase\Router\Exception\RouterException;
 

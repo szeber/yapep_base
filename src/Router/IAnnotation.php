@@ -17,6 +17,13 @@ interface IAnnotation
     public static function createFromArray(array $annotation);
 
     /**
+     * Returns the array representation of the object.
+     *
+     * The returned array must be compatible with the createFromArray methods param.
+     */
+    public function toArray(): array;
+
+    /**
      * @param $state
      *
      * @return static
