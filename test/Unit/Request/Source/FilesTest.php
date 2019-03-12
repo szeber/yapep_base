@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\Test\Unit\Request\Source;
 
@@ -143,8 +143,8 @@ class FilesTest extends TestAbstract
         $expectedResult = [
             $this->paramName => [
                 $this->getFileObject1(),
-                $this->getFileObject2()
-            ]
+                $this->getFileObject2(),
+            ],
         ];
 
         $this->assertArrayOfFileObjectsEquals($expectedResult, $result);
@@ -191,7 +191,7 @@ class FilesTest extends TestAbstract
             Files::KEY_SIZE           => $this->size1,
             Files::KEY_TEMP_FILE_PATH => $this->tmpName1,
             Files::KEY_ERROR_CODE     => $this->error1,
-            Files::KEY_MIME_TYPE      => $this->type1
+            Files::KEY_MIME_TYPE      => $this->type1,
         ];
     }
 

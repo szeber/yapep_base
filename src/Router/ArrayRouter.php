@@ -1,8 +1,7 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\Router;
-
 
 use YapepBase\Exception\RouterException;
 use YapepBase\Request\IRequest;
@@ -58,7 +57,7 @@ class ArrayRouter implements IRouter
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getRoute(string &$controllerClassName = '', string &$actionName = '', ?string $uri = null): string
     {
@@ -68,6 +67,7 @@ class ArrayRouter implements IRouter
         foreach ($this->routes as $controllerAction => $path) {
             if ($this->testIfPathMatchesTarget($path, $method, $target)) {
                 list($controllerClassName, $actionName) = explode('/', $controllerAction, 2);
+
                 return $controllerAction;
             }
         }
@@ -84,6 +84,7 @@ class ArrayRouter implements IRouter
                     return true;
                 }
             }
+
             return false;
         } elseif ('[' == substr($path, 0, 1)) {
             // This path is restricted to a method
@@ -138,6 +139,7 @@ class ArrayRouter implements IRouter
             }
             $this->request->setParam($name, $value);
         }
+
         return true;
     }
 
@@ -195,11 +197,12 @@ class ArrayRouter implements IRouter
                 throw new RouterException('Duplicate route param name: ' . $path, RouterException::ERR_SYNTAX_PARAM);
             }
         }
+
         return $pathRegex;
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getTargetForControllerAction(string $controller, string $action, array $requestParams = []): string
     {

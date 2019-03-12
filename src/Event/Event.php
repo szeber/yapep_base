@@ -1,24 +1,18 @@
 <?php
+declare(strict_types = 1);
 /**
  * This file is part of YAPEPBase.
  *
- * @package      YapepBase
- * @subpackage   Event
  * @copyright    2011 The YAPEP Project All rights reserved.
  * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
  */
-
 namespace YapepBase\Event;
 
 /**
  * Class that describes an event.
- *
- * @package    YapepBase
- * @subpackage Event
  */
 class Event
 {
-
     /** Event type that is raised when the application starts to run. */
     const TYPE_APPLICATION_BEFORE_RUN = 'application.beforeRun';
     /**
@@ -85,5 +79,4 @@ class Event
     {
         return $this->data;
     }
-
 }

@@ -1,12 +1,11 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\Controller;
 
-
 use YapepBase\Exception\ParameterException;
-use YapepBase\Response\IResponse;
 use YapepBase\Request\IRequest;
+use YapepBase\Response\IResponse;
 
 /**
  * Controller interface

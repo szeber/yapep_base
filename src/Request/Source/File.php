@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\Request\Source;
 
@@ -98,7 +98,7 @@ class File
             Files::KEY_SIZE           => $this->sizeInByte,
             Files::KEY_TEMP_FILE_PATH => $this->temporaryFilePath,
             Files::KEY_ERROR_CODE     => $this->errorCode,
-            Files::KEY_MIME_TYPE      => $this->mimeType
+            Files::KEY_MIME_TYPE      => $this->mimeType,
         ];
     }
 }

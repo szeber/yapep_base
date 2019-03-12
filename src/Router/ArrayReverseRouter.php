@@ -1,8 +1,7 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\Router;
-
 
 use YapepBase\Exception\RouterException;
 
@@ -28,7 +27,6 @@ use YapepBase\Exception\RouterException;
  */
 class ArrayReverseRouter implements IReverseRouter
 {
-
     protected $routes = [];
 
     public function __construct(array $routes)
@@ -37,7 +35,7 @@ class ArrayReverseRouter implements IReverseRouter
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getTargetForControllerAction(string $controller, string $action, array $requestParams = []): string
     {
@@ -76,7 +74,6 @@ class ArrayReverseRouter implements IReverseRouter
 
         return $target;
     }
-
 
     /**
      * Returns the route with the parameters

@@ -1,15 +1,15 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\Controller;
 
 use YapepBase\Application;
 
 use YapepBase\Exception\ParameterException;
-use YapepBase\Response\HttpResponse;
 use YapepBase\Request\HttpRequest;
-use YapepBase\Response\IResponse;
 use YapepBase\Request\IRequest;
+use YapepBase\Response\HttpResponse;
+use YapepBase\Response\IResponse;
 
 /**
  * Base class for HTTP controllers.
@@ -61,6 +61,7 @@ abstract class HttpControllerAbstract extends ControllerAbstract
         $this->response->redirect($url, $statusCode);
         // @codeCoverageIgnoreStart
     }
+
     // @codeCoverageIgnoreEnd
 
     /**
@@ -86,8 +87,11 @@ abstract class HttpControllerAbstract extends ControllerAbstract
         $anchor = '',
         $statusCode = 303
     ) {
-        $url = Application::getInstance()->getRouter()->getTargetForControllerAction($controller, $action,
-            $routeParams);
+        $url = Application::getInstance()->getRouter()->getTargetForControllerAction(
+            $controller,
+            $action,
+            $routeParams
+        );
         if (!empty($getParams)) {
             $url .= '?' . \http_build_query($getParams, null, '&');
         }
@@ -97,5 +101,6 @@ abstract class HttpControllerAbstract extends ControllerAbstract
         $this->redirectToUrl($url, $statusCode);
         // @codeCoverageIgnoreStart
     }
+
     // @codeCoverageIgnoreEnd
 }

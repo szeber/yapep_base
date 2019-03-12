@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\Test\Unit\Request;
 
@@ -42,8 +42,7 @@ class HttpRequestTest extends TestAbstract
         array $queryParams = [],
         array $postParams = [],
         array $server = []
-    ): HttpRequest
-    {
+    ): HttpRequest {
         $this->queryParams = new Params($queryParams);
         $this->postParams  = new Params($postParams);
         $this->cookies     = new Params([]);
@@ -53,8 +52,13 @@ class HttpRequestTest extends TestAbstract
         $this->server      = new ServerData($server);
 
         return new HttpRequest(
-            $this->queryParams, $this->postParams, $this->cookies,
-            $this->envParams, $this->inputParams, $this->files, $this->server
+            $this->queryParams,
+            $this->postParams,
+            $this->cookies,
+            $this->envParams,
+            $this->inputParams,
+            $this->files,
+            $this->server
         );
     }
 

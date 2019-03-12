@@ -1,16 +1,12 @@
 <?php
+declare(strict_types = 1);
 /**
  * This file is part of YAPEPBase.
  *
- * @package    YapepBase
- * @subpackage ErrorHandler
  * @copyright  2011 The YAPEP Project All rights reserved.
  * @license    http://www.opensource.org/licenses/bsd-license.php BSD License
  */
-
-
 namespace YapepBase\ErrorHandler;
-
 
 use YapepBase\Application;
 use YapepBase\Config;
@@ -18,13 +14,9 @@ use YapepBase\Exception\Exception;
 
 /**
  * Registry class holding the registered error handlers.
- *
- * @package    YapepBase
- * @subpackage ErrorHandler
  */
 class ErrorHandlerRegistry implements IErrorHandlerRegistry
 {
-
     /** The default timeout for the error ID in seconds. */
     const ERROR_HANDLING_DEFAULT_ID_TIMEOUT = 600;   // 10 minutes
 
@@ -135,13 +127,13 @@ class ErrorHandlerRegistry implements IErrorHandlerRegistry
         array_shift($backTrace);
 
         $this->currentlyHandledError = [
-            'type' => self::TYPE_ERROR,
-            'level' => $errorLevel,
+            'type'    => self::TYPE_ERROR,
+            'level'   => $errorLevel,
             'message' => $message,
-            'file' => $file,
-            'line' => $line,
+            'file'    => $file,
+            'line'    => $line,
             'context' => $context,
-            'trace' => $backTrace,
+            'trace'   => $backTrace,
             'errorId' => $errorId,
         ];
 
@@ -170,6 +162,7 @@ class ErrorHandlerRegistry implements IErrorHandlerRegistry
         if (!($exception instanceof \Exception) && !($exception instanceof \Error)) {
             // The error handlers can only handle exceptions that are descendants of the Exception built in class
             trigger_error('Unable to handle exception of type: ' . get_class($exception), E_USER_ERROR);
+
             return;
         }
 
@@ -177,14 +170,15 @@ class ErrorHandlerRegistry implements IErrorHandlerRegistry
             // We have no error handlers, trigger an error and let the default error handler handle it
             $this->unregister();
             trigger_error('Unhandled exception: ' . $exception->getMessage(), E_USER_ERROR);
+
             return;
         }
         $errorId = $this->generateErrorId($exception->getMessage(), $exception->getFile(), $exception->getLine());
 
         $this->currentlyHandledError = [
-            'type' => self::TYPE_ERROR,
+            'type'      => self::TYPE_ERROR,
             'exception' => $exception,
-            'errorId' => $errorId,
+            'errorId'   => $errorId,
         ];
 
         foreach ($this->errorHandlers as $errorHandler) {
@@ -234,6 +228,7 @@ class ErrorHandlerRegistry implements IErrorHandlerRegistry
                 // We are only running the termination function if we are the registered error handler.
                 $this->terminate(false);
             }
+
             return;
         }
 
@@ -252,6 +247,7 @@ class ErrorHandlerRegistry implements IErrorHandlerRegistry
 
             error_log($errorMessage, 4);
             $this->terminate(true);
+
             return;
         }
 
@@ -270,24 +266,36 @@ class ErrorHandlerRegistry implements IErrorHandlerRegistry
 
             // If we have a previously unhandled error, handle it. This can be caused by errors in one of the registered
             foreach ($this->errorHandlers as $errorHandler) {
-                $errorHandler->handleShutdown($error['type'], $message, $error['file'], $error['line'],
-                    $this->generateErrorId($message, $error['file'], $error['line']));
+                $errorHandler->handleShutdown(
+                    $error['type'],
+                    $message,
+                    $error['file'],
+                    $error['line'],
+                    $this->generateErrorId($message, $error['file'], $error['line'])
+                );
             }
 
             switch ($this->currentlyHandledError['type']) {
                 case self::TYPE_ERROR:
                     foreach ($this->errorHandlers as $errorHandler) {
-                        $errorHandler->handleError($this->currentlyHandledError['level'],
-                            $this->currentlyHandledError['message'], $this->currentlyHandledError['file'],
-                            $this->currentlyHandledError['line'], $this->currentlyHandledError['context'],
-                            $this->currentlyHandledError['errorId'], $this->currentlyHandledError['trace']);
+                        $errorHandler->handleError(
+                            $this->currentlyHandledError['level'],
+                            $this->currentlyHandledError['message'],
+                            $this->currentlyHandledError['file'],
+                            $this->currentlyHandledError['line'],
+                            $this->currentlyHandledError['context'],
+                            $this->currentlyHandledError['errorId'],
+                            $this->currentlyHandledError['trace']
+                        );
                     }
                     break;
 
                 case self::TYPE_EXCEPTION:
                     foreach ($this->errorHandlers as $errorHandler) {
-                        $errorHandler->handleException($this->currentlyHandledError['exception'],
-                            $this->currentlyHandledError['errorId']);
+                        $errorHandler->handleException(
+                            $this->currentlyHandledError['exception'],
+                            $this->currentlyHandledError['errorId']
+                        );
                     }
                     break;
             }

@@ -1,13 +1,13 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\Test\Unit\Request\Source;
 
+use Mockery;
 use YapepBase\File\IFileHandler;
 use YapepBase\Request\Source\File;
 use YapepBase\Request\Source\Files;
 use YapepBase\Test\Unit\TestAbstract;
-use Mockery;
 
 class FileTest extends TestAbstract
 {
@@ -109,7 +109,7 @@ class FileTest extends TestAbstract
             Files::KEY_SIZE           => $this->sizeInByte,
             Files::KEY_TEMP_FILE_PATH => $this->tempFilePath,
             Files::KEY_ERROR_CODE     => $this->errorCode,
-            Files::KEY_MIME_TYPE      => $this->mimeType
+            Files::KEY_MIME_TYPE      => $this->mimeType,
         ];
 
         $this->assertSame($expectedArray, $array);
