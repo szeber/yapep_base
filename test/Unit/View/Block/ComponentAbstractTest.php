@@ -5,6 +5,7 @@ namespace YapepBase\Test\Unit\View\Block;
 
 use Mockery;
 use Mockery\MockInterface;
+use YapepBase\Storage\IKeyGenerator;
 use YapepBase\Storage\IStorage;
 use YapepBase\Test\Unit\TestAbstract;
 
@@ -12,16 +13,16 @@ class ComponentAbstractTest extends TestAbstract
 {
     /** @var ComponentStub */
     protected $component;
-
     /** @var MockInterface */
     protected $storage;
+    /** @var MockInterface */
+    protected $keyGenerator;
 
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->component = new ComponentStub();
-        $this->storage   = Mockery::mock(IStorage::class);
     }
 
     public function testRenderWhenNoStorageSet_shouldJustRender()
@@ -32,6 +33,7 @@ class ComponentAbstractTest extends TestAbstract
 
     public function testRenderWhenNotStoredYet_shouldRenderAndStoreOutputBeforeReturning()
     {
+        $this->expectStorageUsed();
         $this->expectGetFromStorage(null);
         $this->expectSetToStorage();
 
@@ -42,6 +44,7 @@ class ComponentAbstractTest extends TestAbstract
 
     public function testRenderWhenStored_shouldReturnWhatStored()
     {
+        $this->expectStorageUsed();
         $this->expectGetFromStorage($this->component->content);
 
         $this->component->setStorage($this->storage);
@@ -49,12 +52,34 @@ class ComponentAbstractTest extends TestAbstract
         $this->component->render();
     }
 
+    protected function expectStorageUsed()
+    {
+        $this->keyGenerator = Mockery::mock(IKeyGenerator::class)
+            ->shouldReceive('setHashing')
+                ->with(true)
+                ->andReturn(Mockery::self())
+                ->getMock()
+            ->shouldReceive('setPrefix')
+                ->with('component_')
+                ->andReturn(Mockery::self())
+                ->getMock()
+            ->shouldReceive('setSuffix')
+                ->with(get_class($this->component))
+                ->andReturn(Mockery::self())
+                ->getMock();
+
+        $this->storage      = Mockery::mock(IStorage::class)
+            ->shouldReceive('getKeyGenerator')
+            ->andReturn($this->keyGenerator)
+            ->getMock();
+    }
+
     protected function expectGetFromStorage($expectedResult)
     {
         $this->storage
             ->shouldReceive('get')
             ->once()
-            ->with($this->getStorageKey())
+            ->with($this->component->uniqueIdentifier)
             ->andReturn($expectedResult);
     }
 
@@ -64,14 +89,9 @@ class ComponentAbstractTest extends TestAbstract
             ->shouldReceive('set')
             ->once()
             ->with(
-                $this->getStorageKey(),
+                $this->component->uniqueIdentifier,
                 $this->component->content,
                 $this->component->ttl
             );
-    }
-
-    protected function getStorageKey(): string
-    {
-        return 'component_' . $this->component->uniqueIdentifier . md5(get_class($this->component));
     }
 }

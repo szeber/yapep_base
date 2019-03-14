@@ -20,6 +20,8 @@ class Storage extends ItemAbstract
     const METHOD_DELETE = 'delete';
     /** Clear storage method. */
     const METHOD_CLEAR = 'clear';
+    /** Increment storage method. */
+    const METHOD_INCREMENT = 'increment';
 
     /** @var string */
     protected $method;
@@ -72,9 +74,10 @@ class Storage extends ItemAbstract
             self::METHOD_GET,
             self::METHOD_DELETE,
             self::METHOD_CLEAR,
+            self::METHOD_INCREMENT,
         ];
         if (!in_array($method, $availableMethods)) {
-            throw new ParameterException('Invalid method give: ' . $method);
+            throw new ParameterException('Invalid method given: ' . $method);
         }
 
         $this->method = $method;

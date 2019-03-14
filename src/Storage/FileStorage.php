@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace YapepBase\Storage;
 
+use YapepBase\Application;
 use YapepBase\Debug\Item\Storage;
 use YapepBase\Exception\File\Exception as FileException;
 use YapepBase\Exception\File\NotFoundException;
@@ -25,17 +26,8 @@ class FileStorage extends StorageAbstract
     /** @var bool */
     protected $canOnlyStorePlainText = false;
 
-    /** @var string */
-    protected $filenamePrefix = '';
-
-    /** @var string */
-    protected $filenameSuffix = '';
-
     /** @var int */
     protected $fileModeOctal = 0644;
-
-    /** @var bool */
-    protected $hashKey = false;
 
     /** @var bool */
     protected $readOnly;
@@ -43,17 +35,15 @@ class FileStorage extends StorageAbstract
     /** @var FileHandlerPhp */
     protected $fileHandler;
 
-    /** @var DateHelper */
-    protected $dateHelper;
-
     /**
      * @throws ParameterException
      * @throws StorageException
      */
-    public function __construct(IFileHandler $fileHandler, DateHelper $dateHelper, string $path, bool $readOnly = false)
+    public function __construct(IFileHandler $fileHandler, IKeyGenerator $keyGenerator, string $path, bool $readOnly = false)
     {
+        parent::__construct($keyGenerator);
+
         $this->fileHandler = $fileHandler;
-        $this->dateHelper  = $dateHelper;
         $this->readOnly    = $readOnly;
 
         $this->setPath($path);
@@ -105,10 +95,7 @@ class FileStorage extends StorageAbstract
      */
     protected function getFullPath(string $fileName): string
     {
-        $fileName = $this->filenamePrefix . $fileName . $this->filenameSuffix;
-        if ($this->hashKey) {
-            $fileName = md5($fileName);
-        }
+        $fileName = $this->keyGenerator->generate($fileName);
 
         if (!preg_match('/^[-_.a-zA-Z0-9]+$/', $fileName)) {
             throw new StorageException('Invalid filename: ' . $fileName);
@@ -134,15 +121,9 @@ class FileStorage extends StorageAbstract
             throw new StorageException('Unable to write data to FileStorage (file: ' . $fullPath . ' )', 0, $e);
         }
 
-        // Disable potential warnings if unit testing with vfsStream
         $this->fileHandler->changeMode($fullPath, $this->fileModeOctal);
     }
 
-    /**
-     * Retrieves data from the cache identified by the specified key
-     *
-     * @throws StorageException
-     */
     public function get(string $key)
     {
         $item = (new Storage(Storage::METHOD_GET, $key));
@@ -192,7 +173,7 @@ class FileStorage extends StorageAbstract
             return (string)$data;
         }
 
-        $createdAt = $this->dateHelper->getCurrentTimestamp();
+        $createdAt = $this->getDateHelper()->getCurrentTimestamp();
         $expiresAt = 0;
 
         if ($ttlInSeconds > 0) {
@@ -227,7 +208,7 @@ class FileStorage extends StorageAbstract
 
     protected function isExpired(File $file): bool
     {
-        $currentTime = $this->dateHelper->getCurrentTimestamp();
+        $currentTime = $this->getDateHelper()->getCurrentTimestamp();
 
         if (!empty($file->expiresAt) && $file->expiresAt < $currentTime) {
             return true;
@@ -310,30 +291,6 @@ class FileStorage extends StorageAbstract
         return $this;
     }
 
-    public function getFilenamePrefix(): string
-    {
-        return $this->filenamePrefix;
-    }
-
-    public function setFilenamePrefix(string $filenamePrefix): self
-    {
-        $this->filenamePrefix = $filenamePrefix;
-
-        return $this;
-    }
-
-    public function getFilenameSuffix(): string
-    {
-        return $this->filenameSuffix;
-    }
-
-    public function setFilenameSuffix(string $filenameSuffix): self
-    {
-        $this->filenameSuffix = $filenameSuffix;
-
-        return $this;
-    }
-
     public function getFileModeOctal(): int
     {
         return $this->fileModeOctal;
@@ -346,20 +303,18 @@ class FileStorage extends StorageAbstract
         return $this;
     }
 
-    public function isKeyHashed(): bool
-    {
-        return $this->hashKey;
-    }
-
-    public function setHashKey(bool $hashKey): self
-    {
-        $this->hashKey = $hashKey;
-
-        return $this;
-    }
-
     public function getFileHandler(): FileHandlerPhp
     {
         return $this->fileHandler;
+    }
+
+    public function getPath(): string
+    {
+        return $this->path;
+    }
+
+    protected function getDateHelper(): DateHelper
+    {
+        return Application::getInstance()->getDiContainer()[DateHelper::class];
     }
 }

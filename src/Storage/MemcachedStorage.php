@@ -16,77 +16,15 @@ class MemcachedStorage extends StorageAbstract implements IIncrementable
     /** @var Memcached */
     protected $connection;
 
-    /** @var string */
-    protected $keyPrefix = '';
-
-    /** @var string */
-    protected $keySuffix = '';
-
-    /** @var bool */
-    protected $hashKey = true;
-
     /** @var bool */
     protected $readOnly = false;
 
-    public function __construct(Memcached $connection)
+    public function __construct(Memcached $connection, IKeyGenerator $keyGenerator, bool $readOnly = false)
     {
+        parent::__construct($keyGenerator);
+
         $this->connection = $connection;
-    }
-
-    public function getKeyPrefix(): string
-    {
-        return $this->keyPrefix;
-    }
-
-    public function setKeyPrefix(string $keyPrefix): self
-    {
-        $this->keyPrefix = $keyPrefix;
-
-        return $this;
-    }
-
-    public function getKeySuffix(): string
-    {
-        return $this->keySuffix;
-    }
-
-    public function setKeySuffix(string $keySuffix): self
-    {
-        $this->keySuffix = $keySuffix;
-
-        return $this;
-    }
-
-    public function isHashKey(): bool
-    {
-        return $this->hashKey;
-    }
-
-    public function setHashKey(bool $hashKey): self
-    {
-        $this->hashKey = $hashKey;
-
-        return $this;
-    }
-
-    public function setReadOnly(bool $readOnly): self
-    {
-        $this->readOnly = $readOnly;
-
-        return $this;
-    }
-
-    /**
-     * Returns the key ready to be used on the backend.
-     */
-    protected function getFullKey(string $key): string
-    {
-        $key = $this->keyPrefix . $key . $this->keySuffix;
-        if ($this->hashKey) {
-            $key = md5($key);
-        }
-
-        return $key;
+        $this->readOnly   = $readOnly;
     }
 
     /**
@@ -97,11 +35,11 @@ class MemcachedStorage extends StorageAbstract implements IIncrementable
      */
     public function set(string $key, $data, int $ttlInSecondsInSecondsInSeconds = 0): void
     {
-        $item = (new Storage(Storage::METHOD_SET, $key, $data));
-
         $this->protectWhenReadOnly();
 
-        $fullKey  = $this->getFullKey($key);
+        $fullKey   = $this->keyGenerator->generate($key);
+        $debugItem = (new Storage(Storage::METHOD_SET, $fullKey, $data));
+
         $isStored = $this->connection->set($fullKey, $data, $ttlInSecondsInSecondsInSeconds);
 
         if (!$isStored) {
@@ -115,8 +53,8 @@ class MemcachedStorage extends StorageAbstract implements IIncrementable
             }
         }
 
-        $item->setFinished();
-        $this->getDebugDataHandlerRegistry()->addStorage($item);
+        $debugItem->setFinished();
+        $this->getDebugDataHandlerRegistry()->addStorage($debugItem);
     }
 
     /**
@@ -126,10 +64,9 @@ class MemcachedStorage extends StorageAbstract implements IIncrementable
      */
     public function get(string $key)
     {
-        $item = (new Storage(Storage::METHOD_GET, $key));
-
-        $fullKey = $this->getFullKey($key);
-        $result  = $this->connection->get($fullKey);
+        $fullKey   = $this->keyGenerator->generate($key);
+        $debugItem = (new Storage(Storage::METHOD_GET, $fullKey));
+        $result    = $this->connection->get($fullKey);
 
         if (false === $result) {
             $resultCode = $this->connection->getResultCode();
@@ -141,8 +78,8 @@ class MemcachedStorage extends StorageAbstract implements IIncrementable
             }
         }
 
-        $item->setData($result)->setFinished();
-        $this->getDebugDataHandlerRegistry()->addStorage($item);
+        $debugItem->setData($result)->setFinished();
+        $this->getDebugDataHandlerRegistry()->addStorage($debugItem);
 
         return $result;
     }
@@ -154,11 +91,11 @@ class MemcachedStorage extends StorageAbstract implements IIncrementable
      */
     public function delete(string $key): void
     {
-        $item = (new Storage(Storage::METHOD_DELETE, $key));
-
         $this->protectWhenReadOnly();
 
-        $fullKey = $this->getFullKey($key);
+        $item = (new Storage(Storage::METHOD_DELETE, $key));
+
+        $fullKey = $this->keyGenerator->generate($key);
         $this->connection->delete($fullKey);
 
         $item->setFinished();
@@ -183,9 +120,11 @@ class MemcachedStorage extends StorageAbstract implements IIncrementable
 
     public function increment(string $key, int $offset, int $ttlInSeconds = 0): int
     {
-        $item = (new Storage(Storage::METHOD_SET, $key, $offset));
+        $this->protectWhenReadOnly();
 
-        $fullKey = $this->getFullKey($key);
+        $item = (new Storage(Storage::METHOD_INCREMENT, $key, $offset));
+
+        $fullKey = $this->keyGenerator->generate($key);
         $result  = $this->connection->increment($fullKey, $offset, 0, $ttlInSeconds);
 
         if ($result === false) {

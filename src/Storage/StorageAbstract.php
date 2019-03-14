@@ -9,6 +9,19 @@ use YapepBase\Exception\StorageException;
 
 abstract class StorageAbstract implements IStorage
 {
+    /** @var IKeyGenerator */
+    protected $keyGenerator;
+
+    public function __construct(IKeyGenerator $keyGenerator)
+    {
+        $this->keyGenerator = $keyGenerator;
+    }
+
+    public function getKeyGenerator(): IKeyGenerator
+    {
+        return $this->keyGenerator;
+    }
+
     /**
      * @throws StorageException
      */

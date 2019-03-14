@@ -136,7 +136,7 @@ class PimpleContainer extends \Pimple\Container implements IContainer
         return $this->setFactory(IEventHandlerRegistry::class, $eventHandlerRegistryClass);
     }
 
-    public function setDebugDataHandlerRegistry(IEventHandlerRegistry $debugDataHandlerRegistry): self
+    public function setDebugDataHandlerRegistry(IDataHandlerRegistry $debugDataHandlerRegistry): self
     {
         return $this->setInstance(IDataHandlerRegistry::class, $debugDataHandlerRegistry);
     }

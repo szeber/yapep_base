@@ -12,6 +12,11 @@ use YapepBase\Exception\StorageException;
 interface IStorage
 {
     /**
+     * Returns the key generator used by the storage
+     */
+    public function getKeyGenerator(): IKeyGenerator;
+
+    /**
      * Stores data under the specified key
      *
      * @throws StorageException

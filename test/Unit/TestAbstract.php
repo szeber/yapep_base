@@ -8,6 +8,7 @@ use PHPUnit\Framework\TestCase;
 use YapepBase\Application;
 use YapepBase\DependencyInjection\Container;
 use YapepBase\DependencyInjection\PimpleContainer;
+use YapepBase\Helper\DateHelper;
 use YapepBase\Helper\TextHelper;
 
 abstract class TestAbstract extends TestCase
@@ -46,6 +47,11 @@ abstract class TestAbstract extends TestCase
         $this->pimpleContainer = new PimpleContainer();
         $this->diContainer     = new Container($this->pimpleContainer);
         Application::getInstance()->setDiContainer($this->diContainer);
+    }
+
+    protected function initDateHelper(DateHelper $dateHelper)
+    {
+        $this->pimpleContainer[DateHelper::class] = $dateHelper;
     }
 
     protected function assertSameHtmlStructure(string $expectedHtml, string $actualHtml)
