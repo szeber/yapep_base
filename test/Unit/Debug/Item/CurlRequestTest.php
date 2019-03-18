@@ -7,7 +7,6 @@ use YapepBase\Debug\Item\CurlRequest;
 
 class CurlRequestTest extends TestAbstract
 {
-
     public function testConstructor_shouldStoreGivenValues()
     {
         $protocol      = 'http';

@@ -10,7 +10,6 @@ use YapepBase\Exception\ParameterException;
 use YapepBase\Exception\StorageException;
 use YapepBase\Storage\File;
 use YapepBase\Storage\FileStorage;
-use YapepBase\Storage\Key\Generator;
 
 class FileStorageTest extends TestAbstract
 {
@@ -26,7 +25,7 @@ class FileStorageTest extends TestAbstract
     protected $pathWithoutTrailingSlash = '/tmp/path';
     /** @var string */
     protected $key = 'key1';
-    /** @var string  */
+    /** @var string */
     protected $fullPath = '/tmp/path/key1';
     /** @var array */
     protected $data = ['test'];
@@ -308,7 +307,6 @@ class FileStorageTest extends TestAbstract
         $this->expectException(StorageException::class);
         $storage->clear();
     }
-
 
     public function testClear_shouldRemoveContainerDirectory()
     {

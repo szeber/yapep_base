@@ -30,8 +30,7 @@ class SqlQuery extends ItemAbstract
         array $params,
         ?string $callerClass = null,
         ?string $callerMethod = null
-    )
-    {
+    ) {
         parent::__construct($dateHelper);
 
         $this->dsn          = $dsn;

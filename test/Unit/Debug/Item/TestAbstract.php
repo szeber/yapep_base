@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\Test\Unit\Debug\Item;
 
@@ -19,7 +19,6 @@ abstract class TestAbstract extends \YapepBase\Test\Unit\TestAbstract
         parent::setUp();
         $this->dateHelper = \Mockery::mock(DateHelper::class);
     }
-
 
     protected function expectGetCurrentTime()
     {

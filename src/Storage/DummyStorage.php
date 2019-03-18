@@ -25,7 +25,7 @@ class DummyStorage extends StorageAbstract
     {
         parent::__construct($keyGenerator);
 
-        $this->dateHelper = $dateHelper;
+        $this->dateHelper  = $dateHelper;
         $this->storeValues = $storeValues;
     }
 

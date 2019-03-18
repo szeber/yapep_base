@@ -1,10 +1,9 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace YapepBase\Test\Unit\Storage;
 
 use Mockery\MockInterface;
-use YapepBase\Exception\Exception;
 use YapepBase\File\IFileHandler;
 
 class FileHandlerMock
@@ -18,7 +17,7 @@ class FileHandlerMock
     private $path;
     /** @var string */
     private $pathWithoutTrailingSlash;
-    /** @var string  */
+    /** @var string */
     private $fullPath;
 
     public function __construct(int $fileModeOctal, string $path, string $pathWithoutTrailingSlash, string $fullPath)
@@ -27,7 +26,7 @@ class FileHandlerMock
         $this->path                     = $path;
         $this->pathWithoutTrailingSlash = $pathWithoutTrailingSlash;
         $this->fullPath                 = $fullPath;
-        $this->fileHandler = \Mockery::mock(IFileHandler::class);
+        $this->fileHandler              = \Mockery::mock(IFileHandler::class);
     }
 
     public function getMock(): IFileHandler

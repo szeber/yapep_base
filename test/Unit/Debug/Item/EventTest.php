@@ -7,7 +7,6 @@ use YapepBase\Debug\Item\Event;
 
 class EventTest extends TestAbstract
 {
-
     public function testConstructor_shouldStoreGivenValues()
     {
         $name  = 'name';

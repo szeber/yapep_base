@@ -5,8 +5,8 @@ namespace YapepBase\Test\Unit\View\Block;
 
 use Mockery;
 use Mockery\MockInterface;
-use YapepBase\Storage\Key\IGenerator;
 use YapepBase\Storage\IStorage;
+use YapepBase\Storage\Key\IGenerator;
 use YapepBase\Test\Unit\TestAbstract;
 
 class ComponentAbstractTest extends TestAbstract

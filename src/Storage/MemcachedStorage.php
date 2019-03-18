@@ -71,7 +71,7 @@ class MemcachedStorage extends StorageAbstract implements IIncrementable
     public function get(string $key)
     {
         $fullKey   = $this->keyGenerator->generate($key);
-        $debugItem = (new Storage($this->dateHelper,Storage::METHOD_GET, $fullKey));
+        $debugItem = (new Storage($this->dateHelper, Storage::METHOD_GET, $fullKey));
         $result    = $this->connection->get($fullKey);
 
         if (false === $result) {
@@ -99,7 +99,7 @@ class MemcachedStorage extends StorageAbstract implements IIncrementable
     {
         $this->protectWhenReadOnly();
 
-        $item = (new Storage($this->dateHelper,Storage::METHOD_DELETE, $key));
+        $item = (new Storage($this->dateHelper, Storage::METHOD_DELETE, $key));
 
         $fullKey = $this->keyGenerator->generate($key);
         $this->connection->delete($fullKey);
@@ -117,7 +117,7 @@ class MemcachedStorage extends StorageAbstract implements IIncrementable
     {
         $this->protectWhenReadOnly();
 
-        $item = (new Storage($this->dateHelper,Storage::METHOD_CLEAR));
+        $item = (new Storage($this->dateHelper, Storage::METHOD_CLEAR));
 
         $this->connection->flush();
 
@@ -129,7 +129,7 @@ class MemcachedStorage extends StorageAbstract implements IIncrementable
     {
         $this->protectWhenReadOnly();
 
-        $item = (new Storage($this->dateHelper,Storage::METHOD_INCREMENT, $key, $offset));
+        $item = (new Storage($this->dateHelper, Storage::METHOD_INCREMENT, $key, $offset));
 
         $fullKey = $this->keyGenerator->generate($key);
         $result  = $this->connection->increment($fullKey, $offset, 0, $ttlInSeconds);

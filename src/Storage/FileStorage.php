@@ -3,7 +3,6 @@ declare(strict_types = 1);
 
 namespace YapepBase\Storage;
 
-use YapepBase\Application;
 use YapepBase\Debug\Item\Storage;
 use YapepBase\Exception\File\Exception as FileException;
 use YapepBase\Exception\File\NotFoundException;
@@ -49,8 +48,7 @@ class FileStorage extends StorageAbstract
         DateHelper $dateHelper,
         string $path,
         bool $readOnly = false
-    )
-    {
+    ) {
         parent::__construct($keyGenerator);
 
         $this->fileHandler = $fileHandler;
