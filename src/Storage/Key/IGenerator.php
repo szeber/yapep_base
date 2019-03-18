@@ -1,9 +1,9 @@
 <?php
 declare(strict_types = 1);
 
-namespace YapepBase\Storage;
+namespace YapepBase\Storage\Key;
 
-interface IKeyGenerator
+interface IGenerator
 {
     /**
      * @param bool   $hashing If TRUE the generated key will be hashed.

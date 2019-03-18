@@ -12,6 +12,7 @@ use YapepBase\Exception\StorageException;
 use YapepBase\File\FileHandlerPhp;
 use YapepBase\File\IFileHandler;
 use YapepBase\Helper\DateHelper;
+use YapepBase\Storage\Key\IGenerator;
 
 /**
  * Storage what's based on the filesystem.
@@ -35,16 +36,26 @@ class FileStorage extends StorageAbstract
     /** @var FileHandlerPhp */
     protected $fileHandler;
 
+    /** @var DateHelper */
+    protected $dateHelper;
+
     /**
      * @throws ParameterException
      * @throws StorageException
      */
-    public function __construct(IFileHandler $fileHandler, IKeyGenerator $keyGenerator, string $path, bool $readOnly = false)
+    public function __construct(
+        IFileHandler $fileHandler,
+        IGenerator $keyGenerator,
+        DateHelper $dateHelper,
+        string $path,
+        bool $readOnly = false
+    )
     {
         parent::__construct($keyGenerator);
 
         $this->fileHandler = $fileHandler;
         $this->readOnly    = $readOnly;
+        $this->dateHelper  = $dateHelper;
 
         $this->setPath($path);
     }
@@ -111,49 +122,48 @@ class FileStorage extends StorageAbstract
         $fullPath = $this->getFullPath($key);
 
         try {
-            $item = (new Storage(Storage::METHOD_SET, $key, $data));
+            $debugItem = (new Storage($this->dateHelper, Storage::METHOD_SET, $key, $data));
 
             $this->fileHandler->write($fullPath, $this->prepareDataToStore($data, $ttlInSeconds));
+            $this->fileHandler->changeMode($fullPath, $this->fileModeOctal);
 
-            $item->setFinished();
-            $this->getDebugDataHandlerRegistry()->addStorage($item);
+            $debugItem->setFinished();
+            $this->getDebugDataHandlerRegistry()->addStorage($debugItem);
         } catch (FileException $e) {
             throw new StorageException('Unable to write data to FileStorage (file: ' . $fullPath . ' )', 0, $e);
         }
-
-        $this->fileHandler->changeMode($fullPath, $this->fileModeOctal);
     }
 
     public function get(string $key)
     {
-        $item = (new Storage(Storage::METHOD_GET, $key));
+        $debugItem = (new Storage($this->dateHelper, Storage::METHOD_GET, $key));
 
-        $fileName = $this->getFullPath($key);
+        $fullPath = $this->getFullPath($key);
         $data     = null;
 
-        if ($this->fileHandler->checkIsPathExists($fileName)) {
+        if ($this->fileHandler->checkIsPathExists($fullPath)) {
             if (
-                !$this->fileHandler->checkIsReadable($fileName)
-                || ($contents = $this->fileHandler->getAsString($fileName)) === false
+                !$this->fileHandler->checkIsReadable($fullPath)
+                || ($contents = $this->fileHandler->getAsString($fullPath)) === false
             ) {
-                throw new StorageException('Unable to read file: ' . $fileName);
+                throw new StorageException('Unable to read file: ' . $fullPath);
             }
 
             $file = $this->readData($contents);
 
             if ($this->isExpired($file)) {
                 try {
-                    $this->fileHandler->remove($fileName);
+                    $this->fileHandler->remove($fullPath);
                 } catch (FileException $e) {
-                    throw new StorageException('Unable to remove empty file: ' . $fileName, 0, $e);
+                    throw new StorageException('Unable to remove empty file: ' . $fullPath, 0, $e);
                 }
             } else {
                 $data = $file->data;
             }
-        } else {
-            $item->setData($data)->setFinished();
         }
-        $this->getDebugDataHandlerRegistry()->addStorage($item);
+
+        $debugItem->setData($data)->setFinished();
+        $this->getDebugDataHandlerRegistry()->addStorage($debugItem);
 
         return $data;
     }
@@ -173,7 +183,7 @@ class FileStorage extends StorageAbstract
             return (string)$data;
         }
 
-        $createdAt = $this->getDateHelper()->getCurrentTimestamp();
+        $createdAt = $this->dateHelper->getCurrentTimestamp();
         $expiresAt = 0;
 
         if ($ttlInSeconds > 0) {
@@ -199,16 +209,20 @@ class FileStorage extends StorageAbstract
         /** @var File $fileContent */
         $encodedFileContent = json_decode($fileContent);
 
-        if (!property_exists($encodedFileContent, 'data') || !property_exists($encodedFileContent, 'expiresAt')) {
+        if (
+            !property_exists($encodedFileContent, 'data')
+            || !property_exists($encodedFileContent, 'createdAt')
+            || !property_exists($encodedFileContent, 'expiresAt')
+        ) {
             throw new StorageException('Unable to retrieve stored data');
         }
 
-        return $encodedFileContent;
+        return new File($encodedFileContent->data, $encodedFileContent->createdAt, $encodedFileContent->expiresAt);
     }
 
     protected function isExpired(File $file): bool
     {
-        $currentTime = $this->getDateHelper()->getCurrentTimestamp();
+        $currentTime = $this->dateHelper->getCurrentTimestamp();
 
         if (!empty($file->expiresAt) && $file->expiresAt < $currentTime) {
             return true;
@@ -224,21 +238,21 @@ class FileStorage extends StorageAbstract
      */
     public function delete(string $key): void
     {
-        $item = (new Storage(Storage::METHOD_DELETE, $key));
-
         $this->protectWhenReadOnly();
 
-        $fileName = $this->getFullPath($key);
+        $debugItem = (new Storage($this->dateHelper, Storage::METHOD_DELETE, $key));
+
+        $fullPath = $this->getFullPath($key);
 
         try {
-            $this->fileHandler->remove($fileName);
+            $this->fileHandler->remove($fullPath);
         } catch (NotFoundException $e) {
         } catch (FileException $e) {
-            throw new StorageException('Unable to remove the file: ' . $fileName, 0, $e);
+            throw new StorageException('Unable to remove the file: ' . $fullPath, 0, $e);
         }
 
-        $item->setFinished();
-        $this->getDebugDataHandlerRegistry()->addStorage($item);
+        $debugItem->setFinished();
+        $this->getDebugDataHandlerRegistry()->addStorage($debugItem);
     }
 
     /**
@@ -248,9 +262,9 @@ class FileStorage extends StorageAbstract
      */
     public function clear(): void
     {
-        $item = (new Storage(Storage::METHOD_CLEAR));
-
         $this->protectWhenReadOnly();
+
+        $debugItem = (new Storage($this->dateHelper, Storage::METHOD_CLEAR));
 
         try {
             $this->fileHandler->removeDirectory($this->path, true);
@@ -258,8 +272,8 @@ class FileStorage extends StorageAbstract
             throw new StorageException('Unable to remove the directory: ' . $this->path, 0, $e);
         }
 
-        $item->setFinished();
-        $this->getDebugDataHandlerRegistry()->addStorage($item);
+        $debugItem->setFinished();
+        $this->getDebugDataHandlerRegistry()->addStorage($debugItem);
     }
 
     public function isPersistent(): bool
@@ -311,10 +325,5 @@ class FileStorage extends StorageAbstract
     public function getPath(): string
     {
         return $this->path;
-    }
-
-    protected function getDateHelper(): DateHelper
-    {
-        return Application::getInstance()->getDiContainer()[DateHelper::class];
     }
 }

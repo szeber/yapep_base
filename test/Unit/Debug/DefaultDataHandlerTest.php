@@ -23,13 +23,12 @@ class DefaultDataHandlerTest extends TestAbstract
     protected function setUp(): void
     {
         parent::setUp();
-        $this->dataHandler                        = new DefaultDataHandler();
-        $this->pimpleContainer[DateHelper::class] = new DateHelper();
+        $this->dataHandler = new DefaultDataHandler();
     }
 
     public function testAddCurlRequest_shouldStoreGivenItem()
     {
-        $item = new CurlRequest('HTTP', 'GET', 'url');
+        $item = new CurlRequest(new DateHelper(), 'HTTP', 'GET', 'url');
         $this->dataHandler->addCurlRequest($item);
 
         $this->assertGivenItemStoredOnly($this->dataHandler->getCurlRequestItems(), $item);
@@ -45,7 +44,7 @@ class DefaultDataHandlerTest extends TestAbstract
 
     public function testAddEvent_shouldStoreGivenItem()
     {
-        $item = new Event('name', []);
+        $item = new Event(new DateHelper(), 'name', []);
         $this->dataHandler->addEvent($item);
 
         $this->assertGivenItemStoredOnly($this->dataHandler->getEventItems(), $item);
@@ -61,7 +60,7 @@ class DefaultDataHandlerTest extends TestAbstract
 
     public function testAddSqlQuery_shouldStoreGivenItem()
     {
-        $item = new SqlQuery('dsn', 'query', []);
+        $item = new SqlQuery(new DateHelper(), 'dsn', 'query', []);
         $this->dataHandler->addSqlQuery($item);
 
         $this->assertGivenItemStoredOnly($this->dataHandler->getSqlQueryItems(), $item);
@@ -69,7 +68,7 @@ class DefaultDataHandlerTest extends TestAbstract
 
     public function testAddStorage_shouldStoreGivenItem()
     {
-        $item = new Storage(Storage::METHOD_GET, 'key');
+        $item = new Storage(new DateHelper(), Storage::METHOD_GET, 'key');
         $this->dataHandler->addStorage($item);
 
         $this->assertGivenItemStoredOnly($this->dataHandler->getStorageItems(), $item);
@@ -77,7 +76,7 @@ class DefaultDataHandlerTest extends TestAbstract
 
     public function testAddTime_shouldStoreGivenItem()
     {
-        $item = new Time('name');
+        $item = new Time(new DateHelper(), 'name');
         $this->dataHandler->addTime($item);
 
         $this->assertGivenItemStoredOnly($this->dataHandler->getTimeItems(), $item);
@@ -85,7 +84,7 @@ class DefaultDataHandlerTest extends TestAbstract
 
     public function testAddGeneral_shouldStoreGivenItem()
     {
-        $item = new General('name');
+        $item = new General(new DateHelper(), 'name');
         $this->dataHandler->addGeneral($item);
 
         $this->assertGivenItemStoredOnly($this->dataHandler->getGeneralItems(), $item);

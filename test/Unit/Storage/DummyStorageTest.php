@@ -5,8 +5,7 @@ namespace YapepBase\Test\Unit\Storage;
 
 use Mockery\MockInterface;
 use YapepBase\Debug\Item\Storage;
-use YapepBase\Helper\DateHelper;
-use YapepBase\Storage\IKeyGenerator;
+use YapepBase\Storage\Key\IGenerator;
 
 class DummyStorageTest extends TestAbstract
 {
@@ -21,8 +20,7 @@ class DummyStorageTest extends TestAbstract
     {
         parent::setUp();
 
-        $this->keyGenerator = \Mockery::mock(IKeyGenerator::class);
-        $this->initDateHelper(new DateHelper());
+        $this->keyGenerator = \Mockery::mock(IGenerator::class);
         $this->initDebugDataHandler();
     }
 
@@ -31,7 +29,8 @@ class DummyStorageTest extends TestAbstract
         $dummyStorage = $this->getDummyStorage(false);
 
         $this->expectGenerateKey();
-        $this->expectAddStorageDebug(Storage::METHOD_SET, $this->key, $this->data);
+        $this->expectDebugTimesRetrieved();
+        $this->expectAddStorageDebug(Storage::METHOD_SET, $this->key, $this->data, $this->debugStartedAt, $this->debugFinishedAt);
         $dummyStorage->set($this->key, $this->data);
 
         $this->assertFalse($dummyStorage->has($this->key));
@@ -42,7 +41,8 @@ class DummyStorageTest extends TestAbstract
         $dummyStorage = $this->getDummyStorage(true);
 
         $this->expectGenerateKey();
-        $this->expectAddStorageDebug(Storage::METHOD_SET, $this->key, $this->data);
+        $this->expectDebugTimesRetrieved();
+        $this->expectAddStorageDebug(Storage::METHOD_SET, $this->key, $this->data, $this->debugStartedAt, $this->debugFinishedAt);
         $dummyStorage->set($this->key, $this->data);
 
         $this->assertEquals($this->data, $dummyStorage->getSimple($this->key));
@@ -54,7 +54,8 @@ class DummyStorageTest extends TestAbstract
         $dummyStorage->setSimple($this->key, $this->data);
 
         $this->expectGenerateKey();
-        $this->expectAddStorageDebug(Storage::METHOD_GET, $this->key, $this->data);
+        $this->expectDebugTimesRetrieved();
+        $this->expectAddStorageDebug(Storage::METHOD_GET, $this->key, $this->data, $this->debugStartedAt, $this->debugFinishedAt);
         $result = $dummyStorage->get($this->key);
 
         $this->assertEquals($this->data, $result);
@@ -65,7 +66,8 @@ class DummyStorageTest extends TestAbstract
         $dummyStorage = $this->getDummyStorage(true);
 
         $this->expectGenerateKey();
-        $this->expectAddStorageDebug(Storage::METHOD_GET, $this->key, null);
+        $this->expectDebugTimesRetrieved();
+        $this->expectAddStorageDebug(Storage::METHOD_GET, $this->key, null, $this->debugStartedAt, $this->debugFinishedAt);
         $result = $dummyStorage->get($this->key);
 
         $this->assertNull($result);
@@ -77,7 +79,8 @@ class DummyStorageTest extends TestAbstract
         $dummyStorage->setSimple($this->key, $this->data);
 
         $this->expectGenerateKey();
-        $this->expectAddStorageDebug(Storage::METHOD_DELETE, $this->key);
+        $this->expectDebugTimesRetrieved();
+        $this->expectAddStorageDebug(Storage::METHOD_DELETE, $this->key, null, $this->debugStartedAt, $this->debugFinishedAt);
         $dummyStorage->delete($this->key);
 
         $this->assertFalse($dummyStorage->has($this->key));
@@ -90,7 +93,8 @@ class DummyStorageTest extends TestAbstract
         $dummyStorage->setSimple($this->key, $this->data);
         $dummyStorage->setSimple($key2, 'whatever');
 
-        $this->expectAddStorageDebug(Storage::METHOD_CLEAR, null);
+        $this->expectDebugTimesRetrieved();
+        $this->expectAddStorageDebug(Storage::METHOD_CLEAR, null, null, $this->debugStartedAt, $this->debugFinishedAt);
         $dummyStorage->clear();
 
         $this->assertFalse($dummyStorage->has($this->key));
@@ -99,7 +103,7 @@ class DummyStorageTest extends TestAbstract
 
     protected function getDummyStorage(bool $storeValues): DummyStorageStub
     {
-        return $this->storage = new DummyStorageStub($this->keyGenerator, $storeValues);
+        return $this->storage = new DummyStorageStub($this->keyGenerator, $this->dateHelper, $storeValues);
     }
 
     protected function expectGenerateKey()

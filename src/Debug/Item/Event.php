@@ -3,6 +3,8 @@ declare(strict_types = 1);
 
 namespace YapepBase\Debug\Item;
 
+use YapepBase\Helper\DateHelper;
+
 /**
  * Item which represents a triggered event in the applications lifecycle.
  */
@@ -15,8 +17,10 @@ class Event extends ItemAbstract
     /** @var float */
     protected $triggeredAt;
 
-    public function __construct(string $name, array $data = [])
+    public function __construct(DateHelper $dateHelper, string $name, array $data = [])
     {
+        parent::__construct($dateHelper);
+
         $this->name        = $name;
         $this->data        = $data;
         $this->triggeredAt = $this->getDateHelper()->getCurrentTimestampUs();

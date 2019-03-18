@@ -4,6 +4,8 @@ declare(strict_types = 1);
 namespace YapepBase\Storage;
 
 use YapepBase\Debug\Item\Storage;
+use YapepBase\Helper\DateHelper;
+use YapepBase\Storage\Key\IGenerator;
 
 /**
  * A dummy storage what only imitates a real storage
@@ -16,10 +18,14 @@ class DummyStorage extends StorageAbstract
     /** @var array */
     protected $data = [];
 
-    public function __construct(IKeyGenerator $keyGenerator, bool $storeValues = false)
+    /** @var DateHelper */
+    protected $dateHelper;
+
+    public function __construct(IGenerator $keyGenerator, DateHelper $dateHelper, bool $storeValues = false)
     {
         parent::__construct($keyGenerator);
 
+        $this->dateHelper = $dateHelper;
         $this->storeValues = $storeValues;
     }
 
@@ -27,13 +33,13 @@ class DummyStorage extends StorageAbstract
     {
         $fullKey = $this->keyGenerator->generate($key);
 
-        $item = (new Storage(Storage::METHOD_SET, $fullKey, $data))->setFinished();
+        $debugItem = (new Storage($this->dateHelper, Storage::METHOD_SET, $fullKey, $data))->setFinished();
 
         if ($this->storeValues) {
             $this->data[$fullKey] = $data;
         }
 
-        $this->getDebugDataHandlerRegistry()->addStorage($item);
+        $this->getDebugDataHandlerRegistry()->addStorage($debugItem);
     }
 
     public function get(string $key)
@@ -44,8 +50,8 @@ class DummyStorage extends StorageAbstract
             ? $this->data[$fullKey]
             : null;
 
-        $item = (new Storage(Storage::METHOD_GET, $fullKey, $data))->setFinished();
-        $this->getDebugDataHandlerRegistry()->addStorage($item);
+        $debugItem = (new Storage($this->dateHelper, Storage::METHOD_GET, $fullKey, $data))->setFinished();
+        $this->getDebugDataHandlerRegistry()->addStorage($debugItem);
 
         return $data;
     }
@@ -54,16 +60,16 @@ class DummyStorage extends StorageAbstract
     {
         $fullKey = $this->keyGenerator->generate($key);
 
-        $item = (new Storage(Storage::METHOD_DELETE, $fullKey))->setFinished();
-        $this->getDebugDataHandlerRegistry()->addStorage($item);
+        $debugItem = (new Storage($this->dateHelper, Storage::METHOD_DELETE, $fullKey))->setFinished();
+        $this->getDebugDataHandlerRegistry()->addStorage($debugItem);
 
         unset($this->data[$fullKey]);
     }
 
     public function clear(): void
     {
-        $item = (new Storage(Storage::METHOD_CLEAR))->setFinished();
-        $this->getDebugDataHandlerRegistry()->addStorage($item);
+        $debugItem = (new Storage($this->dateHelper, Storage::METHOD_CLEAR))->setFinished();
+        $this->getDebugDataHandlerRegistry()->addStorage($debugItem);
 
         $this->data = [];
     }

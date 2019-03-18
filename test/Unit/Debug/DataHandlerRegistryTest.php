@@ -24,7 +24,7 @@ class DataHandlerRegistryTest extends TestAbstract
     /** @var DataHandlerRegistry */
     protected $registry;
     /** @var float */
-    protected $initiatedAt = 0.1;
+    protected $registryInitiatedAt = 0.1;
     /** @var MockInterface */
     protected $dataHandler1;
     /** @var MockInterface */
@@ -33,26 +33,18 @@ class DataHandlerRegistryTest extends TestAbstract
     protected $name1 = 'name1';
     /** @var string */
     protected $name2 = 'name2';
+    /** @var MockInterface */
+    protected $dateHelper;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->expectSetInitiatedAt();
 
-        $this->registry = new DataHandlerRegistry();
-
+        $this->dateHelper   = Mockery::mock(DateHelper::class);
+        $this->expectGetRegistryInitTime();
+        $this->registry     = new DataHandlerRegistry($this->dateHelper);
         $this->dataHandler1 = Mockery::mock(ICanReturnItems::class);
         $this->dataHandler2 = Mockery::mock(ICanReturnItems::class);
-    }
-
-    protected function expectSetInitiatedAt()
-    {
-        $dateHelper = Mockery::mock(DateHelper::class)
-            ->shouldReceive('getCurrentTimestampUs')
-            ->andReturn($this->initiatedAt)
-            ->getMock();
-
-        $this->pimpleContainer[DateHelper::class] = $dateHelper;
     }
 
     public function testRegister_shouldRegisterGivenHandler()
@@ -92,7 +84,7 @@ class DataHandlerRegistryTest extends TestAbstract
     public function testAddCurlRequest_shouldAddToAllHandlers()
     {
         $this->registerHandlers();
-        $item = new CurlRequest('HTTP', 'GET', 'url');
+        $item = new CurlRequest(new DateHelper(), 'HTTP', 'GET', 'url');
 
         $this->expectAddItemCalledOnHandlers('addCurlRequest', $item);
         $this->registry->addCurlRequest($item);
@@ -110,7 +102,7 @@ class DataHandlerRegistryTest extends TestAbstract
     public function testAddEvent_shouldAddToAllHandlers()
     {
         $this->registerHandlers();
-        $item = new Event('name', []);
+        $item = new Event(new DateHelper(), 'name', []);
 
         $this->expectAddItemCalledOnHandlers('addEvent', $item);
         $this->registry->addEvent($item);
@@ -128,7 +120,7 @@ class DataHandlerRegistryTest extends TestAbstract
     public function testAddSqlQuery_shouldAddToAllHandlers()
     {
         $this->registerHandlers();
-        $item = new SqlQuery('dsn', 'query', []);
+        $item = new SqlQuery(new DateHelper(), 'dsn', 'query', []);
 
         $this->expectAddItemCalledOnHandlers('addSqlQuery', $item);
         $this->registry->addSqlQuery($item);
@@ -137,7 +129,7 @@ class DataHandlerRegistryTest extends TestAbstract
     public function testAddStorage_shouldAddToAllHandlers()
     {
         $this->registerHandlers();
-        $item = new Storage(Storage::METHOD_GET, 'key');
+        $item = new Storage(new DateHelper(), Storage::METHOD_GET, 'key');
 
         $this->expectAddItemCalledOnHandlers('addStorage', $item);
         $this->registry->addStorage($item);
@@ -146,7 +138,7 @@ class DataHandlerRegistryTest extends TestAbstract
     public function testAddTime_shouldAddToAllHandlers()
     {
         $this->registerHandlers();
-        $item = new Time('name');
+        $item = new Time(new DateHelper(), 'name');
 
         $this->expectAddItemCalledOnHandlers('addTime', $item);
         $this->registry->addTime($item);
@@ -155,7 +147,7 @@ class DataHandlerRegistryTest extends TestAbstract
     public function testAddGeneral_shouldAddToAllHandlers()
     {
         $this->registerHandlers();
-        $item = new General('name');
+        $item = new General(new DateHelper(), 'name');
 
         $this->expectAddItemCalledOnHandlers('addGeneral', $item);
         $this->registry->addGeneral($item);
@@ -179,5 +171,13 @@ class DataHandlerRegistryTest extends TestAbstract
                     })
                 );
         }
+    }
+
+    protected function expectGetRegistryInitTime()
+    {
+        $this->dateHelper
+            ->shouldReceive('getCurrentTimestampUs')
+            ->once()
+            ->andReturn($this->registryInitiatedAt);
     }
 }

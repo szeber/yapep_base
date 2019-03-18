@@ -4,6 +4,7 @@ declare(strict_types = 1);
 namespace YapepBase\Debug\Item;
 
 use YapepBase\Exception\ParameterException;
+use YapepBase\Helper\DateHelper;
 
 /**
  * Item which represents a storage usage.
@@ -30,8 +31,10 @@ class Storage extends ItemAbstract
     /** @var mixed */
     protected $data;
 
-    public function __construct(string $method, ?string $key = null, $data = null)
+    public function __construct(DateHelper $dateHelper, string $method, ?string $key = null, $data = null)
     {
+        parent::__construct($dateHelper);
+
         $this->setMethod($method);
 
         $this->key  = $key;

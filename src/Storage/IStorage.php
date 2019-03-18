@@ -5,6 +5,7 @@ namespace YapepBase\Storage;
 
 use YapepBase\Exception\ParameterException;
 use YapepBase\Exception\StorageException;
+use YapepBase\Storage\Key\IGenerator;
 
 /**
  * Storage interface
@@ -14,7 +15,7 @@ interface IStorage
     /**
      * Returns the key generator used by the storage
      */
-    public function getKeyGenerator(): IKeyGenerator;
+    public function getKeyGenerator(): IGenerator;
 
     /**
      * Stores data under the specified key

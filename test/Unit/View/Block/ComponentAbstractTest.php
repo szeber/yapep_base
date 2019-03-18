@@ -5,7 +5,7 @@ namespace YapepBase\Test\Unit\View\Block;
 
 use Mockery;
 use Mockery\MockInterface;
-use YapepBase\Storage\IKeyGenerator;
+use YapepBase\Storage\Key\IGenerator;
 use YapepBase\Storage\IStorage;
 use YapepBase\Test\Unit\TestAbstract;
 
@@ -54,7 +54,7 @@ class ComponentAbstractTest extends TestAbstract
 
     protected function expectStorageUsed()
     {
-        $this->keyGenerator = Mockery::mock(IKeyGenerator::class)
+        $this->keyGenerator = Mockery::mock(IGenerator::class)
             ->shouldReceive('setHashing')
                 ->with(true)
                 ->andReturn(Mockery::self())

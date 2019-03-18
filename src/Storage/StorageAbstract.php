@@ -6,18 +6,19 @@ namespace YapepBase\Storage;
 use YapepBase\Application;
 use YapepBase\Debug\IDataHandlerRegistry;
 use YapepBase\Exception\StorageException;
+use YapepBase\Storage\Key\IGenerator;
 
 abstract class StorageAbstract implements IStorage
 {
-    /** @var IKeyGenerator */
+    /** @var IGenerator */
     protected $keyGenerator;
 
-    public function __construct(IKeyGenerator $keyGenerator)
+    public function __construct(IGenerator $keyGenerator)
     {
         $this->keyGenerator = $keyGenerator;
     }
 
-    public function getKeyGenerator(): IKeyGenerator
+    public function getKeyGenerator(): IGenerator
     {
         return $this->keyGenerator;
     }

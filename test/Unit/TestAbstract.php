@@ -49,7 +49,7 @@ abstract class TestAbstract extends TestCase
         Application::getInstance()->setDiContainer($this->diContainer);
     }
 
-    protected function initDateHelper(DateHelper $dateHelper)
+    protected function addDateHelperToDi(DateHelper $dateHelper)
     {
         $this->pimpleContainer[DateHelper::class] = $dateHelper;
     }

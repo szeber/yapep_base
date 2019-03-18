@@ -3,7 +3,6 @@ declare(strict_types = 1);
 
 namespace YapepBase\Debug;
 
-use YapepBase\Application;
 use YapepBase\Debug\Item\CurlRequest;
 use YapepBase\Debug\Item\Error;
 use YapepBase\Debug\Item\Event;
@@ -20,17 +19,18 @@ use YapepBase\Helper\DateHelper;
  */
 class DataHandlerRegistry implements IDataHandlerRegistry
 {
+    /** @var DateHelper */
+    protected $dateHelper;
+
     /** @var float */
     protected $initiatedAt;
 
     /** @var ICanReturnItems[] */
     protected $dataHandlers = [];
 
-    public function __construct()
+    public function __construct(DateHelper $dateHelper)
     {
-        /** @var DateHelper $dateHelper */
-        $dateHelper = Application::getInstance()->getDiContainer()->get(DateHelper::class);
-
+        $this->dateHelper  = $dateHelper;
         $this->initiatedAt = $dateHelper->getCurrentTimestampUs();
     }
 

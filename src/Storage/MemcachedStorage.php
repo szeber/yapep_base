@@ -7,6 +7,8 @@ use Memcached;
 use YapepBase\Debug\Item\Storage;
 use YapepBase\Exception\ParameterException;
 use YapepBase\Exception\StorageException;
+use YapepBase\Helper\DateHelper;
+use YapepBase\Storage\Key\IGenerator;
 
 /**
  * Memcached storage
@@ -19,11 +21,15 @@ class MemcachedStorage extends StorageAbstract implements IIncrementable
     /** @var bool */
     protected $readOnly = false;
 
-    public function __construct(Memcached $connection, IKeyGenerator $keyGenerator, bool $readOnly = false)
+    /** @var DateHelper */
+    protected $dateHelper;
+
+    public function __construct(Memcached $connection, IGenerator $keyGenerator, DateHelper $dateHelper, bool $readOnly = false)
     {
         parent::__construct($keyGenerator);
 
         $this->connection = $connection;
+        $this->dateHelper = $dateHelper;
         $this->readOnly   = $readOnly;
     }
 
@@ -38,7 +44,7 @@ class MemcachedStorage extends StorageAbstract implements IIncrementable
         $this->protectWhenReadOnly();
 
         $fullKey   = $this->keyGenerator->generate($key);
-        $debugItem = (new Storage(Storage::METHOD_SET, $fullKey, $data));
+        $debugItem = (new Storage($this->dateHelper, Storage::METHOD_SET, $fullKey, $data));
 
         $isStored = $this->connection->set($fullKey, $data, $ttlInSecondsInSecondsInSeconds);
 
@@ -65,7 +71,7 @@ class MemcachedStorage extends StorageAbstract implements IIncrementable
     public function get(string $key)
     {
         $fullKey   = $this->keyGenerator->generate($key);
-        $debugItem = (new Storage(Storage::METHOD_GET, $fullKey));
+        $debugItem = (new Storage($this->dateHelper,Storage::METHOD_GET, $fullKey));
         $result    = $this->connection->get($fullKey);
 
         if (false === $result) {
@@ -93,7 +99,7 @@ class MemcachedStorage extends StorageAbstract implements IIncrementable
     {
         $this->protectWhenReadOnly();
 
-        $item = (new Storage(Storage::METHOD_DELETE, $key));
+        $item = (new Storage($this->dateHelper,Storage::METHOD_DELETE, $key));
 
         $fullKey = $this->keyGenerator->generate($key);
         $this->connection->delete($fullKey);
@@ -109,9 +115,10 @@ class MemcachedStorage extends StorageAbstract implements IIncrementable
      */
     public function clear(): void
     {
-        $item = (new Storage(Storage::METHOD_CLEAR));
-
         $this->protectWhenReadOnly();
+
+        $item = (new Storage($this->dateHelper,Storage::METHOD_CLEAR));
+
         $this->connection->flush();
 
         $item->setFinished();
@@ -122,7 +129,7 @@ class MemcachedStorage extends StorageAbstract implements IIncrementable
     {
         $this->protectWhenReadOnly();
 
-        $item = (new Storage(Storage::METHOD_INCREMENT, $key, $offset));
+        $item = (new Storage($this->dateHelper,Storage::METHOD_INCREMENT, $key, $offset));
 
         $fullKey = $this->keyGenerator->generate($key);
         $result  = $this->connection->increment($fullKey, $offset, 0, $ttlInSeconds);

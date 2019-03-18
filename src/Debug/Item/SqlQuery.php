@@ -3,6 +3,8 @@ declare(strict_types = 1);
 
 namespace YapepBase\Debug\Item;
 
+use YapepBase\Helper\DateHelper;
+
 /**
  * Item which stores the details of an SQL query being executed.
  */
@@ -21,8 +23,17 @@ class SqlQuery extends ItemAbstract
     /** @var string|null */
     protected $callerMethod;
 
-    public function __construct(string $dsn, string $query, array $params, ?string $callerClass = null, ?string $callerMethod = null)
+    public function __construct(
+        DateHelper $dateHelper,
+        string $dsn,
+        string $query,
+        array $params,
+        ?string $callerClass = null,
+        ?string $callerMethod = null
+    )
     {
+        parent::__construct($dateHelper);
+
         $this->dsn          = $dsn;
         $this->query        = $query;
         $this->params       = $params;

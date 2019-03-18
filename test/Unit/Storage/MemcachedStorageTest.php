@@ -6,8 +6,7 @@ namespace YapepBase\Test\Unit\Storage;
 use Mockery\MockInterface;
 use YapepBase\Debug\Item\Storage;
 use YapepBase\Exception\StorageException;
-use YapepBase\Helper\DateHelper;
-use YapepBase\Storage\KeyGenerator;
+use YapepBase\Storage\Key\Generator;
 use YapepBase\Storage\MemcachedStorage;
 
 class MemcachedStorageTest extends TestAbstract
@@ -25,7 +24,6 @@ class MemcachedStorageTest extends TestAbstract
         parent::setUp();
 
         $this->memcached = \Mockery::mock(\Memcached::class);
-        $this->initDateHelper(new DateHelper());
         $this->initDebugDataHandler();
     }
 
@@ -39,7 +37,8 @@ class MemcachedStorageTest extends TestAbstract
     public function testSetWhenSucceeds_shouldStoreValueAndCreateDebug()
     {
         $this->expectSetToMemcached($this->key, true);
-        $this->expectAddStorageDebug(Storage::METHOD_SET, $this->key, $this->data);
+        $this->expectDebugTimesRetrieved();
+        $this->expectAddStorageDebug(Storage::METHOD_SET, $this->key, $this->data, $this->debugStartedAt, $this->debugFinishedAt);
 
         $this->getStorage()->set($this->key, $this->data, $this->ttl);
     }
@@ -52,6 +51,7 @@ class MemcachedStorageTest extends TestAbstract
         $this->expectSetToMemcached($this->key, false);
         $this->expectGetResultCodeFromMemcached($memcachedResultCode);
         $this->expectGetResultMessageFromMemcached($memcachedResultMessage);
+        $this->expectDebugTimesRetrieved();
 
         $this->expectException(StorageException::class);
         $this->expectExceptionMessage($memcachedResultMessage);
@@ -66,7 +66,8 @@ class MemcachedStorageTest extends TestAbstract
 
         $this->expectSetToMemcached($this->key, false);
         $this->expectGetResultCodeFromMemcached($memcachedResultCode);
-        $this->expectAddStorageDebug(Storage::METHOD_SET, $this->key, $this->data);
+        $this->expectDebugTimesRetrieved();
+        $this->expectAddStorageDebug(Storage::METHOD_SET, $this->key, $this->data, $this->debugStartedAt, $this->debugFinishedAt);
 
         $this->getStorage()->set($this->key, $this->data, $this->ttl);
     }
@@ -74,7 +75,8 @@ class MemcachedStorageTest extends TestAbstract
     public function testGetWhenKeyFound_shouldReturnRetrievedData()
     {
         $this->expectGetFromMemcached($this->key, $this->data);
-        $this->expectAddStorageDebug(Storage::METHOD_GET, $this->key, $this->data);
+        $this->expectDebugTimesRetrieved();
+        $this->expectAddStorageDebug(Storage::METHOD_GET, $this->key, $this->data, $this->debugStartedAt, $this->debugFinishedAt);
 
         $result = $this->getStorage()->get($this->key);
 
@@ -96,7 +98,8 @@ class MemcachedStorageTest extends TestAbstract
     {
         $this->expectGetFromMemcached($this->key, false);
         $this->expectGetResultCodeFromMemcached($resultCode);
-        $this->expectAddStorageDebug(Storage::METHOD_GET, $this->key, false);
+        $this->expectDebugTimesRetrieved();
+        $this->expectAddStorageDebug(Storage::METHOD_GET, $this->key, false, $this->debugStartedAt, $this->debugFinishedAt);
 
         $result = $this->getStorage()->get($this->key);
 
@@ -111,6 +114,7 @@ class MemcachedStorageTest extends TestAbstract
         $this->expectGetFromMemcached($this->key, false);
         $this->expectGetResultCodeFromMemcached($memcachedResultCode);
         $this->expectGetResultMessageFromMemcached($memcachedResultMessage);
+        $this->expectDebugTimesRetrieved();
 
         $this->expectException(StorageException::class);
         $this->expectExceptionMessage($memcachedResultMessage);
@@ -128,7 +132,8 @@ class MemcachedStorageTest extends TestAbstract
     public function testDelete_shouldDeleteItemAndSetDebug()
     {
         $this->expectDeleteFromMemcached($this->key);
-        $this->expectAddStorageDebug(Storage::METHOD_DELETE, $this->key, null);
+        $this->expectDebugTimesRetrieved();
+        $this->expectAddStorageDebug(Storage::METHOD_DELETE, $this->key, null, $this->debugStartedAt, $this->debugFinishedAt);
 
         $this->getStorage()->delete($this->key);
     }
@@ -142,7 +147,8 @@ class MemcachedStorageTest extends TestAbstract
     public function testClear_shouldClearMemcached()
     {
         $this->expectClearMemcached();
-        $this->expectAddStorageDebug(Storage::METHOD_CLEAR, null, null);
+        $this->expectDebugTimesRetrieved();
+        $this->expectAddStorageDebug(Storage::METHOD_CLEAR, null, null, $this->debugStartedAt, $this->debugFinishedAt);
 
         $this->getStorage()->clear();
     }
@@ -155,6 +161,7 @@ class MemcachedStorageTest extends TestAbstract
 
     public function testIncrementWhenFails_shouldThrowException()
     {
+        $this->expectDebugTimesRetrieved();
         $this->expectIncrementInMemcached(false);
         $this->expectException(StorageException::class);
 
@@ -166,7 +173,8 @@ class MemcachedStorageTest extends TestAbstract
         $expectedResult = 3;
 
         $this->expectIncrementInMemcached($expectedResult);
-        $this->expectAddStorageDebug(Storage::METHOD_INCREMENT, $this->key, $this->offset);
+        $this->expectDebugTimesRetrieved();
+        $this->expectAddStorageDebug(Storage::METHOD_INCREMENT, $this->key, $this->offset, $this->debugStartedAt, $this->debugFinishedAt);
 
         $result = $this->getStorage()->increment($this->key, $this->offset, $this->ttl);
 
@@ -233,6 +241,6 @@ class MemcachedStorageTest extends TestAbstract
 
     protected function getStorage(bool $readOnly = false): MemcachedStorage
     {
-        return new MemcachedStorage($this->memcached, new KeyGenerator(false), $readOnly);
+        return new MemcachedStorage($this->memcached, new Generator(false), $this->dateHelper, $readOnly);
     }
 }

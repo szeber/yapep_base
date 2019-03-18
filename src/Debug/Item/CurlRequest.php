@@ -3,6 +3,8 @@ declare(strict_types = 1);
 
 namespace YapepBase\Debug\Item;
 
+use YapepBase\Helper\DateHelper;
+
 /**
  * Item which represents a Curl Request.
  */
@@ -24,6 +26,7 @@ class CurlRequest extends ItemAbstract
     protected $options = [];
 
     public function __construct(
+        DateHelper $dateHelper,
         string $protocol,
         string $requestMethod,
         string $url,
@@ -31,6 +34,8 @@ class CurlRequest extends ItemAbstract
         array $headers = [],
         array $options = []
     ) {
+        parent::__construct($dateHelper);
+
         $this->protocol      = $protocol;
         $this->requestMethod = $requestMethod;
         $this->url           = $url;

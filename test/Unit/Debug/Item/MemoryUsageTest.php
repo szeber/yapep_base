@@ -4,7 +4,6 @@ declare(strict_types = 1);
 namespace YapepBase\Test\Unit\Debug\Item;
 
 use YapepBase\Debug\Item\MemoryUsage;
-use YapepBase\Test\Unit\TestAbstract;
 
 class MemoryUsageTest extends TestAbstract
 {
