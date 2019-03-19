@@ -1,7 +1,7 @@
 <?php
 declare(strict_types = 1);
 
-namespace YapepBase\Storage;
+namespace YapepBase\Storage\Entity;
 
 class File
 {

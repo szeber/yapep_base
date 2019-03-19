@@ -11,6 +11,7 @@ use YapepBase\Exception\StorageException;
 use YapepBase\File\FileHandlerPhp;
 use YapepBase\File\IFileHandler;
 use YapepBase\Helper\DateHelper;
+use YapepBase\Storage\Entity\File;
 use YapepBase\Storage\Key\IGenerator;
 
 /**

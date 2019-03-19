@@ -8,7 +8,7 @@ use YapepBase\Exception\File\Exception;
 use YapepBase\Exception\File\NotFoundException;
 use YapepBase\Exception\ParameterException;
 use YapepBase\Exception\StorageException;
-use YapepBase\Storage\File;
+use YapepBase\Storage\Entity\File;
 use YapepBase\Storage\FileStorage;
 
 class FileStorageTest extends TestAbstract
@@ -227,7 +227,7 @@ class FileStorageTest extends TestAbstract
         $expiresAt   = 20;
         $currentTime = 18;
         $fileStorage = $this->getStorage($this->path);
-        $file        = new File($this->data, $this->createdAt, $expiresAt);
+        $file        = new \YapepBase\Storage\Entity\File($this->data, $this->createdAt, $expiresAt);
 
         $this->expectDebugTimesRetrieved();
         $this->fileHandler
