@@ -1,10 +1,11 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace YapepBase\Storage;
 
 use YapepBase\Exception\ParameterException;
 use YapepBase\Exception\StorageException;
+use YapepBase\Storage\Key\IGenerator;
 
 /**
  * Storage interface
@@ -12,24 +13,29 @@ use YapepBase\Exception\StorageException;
 interface IStorage
 {
     /**
-     * Stores data under the specified key
-     *
-     * @throws StorageException     On error.
-     * @throws ParameterException   If TTL is set and not supported by the backend.
+     * Returns the key generator used by the storage
      */
-    public function set(string $key, $data, int $ttlInSeconds = 0): void;
+    public function getKeyGenerator(): IGenerator;
 
     /**
-     * Retrieves data from the cache identified by the specified key..
+     * Stores data under the specified key
      *
-     * @throws StorageException   On error.
+     * @throws StorageException
+     * @throws ParameterException
+     */
+    public function set(string $key, $data, int $ttlInSecondsInSeconds = 0): void;
+
+    /**
+     * Retrieves data identified by the specified key.
+     *
+     * @throws StorageException
      */
     public function get(string $key);
 
     /**
      * Deletes the data specified by the key
      *
-     * @throws StorageException   On error.
+     * @throws StorageException
      */
     public function delete(string $key): void;
 
@@ -41,7 +47,7 @@ interface IStorage
     /**
      * Returns if the backend is persistent or volatile.
      *
-     * If the backend is volatile, a system or service restart may destroy all the stored data.
+     * If the backend is volatile a system or service restart may destroy all the stored data.
      */
     public function isPersistent(): bool;
 

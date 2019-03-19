@@ -1,5 +1,5 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
 /**
  * This file is part of YAPEPBase.
  *
@@ -14,7 +14,6 @@ use YapepBase\Event\Event;
 use YapepBase\Exception\ConfigException;
 use YapepBase\Exception\Exception;
 use YapepBase\Storage\IStorage;
-use YapepBase\Util\Random;
 
 /**
  * Base class for session handlers.
@@ -288,7 +287,7 @@ abstract class SessionAbstract implements ISession
      */
     protected function generateId()
     {
-        return Random::getPseudoString(32);
+        // TODO: Use a lib to generate this for example: ircmaxell/random-lib
     }
 
     /**

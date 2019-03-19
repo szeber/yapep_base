@@ -1,52 +1,29 @@
 <?php
-declare(strict_types = 1);
-/**
- * This file is part of YAPEPBase.
- *
- * @copyright    2011 The YAPEP Project All rights reserved.
- * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
- */
+declare(strict_types=1);
+
 namespace YapepBase\Dao;
 
 use YapepBase\Database\DbConnection;
 
 /**
- * Base abstract DAO which should be extended by every DAO class.
+ * Common ancestor of Data Access Objects.
  */
 abstract class DaoAbstract
 {
-    /** Interval unit for day. */
-    const INTERVAL_UNIT_DAY = 'day';
-    /** Interval unit for month. */
-    const INTERVAL_UNIT_MONTH = 'month';
-    /** Interval unit for year. */
-    const INTERVAL_UNIT_YEAR = 'year';
+    abstract protected function getConnection(): DbConnection;
 
     /**
      * Generates a condition like [tableAlias].[fieldName] = [expectedValue]
-     *
-     * @param DbConnection $dbConnection              DB Connection.
-     * @param string       $fieldName                 The field to check.
-     * @param mixed        $expectation               What value should be the field matched against.
-     * @param array        $conditions                Array which holds the conditions.
-     * @param array        $queryParams               Array which holds the query params.
-     * @param string       $tableAlias                Alias of the table which contains the given field.
-     * @param bool         $onlyNullConsideredEmpty   If TRUE only null value will be considered empty
      */
-    protected function getEqualityCondition(
-        DbConnection $dbConnection,
-        $fieldName,
-        $expectation,
+    protected function setEqualityCondition(
         array &$conditions,
         array &$queryParams,
-        $tableAlias = '',
-        $onlyNullConsideredEmpty = false
+        string $fieldName,
+        $expectation,
+        string $tableAlias = '',
+        bool $onlyNullConsideredEmpty = false
     ) {
-        if (
-            (!$onlyNullConsideredEmpty && empty($expectation))
-            ||
-            ($onlyNullConsideredEmpty && is_null($expectation))
-        ) {
+        if ((!$onlyNullConsideredEmpty && empty($expectation)) || ($onlyNullConsideredEmpty && is_null($expectation))) {
             return;
         }
 
@@ -57,37 +34,28 @@ abstract class DaoAbstract
         $paramName = $this->getParamName($fieldName, $tableAlias);
         $fieldName = $this->getPrefixedField($tableAlias, $fieldName);
 
-        $conditions[]            = $fieldName . ' = :' . $dbConnection->getParamPrefix() . $paramName;
+        $conditions[]            = $fieldName . ' = :' . $this->getConnection()->getParamPrefix() . $paramName;
         $queryParams[$paramName] = $expectation;
     }
 
     /**
-     * Generates a condition like [tableAlias].[fieldName] IN ([list])
-     *
-     * @param DbConnection $dbConnection   DB Connection.
-     * @param string       $fieldName      The field to check.
-     * @param array        $list           List of the possible values
-     * @param array        $conditions     Array which holds the conditions.
-     * @param array        $queryParams    Array which holds the query params.
-     * @param string       $tableAlias     Alias of the table which contains the given field.
-     * @param bool         $isNegated      If TRUE, it will generate a NOT IN, with the default false it will generate an IN condition
+     * Generates a condition like [tableAlias].[fieldName] IN ([values])
      */
-    protected function getInListCondition(
-        DbConnection $dbConnection,
-        $fieldName,
-        array $list,
+    protected function setInListCondition(
         array &$conditions,
         array &$queryParams,
-        $tableAlias = '',
-        $isNegated = false
+        string $fieldName,
+        array $values,
+        string $tableAlias = '',
+        bool $isNegated = false
     ) {
-        if (empty($list)) {
+        if (empty($values)) {
             return;
         }
 
-        $paramPrefix = $dbConnection->getParamPrefix();
+        $paramPrefix = $this->getConnection()->getParamPrefix();
         $paramNames  = [];
-        foreach ($list as $index => $item) {
+        foreach ($values as $index => $item) {
             $paramName = $this->getParamName($fieldName, $tableAlias, $index);
 
             $paramNames[]            = ':' . $paramPrefix . $paramName;
@@ -96,18 +64,14 @@ abstract class DaoAbstract
 
         $operator = $isNegated ? 'NOT IN' : 'IN';
 
-        $conditions[] = $this->getPrefixedField($tableAlias, $fieldName) . ' ' . $operator . ' (' . implode(', ', $paramNames) . ')';
+        $conditions[] = $this->getPrefixedField($tableAlias, $fieldName)
+            . ' ' . $operator . ' (' . implode(', ', $paramNames) . ')';
     }
 
     /**
      * Returns the name of the given field with the proper prefix.
-     *
-     * @param string $tableAlias   Alias of the table.
-     * @param string $fieldName    Name of the field.
-     *
-     * @return string
      */
-    protected function getPrefixedField($tableAlias, $fieldName)
+    protected function getPrefixedField(string $tableAlias, string $fieldName): string
     {
         $prefix = empty($tableAlias) ? '' : $tableAlias . '.';
 
@@ -116,14 +80,8 @@ abstract class DaoAbstract
 
     /**
      * Creates a parameter name based on the given field and table.
-     *
-     * @param string   $fieldName    Name of the field.
-     * @param string   $tableAlias   Alias of the table
-     * @param int|null $index        An index number if the same field and table is used more than once.
-     *
-     * @return string
      */
-    protected function getParamName($fieldName, $tableAlias = '', $index = null)
+    protected function getParamName(string $fieldName, string $tableAlias = '', ?int $index = null): string
     {
         $paramNameParts = [];
 

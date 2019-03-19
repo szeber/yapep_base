@@ -1,199 +1,91 @@
 <?php
-declare(strict_types = 1);
-/**
- * This file is part of YAPEPBase.
- *
- * @copyright  2011 The YAPEP Project All rights reserved.
- * @license    http://www.opensource.org/licenses/bsd-license.php BSD License
- */
+declare(strict_types=1);
+
 namespace YapepBase\Storage;
 
-use YapepBase\Application;
-use YapepBase\Debugger\Item\StorageItem;
+use YapepBase\Debug\Item\Storage;
+use YapepBase\Helper\DateHelper;
+use YapepBase\Storage\Key\IGenerator;
 
 /**
- * Storage class for dummy storage.
- *
- * It wont store anything, and it will return false for every data query attempt.
- *
- * Configuration options:
- *     <ul>
- *         <li>debuggerDisabled: If TRUE, the storage will not add the requests to the debugger if it's available.
- *                               This is useful for example for a storage instance, that is used to store the
- *                               DebugDataCreator's debug information as they can become quite large, and if they were
- *                               sent to the client it can cause problems. Optional, defaults to FALSE.
- *     </ul>
+ * A dummy storage what only imitates a real storage
  */
 class DummyStorage extends StorageAbstract
 {
-    /**
-     * If TRUE, no debug items are created by this storage.
-     *
-     * @var bool
-     */
-    protected $debuggerDisabled;
+    /** @var bool */
+    protected $storeValues;
 
-    /**
-     * Stores data the specified key
-     *
-     * @param string $key          The key to be used to store the data.
-     * @param mixed  $data         The data to store.
-     * @param int    $ttlInSeconds The expiration time of the data in seconds if supported by the backend.
-     *
-     * @return void
-     */
-    public function set($key, $data, $ttlInSeconds = 0)
+    /** @var array */
+    protected $data = [];
+
+    /** @var DateHelper */
+    protected $dateHelper;
+
+    public function __construct(IGenerator $keyGenerator, DateHelper $dateHelper, bool $storeValues = false)
     {
-        $debugger = Application::getInstance()->getDiContainer()->getDebugger();
+        parent::__construct($keyGenerator);
 
-        // If we have a debugger, we have to log the query
-        if (!$this->debuggerDisabled && $debugger !== false) {
-            $debugger->addItem(new StorageItem(
-                'dummy',
-                'dummy.' . $this->currentConfigurationName,
-                StorageItem::METHOD_SET . ' ' . $key . ' for ' . $ttlInSeconds,
-                $data,
-                0
-            ));
-        }
+        $this->dateHelper  = $dateHelper;
+        $this->storeValues = $storeValues;
     }
 
-    /**
-     * Retrieves data from the cache identified by the specified key. Returns FALSE if the key does not exist.
-     *
-     * @param string $key   The key.
-     *
-     * @return mixed   The data or FALSE if the specified key does not exist.
-     */
-    public function get($key)
+    public function set(string $key, $data, int $ttlInSecondsInSeconds = 0): void
     {
-        $debugger = Application::getInstance()->getDiContainer()->getDebugger();
+        $fullKey = $this->keyGenerator->generate($key);
 
-        // If we have a debugger, we have to log the query
-        if (!$this->debuggerDisabled && $debugger !== false) {
-            $debugger->addItem(new StorageItem(
-                'dummy',
-                'dummy.' . $this->currentConfigurationName,
-                StorageItem::METHOD_GET . ' ' . $key,
-                false,
-                0
-            ));
+        $debugItem = (new Storage($this->dateHelper, Storage::METHOD_SET, $fullKey, $data))->setFinished();
+
+        if ($this->storeValues) {
+            $this->data[$fullKey] = $data;
         }
 
-        return false;
+        $this->getDebugDataHandlerRegistry()->addStorage($debugItem);
     }
 
-    /**
-     * Deletes the data specified by the key
-     *
-     * @param string $key   The key.
-     *
-     * @return void
-     *
-     * @throws \YapepBase\Exception\StorageException      On error.
-     */
-    public function delete($key)
+    public function get(string $key)
     {
-        $debugger = Application::getInstance()->getDiContainer()->getDebugger();
+        $fullKey = $this->keyGenerator->generate($key);
 
-        // If we have a debugger, we have to log the query
-        if (!$this->debuggerDisabled && $debugger !== false) {
-            $debugger->addItem(new StorageItem(
-                'dummy',
-                'dummy.' . $this->currentConfigurationName,
-                StorageItem::METHOD_DELETE . ' ' . $key,
-                null,
-                0
-            ));
-        }
+        $data = isset($this->data[$fullKey])
+            ? $this->data[$fullKey]
+            : null;
+
+        $debugItem = (new Storage($this->dateHelper, Storage::METHOD_GET, $fullKey, $data))->setFinished();
+        $this->getDebugDataHandlerRegistry()->addStorage($debugItem);
+
+        return $data;
     }
 
-    /**
-     * Deletes every data in the storage.
-     *
-     * @return mixed
-     */
-    public function clear()
+    public function delete(string $key): void
     {
-        $debugger = Application::getInstance()->getDiContainer()->getDebugger();
+        $fullKey = $this->keyGenerator->generate($key);
 
-        // If we have a debugger, we have to log the query
-        if (!$this->debuggerDisabled && $debugger !== false) {
-            $debugger->addItem(new StorageItem(
-                'dummy',
-                'dummy.' . $this->currentConfigurationName,
-                StorageItem::METHOD_CLEAR,
-                null,
-                0
-            ));
-        }
+        $debugItem = (new Storage($this->dateHelper, Storage::METHOD_DELETE, $fullKey))->setFinished();
+        $this->getDebugDataHandlerRegistry()->addStorage($debugItem);
+
+        unset($this->data[$fullKey]);
     }
 
-    /**
-     * Returns if the backend is persistent or volatile.
-     *
-     * If the backend is volatile a system or service restart may destroy all the stored data.
-     *
-     * @return bool
-     */
-    public function isPersistent()
+    public function clear(): void
+    {
+        $debugItem = (new Storage($this->dateHelper, Storage::METHOD_CLEAR))->setFinished();
+        $this->getDebugDataHandlerRegistry()->addStorage($debugItem);
+
+        $this->data = [];
+    }
+
+    public function isPersistent(): bool
     {
         return false;
     }
 
-    /**
-     * Returns whether the TTL functionality is supported by the backend.
-     *
-     * @return bool
-     */
-    public function isTtlSupported()
+    public function isTtlSupported(): bool
     {
         return false;
     }
 
-    /**
-     * Returns TRUE if the storage backend is read only, FALSE otherwise.
-     *
-     * @return bool
-     */
-    public function isReadOnly()
+    public function isReadOnly(): bool
     {
         return false;
-    }
-
-    /**
-     * Returns the config properties(last part of the key) used by the class.
-     *
-     * @return array
-     */
-    protected function getConfigProperties()
-    {
-        return ['debuggerDisabled'];
-    }
-
-    /**
-     * Sets up the backend.
-     *
-     * @param array $config   The configuration data for the backend.
-     *
-     * @return void
-     */
-    protected function setupConfig(array $config)
-    {
-        $this->debuggerDisabled = isset($config['debuggerDisabled']) ? (bool)$config['debuggerDisabled'] : false;
-    }
-
-    /**
-     * Returns the configuration data for the storage backend. This includes the storage type as used by
-     * the storage factory.
-     *
-     * @return array
-     */
-    public function getConfigData()
-    {
-        return [
-            'storageType'      => StorageFactory::TYPE_DUMMY,
-            'debuggerDisabled' => $this->debuggerDisabled,
-        ];
     }
 }

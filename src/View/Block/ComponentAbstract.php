@@ -1,5 +1,5 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace YapepBase\View\Block;
 
@@ -22,8 +22,10 @@ abstract class ComponentAbstract extends BlockAbstract
     public function render(): void
     {
         if ($this->hasStorage()) {
-            $storage    = $this->getStorage();
-            $storageKey = $this->getStorageKey();
+            $storage = $this->getStorage();
+            $this->configureStorage($storage);
+
+            $storageKey = $this->getUniqueIdentifier();
             $result     = $storage->get($storageKey);
 
             if (empty($result)) {
@@ -45,9 +47,13 @@ abstract class ComponentAbstract extends BlockAbstract
         return $this->getStorage() !== null;
     }
 
-    private function getStorageKey(): string
+    private function configureStorage(IStorage $storage)
     {
-        return 'component_' . $this->getUniqueIdentifier() . md5(get_class($this));
+        $storage
+            ->getKeyGenerator()
+            ->setHashing(true)
+            ->setPrefix('component_')
+            ->setSuffix(get_class($this));
     }
 
     /**

@@ -1,73 +1,40 @@
 <?php
-declare(strict_types = 1);
-/**
- * This file is part of YAPEPBase.
- *
- * @copyright  2011 The YAPEP Project All rights reserved.
- * @license    http://www.opensource.org/licenses/bsd-license.php BSD License
- */
+declare(strict_types=1);
+
 namespace YapepBase\Storage;
 
-use YapepBase\Config;
-use YapepBase\Exception\ConfigException;
+use YapepBase\Application;
+use YapepBase\Debug\IDataHandlerRegistry;
+use YapepBase\Exception\StorageException;
+use YapepBase\Storage\Key\IGenerator;
 
-/**
- * Base class for the storage implementations.
- *
- * Configuration settings for the storage should be set in the format:
- * <b>resource.storage.&lt;configName&gt;.&lt;optionName&gt;
- */
 abstract class StorageAbstract implements IStorage
 {
-    /**
-     * Holds the name of the currently used configuration.
-     *
-     * @var string
-     */
-    protected $currentConfigurationName;
+    /** @var IGenerator */
+    protected $keyGenerator;
 
-    /**
-     * Constructor.
-     *
-     * @param string $configName   The name of the configuration to use.
-     *
-     * @throws \YapepBase\Exception\ConfigException    On configuration errors.
-     * @throws \YapepBase\Exception\StorageException   On storage errors.
-     */
-    public function __construct($configName)
+    public function __construct(IGenerator $keyGenerator)
     {
-        $this->currentConfigurationName = $configName;
+        $this->keyGenerator = $keyGenerator;
+    }
 
-        $properties = $this->getConfigProperties();
-        $configData = [];
-        foreach ($properties as $property) {
-            try {
-                $configData[$property] =
-                    Config::getInstance()->get('resource.storage.' . $configName . '.' . $property);
-            } catch (ConfigException $e) {
-                // We just swallow this because we don't know what properties do we need in advance
-            }
-        }
-
-        $this->setupConfig($configData);
+    public function getKeyGenerator(): IGenerator
+    {
+        return $this->keyGenerator;
     }
 
     /**
-     * Returns the config properties(last part of the key) used by the class.
-     *
-     * @return array
+     * @throws StorageException
      */
-    abstract protected function getConfigProperties();
+    protected function protectWhenReadOnly(): void
+    {
+        if ($this->isReadOnly()) {
+            throw new StorageException('Trying to write to a read only storage');
+        }
+    }
 
-    /**
-     * Sets up the backend.
-     *
-     * @param array $config   The configuration data for the backend.
-     *
-     * @return void
-     *
-     * @throws \YapepBase\Exception\ConfigException    On configuration errors.
-     * @throws \YapepBase\Exception\StorageException   On storage errors.
-     */
-    abstract protected function setupConfig(array $config);
+    protected function getDebugDataHandlerRegistry(): IDataHandlerRegistry
+    {
+        return Application::getInstance()->getDiContainer()->getDebugDataHandlerRegistry();
+    }
 }

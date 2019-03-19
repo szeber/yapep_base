@@ -1,8 +1,9 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace YapepBase\DependencyInjection;
 
+use YapepBase\Debug\IDataHandlerRegistry;
 use YapepBase\ErrorHandler\IErrorHandlerRegistry;
 use YapepBase\Event\IEventHandlerRegistry;
 use YapepBase\File\IFileHandler;
@@ -60,6 +61,11 @@ class Container implements IContainer
     public function getEventHandlerRegistry(): IEventHandlerRegistry
     {
         return $this->container->getEventHandlerRegistry();
+    }
+
+    public function getDebugDataHandlerRegistry(): IDataHandlerRegistry
+    {
+        return $this->container->getDebugDataHandlerRegistry();
     }
 
     public function getSessionRegistry(): ISessionRegistry
