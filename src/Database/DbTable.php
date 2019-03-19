@@ -1,5 +1,5 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
 /**
  * This file is part of YAPEPBase.
  *
@@ -299,9 +299,9 @@ abstract class DbTable
         return $this->getDbConnection(
             DbFactory::TYPE_READ_ONLY
         )->query(
-                $this->getQueryIdComment(__METHOD__) . "\n"
+            $this->getQueryIdComment(__METHOD__) . "\n"
                 . $this->buildSelectQuery($conditions, $orderBy, $direction, $params, $limit),
-                $params
+            $params
         )->fetchAll();
     }
 
