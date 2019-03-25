@@ -10,7 +10,7 @@ use YapepBase\Test\Unit\TestAbstract;
 
 class HeaderContainerTest extends TestAbstract
 {
-    /** @var string  */
+    /** @var string */
     protected $name = 'name1';
     /** @var HeaderContainer */
     protected $headerContainer;

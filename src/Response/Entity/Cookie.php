@@ -8,7 +8,7 @@ class Cookie
     /** @var string */
     protected $name;
 
-    /** @var string  */
+    /** @var string */
     protected $value;
 
     /** @var int */
@@ -46,8 +46,15 @@ class Cookie
 
     public function send(): bool
     {
-        return setcookie($this->name, $this->value, $this->ttlInSeconds, $this->path,
-            $this->domain, $this->secure, $this->httpOnly);
+        return setcookie(
+            $this->name,
+            $this->value,
+            $this->ttlInSeconds,
+            $this->path,
+            $this->domain,
+            $this->secure,
+            $this->httpOnly
+        );
     }
 
     public function getName(): string

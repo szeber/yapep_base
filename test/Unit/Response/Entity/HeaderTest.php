@@ -7,9 +7,9 @@ use YapepBase\Response\Entity\Header;
 
 class HeaderTest extends TestAbstract
 {
-    /** @var string  */
+    /** @var string */
     protected $name = 'name';
-    /** @var string  */
+    /** @var string */
     protected $value = 'value';
     /** @var Header */
     protected $header;
@@ -40,7 +40,9 @@ class HeaderTest extends TestAbstract
      */
     public function testSend_shouldSendHeader()
     {
-        $headers = $this->getHeadersAfterMethodCall(function () {$this->header->send();});
+        $headers = $this->getHeadersAfterMethodCall(function () {
+            $this->header->send();
+        });
 
         $this->assertCount(1, $headers);
         $this->assertSame((string)$this->header, $headers[0]);

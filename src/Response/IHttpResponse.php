@@ -7,7 +7,6 @@ use YapepBase\Exception\RedirectException;
 use YapepBase\Response\Entity\Cookie;
 use YapepBase\Response\Entity\Header;
 
-
 interface IHttpResponse
 {
     public function sendHeader(Header $header): void;

@@ -74,8 +74,7 @@ class OutputHandler implements IOutputHandler
             $headerContainer->add($header);
 
             $this->headersByName[$headerName] = $headerContainer;
-        }
-        else {
+        } else {
             $this->headersByName[$headerName]->add($header);
         }
 
@@ -112,7 +111,6 @@ class OutputHandler implements IOutputHandler
         $this->clearHeadersByName($headerName);
         $this->addHeader($header);
     }
-
 
     public function getHeaders(string $headerName): array
     {
@@ -197,8 +195,7 @@ class OutputHandler implements IOutputHandler
     {
         if ($this->isBuffering()) {
             $content = $this->bufferHandler->stop();
-        }
-        else {
+        } else {
             $content = '';
         }
 

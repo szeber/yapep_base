@@ -26,7 +26,7 @@ class HttpResponse implements IResponse, IHttpResponse
     /** @var Httpstatus */
     protected $statusHelper;
 
-    /** @var string  */
+    /** @var string */
     protected $charset = 'UTF-8';
 
     /** @var ViewAbstract|null */

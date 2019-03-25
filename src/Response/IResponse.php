@@ -6,7 +6,6 @@ namespace YapepBase\Response;
 use YapepBase\Response\Exception\ResponseSentException;
 use YapepBase\View\ViewAbstract;
 
-
 interface IResponse
 {
     public function setBody(ViewAbstract $body): void;

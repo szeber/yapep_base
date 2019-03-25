@@ -22,12 +22,13 @@ class CookieTest extends TestAbstract
 
         $cookie = new Cookie($name, $value, $ttlInSeconds, $path, $domain, $secure, $httpOnly);
 
-        $headers = $this->getHeadersAfterMethodCall(function () use ($cookie) {$cookie->send();});
+        $headers = $this->getHeadersAfterMethodCall(function () use ($cookie) {
+            $cookie->send();
+        });
 
         $expectedCookieHeader = 'Set-Cookie: name=value; expires=Thu, 01-Jan-1970 00:00:01 GMT; Max-Age=0; path=/test; domain=.dev; secure; HttpOnly';
 
         $this->assertCount(1, $headers);
         $this->assertSame($expectedCookieHeader, $headers[0]);
     }
-
 }

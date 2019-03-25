@@ -23,7 +23,7 @@ class Header
 
     public function __toString(): string
     {
-        return $this->name  . (empty($this->value) ? '' : ': ' . $this->value);
+        return $this->name . (empty($this->value) ? '' : ': ' . $this->value);
     }
 
     public function getName(): string

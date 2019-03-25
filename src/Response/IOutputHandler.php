@@ -28,7 +28,6 @@ interface IOutputHandler extends IHeaderHandler, ICookieHandler
      */
     public function stopBuffer(): void;
 
-
     /**
      * Sends out the given content/body
      *

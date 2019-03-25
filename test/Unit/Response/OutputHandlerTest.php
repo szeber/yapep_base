@@ -52,7 +52,6 @@ class OutputHandlerTest extends TestAbstract
         $this->assertTrue($isBuffering);
     }
 
-
     public function testStartBufferHeadersAlreadySent_shouldThrowException()
     {
         $outputHandler = new OutputHandler(false);

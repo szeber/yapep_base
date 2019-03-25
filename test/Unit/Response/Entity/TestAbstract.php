@@ -5,7 +5,6 @@ namespace YapepBase\Test\Unit\Response\Entity;
 
 abstract class TestAbstract extends \YapepBase\Test\Unit\TestAbstract
 {
-
     protected function getHeadersAfterMethodCall(callable $testedMethod): array
     {
         ob_start();

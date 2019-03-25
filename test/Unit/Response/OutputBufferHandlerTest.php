@@ -38,7 +38,6 @@ class OutputBufferHandlerTest extends TestAbstract
 
     public function testStartWhenAlreadyStarted_shouldDoNothing()
     {
-
         $this->outputBufferHandler->start();
 
         $currentObLevel = ob_get_level();
@@ -72,7 +71,6 @@ class OutputBufferHandlerTest extends TestAbstract
 
         $this->assertFalse($isStarted);
     }
-
 
     public function testIsStartedWhenStarted_shouldReturnTrue()
     {

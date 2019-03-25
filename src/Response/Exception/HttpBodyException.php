@@ -5,12 +5,12 @@ namespace YapepBase\Response\Exception;
 
 class HttpBodyException extends Exception
 {
-    const CODE_NO_CONTENT_WITH_BODY = 1;
+    const CODE_NO_CONTENT_WITH_BODY                  = 1;
     const CODE_PARTIAL_CONTENT_WITHOUT_RANGE_OR_DATE = 2;
-    const CODE_LOCATION_HEADER_NOT_PROVIDED = 3;
-    const CODE_DATE_HEADER_NOT_PROVIDED = 4;
-    const CODE_WWW_AUTH_HEADER_NOT_PROVIDED = 5;
-    const CODE_ALLOW_HEADER_NOT_PROVIDED = 6;
+    const CODE_LOCATION_HEADER_NOT_PROVIDED          = 3;
+    const CODE_DATE_HEADER_NOT_PROVIDED              = 4;
+    const CODE_WWW_AUTH_HEADER_NOT_PROVIDED          = 5;
+    const CODE_ALLOW_HEADER_NOT_PROVIDED             = 6;
 
     public function __construct(int $code)
     {
@@ -41,6 +41,4 @@ class HttpBodyException extends Exception
         }
         parent::__construct($message, $code);
     }
-
-
 }

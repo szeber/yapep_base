@@ -181,8 +181,8 @@ class HttpResponseTest extends TestAbstract
 
     public function testRedirect_shouldThrowRedirectException()
     {
-        $url        = '/test';
-        $statusCode = 0;
+        $url            = '/test';
+        $statusCode     = 0;
         $locationHeader = new Header('Location', $url);
 
         $this->expectHeaderSet($locationHeader);

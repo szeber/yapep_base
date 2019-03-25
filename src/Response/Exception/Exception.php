@@ -5,5 +5,4 @@ namespace YapepBase\Response\Exception;
 
 class Exception extends \YapepBase\Exception\Exception
 {
-
 }
