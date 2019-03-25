@@ -121,7 +121,7 @@ class Route
             self::KEY_METHODS        => $this->methods,
             self::KEY_REGEX_PATTERNS => $this->regexPatterns,
             self::KEY_PATHS          => $pathsArray,
-            self::KEY_ANNOTATIONS    => $annotationsArray
+            self::KEY_ANNOTATIONS    => $annotationsArray,
         ];
     }
 

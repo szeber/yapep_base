@@ -1,8 +1,9 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace YapepBase\DependencyInjection;
 
+use YapepBase\Debug\IDataHandlerRegistry;
 use YapepBase\ErrorHandler\IErrorHandlerRegistry;
 use YapepBase\Event\IEventHandlerRegistry;
 use YapepBase\File\IFileHandler;
@@ -12,6 +13,8 @@ use YapepBase\Response\IResponse;
 use YapepBase\Router\IRouter;
 use YapepBase\Session\ISessionRegistry;
 use YapepBase\Shell\ICommandExecutor;
+use YapepBase\View\Data\Data;
+use YapepBase\View\Data\ICanEscape;
 
 /**
  * Generic DI container implementation used in the framework.
@@ -53,6 +56,11 @@ class PimpleContainer extends \Pimple\Container implements IContainer
         return $this->get(IEventHandlerRegistry::class);
     }
 
+    public function getDebugDataHandlerRegistry(): IDataHandlerRegistry
+    {
+        return $this->get(IDataHandlerRegistry::class);
+    }
+
     public function getSessionRegistry(): ISessionRegistry
     {
         return $this->get(ISessionRegistry::class);
@@ -71,6 +79,11 @@ class PimpleContainer extends \Pimple\Container implements IContainer
     public function getCommandExecutor(): ICommandExecutor
     {
         return $this->get(ICommandExecutor::class);
+    }
+
+    public function getViewData(): Data
+    {
+        return $this->get(Data::class);
     }
 
     public function setRouter(IRouter $router): self
@@ -123,6 +136,16 @@ class PimpleContainer extends \Pimple\Container implements IContainer
         return $this->setFactory(IEventHandlerRegistry::class, $eventHandlerRegistryClass);
     }
 
+    public function setDebugDataHandlerRegistry(IDataHandlerRegistry $debugDataHandlerRegistry): self
+    {
+        return $this->setInstance(IDataHandlerRegistry::class, $debugDataHandlerRegistry);
+    }
+
+    public function setDebugDataHandlerRegistryAsFactory(string $debugDataHandlerRegistry): self
+    {
+        return $this->setFactory(IDataHandlerRegistry::class, $debugDataHandlerRegistry);
+    }
+
     public function setSessionRegistry(ISessionRegistry $sessionRegistry): self
     {
         return $this->setInstance(ISessionRegistry::class, $sessionRegistry);
@@ -161,6 +184,11 @@ class PimpleContainer extends \Pimple\Container implements IContainer
     public function setCommandExecutorAsFactory(string $commandExecutorClass): self
     {
         return $this->setFactory(ICommandExecutor::class, $commandExecutorClass);
+    }
+
+    public function setViewData(ICanEscape $data): self
+    {
+        return $this->setInstance(Data::class, $data);
     }
 
     protected function setInstance(string $id, $object): self

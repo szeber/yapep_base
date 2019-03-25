@@ -3,10 +3,7 @@ declare(strict_types=1);
 
 namespace YapepBase\Test\Unit\Router\Entity;
 
-use Mockery;
-use Mockery\MockInterface;
 use YapepBase\Exception\InvalidArgumentException;
-use YapepBase\Router\Entity\ControllerAction;
 use YapepBase\Router\Entity\Path;
 use YapepBase\Router\Entity\Route;
 use YapepBase\Router\IAnnotation;
@@ -14,17 +11,17 @@ use YapepBase\Test\Unit\TestAbstract;
 
 class RouterTest extends TestAbstract
 {
-    /** @var string  */
+    /** @var string */
     protected $controller    = 'Controller';
-    /** @var string  */
+    /** @var string */
     protected $action        = 'Action';
-    /** @var string  */
+    /** @var string */
     protected $name          = 'routeName';
-    /** @var array  */
+    /** @var array */
     protected $methods       = ['GET'];
-    /** @var array  */
+    /** @var array */
     protected $regexPatterns = [];
-    /** @var Path[]  */
+    /** @var Path[] */
     protected $paths         = [];
     /** @var IAnnotation[] */
     protected $annotations   = [];
@@ -63,7 +60,7 @@ class RouterTest extends TestAbstract
 
     public function testCreateFromArray_shouldReturnProperlySetRouter()
     {
-        $routeArray = $this->getRoute()->toArray();
+        $routeArray     = $this->getRoute()->toArray();
         $routeFromArray = Route::createFromArray($routeArray);
 
         $this->assertRouteEquals($routeFromArray);
@@ -136,5 +133,4 @@ class RouterTest extends TestAbstract
         $this->assertEquals($this->paths, $actualRoute->getPaths());
         $this->assertEquals($this->annotations, $actualRoute->getAnnotations());
     }
-
 }

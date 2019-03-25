@@ -1,9 +1,10 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace YapepBase\DependencyInjection;
 
 use Psr\Container\ContainerInterface;
+use YapepBase\Debug\IDataHandlerRegistry;
 use YapepBase\ErrorHandler\IErrorHandlerRegistry;
 use YapepBase\Event\IEventHandlerRegistry;
 use YapepBase\File\IFileHandler;
@@ -13,6 +14,7 @@ use YapepBase\Response\IResponse;
 use YapepBase\Router\IRouter;
 use YapepBase\Session\ISessionRegistry;
 use YapepBase\Shell\ICommandExecutor;
+use YapepBase\View\Data\Data;
 
 interface IContainer extends ContainerInterface
 {
@@ -26,6 +28,8 @@ interface IContainer extends ContainerInterface
 
     public function getEventHandlerRegistry(): IEventHandlerRegistry;
 
+    public function getDebugDataHandlerRegistry(): IDataHandlerRegistry;
+
     public function getSessionRegistry(): ISessionRegistry;
 
     public function getLoggerRegistry(): ILoggerRegistry;
@@ -33,4 +37,6 @@ interface IContainer extends ContainerInterface
     public function getFileHandler(): IFileHandler;
 
     public function getCommandExecutor(): ICommandExecutor;
+
+    public function getViewData(): Data;
 }

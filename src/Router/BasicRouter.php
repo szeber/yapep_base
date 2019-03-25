@@ -10,7 +10,6 @@ use YapepBase\Router\Exception\RouteNotFoundException;
 
 class BasicRouter implements IRouter
 {
-
     /** @var Route[] */
     protected $routesByControllerAction = [];
 
@@ -23,7 +22,7 @@ class BasicRouter implements IRouter
     public function __construct(array $routes)
     {
         $this->routesByControllerAction = [];
-        $this->routesByName = [];
+        $this->routesByName             = [];
 
         foreach ($routes as $route) {
             $this->routesByControllerAction[$route->getControllerAction()] = $route;
@@ -97,6 +96,6 @@ class BasicRouter implements IRouter
             }
         }
 
-        throw new RouteNotFoundException('Route not found for method ' .$method . ' and path ' . $path);
+        throw new RouteNotFoundException('Route not found for method ' . $method . ' and path ' . $path);
     }
 }

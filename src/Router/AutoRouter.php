@@ -59,6 +59,7 @@ class AutoRouter implements IRouter
         foreach ($parts as $key => $value) {
             $parts[$key] = ucfirst($value);
         }
+
         return implode('', $parts);
     }
 
@@ -71,7 +72,7 @@ class AutoRouter implements IRouter
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getPathByControllerAndAction(string $controller, string $action, array $routeParams = []): string
     {
@@ -85,6 +86,7 @@ class AutoRouter implements IRouter
         if (!empty($routeParams)) {
             $path .= '/' . implode('/', $routeParams);
         }
+
         return $path;
     }
 

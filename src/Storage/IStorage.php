@@ -1,12 +1,11 @@
 <?php
-declare(strict_types = 1);
-/**
- * This file is part of YAPEPBase.
- *
- * @copyright    2011 The YAPEP Project All rights reserved.
- * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
- */
+declare(strict_types=1);
+
 namespace YapepBase\Storage;
+
+use YapepBase\Exception\ParameterException;
+use YapepBase\Exception\StorageException;
+use YapepBase\Storage\Key\IGenerator;
 
 /**
  * Storage interface
@@ -14,76 +13,51 @@ namespace YapepBase\Storage;
 interface IStorage
 {
     /**
-     * Stores data the specified key
-     *
-     * @param string $key    The key to be used to store the data.
-     * @param mixed  $data   The data to store.
-     * @param int    $ttl    The expiration time of the data in seconds if supported by the backend.
-     *
-     * @return void
-     *
-     * @throws \YapepBase\Exception\StorageException      On error.
-     * @throws \YapepBase\Exception\ParameterException    If TTL is set and not supported by the backend.
+     * Returns the key generator used by the storage
      */
-    public function set($key, $data, $ttl = 0);
+    public function getKeyGenerator(): IGenerator;
 
     /**
-     * Retrieves data from the cache identified by the specified key. Returns FALSE if the key does not exist.
+     * Stores data under the specified key
      *
-     * @param string $key   The key.
-     *
-     * @return mixed   The data or FALSE if the specified key does not exist.
-     *
-     * @throws \YapepBase\Exception\StorageException      On error.
+     * @throws StorageException
+     * @throws ParameterException
      */
-    public function get($key);
+    public function set(string $key, $data, int $ttlInSecondsInSeconds = 0): void;
+
+    /**
+     * Retrieves data identified by the specified key.
+     *
+     * @throws StorageException
+     */
+    public function get(string $key);
 
     /**
      * Deletes the data specified by the key
      *
-     * @param string $key   The key.
-     *
-     * @return void
-     *
-     * @throws \YapepBase\Exception\StorageException      On error.
+     * @throws StorageException
      */
-    public function delete($key);
+    public function delete(string $key): void;
 
     /**
      * Deletes every data in the storage.
-     *
-     * @return mixed
      */
-    public function clear();
+    public function clear(): void;
 
     /**
      * Returns if the backend is persistent or volatile.
      *
      * If the backend is volatile a system or service restart may destroy all the stored data.
-     *
-     * @return bool
      */
-    public function isPersistent();
+    public function isPersistent(): bool;
 
     /**
      * Returns whether the TTL functionality is supported by the backend.
-     *
-     * @return bool
      */
-    public function isTtlSupported();
+    public function isTtlSupported(): bool;
 
     /**
      * Returns TRUE if the storage backend is read only, FALSE otherwise.
-     *
-     * @return bool
      */
-    public function isReadOnly();
-
-    /**
-     * Returns the configuration data for the storage backend. This includes the storage type as used by
-     * the storage factory.
-     *
-     * @return array
-     */
-    public function getConfigData();
+    public function isReadOnly(): bool;
 }

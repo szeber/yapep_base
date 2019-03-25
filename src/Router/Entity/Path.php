@@ -73,7 +73,7 @@ class Path
 
         return [
             self::ARRAY_KEY_PATTERN => $this->pattern,
-            self::ARRAY_KEY_PARAMS  => $params
+            self::ARRAY_KEY_PARAMS  => $params,
         ];
     }
 
@@ -83,14 +83,14 @@ class Path
     protected static function getPatternFromArray(array $path): string
     {
         if (!isset($path[self::ARRAY_KEY_PATTERN])) {
-             throw new InvalidArgumentException('No path pattern set for path');
-         }
+            throw new InvalidArgumentException('No path pattern set for path');
+        }
 
-         if (!is_string($path[self::ARRAY_KEY_PATTERN])) {
-             throw new InvalidArgumentException(
+        if (!is_string($path[self::ARRAY_KEY_PATTERN])) {
+            throw new InvalidArgumentException(
                  'Invalid path pattern. Expected string, got ' . gettype($path['pathPattern'])
              );
-         }
+        }
 
         return '/' . trim($path[self::ARRAY_KEY_PATTERN], "/ \r\n\t\0");
     }
@@ -99,8 +99,7 @@ class Path
     {
         try {
             $paramClass = Mapper::getClassByType($type);
-        }
-        catch (InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             $paramClass = $type;
         }
 
@@ -120,6 +119,7 @@ class Path
     protected function getParamType(IParam $param)
     {
         $class = get_class($param);
+
         return Mapper::getTypeByClass($class);
     }
 
@@ -158,7 +158,7 @@ class Path
         $path = $this->pattern;
 
         foreach ($routeParams as $name => $value) {
-            $path = str_replace('{' .  $name . '}', $value, $path);
+            $path = str_replace('{' . $name . '}', $value, $path);
         }
 
         return $path;

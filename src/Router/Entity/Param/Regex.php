@@ -1,5 +1,5 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace YapepBase\Router\Entity\Param;
 
@@ -40,7 +40,7 @@ class Regex extends ParamAbstract
     {
         return [
             'name'    => $this->name,
-            'pattern' => $this->pattern
+            'pattern' => $this->pattern,
         ];
     }
 
@@ -51,6 +51,7 @@ class Regex extends ParamAbstract
             $state['pattern']
         );
     }
+
     public function getPattern(): string
     {
         return $this->pattern;

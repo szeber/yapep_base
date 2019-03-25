@@ -1,5 +1,5 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
 /**
  * This file is part of YAPEPBase.
  *
@@ -65,7 +65,7 @@ abstract class DbConnection
     /**
      * Opens the connection
      *
-     * @param array $configuration   The configuration for the connection
+     * @param array $configuration The configuration for the connection
      *
      * @return void
      */
@@ -81,9 +81,9 @@ abstract class DbConnection
     /**
      * Constructor
      *
-     * @param array  $configuration    The configuration for the parameters.
-     * @param string $connectionName   The name of the connection.
-     * @param string $paramPrefix      The prefix for the bound parameters.
+     * @param array  $configuration  The configuration for the parameters.
+     * @param string $connectionName The name of the connection.
+     * @param string $paramPrefix    The prefix for the bound parameters.
      *
      * @throws DatabaseException   On connection errors.
      */
@@ -128,8 +128,8 @@ abstract class DbConnection
     /**
      * Runs a query and returns the result object.
      *
-     * @param string $query    The query to execute.
-     * @param array  $params   The parameters for the query.
+     * @param string $query  The query to execute.
+     * @param array  $params The parameters for the query.
      *
      * @return \YapepBase\Database\DbResult   The result of the query.
      *
@@ -139,6 +139,14 @@ abstract class DbConnection
     {
         if (empty($this->connection)) {
             throw new DatabaseException('Connection to the database is not established');
+        }
+
+        $backtrace    = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
+        $callerClass  = null;
+        $callerMethod = null;
+        if (isset($backtrace[1])) {
+            $callerClass  = $backtrace[1]['class'];
+            $callerMethod = $backtrace[1]['function'];
         }
 
         try {
@@ -151,14 +159,18 @@ abstract class DbConnection
                 foreach ($params as $paramName => $paramValue) {
                     $paramsQuoted[$paramName] = $this->quote($paramValue);
                 }
-                $debugItem = new SqlQueryItem($this->getBackendType(), $this->getBackendType() . '.'
-                    . $this->connectionName, $query, $paramsQuoted);
+                $debugItem = new SqlQueryItem(
+                    $this->getBackendType(),
+                    $this->getBackendType() . '.' . $this->connectionName,
+                    $query,
+                    $paramsQuoted
+                );
                 $debugger->addItem($debugItem);
                 $startTime = microtime(true);
             }
 
             $statement = $this->connection->prepare($query);
-            foreach ($params as $key=>$value) {
+            foreach ($params as $key => $value) {
                 $statement->bindValue(':' . $this->paramPrefix . $key, $value, $this->getParamType($value));
             }
             $statement->execute();
@@ -186,11 +198,11 @@ abstract class DbConnection
      *
      * Be warned! You have to write the SELECT keyword in uppercase in order to work properly.
      *
-     * @param string   $query          Th query to execute.
-     * @param array    $params         The parameters for the query.
-     * @param int      $pageNumber     The number of the requested page.
-     * @param int      $itemsPerPage   How many items should be listed in the page.
-     * @param bool|int $itemCount      If it is set to FALSE then it wont be populated. (outgoing parameter)
+     * @param string   $query        Th query to execute.
+     * @param array    $params       The parameters for the query.
+     * @param int      $pageNumber   The number of the requested page.
+     * @param int      $itemsPerPage How many items should be listed in the page.
+     * @param bool|int $itemCount    If it is set to FALSE then it wont be populated. (outgoing parameter)
      *
      * @return \YapepBase\Database\DbResult   The result of the query.
      *
@@ -222,7 +234,7 @@ abstract class DbConnection
      *
      * Also casts the specified value if it's necessary.
      *
-     * @param mixed $value   The value to examine.
+     * @param mixed $value The value to examine.
      *
      * @return int   The PDO data type.
      */
@@ -308,7 +320,7 @@ abstract class DbConnection
      *
      * Do not use this function to quote data in a query, use the bound parameters instead. {@see self::query()}
      *
-     * @param mixed $value   The value to quote.
+     * @param mixed $value The value to quote.
      *
      * @return string   The quoted value.
      *
@@ -326,7 +338,7 @@ abstract class DbConnection
     /**
      * Returns the last insert id for the connection.
      *
-     * @param string $name   Name of the sequence object from which the ID should be returned.
+     * @param string $name Name of the sequence object from which the ID should be returned.
      *
      * @return string
      *
@@ -354,9 +366,9 @@ abstract class DbConnection
     /**
      * Parses the message and code from the specified PDOException.
      *
-     * @param \PDOException $exception   The exception to parse
-     * @param string        $message     The parsed message (outgoing param).
-     * @param int           $code        The parsed code (outgoing param).
+     * @param \PDOException $exception The exception to parse
+     * @param string        $message   The parsed message (outgoing param).
+     * @param int           $code      The parsed code (outgoing param).
      *
      * @return \YapepBase\Exception\DatabaseException
      */
@@ -379,8 +391,8 @@ abstract class DbConnection
      *
      * This method should be used to escape the string part in the "LIKE 'string' ESCAPE 'escapeCharacter'" statement.
      *
-     * @param string $string            The string to escape.
-     * @param string $escapeCharacter   The character to use as the escape character. Defaults to backslash.
+     * @param string $string          The string to escape.
+     * @param string $escapeCharacter The character to use as the escape character. Defaults to backslash.
      *
      * @return string
      */
@@ -396,7 +408,7 @@ abstract class DbConnection
     /**
      * Returns the specified unix timestamp as a date-time string usable by the current db connection type.
      *
-     * @param int $timestamp   The date to format. If NULL, the current date is returned.
+     * @param int $timestamp The date to format. If NULL, the current date is returned.
      *
      * @return string
      */
@@ -408,7 +420,7 @@ abstract class DbConnection
     /**
      * Returns the specified unix timestamp as a date string usable by the current db connection type.
      *
-     * @param int $timestamp   The date to format. If NULL, the current date is returned.
+     * @param int $timestamp The date to format. If NULL, the current date is returned.
      *
      * @return string
      */

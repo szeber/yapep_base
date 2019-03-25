@@ -1,32 +1,21 @@
 <?php
-/**
- * This file is part of YAPEPBase.
- *
- * @package      YapepBase
- * @subpackage   Controller
- * @copyright    2011 The YAPEP Project All rights reserved.
- * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
- */
+declare(strict_types=1);
 
 namespace YapepBase\Controller;
 
 use YapepBase\Application;
 
-use YapepBase\Response\HttpResponse;
 use YapepBase\Exception\ControllerException;
 use YapepBase\Request\HttpRequest;
-use YapepBase\Response\IResponse;
 use YapepBase\Request\IRequest;
+use YapepBase\Response\HttpResponse;
+use YapepBase\Response\IResponse;
 
 /**
  * Base class for HTTP controllers.
- *
- * @package    YapepBase
- * @subpackage Controller
  */
-abstract class HttpController extends BaseController
+abstract class HttpController extends ControllerAbstract
 {
-
     /**
      * The request instance
      *
@@ -52,12 +41,16 @@ abstract class HttpController extends BaseController
     public function __construct(IRequest $request, IResponse $response)
     {
         if (!($request instanceof HttpRequest)) {
-            throw new ControllerException('The specified request is not a HttpRequest',
-                ControllerException::ERR_INCOMPATIBLE_REQUEST);
+            throw new ControllerException(
+                'The specified request is not a HttpRequest',
+                ControllerException::ERR_INCOMPATIBLE_REQUEST
+            );
         }
         if (!($response instanceof HttpResponse)) {
-            throw new ControllerException('The specified response is not a HttpResponse',
-                ControllerException::ERR_INCOMPATIBLE_RESPONSE);
+            throw new ControllerException(
+                'The specified response is not a HttpResponse',
+                ControllerException::ERR_INCOMPATIBLE_RESPONSE
+            );
         }
         parent::__construct($request, $response);
     }
@@ -77,6 +70,7 @@ abstract class HttpController extends BaseController
         $this->response->redirect($url, $statusCode);
         // @codeCoverageIgnoreStart
     }
+
     // @codeCoverageIgnoreEnd
 
     /**
@@ -102,8 +96,11 @@ abstract class HttpController extends BaseController
         $anchor = '',
         $statusCode = 303
     ) {
-        $url = Application::getInstance()->getDiContainer()->getRouter()->getPathByControllerAndAction($controller, $action,
-            $routeParams);
+        $url = Application::getInstance()->getDiContainer()->getRouter()->getPathByControllerAndAction(
+            $controller,
+            $action,
+            $routeParams
+        );
         if (!empty($getParams)) {
             $url .= '?' . \http_build_query($getParams, null, '&');
         }
@@ -113,5 +110,6 @@ abstract class HttpController extends BaseController
         $this->redirectToUrl($url, $statusCode);
         // @codeCoverageIgnoreStart
     }
+
     // @codeCoverageIgnoreEnd
 }

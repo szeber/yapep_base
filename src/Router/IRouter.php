@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace YapepBase\Router;
 
-
 use YapepBase\Request\IRequest;
 use YapepBase\Router\Entity\ControllerAction;
 use YapepBase\Router\Exception\RouteNotFoundException;
@@ -14,7 +13,6 @@ use YapepBase\Router\Exception\RouterException;
  */
 interface IRouter
 {
-
     /**
      * @throws RouteNotFoundException
      * @throws RouterException

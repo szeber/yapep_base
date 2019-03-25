@@ -5,9 +5,12 @@
   "require": {
     "php": ">=7.3.0",
     "lukasoppermann/http-status": "^2.0.1",
-    "pimple/pimple": "^3.2",
     "psr/container": "1.0.0",
-    "ext-json": "*"
+    "pimple/pimple": "^3.2",
+    "emulgeator/server-superglobal-object-representation": "1.0.3",
+    "ext-memcached": "*",
+    "ext-json": "*",
+    "ext-pdo": "*"
   },
   "require-dev": {
     "phpunit/phpunit": "^8.0",
@@ -22,15 +25,6 @@
     "psr-4": {
       "YapepBase\\": "src",
       "YapepBase\\Test\\": "test"
-    }
-  },
-  "repositories": {
-    "dev-package": {
-      "type": "path",
-      "url": "src/YapepBase",
-      "options": {
-        "symlink": true
-      }
     }
   },
   "authors": [

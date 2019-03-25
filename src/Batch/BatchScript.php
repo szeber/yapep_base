@@ -1,5 +1,5 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
 /**
  * This file is part of YAPEPBase.
  *
@@ -8,7 +8,7 @@ declare(strict_types = 1);
  */
 
 // Set the ticks, so we can handle signals
-declare(ticks = 1);
+declare(ticks=1);
 
 namespace YapepBase\Batch;
 
@@ -18,7 +18,7 @@ use YapepBase\ErrorHandler\ITerminatable;
 use YapepBase\Event\Event;
 use YapepBase\Exception\ParameterException;
 use YapepBase\Mime\MimeType;
-use YapepBase\View\ViewDo;
+use YapepBase\View\Data\Data;
 
 /**
  * Base class for batch scripts.
@@ -158,7 +158,7 @@ abstract class BatchScript implements ITerminatable
         $application                       = Application::getInstance();
         $container                         = $application->getDiContainer();
         $container[Container::KEY_VIEW_DO] = $container->share(function ($container) {
-            return new ViewDo(MimeType::PLAINTEXT);
+            return new Data(MimeType::PLAINTEXT);
         });
     }
 

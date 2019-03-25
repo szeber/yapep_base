@@ -1,238 +1,91 @@
 <?php
-declare(strict_types = 1);
-/**
- * This file is part of YAPEPBase.
- *
- * @copyright    2011 The YAPEP Project All rights reserved.
- * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
- */
+declare(strict_types=1);
+
 namespace YapepBase\Storage;
 
-use YapepBase\Application;
-use YapepBase\Debugger\Item\StorageItem;
-use YapepBase\Exception\ConfigException;
+use Memcached;
+use YapepBase\Debug\Item\Storage;
+use YapepBase\Exception\ParameterException;
 use YapepBase\Exception\StorageException;
+use YapepBase\Helper\DateHelper;
+use YapepBase\Storage\Key\IGenerator;
 
 /**
- * MemcachedStorage class
- *
- * Storage backend, that uses the memcached extension. For the memcache extension {@see MemcacheStorage}.
- * This is the preferred memcache implementation if the memcached extension is available on your system.
- *
- * Configuration options:
- *     <ul>
- *         <li>host:             The memcache server's hostname or IP.</li>
- *         <li>port:             The port of the memcache server. Optional, defaults to 11211</li>
- *         <li>keyPrefix:        The keys will be prefixed with this string. Optional, defaults to empty string.</li>
- *         <li>keySuffix:        The keys will be suffixed with this string. Optional, defaults to empty string.</li>
- *         <li>hashKey:          If TRUE, the key will be hashed before being stored. Optional, defaults to FALSE.</li>
- *         <li>readOnly:         If TRUE, the storage instance will be read only, and any write attempts will
- *                               throw an exception. Optional, defaults to FALSE</li>
- *         <li>debuggerDisabled: If TRUE, the storage will not add the requests to the debugger if it's available.
- *                               This is useful for example for a storage instance, that is used to store the
- *                               DebugDataCreator's debug information as they can become quite large, and if they were
- *                               sent to the client it can cause problems. Optional, defaults to FALSE.
- *     </ul>
- *
- * @todo locking
+ * Memcached storage
  */
 class MemcachedStorage extends StorageAbstract implements IIncrementable
 {
-    /**
-     * The memcache connection instance
-     *
-     * @var \Memcached
-     */
-    protected $memcache;
+    /** @var Memcached */
+    protected $connection;
 
-    /**
-     * The memcache host
-     *
-     * @var string
-     */
-    protected $host;
-
-    /**
-     * The memcache port
-     *
-     * @var int
-     */
-    protected $port;
-
-    /**
-     * The string to prefix the keys with
-     *
-     * @var string
-     */
-    protected $keyPrefix;
-
-    /**
-     * The string to suffix the keys with
-     *
-     * @var string
-     */
-    protected $keySuffix;
-
-    /**
-     * If TRUE, the key will be hashed before storing
-     *
-     * @var bool
-     */
-    protected $hashKey;
-
-    /**
-     * If TRUE, the storage will be read only.
-     *
-     * @var bool
-     */
+    /** @var bool */
     protected $readOnly = false;
 
-    /**
-     * If TRUE, no debug items are created by this storage.
-     *
-     * @var bool
-     */
-    protected $debuggerDisabled;
+    /** @var DateHelper */
+    protected $dateHelper;
 
-    /**
-     * Returns the config properties(last part of the key) used by the class.
-     *
-     * @return array
-     */
-    protected function getConfigProperties()
+    public function __construct(Memcached $connection, IGenerator $keyGenerator, DateHelper $dateHelper, bool $readOnly = false)
     {
-        return [
-            'host',
-            'port',
-            'keyPrefix',
-            'keySuffix',
-            'hashKey',
-            'readOnly',
-            'debuggerDisabled',
-        ];
-    }
+        parent::__construct($keyGenerator);
 
-    /**
-     * Sets up the backend.
-     *
-     * @param array $config   The configuration data for the backend.
-     *
-     * @return void
-     *
-     * @throws \YapepBase\Exception\ConfigException    On configuration errors.
-     * @throws \YapepBase\Exception\StorageException   On storage errors.
-     */
-    protected function setupConfig(array $config)
-    {
-        if (empty($config['host'])) {
-            throw new ConfigException('Host is not set for MemcachedStorage: ' . $this->currentConfigurationName);
-        }
-        $this->host             = $config['host'];
-        $this->port             = empty($config['port']) ? 11211 : (int)$config['port'];
-        $this->keyPrefix        = empty($config['keyPrefix']) ? '' : $config['keyPrefix'];
-        $this->keySuffix        = empty($config['keySuffix']) ? '' : $config['keySuffix'];
-        $this->hashKey          = empty($config['hashKey']) ? false : (bool)$config['hashKey'];
-        $this->readOnly         = empty($config['readOnly']) ? false : (bool)$config['readOnly'];
-        $this->debuggerDisabled = empty($config['debuggerDisabled']) ? false : (bool)$config['debuggerDisabled'];
-
-        $this->memcache = Application::getInstance()->getDiContainer()->getMemcached();
-        $serverList     = $this->memcache->getServerList();
-        if (empty($serverList)) {
-            $this->memcache->addServer($this->host, $this->port);
-        }
-    }
-
-    /**
-     * Returns the key ready to be used on the backend.
-     *
-     * @param string $key   The base key.
-     *
-     * @return string
-     */
-    protected function makeKey($key)
-    {
-        $key = $this->keyPrefix . $key . $this->keySuffix;
-        if ($this->hashKey) {
-            $key = md5($key);
-        }
-
-        return $key;
+        $this->connection = $connection;
+        $this->dateHelper = $dateHelper;
+        $this->readOnly   = $readOnly;
     }
 
     /**
      * Stores data the specified key
      *
-     * @param string $key    The key to be used to store the data.
-     * @param mixed  $data   The data to store.
-     * @param int    $ttl    The expiration time of the data in seconds if supported by the backend.
-     *
-     * @return void
-     *
-     * @throws \YapepBase\Exception\StorageException      On error.
-     * @throws \YapepBase\Exception\ParameterException    If TTL is set and not supported by the backend.
+     * @throws StorageException
+     * @throws ParameterException
      */
-    public function set($key, $data, $ttl = 0)
+    public function set(string $key, $data, int $ttlInSecondsInSecondsInSeconds = 0): void
     {
-        if ($this->readOnly) {
-            throw new StorageException('Trying to write to a read only storage');
-        }
-        $debugger = Application::getInstance()->getDiContainer()->getDebugger();
+        $this->protectWhenReadOnly();
 
-        $startTime = microtime(true);
+        $fullKey   = $this->keyGenerator->generate($key);
+        $debugItem = (new Storage($this->dateHelper, Storage::METHOD_SET, $fullKey, $data));
 
-        if (!$this->memcache->set($this->makeKey($key), $data, $ttl)) {
-            $code = $this->memcache->getResultCode();
-            if (\Memcached::RES_NOTSTORED !== $code) {
-                throw new StorageException('Unable to store value in memcache. Error: '
-                    . $this->memcache->getResultMessage(), $this->memcache->getResultCode());
+        $isStored = $this->connection->set($fullKey, $data, $ttlInSecondsInSecondsInSeconds);
+
+        if (!$isStored) {
+            $resultCode = $this->connection->getResultCode();
+
+            if (Memcached::RES_NOTSTORED !== $resultCode) {
+                throw new StorageException(
+                    'Unable to store value in memcache. Error: ' . $this->connection->getResultMessage(),
+                    $resultCode
+                );
             }
         }
 
-        // If we have a debugger, we have to log the request
-        if (!$this->debuggerDisabled && $debugger !== false) {
-            $debugger->addItem(new StorageItem(
-                'memcached',
-                'memcached.' . $this->currentConfigurationName,
-                StorageItem::METHOD_SET . ' ' . $key . ' for ' . $ttl,
-                $data,
-                microtime(true) - $startTime
-            ));
-        }
+        $debugItem->setFinished();
+        $this->getDebugDataHandlerRegistry()->addStorage($debugItem);
     }
 
     /**
      * Retrieves data from the cache identified by the specified key
      *
-     * @param string $key   The key.
-     *
-     * @return mixed
-     *
-     * @throws \YapepBase\Exception\StorageException      On error.
+     * @throws StorageException
      */
-    public function get($key)
+    public function get(string $key)
     {
-        $debugger = Application::getInstance()->getDiContainer()->getDebugger();
+        $fullKey   = $this->keyGenerator->generate($key);
+        $debugItem = (new Storage($this->dateHelper, Storage::METHOD_GET, $fullKey));
+        $result    = $this->connection->get($fullKey);
 
-        $startTime = microtime(true);
-
-        $result = $this->memcache->get($this->makeKey($key));
         if (false === $result) {
-            $code = $this->memcache->getResultCode();
-            if (\Memcached::RES_NOTFOUND !== $code && \Memcached::RES_SUCCESS !== $code) {
-                throw new StorageException('Unable to get value in memcache. Error: '
-                    . $this->memcache->getResultMessage(), $this->memcache->getResultCode());
+            $resultCode = $this->connection->getResultCode();
+            if (Memcached::RES_NOTFOUND !== $resultCode && Memcached::RES_SUCCESS !== $resultCode) {
+                throw new StorageException(
+                    'Unable to get value in memcache. Error: ' . $this->connection->getResultMessage(),
+                    $resultCode
+                );
             }
         }
-        // If we have a debugger, we have to log the request
-        if (!$this->debuggerDisabled && $debugger !== false) {
-            $debugger->addItem(new StorageItem(
-                'memcached',
-                'memcached.' . $this->currentConfigurationName,
-                StorageItem::METHOD_GET . ' ' . $key,
-                $result,
-                microtime(true) - $startTime
-            ));
-        }
+
+        $debugItem->setData($result)->setFinished();
+        $this->getDebugDataHandlerRegistry()->addStorage($debugItem);
 
         return $result;
     }
@@ -240,129 +93,71 @@ class MemcachedStorage extends StorageAbstract implements IIncrementable
     /**
      * Deletes the data specified by the key
      *
-     * @param string $key   The key.
-     *
-     * @return void
-     *
-     * @throws \YapepBase\Exception\StorageException      On error.
+     * @throws StorageException
      */
-    public function delete($key)
+    public function delete(string $key): void
     {
-        if ($this->readOnly) {
-            throw new StorageException('Trying to write to a read only storage');
-        }
-        $debugger = Application::getInstance()->getDiContainer()->getDebugger();
+        $this->protectWhenReadOnly();
 
-        $startTime = microtime(true);
+        $item = (new Storage($this->dateHelper, Storage::METHOD_DELETE, $key));
 
-        $this->memcache->delete($this->makeKey($key));
+        $fullKey = $this->keyGenerator->generate($key);
+        $this->connection->delete($fullKey);
 
-        // If we have a debugger, we have to log the request
-        if (!$this->debuggerDisabled && $debugger !== false) {
-            $debugger->addItem(new StorageItem(
-                'memcached',
-                'memcached.' . $this->currentConfigurationName,
-                StorageItem::METHOD_DELETE . ' ' . $key,
-                null,
-                microtime(true) - $startTime
-            ));
-        }
+        $item->setFinished();
+        $this->getDebugDataHandlerRegistry()->addStorage($item);
     }
 
     /**
      * Deletes every data in the storage.
      *
      * <b>Warning!</b> Flushes the whole memcached server
-     *
-     * @return mixed
      */
-    public function clear()
+    public function clear(): void
     {
-        if ($this->readOnly) {
-            throw new StorageException('Trying to write to a read only storage');
-        }
-        $debugger = Application::getInstance()->getDiContainer()->getDebugger();
+        $this->protectWhenReadOnly();
 
-        $startTime = microtime(true);
+        $item = (new Storage($this->dateHelper, Storage::METHOD_CLEAR));
 
-        $this->memcache->flush();
+        $this->connection->flush();
 
-        // If we have a debugger, we have to log the request
-        if (!$this->debuggerDisabled && $debugger !== false) {
-            $debugger->addItem(new StorageItem(
-                'memcached',
-                'memcached.' . $this->currentConfigurationName,
-                StorageItem::METHOD_CLEAR,
-                null,
-                microtime(true) - $startTime
-            ));
-        }
+        $item->setFinished();
+        $this->getDebugDataHandlerRegistry()->addStorage($item);
     }
 
-    /**
-     * Increments (or decreases) the value of the key with the given offset.
-     *
-     * @param string $key      The key of the item to increment.
-     * @param int    $offset   The amount by which to increment the item's value.
-     *
-     * @return int   The changed value.
-     */
-    public function increment($key, $offset, $ttl = 0)
+    public function increment(string $key, int $offset, int $ttlInSeconds = 0): int
     {
-        return $this->memcache->increment($this->makeKey($key), $offset, 0, $ttl);
+        $this->protectWhenReadOnly();
+
+        $item = (new Storage($this->dateHelper, Storage::METHOD_INCREMENT, $key, $offset));
+
+        $fullKey = $this->keyGenerator->generate($key);
+        $result  = $this->connection->increment($fullKey, $offset, 0, $ttlInSeconds);
+
+        if ($result === false) {
+            throw new StorageException('Failed to increment key ' . $key);
+        }
+
+        $item->setFinished();
+        $this->getDebugDataHandlerRegistry()->addStorage($item);
+
+        return $result;
     }
 
-    /**
-     * Returns if the backend is persistent or volatile.
-     *
-     * If the backend is volatile a system or service restart may destroy all the stored data.
-     *
-     * @return bool
-     */
-    public function isPersistent()
+    public function isPersistent(): bool
     {
         // Memcache is cleared on restart of the memcache service, so it's never considered persistent.
         return false;
     }
 
-    /**
-     * Returns whether the TTL functionality is supported by the backend.
-     *
-     * @return bool
-     */
-    public function isTtlSupported()
+    public function isTtlSupported(): bool
     {
         // Memcache has TTL support
         return true;
     }
 
-    /**
-     * Returns TRUE if the storage backend is read only, FALSE otherwise.
-     *
-     * @return bool
-     */
-    public function isReadOnly()
+    public function isReadOnly(): bool
     {
         return $this->readOnly;
-    }
-
-    /**
-     * Returns the configuration data for the storage backend. This includes the storage type as used by
-     * the storage factory.
-     *
-     * @return array
-     */
-    public function getConfigData()
-    {
-        return [
-            'storageType'      => StorageFactory::TYPE_MEMCACHED,
-            'host'             => $this->host,
-            'port'             => $this->port,
-            'keyPrefix'        => $this->keyPrefix,
-            'keySuffix'        => $this->keySuffix,
-            'hashKey'          => $this->hashKey,
-            'readOnly'         => $this->readOnly,
-            'debuggerDisabled' => $this->debuggerDisabled,
-        ];
     }
 }

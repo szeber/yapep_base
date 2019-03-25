@@ -4,15 +4,15 @@ declare(strict_types=1);
 namespace YapepBase;
 
 use YapepBase\Controller\IController;
-use YapepBase\DependencyInjection\IContainer;
-use YapepBase\Exception\RedirectException;
-use YapepBase\Event\Event;
-use YapepBase\Request\HttpRequest;
 use YapepBase\DependencyInjection\Container;
+use YapepBase\DependencyInjection\IContainer;
+use YapepBase\Event\Event;
+use YapepBase\Exception\ControllerException;
 use YapepBase\Exception\Exception;
 use YapepBase\Exception\HttpException;
-use YapepBase\Exception\ControllerException;
+use YapepBase\Exception\RedirectException;
 use YapepBase\Exception\RouterException;
+use YapepBase\Request\HttpRequest;
 
 /**
  * Singleton class responsible to "hold" the application together by managing the dispatch process.
@@ -48,11 +48,12 @@ class Application
     /**
      * Singleton getter
      */
-    public static function getInstance(): Application
+    public static function getInstance(): self
     {
         if (is_null(static::$instance)) {
             static::$instance = new static();
         }
+
         return static::$instance;
     }
 
@@ -61,7 +62,7 @@ class Application
      *
      * Be careful with this method, since it breaks the Singleton pattern.
      */
-    public static function setInstance(Application $instance): void
+    public static function setInstance(self $instance): void
     {
         static::$instance = $instance;
     }
@@ -82,6 +83,7 @@ class Application
         if (empty($this->diContainer)) {
             throw new Exception('You need to set a configured DI Container to be able to use the Application');
         }
+
         return $this->diContainer;
     }
 
@@ -114,7 +116,6 @@ class Application
 
             try {
                 $this->diContainer->getRouter()->getControllerActionByMethodAndPath($controllerName, $action);
-
             } catch (RouterException $exception) {
                 if ($exception->getCode() == RouterException::ERR_NO_ROUTE_FOUND) {
                     // The route was not found, generate a 404 HttpException
@@ -189,7 +190,6 @@ class Application
             $this->raiseEventIfNotRaisedYet($eventType);
         }
     }
-
 
     protected function sendResponse()
     {

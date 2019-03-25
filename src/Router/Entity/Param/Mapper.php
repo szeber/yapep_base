@@ -10,7 +10,6 @@ use YapepBase\Exception\InvalidArgumentException;
  */
 class Mapper
 {
-
     public const TYPE_NUMERIC                = 'num';
     public const TYPE_ALPHA                  = 'alpha';
     public const TYPE_ALPHA_NUMERIC          = 'alnum';
@@ -37,6 +36,7 @@ class Mapper
         if (!isset(self::BUILT_IN_TYPE_MAP[$type])) {
             throw new InvalidArgumentException('Type ' . $type . ' is not mapped to a Class');
         }
+
         return self::BUILT_IN_TYPE_MAP[$type];
     }
 

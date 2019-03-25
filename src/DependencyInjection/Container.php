@@ -1,8 +1,9 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace YapepBase\DependencyInjection;
 
+use YapepBase\Debug\IDataHandlerRegistry;
 use YapepBase\ErrorHandler\IErrorHandlerRegistry;
 use YapepBase\Event\IEventHandlerRegistry;
 use YapepBase\File\IFileHandler;
@@ -12,6 +13,7 @@ use YapepBase\Response\IResponse;
 use YapepBase\Router\IRouter;
 use YapepBase\Session\ISessionRegistry;
 use YapepBase\Shell\ICommandExecutor;
+use YapepBase\View\Data\Data;
 
 /**
  * Generic DI container implementation used in the framework.
@@ -61,6 +63,11 @@ class Container implements IContainer
         return $this->container->getEventHandlerRegistry();
     }
 
+    public function getDebugDataHandlerRegistry(): IDataHandlerRegistry
+    {
+        return $this->container->getDebugDataHandlerRegistry();
+    }
+
     public function getSessionRegistry(): ISessionRegistry
     {
         return $this->container->getSessionRegistry();
@@ -79,5 +86,10 @@ class Container implements IContainer
     public function getCommandExecutor(): ICommandExecutor
     {
         return $this->container->getCommandExecutor();
+    }
+
+    public function getViewData(): Data
+    {
+        return $this->container->getViewData();
     }
 }
