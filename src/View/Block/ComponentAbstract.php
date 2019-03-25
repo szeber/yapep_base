@@ -10,7 +10,7 @@ use YapepBase\Storage\IStorage;
  *
  * A component is a special block what is capable of satisfying its own data requirements.
  *
- * Generally nothing in the View layer should have access to any data source so we keep the boundaries clear to have MVC
+ * Generally nothing in the View layer should have access to any data source so we keep the boundaries clearHeadersByName to have MVC
  * but in special cases it's not feasible to be that strict.
  * For example imagine the case that you have a select input in the layout to which you populate the options from a DB table.
  * Without a component you'd need to get the required data via the Controller for every page.

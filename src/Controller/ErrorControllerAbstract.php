@@ -25,7 +25,7 @@ abstract class ErrorControllerAbstract extends HttpControllerAbstract
     protected function before()
     {
         // Clear all previous output before rendering
-        $this->response->clearAllOutput();
+        $this->response->getOutputHandler()->clear();
         parent::before();
     }
 

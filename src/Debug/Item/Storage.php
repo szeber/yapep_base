@@ -20,7 +20,7 @@ class Storage extends ItemAbstract
     /** Delete storage method. */
     const METHOD_DELETE = 'delete';
     /** Clear storage method. */
-    const METHOD_CLEAR = 'clear';
+    const METHOD_CLEAR = 'clearHeadersByName';
     /** Increment storage method. */
     const METHOD_INCREMENT = 'increment';
 

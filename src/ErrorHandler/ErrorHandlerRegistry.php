@@ -238,7 +238,7 @@ class ErrorHandlerRegistry implements IErrorHandlerRegistry
 
         // Shutdown because of a fatal error
         if (empty($this->errorHandlers)) {
-            // We have no error handlers defined, send the fatal error to the SAPI's logger.
+            // We have no error handlers defined, sendContent the fatal error to the SAPI's logger.
             $errorMessage = 'No errorhandlers are defined and a fatal error occured: '
                 . $error['message']
                 . '. File: ' . $error['file']
