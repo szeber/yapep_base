@@ -7,6 +7,8 @@ use YapepBase\Exception\InvalidArgumentException;
 
 class Regex extends ParamAbstract
 {
+    const ARRAY_KEY_PATTERN = 'pattern';
+
     /** @var string */
     protected $pattern;
 
@@ -17,15 +19,6 @@ class Regex extends ParamAbstract
         $this->pattern = $pattern;
     }
 
-    protected static function validateParamData(array $paramData): void
-    {
-        parent::validateParamData($paramData);
-
-        if (!isset($paramData['pattern'])) {
-            throw new InvalidArgumentException('No "pattern" value for regex parameter');
-        }
-    }
-
     public static function createFromArray(array $paramData)
     {
         static::validateParamData($paramData);
@@ -34,14 +27,6 @@ class Regex extends ParamAbstract
             (string)$paramData['name'],
             (string)$paramData['pattern']
         );
-    }
-
-    public function toArray(): array
-    {
-        return [
-            'name'    => $this->name,
-            'pattern' => $this->pattern,
-        ];
     }
 
     public static function __set_state(array $state)
@@ -55,5 +40,19 @@ class Regex extends ParamAbstract
     public function getPattern(): string
     {
         return $this->pattern;
+    }
+
+    protected function getExtraArrayFields(): array
+    {
+        return [self::ARRAY_KEY_PATTERN => $this->pattern];
+    }
+
+    protected static function validateParamData(array $paramData): void
+    {
+        parent::validateParamData($paramData);
+
+        if (empty($paramData['pattern'])) {
+            throw new InvalidArgumentException('No "pattern" value for regex parameter');
+        }
     }
 }

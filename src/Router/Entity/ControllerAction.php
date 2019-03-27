@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace YapepBase\Router\Entity;
 
+use YapepBase\Exception\InvalidArgumentException;
 use YapepBase\Router\IAnnotation;
 
 class ControllerAction
@@ -12,27 +13,51 @@ class ControllerAction
     /** @var string */
     protected $action;
     /** @var array */
-    protected $parameters = [];
+    protected $paramsByName = [];
     /** @var IAnnotation[] */
-    protected $annotations = [];
+    protected $annotationsByClassName = [];
 
-    public function __construct(string $controller, string $action, array $parameters, array $annotations)
+    /**
+     * @param string        $controller
+     * @param string        $action
+     * @param array         $paramsByName
+     * @param IAnnotation[] $annotationsByClassName
+     *
+     * @throws InvalidArgumentException
+     */
+    public function __construct(string $controller, string $action, array $paramsByName, array $annotationsByClassName)
     {
-        $this->controller  = $controller;
-        $this->action      = $action;
-        $this->parameters  = $this->cleanupParameters($parameters);
-        $this->annotations = $annotations;
+        $this->validateParams($paramsByName);
+        $this->validationAnnotations($annotationsByClassName);
+
+        $this->controller             = $controller;
+        $this->action                 = $action;
+        $this->paramsByName           = $paramsByName;
+        $this->annotationsByClassName = $annotationsByClassName;
     }
 
-    protected function cleanupParameters(array $parameters): array
+    /**
+     * @throws InvalidArgumentException
+     */
+    protected function validateParams(array $params): void
     {
-        foreach ($parameters as $index => $value) {
+        foreach ($params as $index => $value) {
             if (is_numeric($index)) {
-                unset($parameters[$index]);
+                throw new InvalidArgumentException('Params should be indexed by the name.');
             }
         }
+    }
 
-        return $parameters;
+    /**
+     * @throws InvalidArgumentException
+     */
+    protected function validationAnnotations(array $annotations): void
+    {
+        foreach ($annotations as $annotation) {
+            if (!($annotation instanceof IAnnotation)) {
+                throw new InvalidArgumentException('Only Annotations should be passed');
+            }
+        }
     }
 
     public function getController(): string
@@ -50,9 +75,9 @@ class ControllerAction
         return $this->getController() . '/' . $this->getAction();
     }
 
-    public function getParameters(): array
+    public function getParams(): array
     {
-        return $this->parameters;
+        return $this->paramsByName;
     }
 
     /**
@@ -60,12 +85,12 @@ class ControllerAction
      */
     public function getAnnotations(): array
     {
-        return $this->annotations;
+        return $this->annotationsByClassName;
     }
 
     public function getAnnotation(string $className): ?IAnnotation
     {
-        return $this->annotations[$className] ?? null;
+        return $this->annotationsByClassName[$className] ?? null;
     }
 
     public function __toString()

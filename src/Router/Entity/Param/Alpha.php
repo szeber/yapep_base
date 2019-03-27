@@ -9,4 +9,9 @@ class Alpha extends ParamAbstract
     {
         return '[a-zA-Z]+';
     }
+
+    protected function getExtraArrayFields(): array
+    {
+        return [];
+    }
 }

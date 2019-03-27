@@ -9,7 +9,7 @@ use YapepBase\Router\Entity\Route;
 use YapepBase\Router\IAnnotation;
 use YapepBase\Test\Unit\TestAbstract;
 
-class RouterTest extends TestAbstract
+class RouteTest extends TestAbstract
 {
     /** @var string */
     protected $controller    = 'Controller';
@@ -76,7 +76,7 @@ class RouterTest extends TestAbstract
             'action empty'          => [array_merge($routeArray, [Route::KEY_ACTION => '']), 'No action is specified for route'],
             'methods not array'     => [array_merge($routeArray, [Route::KEY_METHODS => '']), 'The methods should be an array in the route'],
             'patterns not array'    => [array_merge($routeArray, [Route::KEY_REGEX_PATTERNS => '']), 'The regexPatterns should be an array in the route'],
-            'empty paths'           => [array_merge($routeArray, [Route::KEY_PATHS => '']), 'No paths specified or the paths is not an array for route'],
+            'empty paths'           => [array_merge($routeArray, [Route::KEY_PATHS => '']), 'No paths specified or the path is not an array for route'],
             'annotations not array' => [array_merge($routeArray, [Route::KEY_ANNOTATIONS => '']), 'Annotations should be an array in the route'],
         ];
     }
@@ -108,6 +108,22 @@ class RouterTest extends TestAbstract
 
         $this->assertSame($this->controller, $result->getController());
         $this->assertSame($this->action, $result->getAction());
+    }
+
+    public function testGetParameterisedPathWhenParamsDoesNotExist_shouldReturnNull()
+    {
+        $result = $this->getRoute()->getParameterisedPath(['test' => 1]);
+
+        $this->assertNull($result);
+    }
+
+    public function testGetParameterisedPath_shouldReturnParameterisedPath()
+    {
+        $routeParams = [];
+
+        $result = $this->getRoute()->getParameterisedPath($routeParams);
+
+        $this->assertSame($this->paths[0]->getParameterisedPath($routeParams), $result);
     }
 
     protected function getRoute(): Route

@@ -106,9 +106,10 @@ class Route
     public function toArray(): array
     {
         $pathsArray = [];
-        foreach ($this->paths as $annotation) {
-            $pathsArray[] = $annotation->toArray();
+        foreach ($this->paths as $path) {
+            $pathsArray[] = $path->toArray();
         }
+
         $annotationsArray = [];
         foreach ($this->annotations as $annotation) {
             $annotationsArray[get_class($annotation)] = $annotation->toArray();
@@ -148,7 +149,7 @@ class Route
         }
 
         if (!isset($route[self::KEY_PATHS]) || !is_array($route[self::KEY_PATHS])) {
-            throw new InvalidArgumentException('No paths specified or the paths is not an array for route');
+            throw new InvalidArgumentException('No paths specified or the path is not an array for route');
         }
 
         if (isset($route[self::KEY_ANNOTATIONS]) && !is_array($route[self::KEY_ANNOTATIONS])) {
@@ -216,15 +217,31 @@ class Route
         }
 
         foreach ($this->getRegexPatterns() as $regexPattern) {
-            if (preg_match($regexPattern, $path, $matches)) {
-                // Match found, remove the full path from the matches, set the rest as params
-                unset($matches[0]);
-
-                return new ControllerAction($this->controller, $this->action, $matches, $this->getAnnotations());
+            $params = [];
+            if ($this->matchPathAndRetrieveParams($regexPattern, $path, $params)) {
+                return new ControllerAction($this->controller, $this->action, $params, $this->getAnnotations());
             }
         }
 
         return null;
+    }
+
+    protected function matchPathAndRetrieveParams(string $regexPattern, string $path, array &$params): bool
+    {
+        $result = false;
+        if (preg_match($regexPattern, $path, $matches)) {
+            // Only keep the named params
+            foreach ($matches as $index => $match) {
+                if (is_int($index)) {
+                    unset($matches[$index]);
+                }
+            }
+
+            $params = $matches;
+            $result = true;
+        }
+
+        return $result;
     }
 
     public function getParameterisedPath(array $routeParams = []): ?string

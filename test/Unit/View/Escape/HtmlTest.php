@@ -5,7 +5,7 @@ namespace YapepBase\Test\Unit\View\Escape;
 
 use Mockery;
 use Mockery\MockInterface;
-use YapepBase\Exception\ParameterException;
+use YapepBase\Exception\InvalidArgumentException;
 use YapepBase\Test\Unit\TestAbstract;
 use YapepBase\View\Escape\Html;
 use YapepBase\View\Escape\IEscape;
@@ -80,7 +80,7 @@ class HtmlTest extends TestAbstract
         $object         = new \stdClass();
         $object->public = 'public';
 
-        $this->expectException(ParameterException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->html->_escape($object);
     }
 

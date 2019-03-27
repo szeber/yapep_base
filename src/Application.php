@@ -13,6 +13,7 @@ use YapepBase\Exception\HttpException;
 use YapepBase\Exception\RedirectException;
 use YapepBase\Exception\RouterException;
 use YapepBase\Request\HttpRequest;
+use YapepBase\Router\Entity\ControllerAction;
 
 /**
  * Singleton class responsible to "hold" the application together by managing the dispatch process.
@@ -110,23 +111,22 @@ class Application
 
         try {
             $eventHandlerRegistry->raise(new Event(Event::TYPE_APPLICATION_BEFORE_RUN));
-
-            $controllerName = '';
-            $action         = '';
+            $controllerAction = null;
 
             try {
-                $this->diContainer->getRouter()->getControllerActionByMethodAndPath($controllerName, $action);
+                $request = $this->diContainer->getRequest();
+                $controllerAction = $this->diContainer->getRouter()->getControllerActionByRequest($request);
             } catch (RouterException $exception) {
                 if ($exception->getCode() == RouterException::ERR_NO_ROUTE_FOUND) {
                     // The route was not found, generate a 404 HttpException
-                    throw new HttpException('Route not found. Controller/action: ' . $controllerName . '/' . $action, 404);
+                    throw new HttpException('Route not found', 404);
                 } else {
                     // This was not a no route found error, re-throw the exception
                     throw $exception;
                 }
             }
 
-            $this->runAction($controllerName, $action);
+            $this->runAction($controllerAction);
             $this->sendResponse();
         } catch (HttpException $exception) {
             $this->runErrorAction($exception->getCode());
@@ -153,14 +153,14 @@ class Application
      * @throws Exception
      * @throws RedirectException
      */
-    protected function runAction(string $controllerName, string $action): void
+    protected function runAction(?ControllerAction $controllerAction): void
     {
         $eventHandlerRegistry = $this->diContainer->getEventHandlerRegistry();
-        $controller           = $this->getController($controllerName);
+        $controller           = $this->getController($controllerAction->getController());
 
         $eventHandlerRegistry->raise(new Event(Event::TYPE_APPLICATION_BEFORE_CONTROLLER_RUN));
 
-        $controller->run($action);
+        $controller->run($controllerAction->getAction());
 
         $eventHandlerRegistry->raise(new Event(Event::TYPE_APPLICATION_AFTER_CONTROLLER_RUN));
     }

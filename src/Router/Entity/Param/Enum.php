@@ -7,6 +7,8 @@ use YapepBase\Exception\InvalidArgumentException;
 
 class Enum extends ParamAbstract
 {
+    const ARRAY_KEY_VALUES = 'values';
+
     /** @var array */
     protected $values = [];
 
@@ -17,21 +19,6 @@ class Enum extends ParamAbstract
         $this->values = $values;
     }
 
-    protected static function validateParamData(array $paramData): void
-    {
-        parent::validateParamData($paramData);
-
-        if (!isset($paramData['values'])) {
-            throw new InvalidArgumentException('No "values" value for enum parameter');
-        }
-
-        if (!is_array($paramData['values'])) {
-            throw new InvalidArgumentException(
-                'The "values" value should be an array, got ' . gettype($paramData['values'])
-            );
-        }
-    }
-
     public static function createFromArray(array $paramData)
     {
         static::validateParamData($paramData);
@@ -40,14 +27,6 @@ class Enum extends ParamAbstract
             (string)$paramData['name'],
             $paramData['values']
         );
-    }
-
-    public function toArray(): array
-    {
-        return [
-            'name'   => $this->name,
-            'values' => $this->values,
-        ];
     }
 
     public static function __set_state(array $state): self
@@ -63,6 +42,11 @@ class Enum extends ParamAbstract
         return parent::getName();
     }
 
+    public function getValues(): array
+    {
+        return $this->values;
+    }
+
     public function getPattern(): string
     {
         return implode(
@@ -74,5 +58,25 @@ class Enum extends ParamAbstract
                 $this->values
             )
         );
+    }
+
+    protected static function validateParamData(array $paramData): void
+    {
+        parent::validateParamData($paramData);
+
+        if (empty($paramData['values'])) {
+            throw new InvalidArgumentException('No "values" value for enum parameter');
+        }
+
+        if (!is_array($paramData['values'])) {
+            throw new InvalidArgumentException(
+                'The "values" value should be an array, got ' . gettype($paramData['values'])
+            );
+        }
+    }
+
+    protected function getExtraArrayFields(): array
+    {
+        return [self::ARRAY_KEY_VALUES => $this->values];
     }
 }

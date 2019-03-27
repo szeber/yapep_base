@@ -6,12 +6,12 @@ namespace YapepBase\Router\Entity;
 use YapepBase\Exception\InvalidArgumentException;
 use YapepBase\Router\Entity\Param\IParam;
 use YapepBase\Router\Entity\Param\Mapper;
+use YapepBase\Router\Entity\Param\ParamAbstract;
 
 class Path
 {
-    const ARRAY_KEY_PATTERN    = 'pathPattern';
-    const ARRAY_KEY_PARAMS     = 'params';
-    const ARRAY_KEY_PARAM_TYPE = 'type';
+    const ARRAY_KEY_PATTERN = 'pathPattern';
+    const ARRAY_KEY_PARAMS  = 'params';
 
     /** @var string */
     protected $pattern;
@@ -25,8 +25,23 @@ class Path
      */
     public function __construct(string $pattern, array $params)
     {
+        $this->validateParams($params);
+
         $this->pattern = $pattern;
         $this->params  = $params;
+    }
+
+    public function getPattern(): string
+    {
+        return $this->pattern;
+    }
+
+    /**
+     * @return IParam[]
+     */
+    public function getParams(): array
+    {
+        return $this->params;
     }
 
     /**
@@ -48,12 +63,17 @@ class Path
         $params  = [];
 
         foreach ($path[self::ARRAY_KEY_PARAMS] ?? [] as $index => $paramData) {
-            if (empty($paramData[self::ARRAY_KEY_PARAM_TYPE])) {
-                throw new InvalidArgumentException('No type set for path ' . $pattern . ' param ' . $index);
+
+            if (empty($paramData[ParamAbstract::ARRAY_KEY_CLASS])) {
+                throw new InvalidArgumentException('No class set for path ' . $pattern . ' param ' . $index);
             }
 
             /** @var IParam $paramClass */
-            $paramClass = static::getParamClass($paramData[self::ARRAY_KEY_PARAM_TYPE]);
+            $paramClass = $paramData[ParamAbstract::ARRAY_KEY_CLASS];
+
+            if (!is_subclass_of($paramClass, IParam::class)) {
+                throw new InvalidArgumentException('Only Params can be set');
+            }
 
             $params[] = $paramClass::createFromArray($paramData);
         }
@@ -65,8 +85,7 @@ class Path
     {
         $params = [];
         foreach ($this->params as $param) {
-            $paramData                             = $param->toArray();
-            $paramData[self::ARRAY_KEY_PARAM_TYPE] = $this->getParamType($param);
+            $paramData = $param->toArray();
 
             $params[] = $paramData;
         }
@@ -75,6 +94,59 @@ class Path
             self::ARRAY_KEY_PATTERN => $this->pattern,
             self::ARRAY_KEY_PARAMS  => $params,
         ];
+    }
+
+    public function getParameterisedPath(array $routeParamsByName): ?string
+    {
+        $paramNames = $this->getParamNames();
+
+        if (count($routeParamsByName) !== count($paramNames)) {
+            return null;
+        }
+
+        if (!empty(array_diff($paramNames, array_keys($routeParamsByName)))) {
+            return null;
+        }
+
+        $path = $this->pattern;
+
+        foreach ($routeParamsByName as $name => $value) {
+            $path = str_replace('{' . $name . '}', $value, $path);
+        }
+
+        return $path;
+    }
+
+    public function getRegexPattern(): string
+    {
+        $pattern = '#^' . $this->pattern . '$#';
+
+        foreach ($this->params as $param) {
+            $paramName = preg_quote($param->getName(), '#');
+            $regexPart = '(?P<' . $paramName . '>' . addcslashes($param->getPattern(), '#') . ')';
+            $pattern   = str_replace('{' . $param->getName() . '}', $regexPart, $pattern);
+        }
+
+        return $pattern;
+    }
+
+    protected function getParamType(IParam $param)
+    {
+        $class = get_class($param);
+
+        return Mapper::getTypeByClass($class);
+    }
+
+    /**
+     * @throws InvalidArgumentException
+     */
+    protected function validateParams(array $params): void
+    {
+        foreach ($params as $value) {
+            if (!($value instanceof IParam)) {
+                throw new InvalidArgumentException('Params should implement IParam');
+            }
+        }
     }
 
     /**
@@ -87,9 +159,7 @@ class Path
         }
 
         if (!is_string($path[self::ARRAY_KEY_PATTERN])) {
-            throw new InvalidArgumentException(
-                 'Invalid path pattern. Expected string, got ' . gettype($path['pathPattern'])
-             );
+            throw new InvalidArgumentException('Invalid path pattern. Expected string, got ' . gettype($path['pathPattern']));
         }
 
         return '/' . trim($path[self::ARRAY_KEY_PATTERN], "/ \r\n\t\0");
@@ -116,51 +186,10 @@ class Path
         return $paramClass;
     }
 
-    protected function getParamType(IParam $param)
-    {
-        $class = get_class($param);
-
-        return Mapper::getTypeByClass($class);
-    }
-
-    public function getRegexPattern(): string
-    {
-        $pattern = '#^' . $this->pattern . '$#';
-
-        foreach ($this->params as $param) {
-            $paramName = preg_quote($param->getName(), '#');
-            $regexPart = '(?P<' . $paramName . '>' . addcslashes($param->getPattern(), '#') . ')';
-            $pattern   = str_replace('{' . $param->getName() . '}', $regexPart, $pattern);
-        }
-
-        return $pattern;
-    }
-
     protected function getParamNames(): array
     {
         preg_match_all('#\{([-_a-zA-Z0-9]+)\}#', $this->pattern, $matches, PREG_PATTERN_ORDER);
 
         return $matches[1] ?? [];
-    }
-
-    public function getParameterisedPath(array $routeParams): ?string
-    {
-        $paramNames = $this->getParamNames();
-
-        if (count($routeParams) !== count($paramNames)) {
-            return null;
-        }
-
-        if (!empty(array_diff($paramNames, array_keys($routeParams)))) {
-            return null;
-        }
-
-        $path = $this->pattern;
-
-        foreach ($routeParams as $name => $value) {
-            $path = str_replace('{' . $name . '}', $value, $path);
-        }
-
-        return $path;
     }
 }

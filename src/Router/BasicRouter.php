@@ -61,23 +61,6 @@ class BasicRouter implements IRouter
         return $this->getParameterisedPathFromRoute($this->routesByName[$name], $routeParams);
     }
 
-    /**
-     * @throws RouteNotFoundException
-     */
-    protected function getParameterisedPathFromRoute(Route $route, array $routeParams): string
-    {
-        $path = $route->getParameterisedPath($routeParams);
-
-        if (null === $path) {
-            throw new RouteNotFoundException(
-                'No patterns found for controller/action ' . $route->getControllerAction() . ' with parameter list: '
-                . json_encode($routeParams)
-            );
-        }
-
-        return $path;
-    }
-
     public function getControllerActionByRequest(IRequest $request): ControllerAction
     {
         return $this->getControllerActionByMethodAndPath($request->getMethod(), $request->getTarget());
@@ -97,5 +80,22 @@ class BasicRouter implements IRouter
         }
 
         throw new RouteNotFoundException('Route not found for method ' . $method . ' and path ' . $path);
+    }
+
+    /**
+     * @throws RouteNotFoundException
+     */
+    protected function getParameterisedPathFromRoute(Route $route, array $routeParams): string
+    {
+        $path = $route->getParameterisedPath($routeParams);
+
+        if (null === $path) {
+            throw new RouteNotFoundException(
+                'No patterns found for controller/action ' . $route->getControllerAction() . ' with parameter list: '
+                . json_encode($routeParams)
+            );
+        }
+
+        return $path;
     }
 }

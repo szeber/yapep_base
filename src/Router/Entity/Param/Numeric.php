@@ -9,4 +9,9 @@ class Numeric extends ParamAbstract
     {
         return '[0-9]+';
     }
+
+    protected function getExtraArrayFields(): array
+    {
+        return [];
+    }
 }

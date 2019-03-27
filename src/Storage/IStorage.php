@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace YapepBase\Storage;
 
-use YapepBase\Exception\ParameterException;
+use YapepBase\Exception\InvalidArgumentException;
 use YapepBase\Exception\StorageException;
 use YapepBase\Storage\Key\IGenerator;
 
@@ -21,7 +21,7 @@ interface IStorage
      * Stores data under the specified key
      *
      * @throws StorageException
-     * @throws ParameterException
+     * @throws InvalidArgumentException
      */
     public function set(string $key, $data, int $ttlInSecondsInSeconds = 0): void;
 

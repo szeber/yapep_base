@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace YapepBase\View\Layout;
 
-use YapepBase\Exception\ParameterException;
+use YapepBase\Exception\InvalidArgumentException;
 use YapepBase\View\Block\BlockAbstract;
 use YapepBase\View\Block\Html\CharsetMeta;
 use YapepBase\View\Block\Html\Condition;
@@ -186,12 +186,12 @@ abstract class LayoutAbstract extends ViewAbstract
     }
 
     /**
-     * @throws ParameterException   If the given slot does not exist.
+     * @throws InvalidArgumentException   If the given slot does not exist.
      */
     protected function renderSlot(string $name): void
     {
         if (!isset($this->slotsByName[$name])) {
-            throw new ParameterException('Slot not defined: ' . $name);
+            throw new InvalidArgumentException('Slot not defined: ' . $name);
         }
 
         foreach ($this->slotsByName[$name] as $renderable) {

@@ -5,7 +5,7 @@ namespace YapepBase\Test\Unit\View\Data;
 
 use Mockery;
 use Mockery\MockInterface;
-use YapepBase\Exception\ParameterException;
+use YapepBase\Exception\InvalidArgumentException;
 use YapepBase\Test\Unit\TestAbstract;
 use YapepBase\View\Data\Data;
 use YapepBase\View\Escape\IEscape;
@@ -50,7 +50,7 @@ class DataTest extends TestAbstract
     {
         $this->viewData->set($this->key, $this->value);
 
-        $this->expectException(ParameterException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->viewData->set($this->key, 'new');
     }
 
@@ -63,7 +63,7 @@ class DataTest extends TestAbstract
             $this->key  => 'new',
         ];
 
-        $this->expectException(ParameterException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->viewData->setMass($mass);
     }
 
@@ -81,7 +81,7 @@ class DataTest extends TestAbstract
 
     public function testGetForHtmlWhenKeyNotExist_shouldThrowException()
     {
-        $this->expectException(ParameterException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->viewData->getForHtml('notExist');
     }
 
@@ -108,7 +108,7 @@ class DataTest extends TestAbstract
 
     public function testGetForJavascriptWhenKeyNotExist_shouldThrowException()
     {
-        $this->expectException(ParameterException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->viewData->getForJavascript('notExist');
     }
 
@@ -135,7 +135,7 @@ class DataTest extends TestAbstract
 
     public function testGetRawWhenKeyNotExist_shouldThrowException()
     {
-        $this->expectException(ParameterException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->viewData->getRaw('notExist');
     }
 

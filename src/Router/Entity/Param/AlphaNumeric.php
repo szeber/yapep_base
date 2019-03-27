@@ -9,4 +9,9 @@ class AlphaNumeric extends ParamAbstract
     {
         return '[0-9a-zA-Z]+';
     }
+
+    protected function getExtraArrayFields(): array
+    {
+        return [];
+    }
 }
