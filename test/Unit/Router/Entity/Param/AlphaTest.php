@@ -51,7 +51,7 @@ class AlphaTest extends TestAbstract
      */
     public function testGetPattern_shouldMatchOnlyAlphaCharacters(string $testString, int $matchCount)
     {
-        $alpha = new Alpha($this->name);
+        $alpha   = new Alpha($this->name);
         $pattern = $alpha->getPattern();
 
         $this->assertSame($matchCount, preg_match('#^' . $pattern . '$#', $testString));

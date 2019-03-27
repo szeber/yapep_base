@@ -17,10 +17,9 @@ class RegexTest extends TestAbstract
         parent::setUp();
         $this->paramData = [
             Regex::ARRAY_KEY_NAME    => $this->name,
-            Regex::ARRAY_KEY_PATTERN => $this->pattern
+            Regex::ARRAY_KEY_PATTERN => $this->pattern,
         ];
     }
-
 
     public function invalidParamProvider(): array
     {
@@ -55,7 +54,7 @@ class RegexTest extends TestAbstract
         $expectedArray = [
             Regex::ARRAY_KEY_CLASS   => get_class($object),
             Regex::ARRAY_KEY_NAME    => $this->name,
-            Regex::ARRAY_KEY_PATTERN => $this->pattern
+            Regex::ARRAY_KEY_PATTERN => $this->pattern,
         ];
         $this->assertEquals($expectedArray, $array);
     }
@@ -80,7 +79,7 @@ class RegexTest extends TestAbstract
      */
     public function testGetPattern_shouldMatchOnlyRegexCharacters(string $testString, int $matchCount)
     {
-        $Regex = new Regex($this->name, $this->pattern);
+        $Regex   = new Regex($this->name, $this->pattern);
         $pattern = $Regex->getPattern();
 
         $this->assertSame($matchCount, preg_match('#^' . $pattern . '$#', $testString));

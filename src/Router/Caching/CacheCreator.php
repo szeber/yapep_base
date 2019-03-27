@@ -35,7 +35,7 @@ class CacheCreator
             $routes = array_merge($routes, $collector->getCollectedRoutes());
         }
 
-        $fileContent = "<?php\n\n// Generated file, do not modify!\n\nreturn " . var_export($routes, true) . ";";
+        $fileContent = "<?php\n\n// Generated file, do not modify!\n\nreturn " . var_export($routes, true) . ';';
 
         $this->fileHandler->write($path, $fileContent);
     }

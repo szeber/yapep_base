@@ -17,7 +17,7 @@ class CacheCreatorTest extends TestAbstract
     {
         $collector1          = $this->expectCollectorUsed([1]);
         $collector2          = $this->expectCollectorUsed([2]);
-        $expectedFileContent = <<<PHP
+        $expectedFileContent = <<<'PHP'
 <?php
 
 // Generated file, do not modify!

@@ -7,7 +7,6 @@ use Mockery\MockInterface;
 use YapepBase\Exception\InvalidArgumentException;
 use YapepBase\File\IFileHandler;
 use YapepBase\Router\Collector\YamlCollector;
-use YapepBase\Router\Entity\Path;
 use YapepBase\Test\Unit\TestAbstract;
 
 class YamlCollectorTest extends TestAbstract
@@ -42,7 +41,7 @@ class YamlCollectorTest extends TestAbstract
 
     public function testConstruct_shouldStoreRoutes()
     {
-        $yaml = <<<YAML
+        $yaml = <<<'YAML'
 - name: foo
   controller: Foo
   action: Index

@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace YapepBase\Test\Unit\Router\Entity;
 
 use YapepBase\Exception\InvalidArgumentException;
-use YapepBase\Router\Entity\Param\Enum;
 use YapepBase\Router\Entity\Param\IParam;
 use YapepBase\Router\Entity\Param\Numeric;
 use YapepBase\Router\Entity\Param\ParamAbstract;
@@ -41,7 +40,7 @@ class PathTest extends TestAbstract
     {
         $state = [
             'pattern' => $this->pattern,
-            'params'  => $this->params
+            'params'  => $this->params,
         ];
 
         $path = Path::__set_state($state);
@@ -53,7 +52,7 @@ class PathTest extends TestAbstract
     public function testCreateFromArrayWhenNoParamsGiven_shouldReturnPath()
     {
         $pathArray = [
-            Path::ARRAY_KEY_PATTERN => $this->pattern
+            Path::ARRAY_KEY_PATTERN => $this->pattern,
         ];
 
         $path = Path::createFromArray($pathArray);
@@ -68,7 +67,7 @@ class PathTest extends TestAbstract
         unset($paramArray[ParamAbstract::ARRAY_KEY_CLASS]);
         $pathArray  = [
             Path::ARRAY_KEY_PATTERN => $this->pattern,
-            Path::ARRAY_KEY_PARAMS  => [$paramArray]
+            Path::ARRAY_KEY_PARAMS  => [$paramArray],
         ];
 
         $this->expectException(InvalidArgumentException::class);
@@ -77,11 +76,11 @@ class PathTest extends TestAbstract
 
     public function testCreateFromArrayWhenParamClassInvalid_shouldThrowException()
     {
-        $paramArray = $this->param1->toArray();
+        $paramArray                                 = $this->param1->toArray();
         $paramArray[ParamAbstract::ARRAY_KEY_CLASS] = 'invalid';
-        $pathArray  = [
+        $pathArray                                  = [
             Path::ARRAY_KEY_PATTERN => $this->pattern,
-            Path::ARRAY_KEY_PARAMS  => [$paramArray]
+            Path::ARRAY_KEY_PARAMS  => [$paramArray],
         ];
 
         $this->expectException(InvalidArgumentException::class);
@@ -93,7 +92,7 @@ class PathTest extends TestAbstract
         $paramArray = $this->param1->toArray();
         $pathArray  = [
             Path::ARRAY_KEY_PATTERN => $this->pattern,
-            Path::ARRAY_KEY_PARAMS  => [$paramArray]
+            Path::ARRAY_KEY_PARAMS  => [$paramArray],
         ];
 
         $path = Path::createFromArray($pathArray);
@@ -148,7 +147,7 @@ class PathTest extends TestAbstract
 
     public function testGetRegexPatternWhenNoParamsSet_shouldReturnRegexFromPath()
     {
-        $path = new Path('/', []);
+        $path   = new Path('/', []);
         $result = $path->getRegexPattern();
 
         $expectedResult = '#^/$#';

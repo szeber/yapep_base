@@ -159,7 +159,7 @@ class ApplicationTest extends TestAbstract
     protected function expectGetRoute()
     {
         $controllerAction = new ControllerAction($this->controllerName, $this->actionName, [], []);
-        $router = Mockery
+        $router           = Mockery
             ::mock(IRouter::class)
             ->shouldReceive('getControllerActionByRequest')
             ->once()

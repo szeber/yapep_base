@@ -51,7 +51,7 @@ class UuidTest extends TestAbstract
      */
     public function testGetPattern_shouldMatchOnlyUuidCharacters(string $testString, int $matchCount)
     {
-        $Uuid = new Uuid($this->name);
+        $Uuid    = new Uuid($this->name);
         $pattern = $Uuid->getPattern();
 
         $this->assertSame($matchCount, preg_match('#^' . $pattern . '$#', $testString));

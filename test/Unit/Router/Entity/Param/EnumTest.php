@@ -17,10 +17,9 @@ class EnumTest extends TestAbstract
         parent::setUp();
         $this->paramData = [
             Enum::ARRAY_KEY_NAME   => $this->name,
-            Enum::ARRAY_KEY_VALUES => $this->values
+            Enum::ARRAY_KEY_VALUES => $this->values,
         ];
     }
-
 
     public function invalidParamProvider(): array
     {
@@ -56,7 +55,7 @@ class EnumTest extends TestAbstract
         $expectedArray = [
             Enum::ARRAY_KEY_CLASS  => get_class($object),
             Enum::ARRAY_KEY_NAME   => $this->name,
-            Enum::ARRAY_KEY_VALUES => $this->values
+            Enum::ARRAY_KEY_VALUES => $this->values,
         ];
         $this->assertEquals($expectedArray, $array);
     }
@@ -81,7 +80,7 @@ class EnumTest extends TestAbstract
      */
     public function testGetPattern_shouldMatchOnlyEnumCharacters(string $testString, int $matchCount)
     {
-        $Enum = new Enum($this->name, $this->values);
+        $Enum    = new Enum($this->name, $this->values);
         $pattern = $Enum->getPattern();
 
         $this->assertSame($matchCount, preg_match('#^' . $pattern . '$#', $testString));

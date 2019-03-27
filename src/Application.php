@@ -114,7 +114,7 @@ class Application
             $controllerAction = null;
 
             try {
-                $request = $this->diContainer->getRequest();
+                $request          = $this->diContainer->getRequest();
                 $controllerAction = $this->diContainer->getRouter()->getControllerActionByRequest($request);
             } catch (RouterException $exception) {
                 if ($exception->getCode() == RouterException::ERR_NO_ROUTE_FOUND) {

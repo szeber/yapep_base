@@ -52,7 +52,7 @@ class AlphaNumericExtendedTest extends TestAbstract
     public function testGetPattern_shouldMatchOnlyAlphaCharacters(string $testString, int $matchCount)
     {
         $AlphaNumericExtended = new AlphaNumericExtended($this->name);
-        $pattern      = $AlphaNumericExtended->getPattern();
+        $pattern              = $AlphaNumericExtended->getPattern();
 
         $this->assertSame($matchCount, preg_match('#^' . $pattern . '$#', $testString));
     }

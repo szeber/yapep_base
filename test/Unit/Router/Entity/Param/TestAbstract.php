@@ -9,7 +9,7 @@ use YapepBase\Router\Entity\Param\ParamAbstract;
 
 abstract class TestAbstract extends \YapepBase\Test\Unit\TestAbstract
 {
-    /** @var string  */
+    /** @var string */
     protected $name = 'test';
 
     public function invalidParamProvider(): array

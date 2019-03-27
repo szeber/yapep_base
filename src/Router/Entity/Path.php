@@ -63,7 +63,6 @@ class Path
         $params  = [];
 
         foreach ($path[self::ARRAY_KEY_PARAMS] ?? [] as $index => $paramData) {
-
             if (empty($paramData[ParamAbstract::ARRAY_KEY_CLASS])) {
                 throw new InvalidArgumentException('No class set for path ' . $pattern . ' param ' . $index);
             }
