@@ -6,7 +6,7 @@ namespace YapepBase\Test\Unit\Storage;
 use YapepBase\Debug\Item\Storage;
 use YapepBase\Exception\File\Exception;
 use YapepBase\Exception\File\NotFoundException;
-use YapepBase\Exception\ParameterException;
+use YapepBase\Exception\InvalidArgumentException;
 use YapepBase\Exception\StorageException;
 use YapepBase\Storage\Entity\File;
 use YapepBase\Storage\FileStorage;
@@ -46,7 +46,7 @@ class FileStorageTest extends TestAbstract
 
     public function testConstructWhenPathEmpty_shouldThrowException()
     {
-        $this->expectException(ParameterException::class);
+        $this->expectException(InvalidArgumentException::class);
 
         $this->getStorageForConstructTest('');
     }
@@ -119,7 +119,7 @@ class FileStorageTest extends TestAbstract
 
         $this->expectDebugTimesRetrieved();
 
-        $this->expectException(ParameterException::class);
+        $this->expectException(InvalidArgumentException::class);
         $storage->set($this->key, $this->data, $this->ttl);
     }
 

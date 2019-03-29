@@ -5,7 +5,7 @@ namespace YapepBase\Storage;
 
 use Memcached;
 use YapepBase\Debug\Item\Storage;
-use YapepBase\Exception\ParameterException;
+use YapepBase\Exception\InvalidArgumentException;
 use YapepBase\Exception\StorageException;
 use YapepBase\Helper\DateHelper;
 use YapepBase\Storage\Key\IGenerator;
@@ -37,7 +37,7 @@ class MemcachedStorage extends StorageAbstract implements IIncrementable
      * Stores data the specified key
      *
      * @throws StorageException
-     * @throws ParameterException
+     * @throws InvalidArgumentException
      */
     public function set(string $key, $data, int $ttlInSecondsInSecondsInSeconds = 0): void
     {

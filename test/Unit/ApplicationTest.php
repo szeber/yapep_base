@@ -14,6 +14,7 @@ use YapepBase\Exception\RedirectException;
 use YapepBase\Exception\RouterException;
 use YapepBase\Request\IRequest;
 use YapepBase\Response\IResponse;
+use YapepBase\Router\Entity\ControllerAction;
 use YapepBase\Router\IRouter;
 
 class ApplicationTest extends TestAbstract
@@ -157,22 +158,13 @@ class ApplicationTest extends TestAbstract
 
     protected function expectGetRoute()
     {
-        $router = Mockery
+        $controllerAction = new ControllerAction($this->controllerName, $this->actionName, [], []);
+        $router           = Mockery
             ::mock(IRouter::class)
-            ->shouldReceive('getRoute')
+            ->shouldReceive('getControllerActionByRequest')
             ->once()
-            ->with(
-                Mockery::on(function (&$controller) {
-                    $controller = $this->controllerName;
-
-                    return true;
-                }),
-                Mockery::on(function (&$action) {
-                    $action = $this->actionName;
-
-                    return true;
-                })
-            )
+            ->with($this->request)
+            ->andReturn($controllerAction)
             ->getMock();
 
         $this->pimpleContainer->setRouter($router);
@@ -182,8 +174,9 @@ class ApplicationTest extends TestAbstract
     {
         $router = Mockery
             ::mock(IRouter::class)
-            ->shouldReceive('getRoute')
+            ->shouldReceive('getControllerActionByRequest')
             ->once()
+            ->with($this->request)
             ->andThrows($expectedException)
             ->getMock();
 

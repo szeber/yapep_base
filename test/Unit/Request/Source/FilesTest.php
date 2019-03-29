@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace YapepBase\Test\Unit\Request\Source;
 
 use PHPUnit\Framework\ExpectationFailedException;
-use YapepBase\Exception\ParameterException;
+use YapepBase\Exception\InvalidArgumentException;
 use YapepBase\Request\Source\File;
 use YapepBase\Request\Source\Files;
 use YapepBase\Test\Unit\TestAbstract;
@@ -51,7 +51,7 @@ class FilesTest extends TestAbstract
      */
     public function testConstructWhenInvalidFileGiven_shouldThrowException(array $invalidFile)
     {
-        $this->expectException(ParameterException::class);
+        $this->expectException(InvalidArgumentException::class);
         new Files(['invalid' => $invalidFile]);
     }
 
@@ -59,7 +59,7 @@ class FilesTest extends TestAbstract
     {
         $files = new Files([]);
 
-        $this->expectException(ParameterException::class);
+        $this->expectException(InvalidArgumentException::class);
         $files->isMultiUpload('nonExistent');
     }
 

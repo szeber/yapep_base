@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace YapepBase\Test\Unit\View\Layout;
 
 use Mockery;
-use YapepBase\Exception\ParameterException;
+use YapepBase\Exception\InvalidArgumentException;
 use YapepBase\Test\Unit\TestAbstract;
 use YapepBase\View\Block\Html\Condition;
 use YapepBase\View\Block\Html\CssFile;
@@ -161,7 +161,7 @@ class LayoutAbstractTest extends TestAbstract
 
     public function testRenderSlotWhenNotExist_shouldThrowException()
     {
-        $this->expectException(ParameterException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->layout->renderSlot('notExist');
     }
 

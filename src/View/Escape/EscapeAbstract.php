@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace YapepBase\View\Escape;
 
-use YapepBase\Exception\ParameterException;
+use YapepBase\Exception\InvalidArgumentException;
 
 /**
  * Common ancestor for the different escape classes.
@@ -64,7 +64,7 @@ abstract class EscapeAbstract implements IEscape
     protected function wrapObjectForEscape(object $value)
     {
         foreach ($value as $whatever) {
-            throw new ParameterException('No public properties are allowed on objects, please hide them and add getter methods!');
+            throw new InvalidArgumentException('No public properties are allowed on objects, please hide them and add getter methods!');
         }
 
         $wrappedObject                 = new static();

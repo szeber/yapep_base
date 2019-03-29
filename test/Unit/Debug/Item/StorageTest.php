@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace YapepBase\Test\Unit\Debug\Item;
 
 use YapepBase\Debug\Item\Storage;
-use YapepBase\Exception\ParameterException;
+use YapepBase\Exception\InvalidArgumentException;
 
 class StorageTest extends TestAbstract
 {
@@ -24,7 +24,7 @@ class StorageTest extends TestAbstract
 
     public function testConstructorWhenInvalidMethodGiven_shouldThrowException()
     {
-        $this->expectException(ParameterException::class);
+        $this->expectException(InvalidArgumentException::class);
         new Storage($this->dateHelper, 'invalid', 'key');
     }
 }

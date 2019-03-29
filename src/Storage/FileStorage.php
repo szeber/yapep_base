@@ -6,7 +6,7 @@ namespace YapepBase\Storage;
 use YapepBase\Debug\Item\Storage;
 use YapepBase\Exception\File\Exception as FileException;
 use YapepBase\Exception\File\NotFoundException;
-use YapepBase\Exception\ParameterException;
+use YapepBase\Exception\InvalidArgumentException;
 use YapepBase\Exception\StorageException;
 use YapepBase\File\FileHandlerPhp;
 use YapepBase\File\IFileHandler;
@@ -40,7 +40,7 @@ class FileStorage extends StorageAbstract
     protected $dateHelper;
 
     /**
-     * @throws ParameterException
+     * @throws InvalidArgumentException
      * @throws StorageException
      */
     public function __construct(
@@ -60,13 +60,13 @@ class FileStorage extends StorageAbstract
     }
 
     /**
-     * @throws ParameterException
+     * @throws InvalidArgumentException
      * @throws StorageException
      */
     public function setPath(string $path)
     {
         if (empty($path)) {
-            throw new ParameterException('Path has to be set');
+            throw new InvalidArgumentException('Path has to be set');
         }
 
         if (substr($path, -1, 1) !== DIRECTORY_SEPARATOR) {
@@ -170,12 +170,12 @@ class FileStorage extends StorageAbstract
     /**
      * Returns the data prepared to be written.
      *
-     * @throws ParameterException
+     * @throws InvalidArgumentException
      */
     protected function prepareDataToStore($data, int $ttlInSeconds = 0): string
     {
         if ($ttlInSeconds != 0 && $this->canOnlyStorePlainText) {
-            throw new ParameterException('TTL can not be used with plain text mode!');
+            throw new InvalidArgumentException('TTL can not be used with plain text mode!');
         }
 
         if ($this->canOnlyStorePlainText) {
