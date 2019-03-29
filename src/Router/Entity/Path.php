@@ -5,7 +5,6 @@ namespace YapepBase\Router\Entity;
 
 use YapepBase\Exception\InvalidArgumentException;
 use YapepBase\Router\Entity\Param\IParam;
-use YapepBase\Router\Entity\Param\Mapper;
 use YapepBase\Router\Entity\Param\ParamAbstract;
 
 class Path
@@ -129,13 +128,6 @@ class Path
         return $pattern;
     }
 
-    protected function getParamType(IParam $param)
-    {
-        $class = get_class($param);
-
-        return Mapper::getTypeByClass($class);
-    }
-
     /**
      * @throws InvalidArgumentException
      */
@@ -162,27 +154,6 @@ class Path
         }
 
         return '/' . trim($path[self::ARRAY_KEY_PATTERN], "/ \r\n\t\0");
-    }
-
-    protected static function getParamClass(string $type): string
-    {
-        try {
-            $paramClass = Mapper::getClassByType($type);
-        } catch (InvalidArgumentException $e) {
-            $paramClass = $type;
-        }
-
-        if (!class_exists($paramClass, true)) {
-            throw new InvalidArgumentException('Class ' . $paramClass . ' not found for path parameter');
-        }
-
-        if (!in_array(IParam::class, class_implements($paramClass, false))) {
-            throw new InvalidArgumentException(
-                'Invalid path param class: ' . $paramClass . '. It should implement ' . IParam::class
-            );
-        }
-
-        return $paramClass;
     }
 
     protected function getParamNames(): array

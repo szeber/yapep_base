@@ -27,7 +27,7 @@ class BasicRouter implements IRouter
         foreach ($routes as $route) {
             $this->routesByControllerAction[$route->getControllerAction()] = $route;
 
-            if ($route->getName()) {
+            if (!empty($route->getName())) {
                 $this->routesByName[$route->getName()] = $route;
             }
         }
@@ -61,11 +61,6 @@ class BasicRouter implements IRouter
         return $this->getParameterisedPathFromRoute($this->routesByName[$name], $routeParams);
     }
 
-    public function getControllerActionByRequest(IRequest $request): ControllerAction
-    {
-        return $this->getControllerActionByMethodAndPath($request->getMethod(), $request->getTarget());
-    }
-
     public function getControllerActionByMethodAndPath(string $method, string $path): ControllerAction
     {
         // Normalise the path to start with a single slash and not have a trailing slash
@@ -80,6 +75,11 @@ class BasicRouter implements IRouter
         }
 
         throw new RouteNotFoundException('Route not found for method ' . $method . ' and path ' . $path);
+    }
+
+    public function getControllerActionByRequest(IRequest $request): ControllerAction
+    {
+        return $this->getControllerActionByMethodAndPath($request->getMethod(), $request->getTarget());
     }
 
     /**

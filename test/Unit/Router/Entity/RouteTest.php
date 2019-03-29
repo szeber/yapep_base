@@ -19,8 +19,6 @@ class RouteTest extends TestAbstract
     protected $name          = 'routeName';
     /** @var array */
     protected $methods       = ['GET'];
-    /** @var array */
-    protected $regexPatterns = [];
     /** @var Path[] */
     protected $paths         = [];
     /** @var IAnnotation[] */
@@ -30,9 +28,8 @@ class RouteTest extends TestAbstract
     {
         parent::setUp();
 
-        $path                  = new Path('/', []);
-        $this->paths[]         = $path;
-        $this->regexPatterns[] = $path->getRegexPattern();
+        $path          = new Path('/', []);
+        $this->paths[] = $path;
     }
 
     public function testConstruct_shouldStoreGivenValuesProperly()
@@ -49,7 +46,6 @@ class RouteTest extends TestAbstract
             Route::KEY_ACTION         => $this->action,
             Route::KEY_NAME           => $this->name,
             Route::KEY_METHODS        => $this->methods,
-            Route::KEY_REGEX_PATTERNS => $this->regexPatterns,
             Route::KEY_PATHS          => $this->paths,
             Route::KEY_ANNOTATIONS    => $this->annotations,
         ];
@@ -75,7 +71,6 @@ class RouteTest extends TestAbstract
             'controller empty'      => [array_merge($routeArray, [Route::KEY_CONTROLLER => '']), 'No controller is specified for route'],
             'action empty'          => [array_merge($routeArray, [Route::KEY_ACTION => '']), 'No action is specified for route'],
             'methods not array'     => [array_merge($routeArray, [Route::KEY_METHODS => '']), 'The methods should be an array in the route'],
-            'patterns not array'    => [array_merge($routeArray, [Route::KEY_REGEX_PATTERNS => '']), 'The regexPatterns should be an array in the route'],
             'empty paths'           => [array_merge($routeArray, [Route::KEY_PATHS => '']), 'No paths specified or the path is not an array for route'],
             'annotations not array' => [array_merge($routeArray, [Route::KEY_ANNOTATIONS => '']), 'Annotations should be an array in the route'],
         ];
@@ -133,7 +128,6 @@ class RouteTest extends TestAbstract
             $this->action,
             $this->name,
             $this->methods,
-            $this->regexPatterns,
             $this->paths,
             $this->annotations
         );
@@ -145,7 +139,6 @@ class RouteTest extends TestAbstract
         $this->assertSame($this->action, $actualRoute->getAction());
         $this->assertSame($this->name, $actualRoute->getName());
         $this->assertSame($this->methods, $actualRoute->getMethods());
-        $this->assertSame($this->regexPatterns, $actualRoute->getRegexPatterns());
         $this->assertEquals($this->paths, $actualRoute->getPaths());
         $this->assertEquals($this->annotations, $actualRoute->getAnnotations());
     }

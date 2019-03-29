@@ -8,13 +8,12 @@ use YapepBase\Router\IAnnotation;
 
 class Route
 {
-    public const KEY_PATHS          = 'paths';
-    public const KEY_REGEX_PATTERNS = 'regexPatterns';
-    public const KEY_METHODS        = 'methods';
-    public const KEY_ACTION         = 'action';
-    public const KEY_CONTROLLER     = 'controller';
-    public const KEY_NAME           = 'name';
-    public const KEY_ANNOTATIONS    = 'annotations';
+    public const KEY_PATHS       = 'paths';
+    public const KEY_METHODS     = 'methods';
+    public const KEY_ACTION      = 'action';
+    public const KEY_CONTROLLER  = 'controller';
+    public const KEY_NAME        = 'name';
+    public const KEY_ANNOTATIONS = 'annotations';
 
     /** @var string|null */
     protected $name;
@@ -28,9 +27,6 @@ class Route
     /** @var string[] */
     protected $methods = [];
 
-    /** @var string[] */
-    protected $regexPatterns = [];
-
     /** @var Path[] */
     protected $paths = [];
 
@@ -42,7 +38,6 @@ class Route
         string $action,
         ?string $name,
         array $methods,
-        array $regexPatterns,
         array $paths,
         array $annotations
     ) {
@@ -50,7 +45,6 @@ class Route
         $this->controller    = $controller;
         $this->action        = $action;
         $this->methods       = $methods;
-        $this->regexPatterns = $regexPatterns;
         $this->paths         = $paths;
         $this->annotations   = $annotations;
     }
@@ -67,7 +61,6 @@ class Route
             $state[self::KEY_ACTION],
             $state[self::KEY_NAME],
             $state[self::KEY_METHODS],
-            $state[self::KEY_REGEX_PATTERNS],
             $state[self::KEY_PATHS],
             $state[self::KEY_ANNOTATIONS]
         );
@@ -85,19 +78,11 @@ class Route
         $paths       = static::parsePaths($route[self::KEY_PATHS]);
         $annotations = static::parseAnnotations($route[self::KEY_ANNOTATIONS] ?? []);
 
-        $regexPatterns = array_map(
-            function (Path $path) {
-                return $path->getRegexPattern();
-            },
-            $paths
-        );
-
         return new static(
             $route[self::KEY_CONTROLLER],
             $route[self::KEY_ACTION],
             $route[self::KEY_NAME] ?? null,
             $route[self::KEY_METHODS] ?? [],
-            $regexPatterns,
             $paths,
             $annotations
         );
@@ -120,7 +105,6 @@ class Route
             self::KEY_ACTION         => $this->action,
             self::KEY_NAME           => $this->name,
             self::KEY_METHODS        => $this->methods,
-            self::KEY_REGEX_PATTERNS => $this->regexPatterns,
             self::KEY_PATHS          => $pathsArray,
             self::KEY_ANNOTATIONS    => $annotationsArray,
         ];
@@ -142,10 +126,6 @@ class Route
 
         if (isset($route[self::KEY_METHODS]) && !is_array($route[self::KEY_METHODS])) {
             throw new InvalidArgumentException('The methods should be an array in the route');
-        }
-
-        if (isset($route[self::KEY_REGEX_PATTERNS]) && !is_array($route[self::KEY_REGEX_PATTERNS])) {
-            throw new InvalidArgumentException('The regexPatterns should be an array in the route');
         }
 
         if (!isset($route[self::KEY_PATHS]) || !is_array($route[self::KEY_PATHS])) {
@@ -198,7 +178,12 @@ class Route
      */
     public function getRegexPatterns(): array
     {
-        return $this->regexPatterns;
+        return array_map(
+            function (Path $path) {
+                return $path->getRegexPattern();
+            },
+            $this->paths
+        );
     }
 
     /**
