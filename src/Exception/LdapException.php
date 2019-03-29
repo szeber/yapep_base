@@ -85,7 +85,7 @@ class LdapException extends \Exception
 
     /**
      * Does not indicate an error condition, but indicates that the server is ready for the next step in the process.
-     * The client must sendContent the server the same SASL mechanism to continue the process.
+     * The client must send the server the same SASL mechanism to continue the process.
      */
     const LDAP_SASL_BIND_IN_PROGRESS = 14;
 

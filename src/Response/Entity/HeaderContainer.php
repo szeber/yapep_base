@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace YapepBase\Response\Entity;
 
-use YapepBase\Exception\ParameterException;
+use YapepBase\Exception\InvalidArgumentException;
 
 class HeaderContainer
 {
@@ -18,12 +18,12 @@ class HeaderContainer
     }
 
     /**
-     * @throws ParameterException
+     * @throws InvalidArgumentException
      */
     public function add(Header $header): self
     {
         if ($header->getName() !== $this->name) {
-            throw new ParameterException('Name of container should be the same as the added headers');
+            throw new InvalidArgumentException('Name of container should be the same as the added headers');
         }
 
         $this->headersByValue[$header->getValue()] = $header;

@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace YapepBase\View\Data;
 
-use YapepBase\Exception\ParameterException;
+use YapepBase\Exception\InvalidArgumentException;
 
 /**
  * Provides an interface for a data storage what can escape the returned data
@@ -13,14 +13,14 @@ interface ICanEscape
     /**
      * Sets the given value with the given key to the object.
      *
-     * @throws ParameterException   If the given key already exists.
+     * @throws InvalidArgumentException   If the given key already exists.
      */
     public function set(string $key, $value): void;
 
     /**
      * Sets the elements of the given array by their key
      *
-     * @throws ParameterException    If any of the keys already exist.
+     * @throws InvalidArgumentException    If any of the keys already exist.
      */
     public function setMass(array $valuesByName): void;
 

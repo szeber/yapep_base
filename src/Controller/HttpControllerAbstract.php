@@ -5,7 +5,7 @@ namespace YapepBase\Controller;
 
 use YapepBase\Application;
 
-use YapepBase\Exception\ParameterException;
+use YapepBase\Exception\ControllerException;
 use YapepBase\Request\HttpRequest;
 use YapepBase\Request\IRequest;
 use YapepBase\Response\HttpResponse;
@@ -14,7 +14,7 @@ use YapepBase\Response\IResponse;
 /**
  * Base class for HTTP controllers.
  */
-abstract class HttpControllerAbstract extends ControllerAbstract
+abstract class HttpController extends ControllerAbstract
 {
     /**
      * The request instance
@@ -30,20 +30,29 @@ abstract class HttpControllerAbstract extends ControllerAbstract
      */
     protected $response;
 
-    public function setRequest(IRequest $request): void
+    /**
+     * Constructor.
+     *
+     * @param \YapepBase\Request\HttpRequest   $request  The request object. Must be a HttpRequest or descendant.
+     * @param \YapepBase\Response\HttpResponse $response The response object. Must be a HttpResponse or descendant.
+     *
+     * @throws \YapepBase\Exception\ControllerException   On error. (eg. incompatible request or response object)
+     */
+    public function __construct(IRequest $request, IResponse $response)
     {
         if (!($request instanceof HttpRequest)) {
-            throw new ParameterException('Http Controller should only use Http request');
+            throw new ControllerException(
+                'The specified request is not a HttpRequest',
+                ControllerException::ERR_INCOMPATIBLE_REQUEST
+            );
         }
-        parent::setRequest($request);
-    }
-
-    public function setResponse(IResponse $response): void
-    {
         if (!($response instanceof HttpResponse)) {
-            throw new ParameterException('Http Controller should only use Http response');
+            throw new ControllerException(
+                'The specified response is not a HttpResponse',
+                ControllerException::ERR_INCOMPATIBLE_RESPONSE
+            );
         }
-        parent::setResponse($response);
+        parent::__construct($request, $response);
     }
 
     /**
@@ -87,7 +96,7 @@ abstract class HttpControllerAbstract extends ControllerAbstract
         $anchor = '',
         $statusCode = 303
     ) {
-        $url = Application::getInstance()->getRouter()->getTargetForControllerAction(
+        $url = Application::getInstance()->getDiContainer()->getRouter()->getPathByControllerAndAction(
             $controller,
             $action,
             $routeParams

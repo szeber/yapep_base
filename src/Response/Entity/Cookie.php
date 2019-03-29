@@ -91,4 +91,18 @@ class Cookie
     {
         return $this->httpOnly;
     }
+
+    public function setSecure(bool $secure): self
+    {
+        $this->secure = $secure;
+
+        return $this;
+    }
+
+    public function setHttpOnly(bool $httpOnly): self
+    {
+        $this->httpOnly = $httpOnly;
+
+        return $this;
+    }
 }

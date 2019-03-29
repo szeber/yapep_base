@@ -3,21 +3,37 @@ declare(strict_types=1);
 
 namespace YapepBase\Router;
 
+use YapepBase\Request\IRequest;
+use YapepBase\Router\Entity\ControllerAction;
+use YapepBase\Router\Exception\RouteNotFoundException;
+use YapepBase\Router\Exception\RouterException;
+
 /**
  * Router interface
  */
-interface IRouter extends IReverseRouter
+interface IRouter
 {
     /**
-     * Returns a controller and an action for the request's target.
-     *
-     * @param string $controllerClassName The controller class name. (Outgoing parameter)
-     * @param string $actionName          The action name in the controller class. (Outgoing parameter)
-     * @param string $uri                 The uri to check. If not given, the current uri will be used.
-     *
-     * @return string   The controller and action separated by a '/' character.
-     *
-     * @throws \YapepBase\Exception\RouterException   On errors. (Including if the route is not found)
+     * @throws RouteNotFoundException
+     * @throws RouterException
      */
-    public function getRoute(string &$controllerClassName, string &$actionName, ?string $uri = null): string;
+    public function getPathByControllerAndAction(string $controller, string $action, array $routeParams = []): string;
+
+    /**
+     * @throws RouteNotFoundException
+     * @throws RouterException
+     */
+    public function getPathByName(string $name, array $routeParams = []): string;
+
+    /**
+     * @throws RouteNotFoundException
+     * @throws RouterException
+     */
+    public function getControllerActionByRequest(IRequest $request): ControllerAction;
+
+    /**
+     * @throws RouteNotFoundException
+     * @throws RouterException
+     */
+    public function getControllerActionByMethodAndPath(string $method, string $path): ControllerAction;
 }

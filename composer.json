@@ -16,7 +16,11 @@
     "phpunit/phpunit": "^8.0",
     "mockery/mockery": "^1.2",
     "friendsofphp/php-cs-fixer": "^2.14.2",
-    "ext-xdebug": "*"
+    "ext-xdebug": "*",
+    "symfony/yaml": "^4.2.3"
+  },
+  "suggest": {
+    "symfony/yaml": "Required for working with YAML files"
   },
   "autoload": {
     "psr-4": {

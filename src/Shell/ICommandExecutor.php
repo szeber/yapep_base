@@ -13,7 +13,7 @@ namespace YapepBase\Shell;
  */
 interface ICommandExecutor
 {
-    /** Output mode: sendContent command output straight to STDOUT */
+    /** Output mode: send command output straight to STDOUT */
     const OUTPUT_STDOUT = 1;
     /** Output mode: return the command's output as a variable */
     const OUTPUT_VAR    = 2;

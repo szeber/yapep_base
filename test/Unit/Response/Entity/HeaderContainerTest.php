@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace YapepBase\Test\Unit\Response\Entity;
 
-use YapepBase\Exception\ParameterException;
+use YapepBase\Exception\InvalidArgumentException;
 use YapepBase\Response\Entity\Header;
 use YapepBase\Response\Entity\HeaderContainer;
 use YapepBase\Test\Unit\TestAbstract;
@@ -23,7 +23,7 @@ class HeaderContainerTest extends TestAbstract
 
     public function testAddWhenDifferentNameGiven_shouldThrowException()
     {
-        $this->expectException(ParameterException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->headerContainer->add(new Header('differentName'));
     }
 

@@ -249,11 +249,11 @@ class CurlHttpRequest
     public function send()
     {
         if (empty($this->url)) {
-            throw new CurlException('Trying to sendContent an HTTP request without setting the URL');
+            throw new CurlException('Trying to send an HTTP request without setting the URL');
         }
 
         if (!$this->isMethodValid($this->method)) {
-            throw new CurlException('Trying to sendContent an HTTP request with an invalid method: ' . $this->method);
+            throw new CurlException('Trying to send an HTTP request with an invalid method: ' . $this->method);
         }
 
         $options = $this->options;

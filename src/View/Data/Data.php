@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace YapepBase\View\Data;
 
-use YapepBase\Exception\ParameterException;
+use YapepBase\Exception\InvalidArgumentException;
 use YapepBase\View\Escape\IEscape;
 
 /**
@@ -35,7 +35,7 @@ class Data implements ICanEscape
     public function set(string $key, $value): void
     {
         if ($this->has($key)) {
-            throw new ParameterException('Key already exist: ' . $key);
+            throw new InvalidArgumentException('Key already exist: ' . $key);
         }
 
         $this->dataRaw[$key] = $value;
@@ -75,7 +75,7 @@ class Data implements ICanEscape
     public function getRaw(string $key)
     {
         if (!$this->has($key)) {
-            throw new ParameterException('The given key does not exist');
+            throw new InvalidArgumentException('The given key does not exist');
         }
 
         return $this->dataRaw[$key];

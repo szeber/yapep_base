@@ -4,35 +4,26 @@ declare(strict_types=1);
 namespace YapepBase\Router;
 
 use YapepBase\Request\IRequest;
+use YapepBase\Router\Entity\ControllerAction;
+use YapepBase\Router\Exception\FunctionNotSupportedException;
 
 /**
  * Generates the controller and action name based on the received target.
  */
 class AutoRouter implements IRouter
 {
-    /** @var IRequest */
-    protected $request;
-
-    public function __construct(IRequest $request)
+    public function getControllerActionByRequest(IRequest $request): ControllerAction
     {
-        $this->request = $request;
+        return $this->getControllerActionByMethodAndPath($request->getMethod(), $request->getTarget());
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getRoute(string &$controllerClassName, string &$actionName, ?string $uri = null): string
+    public function getControllerActionByMethodAndPath(string $method, string $path): ControllerAction
     {
-        $uri                 = empty($uri) ? $this->request->getTarget() : $uri;
-        $uriParts            = explode('/', trim($uri, '/ '));
-        $controllerClassName = $this->getControllerClassName($uriParts);
-        $actionName          = $this->getActionName($uriParts);
+        $pathParts           = explode('/', trim($path, '/ '));
+        $controllerClassName = $this->getControllerClassName($pathParts);
+        $actionName          = $this->getActionName($pathParts);
 
-        foreach ($uriParts as $key => $value) {
-            $this->request->setParam($key, $value);
-        }
-
-        return $controllerClassName . '/' . $actionName;
+        return new ControllerAction($controllerClassName, $actionName, $pathParts);
     }
 
     protected function getControllerClassName(array &$uriParts): string
@@ -83,19 +74,24 @@ class AutoRouter implements IRouter
     /**
      * {@inheritdoc}
      */
-    public function getTargetForControllerAction(string $controller, string $action, array $requestParams = []): string
+    public function getPathByControllerAndAction(string $controller, string $action, array $routeParams = []): string
     {
-        if ('Index' == $action && 'Index' == $controller && empty($requestParams)) {
+        if ('Index' == $action && 'Index' == $controller && empty($routeParams)) {
             $path = '/';
-        } elseif ('Index' == $action && empty($requestParams)) {
+        } elseif ('Index' == $action && empty($routeParams)) {
             $path = '/' . $this->convertNameToPathPart($controller);
         } else {
             $path = '/' . $this->convertNameToPathPart($controller) . '/' . $this->convertNameToPathPart($action);
         }
-        if (!empty($requestParams)) {
-            $path .= '/' . implode('/', $requestParams);
+        if (!empty($routeParams)) {
+            $path .= '/' . implode('/', $routeParams);
         }
 
         return $path;
+    }
+
+    public function getPathByName(string $name, array $routeParams = []): string
+    {
+        throw new FunctionNotSupportedException('The auto router does not support name based routes');
     }
 }

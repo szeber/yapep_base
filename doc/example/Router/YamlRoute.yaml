@@ -1,0 +1,60 @@
+- name: foo
+  controller: Foo
+  action: Index
+  methods:
+    - GET
+    - POST
+  paths:
+    - pathPattern: /foo
+- name: bar
+  controller: Bar
+  action: Index
+  paths:
+    - pathPattern: /bar
+    - pathPattern: /bar/num/{id}
+      params:
+        - name: id
+          paramClass: \YapepBase\Router\Entity\Param\Numeric
+    - pathPattern: /bar/alpha/{alpha}
+      params:
+        - name: \YapepBase\Router\Entity\Param\Alpha
+          paramClass: alpha
+    - pathPattern: /bar/alnum/{alnum}
+      params:
+        - name: alnum
+          paramClass: \YapepBase\Router\Entity\Param\AlphaNumeric
+    - pathPattern: /bar/alnumext/{alnumext}
+      params:
+        - name: alnumext
+          paramClass: \YapepBase\Router\Entity\Param\AlphaNumericExtended
+    - pathPattern: /bar/uuid/{uuid}
+      params:
+        - name: uuid
+          paramClass: \YapepBase\Router\Entity\Param\Uuid
+    - pathPattern: /bar/regex/{regex}
+      params:
+        - name: regex
+          paramClass: \YapepBase\Router\Entity\Param\Regex
+          pattern: '[a-z][a-zA-Z]+'
+    - pathPattern: /bar/{enum}
+      params:
+        - name: enum
+          paramClass: \YapepBase\Router\Entity\Param\Enum
+          values: [foo, bar]
+# Commented out to show usage of a custom type. The custom type does not exist
+#    - pathPattern: /bar/custom/{custom}
+#      params:
+#        - name: custom
+#          paramClass: \YapepBase\Example\Router\CustomRouter
+#          custom1: foo
+#          custom2: bar
+    - pathPattern: /bar/multi/{id}/names/{name}
+      params:
+        - name: id
+          paramClass: \YapepBase\Router\Entity\Param\Numeric
+        - name: name
+          paramClass: alnumext
+# Commented out to show usage of annotations. Currently we don't have any implemented annotations
+#  annotations:
+#    \YapepBase\PermissionHandling\Permission:
+#      permissions: [foo, bar]

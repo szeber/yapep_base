@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace YapepBase\Request\Source;
 
-use YapepBase\Exception\ParameterException;
+use YapepBase\Exception\InvalidArgumentException;
 
 /**
  * Stores and handles the uploaded files
@@ -79,7 +79,7 @@ class Files implements IFiles
     }
 
     /**
-     * @throws ParameterException
+     * @throws InvalidArgumentException
      */
     protected function validateFile(array $file): void
     {
@@ -89,7 +89,7 @@ class Files implements IFiles
             || !isset($file[self::KEY_SIZE])
             || (empty($file[self::KEY_TEMP_FILE_PATH]) && $file[self::KEY_ERROR_CODE] == UPLOAD_ERR_OK)
         ) {
-            throw new ParameterException('Invalid array provided. Some required fields are missing');
+            throw new InvalidArgumentException('Invalid array provided. Some required fields are missing');
         }
     }
 
@@ -107,7 +107,7 @@ class Files implements IFiles
     public function isMultiUpload(string $name): bool
     {
         if (!$this->has($name)) {
-            throw new ParameterException('File ' . $name . ' does not exist');
+            throw new InvalidArgumentException('File ' . $name . ' does not exist');
         }
 
         return count($this->fileObjectsByNameAndIndex[$name]) > 1;

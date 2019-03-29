@@ -317,9 +317,9 @@ class FileHandlerPhp implements IFileHandler
 
         // The file_get_contents's maxlen parameter does not have a default value
         if (is_null($maxLength)) {
-            $result = file_get_contents($path, null, null, $offset);
+            $result = file_get_contents($path, false, null, $offset);
         } else {
-            $result = file_get_contents($path, null, null, $offset, $maxLength);
+            $result = file_get_contents($path, false, null, $offset, $maxLength);
         }
 
         if (false === $result) {

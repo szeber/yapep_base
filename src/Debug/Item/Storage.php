@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace YapepBase\Debug\Item;
 
-use YapepBase\Exception\ParameterException;
+use YapepBase\Exception\InvalidArgumentException;
 use YapepBase\Helper\DateHelper;
 
 /**
@@ -70,6 +70,9 @@ class Storage extends ItemAbstract
         return $this->startTime;
     }
 
+    /**
+     * @throws InvalidArgumentException
+     */
     protected function setMethod(string $method)
     {
         $availableMethods = [
@@ -80,7 +83,7 @@ class Storage extends ItemAbstract
             self::METHOD_INCREMENT,
         ];
         if (!in_array($method, $availableMethods)) {
-            throw new ParameterException('Invalid method given: ' . $method);
+            throw new InvalidArgumentException('Invalid method given: ' . $method);
         }
 
         $this->method = $method;
