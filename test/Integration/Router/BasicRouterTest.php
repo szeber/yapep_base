@@ -17,7 +17,7 @@ class BasicRouterTest extends TestAbstract
     /** @var MockInterface */
     protected $fileHandler;
     /** @var string */
-    protected $simpleYamlRoute = <<<YAML
+    protected $simpleYamlRoute = <<<'YAML'
 - name: foo
   controller: Foo
   action: Index
@@ -27,7 +27,7 @@ class BasicRouterTest extends TestAbstract
     - pathPattern: /foo
 YAML;
 
-    /** @var string  */
+    /** @var string */
     protected $multiPathYamlRoute = <<<YAML
 - name: bar
   controller: Bar
@@ -47,7 +47,6 @@ YAML;
           values: [one, two]
 YAML;
 
-
     protected function setUp(): void
     {
         parent::setUp();
@@ -56,7 +55,6 @@ YAML;
 
     public function testGetControllerActionByMethodAndPathWhenWhenMethodMatches_shouldFindTarget()
     {
-
         $basicRouter = $this->getRouterByYamlContent($this->simpleYamlRoute);
 
         $controllerAction = $basicRouter->getControllerActionByMethodAndPath('GET', '/foo');
@@ -77,6 +75,7 @@ YAML;
     {
         $controller = 'Bar';
         $action     = 'Index';
+
         return [
             ['/bar', $controller, $action],
             ['/bar/num/1', $controller, $action],
@@ -88,9 +87,10 @@ YAML;
      * @dataProvider multiPathRoutePathProvider
      */
     public function testGetControllerActionByMethodAndPathWhenWhenMultiPathRouteGiven_shouldFindTargetByEveryPath(
-        string $path, string $expectedController, string $expectedAction
-    )
-    {
+        string $path,
+        string $expectedController,
+        string $expectedAction
+    ) {
         $basicRouter = $this->getRouterByYamlContent($this->multiPathYamlRoute);
 
         $controllerAction = $basicRouter->getControllerActionByMethodAndPath('GET', $path);
@@ -111,6 +111,7 @@ YAML;
     public function multiPathRouteNameProvider(): array
     {
         $routeName = 'bar';
+
         return [
             [$routeName, [], '/bar'],
             [$routeName, ['id' => 1], '/bar/num/1'],

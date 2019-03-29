@@ -7,5 +7,4 @@ use PHPUnit\Framework\TestCase;
 
 abstract class TestAbstract extends TestCase
 {
-
 }

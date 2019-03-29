@@ -17,7 +17,7 @@ class BasicRouterTest extends TestAbstract
     protected $controller = 'IndexController';
     /** @var string */
     protected $action = 'GetUser';
-    /** @var string  */
+    /** @var string */
     protected $routeName = 'get-user';
     /** @var string */
     protected $pathPattern = '/test/{id}';
@@ -59,7 +59,7 @@ class BasicRouterTest extends TestAbstract
         $router = new BasicRouter([$this->getRoute()]);
 
         $routeParams = [$this->pathParamName => $this->pathParamValue];
-        $path = $router->getPathByName($this->routeName, $routeParams);
+        $path        = $router->getPathByName($this->routeName, $routeParams);
 
         $this->assertSame($this->parameterisedPath, $path);
     }
@@ -85,7 +85,7 @@ class BasicRouterTest extends TestAbstract
     public function testGetControllerActionByRequest_shouldReturnControllerAction()
     {
         $request = $this->expectRequestUsedToGetRoute();
-        $router = new BasicRouter([$this->getRoute()]);
+        $router  = new BasicRouter([$this->getRoute()]);
 
         $controllerAction = $router->getControllerActionByRequest($request);
 
@@ -96,6 +96,7 @@ class BasicRouterTest extends TestAbstract
     protected function getRoute()
     {
         $path = new Path($this->pathPattern, [new Numeric($this->pathParamName)]);
+
         return new Route($this->controller, $this->action, $this->routeName, ['GET'], [$path], []);
     }
 
