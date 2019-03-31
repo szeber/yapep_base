@@ -11,6 +11,7 @@ use YapepBase\Response\Entity\Cookie;
 use YapepBase\Response\Entity\Header;
 use YapepBase\Response\Exception\Exception;
 use YapepBase\Response\Exception\ResponseSentException;
+use YapepBase\View\IRenderable;
 use YapepBase\View\ViewAbstract;
 
 /**
@@ -64,7 +65,7 @@ class HttpResponse implements IResponse, IHttpResponse
         $this->outputHandler->addCookie($cookie);
     }
 
-    public function setBody(ViewAbstract $body): void
+    public function setBody(IRenderable $body): void
     {
         if (!empty($this->renderedBody)) {
             throw new Exception('Rendered body already set');
@@ -80,7 +81,7 @@ class HttpResponse implements IResponse, IHttpResponse
         $this->renderedBody = $body;
     }
 
-    public function getBody(): ?ViewAbstract
+    public function getBody(): ?IRenderable
     {
         return $this->body;
     }

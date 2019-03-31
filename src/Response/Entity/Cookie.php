@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace YapepBase\Response\Entity;
 
+use YapepBase\Helper\DateHelper;
+
 class Cookie
 {
     /** @var string */
@@ -26,6 +28,9 @@ class Cookie
     /** @var bool */
     protected $httpOnly;
 
+    /** @var DateHelper */
+    protected $dateHelper;
+
     public function __construct(
         string $name,
         string $value,
@@ -33,7 +38,8 @@ class Cookie
         string $path = '/',
         string $domain = '',
         bool $secure = false,
-        bool $httpOnly = false
+        bool $httpOnly = false,
+        ?DateHelper $dateHelper = null
     ) {
         $this->name         = $name;
         $this->value        = $value;
@@ -42,6 +48,10 @@ class Cookie
         $this->domain       = $domain;
         $this->secure       = $secure;
         $this->httpOnly     = $httpOnly;
+
+        $this->dateHelper = empty($dateHelper)
+            ? new DateHelper()
+            : $dateHelper;
     }
 
     public function send(): bool
@@ -49,7 +59,7 @@ class Cookie
         return setcookie(
             $this->name,
             $this->value,
-            $this->ttlInSeconds,
+            $this->getExpirationTime(),
             $this->path,
             $this->domain,
             $this->secure,
@@ -104,5 +114,39 @@ class Cookie
         $this->httpOnly = $httpOnly;
 
         return $this;
+    }
+
+    public function toHeader(): Header
+    {
+        $headerName       = 'Set-Cookie';
+        $headerValueParts = [$this->name . '=' . $this->value];
+
+        if (!empty($this->ttlInSeconds)) {
+            $expirationTime     = date('D, d-M-Y H:i:s', $this->getExpirationTime()) . ' GMT; Max-Age=' . $this->ttlInSeconds;
+            $headerValueParts[] = 'expires=' . $expirationTime;
+        }
+
+        $headerValueParts[] = 'path=' . $this->path;
+
+        if (!empty($this->domain)) {
+            $headerValueParts[] = 'domain=' . $this->domain;
+        }
+
+        if (!empty($this->secure)) {
+            $headerValueParts[] = 'secure';
+        }
+
+        if (!empty($this->httpOnly)) {
+            $headerValueParts[] = 'HttpOnly';
+        }
+
+        return new Header($headerName, implode('; ', $headerValueParts));
+    }
+
+    protected function getExpirationTime(): int
+    {
+        return empty($this->ttlInSeconds)
+            ? 0
+            : $this->dateHelper->getCurrentTimestamp() + $this->ttlInSeconds;
     }
 }
