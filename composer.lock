@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "39fd105fa96b0f2cbe8875ee2dc06bca",
+    "content-hash": "bac33069d6c5343e6c62ebfccecef4e2",
     "packages": [
         {
             "name": "emulgeator/server-superglobal-object-representation",
@@ -2946,5 +2946,7 @@
         "ext-json": "*",
         "ext-pdo": "*"
     },
-    "platform-dev": []
+    "platform-dev": {
+        "ext-xdebug": "*"
+    }
 }
