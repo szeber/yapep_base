@@ -32,8 +32,7 @@ abstract class ErrorControllerAbstract extends HttpControllerAbstract
         try {
             $this->response->setStatusCode((int)$errorCode);
             parent::run($errorCode);
-        }
-        catch (ActionNotFoundException $exception) {
+        } catch (ActionNotFoundException $exception) {
             // Action not found for the specified error code, log the error and run with 500 instead.
             trigger_error($exception->getMessage(), E_USER_WARNING);
             $this->run('500');

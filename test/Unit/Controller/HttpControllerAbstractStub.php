@@ -22,5 +22,4 @@ class HttpControllerAbstractStub extends HttpControllerAbstract
     ): void {
         parent::redirectToRoute($controller, $action, $routeParams, $getParams, $anchor, $statusCode);
     }
-
 }

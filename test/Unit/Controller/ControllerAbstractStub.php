@@ -8,11 +8,11 @@ use YapepBase\View\IRenderable;
 
 class ControllerAbstractStub extends ControllerAbstract
 {
-    /** @var string  */
+    /** @var string */
     public $resultString = 'string';
     /** @var IRenderable */
     public $resultView;
-    /** @var bool  */
+    /** @var bool */
     public $isRedirected = false;
 
     public function __construct()

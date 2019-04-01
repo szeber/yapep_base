@@ -32,14 +32,14 @@ class HttpControllerAbstractTest extends TestAbstract
     {
         parent::setUp();
 
-        $this->request = \Mockery::mock(HttpRequest::class);
+        $this->request  = \Mockery::mock(HttpRequest::class);
         $this->response = \Mockery::mock(HttpResponse::class);
     }
 
     public function testSetRequestWhenNotHttpRequestGiven_shouldThrowException()
     {
         $controller = new HttpControllerAbstractStub();
-        $request = \Mockery::mock(IRequest::class);
+        $request    = \Mockery::mock(IRequest::class);
 
         $this->expectException(IncompatibleRequestException::class);
         $controller->setRequest($request);
@@ -72,7 +72,7 @@ class HttpControllerAbstractTest extends TestAbstract
     public function testRedirectToRouteWhenGetParamsGiven_shouldAddToUrl()
     {
         $getParams = ['test' => 1];
-        $url = $this->redirectUrl . '?test=1';
+        $url       = $this->redirectUrl . '?test=1';
 
         $this->expectGetPathFromRouter([]);
         $this->expectRedirect($url);
@@ -82,7 +82,7 @@ class HttpControllerAbstractTest extends TestAbstract
     public function testRedirectToRouteWhenAnchorGiven_shouldAddToUrl()
     {
         $anchor = 'test';
-        $url = $this->redirectUrl . '#test';
+        $url    = $this->redirectUrl . '#test';
 
         $this->expectGetPathFromRouter([]);
         $this->expectRedirect($url);

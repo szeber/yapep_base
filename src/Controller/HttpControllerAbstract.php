@@ -34,6 +34,7 @@ abstract class HttpControllerAbstract extends ControllerAbstract
         if (!($request instanceof HttpRequest)) {
             throw new IncompatibleRequestException($request, HttpRequest::class);
         }
+
         return parent::setRequest($request);
     }
 
@@ -42,6 +43,7 @@ abstract class HttpControllerAbstract extends ControllerAbstract
         if (!($response instanceof HttpResponse)) {
             throw new IncompatibleResponseException($response, HttpResponse::class);
         }
+
         return parent::setResponse($response);
     }
 
@@ -68,8 +70,7 @@ abstract class HttpControllerAbstract extends ControllerAbstract
         array $getParams = [],
         string $anchor = '',
         int $statusCode = 303
-    ): void
-    {
+    ): void {
         $url = Application::getInstance()->getDiContainer()->getRouter()->getPathByControllerAndAction(
             $controller,
             $action,

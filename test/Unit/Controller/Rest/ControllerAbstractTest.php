@@ -157,7 +157,7 @@ class ControllerAbstractTest extends TestAbstract
     {
         return [
             [new HttpException()],
-            [new RedirectException('', RedirectException::TYPE_INTERNAL)]
+            [new RedirectException('', RedirectException::TYPE_INTERNAL)],
         ];
     }
 

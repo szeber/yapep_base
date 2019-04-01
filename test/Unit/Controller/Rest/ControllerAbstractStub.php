@@ -16,24 +16,28 @@ class ControllerAbstractStub extends ControllerAbstract
     public function getTest(): JsonTemplate
     {
         $viewData = new SimpleData(['get' => 1]);
+
         return new JsonTemplate($viewData);
     }
 
     public function postTest(): JsonTemplate
     {
         $viewData = new SimpleData(['post' => 1]);
+
         return new JsonTemplate($viewData);
     }
 
     public function putTest(): JsonTemplate
     {
         $viewData = new SimpleData(['post' => 1]);
+
         return new JsonTemplate($viewData);
     }
 
     public function deleteTest(): JsonTemplate
     {
         $viewData = new SimpleData(['delete' => 1]);
+
         return new JsonTemplate($viewData);
     }
 

@@ -37,6 +37,7 @@ abstract class ControllerAbstract extends HttpControllerAbstract
             if (!method_exists($this, $actionMethodName)) {
                 if ($this->request->getMethod() === HttpRequest::METHOD_HTTP_OPTIONS) {
                     $this->response->sendHeader(new Header('Allow', implode(', ', $validMethodsForCurrentAction)));
+
                     return;
                 }
 
@@ -44,16 +45,13 @@ abstract class ControllerAbstract extends HttpControllerAbstract
             }
 
             parent::run($action);
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             $this->sendHeadersAccordingToError($e);
             $this->setErrorResponse($e);
-        }
-        catch (HttpException|RedirectException $e) {
+        } catch (HttpException | RedirectException $e) {
             // This is a standard HTTP exception or a redirect exception, simply re-throw it
             throw $e;
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             trigger_error(
                 'Unhandled exception of ' . get_class($e) . ' while serving api response. Error: ' . $e->getMessage(),
                 E_RECOVERABLE_ERROR
@@ -85,8 +83,7 @@ abstract class ControllerAbstract extends HttpControllerAbstract
 
         if ($statusCode === 401 && !$this->response->getOutputHandler()->hasHeader('WWW-Authenticate')) {
             $this->response->sendHeader(new Header('WWW-Authenticate', 'Session realm="Please provide the session token"'));
-        }
-        elseif ($statusCode === 405 && !$this->response->getOutputHandler()->hasHeader('Allow')) {
+        } elseif ($statusCode === 405 && !$this->response->getOutputHandler()->hasHeader('Allow')) {
             $this->response->sendHeader(new Header('Allow', implode(', ', $validMethodsForCurrentAction)));
         }
     }
@@ -100,7 +97,7 @@ abstract class ControllerAbstract extends HttpControllerAbstract
     {
         $methods = [];
         foreach (get_class_methods($this) as $methodName) {
-            if (preg_match('/^([a-z]+)' . preg_quote(ucfirst($this->getCalledAction()), '/') .'$/', $methodName, $matches)) {
+            if (preg_match('/^([a-z]+)' . preg_quote(ucfirst($this->getCalledAction()), '/') . '$/', $methodName, $matches)) {
                 $methods[] = strtoupper($matches[1]);
             }
         }

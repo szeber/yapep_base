@@ -25,12 +25,14 @@ abstract class ControllerAbstract implements IController
     public function setRequest(IRequest $request)
     {
         $this->request = $request;
+
         return $this;
     }
 
     public function setResponse(IResponse $response)
     {
         $this->response = $response;
+
         return $this;
     }
 
