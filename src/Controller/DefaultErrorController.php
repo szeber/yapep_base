@@ -1,35 +1,24 @@
 <?php
 declare(strict_types=1);
-/**
- * This file is part of YAPEPBase.
- *
- * @copyright    2011 The YAPEP Project All rights reserved.
- * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
- */
+
 namespace YapepBase\Controller;
+
+use YapepBase\View\Data\SimpleData;
+use YapepBase\View\IRenderable;
+use YapepBase\View\Template\SimpleHtmlTemplate;
 
 /**
  * Default implementation for an error controller
  */
 class DefaultErrorController extends ErrorControllerAbstract
 {
-    /**
-     * Runs on page not found (404) errors
-     *
-     * @return \YapepBase\View\TemplateAbstract|string
-     */
-    protected function do404()
+    protected function do404(): IRenderable
     {
-        return '<h1>404 - Page not found</h1>';
+        return new SimpleHtmlTemplate(new SimpleData('<h1>404 - Page not found</h1>'));
     }
 
-    /**
-     * Runs on internal server error (500) erorrs
-     *
-     * @return \YapepBase\View\TemplateAbstract|string
-     */
-    protected function do500()
+    protected function do500(): IRenderable
     {
-        return '<h1>500 - Internal server error</h1>';
+        return new SimpleHtmlTemplate(new SimpleData('<h1>500 - Internal server error</h1>'));
     }
 }

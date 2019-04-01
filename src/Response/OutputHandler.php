@@ -204,6 +204,9 @@ class OutputHandler implements IOutputHandler
 
     public function clear(): void
     {
+        $this->clearHeaders();
+        $this->clearCookies();
+
         if (!$this->isBuffering()) {
             return;
         }

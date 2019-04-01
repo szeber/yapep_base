@@ -5,7 +5,10 @@ namespace YapepBase\Controller;
 
 use YapepBase\Application;
 
-use YapepBase\Exception\ControllerException;
+use YapepBase\Controller\Exception\IncompatibleRequestException;
+use YapepBase\Controller\Exception\IncompatibleResponseException;
+use YapepBase\Exception\RedirectException;
+use YapepBase\Exception\RouterException;
 use YapepBase\Request\HttpRequest;
 use YapepBase\Request\IRequest;
 use YapepBase\Response\HttpResponse;
@@ -14,102 +17,71 @@ use YapepBase\Response\IResponse;
 /**
  * Base class for HTTP controllers.
  */
-abstract class HttpController extends ControllerAbstract
+abstract class HttpControllerAbstract extends ControllerAbstract
 {
     /**
-     * The request instance
-     *
-     * @var \YapepBase\Request\HttpRequest
+     * @var HttpRequest
      */
     protected $request;
 
     /**
-     * The response instance
-     *
-     * @var \YapepBase\Response\HttpResponse
+     * @var HttpResponse
      */
     protected $response;
 
-    /**
-     * Constructor.
-     *
-     * @param \YapepBase\Request\HttpRequest   $request  The request object. Must be a HttpRequest or descendant.
-     * @param \YapepBase\Response\HttpResponse $response The response object. Must be a HttpResponse or descendant.
-     *
-     * @throws \YapepBase\Exception\ControllerException   On error. (eg. incompatible request or response object)
-     */
-    public function __construct(IRequest $request, IResponse $response)
+    public function setRequest(IRequest $request)
     {
         if (!($request instanceof HttpRequest)) {
-            throw new ControllerException(
-                'The specified request is not a HttpRequest',
-                ControllerException::ERR_INCOMPATIBLE_REQUEST
-            );
+            throw new IncompatibleRequestException($request, HttpRequest::class);
         }
+        return parent::setRequest($request);
+    }
+
+    public function setResponse(IResponse $response)
+    {
         if (!($response instanceof HttpResponse)) {
-            throw new ControllerException(
-                'The specified response is not a HttpResponse',
-                ControllerException::ERR_INCOMPATIBLE_RESPONSE
-            );
+            throw new IncompatibleResponseException($response, HttpResponse::class);
         }
-        parent::__construct($request, $response);
+        return parent::setResponse($response);
     }
 
     /**
      * Redirects the client to the specified URL.
      *
-     * @param string $url        The URL to redirect to.
-     * @param int    $statusCode The status code of the redirect (3XX).
-     *
-     * @return void
-     *
-     * @throws \YapepBase\Exception\RedirectException   To stop execution of the controller.
+     * @throws RedirectException
      */
-    protected function redirectToUrl($url, $statusCode = 303)
+    protected function redirectToUrl(string $url, int $statusCode = 303): void
     {
         $this->response->redirect($url, $statusCode);
-        // @codeCoverageIgnoreStart
     }
-
-    // @codeCoverageIgnoreEnd
 
     /**
      * Redirects the client to the URL specified by the controller and action.
      *
-     * @param string $controller  The name of the controller.
-     * @param string $action      The action of the controller.
-     * @param array  $routeParams Associative array containing the route parameters for the URL.
-     * @param array  $getParams   Associative array containing the GET parameters for the URL.
-     * @param string $anchor      The anchor for the URL
-     * @param int    $statusCode  The status code of the redirect (3XX).
-     *
-     * @return void
-     *
-     * @throws \YapepBase\Exception\RedirectException   To stop execution of the controller.
-     * @throws \YapepBase\Exception\RouterException     If there was an error creating the URL.
+     * @throws RedirectException
+     * @throws RouterException
      */
     protected function redirectToRoute(
-        $controller,
-        $action,
-        $routeParams = [],
-        $getParams = [],
-        $anchor = '',
-        $statusCode = 303
-    ) {
+        string $controller,
+        string $action,
+        array $routeParams = [],
+        array $getParams = [],
+        string $anchor = '',
+        int $statusCode = 303
+    ): void
+    {
         $url = Application::getInstance()->getDiContainer()->getRouter()->getPathByControllerAndAction(
             $controller,
             $action,
             $routeParams
         );
+
         if (!empty($getParams)) {
-            $url .= '?' . \http_build_query($getParams, null, '&');
+            $url .= '?' . \http_build_query($getParams, '', '&');
         }
         if (!empty($anchor)) {
             $url .= '#' . $anchor;
         }
         $this->redirectToUrl($url, $statusCode);
-        // @codeCoverageIgnoreStart
     }
-
-    // @codeCoverageIgnoreEnd
 }

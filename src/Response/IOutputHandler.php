@@ -39,4 +39,9 @@ interface IOutputHandler extends IHeaderHandler, ICookieHandler
      * Returns the buffered content.
      */
     public function getBufferedContent(): string;
+
+    /**
+     * Clears every buffered output
+     */
+    public function clear(): void;
 }
