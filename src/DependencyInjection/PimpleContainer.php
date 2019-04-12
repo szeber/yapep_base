@@ -191,6 +191,7 @@ class PimpleContainer extends \Pimple\Container implements IContainer
         return $this->setInstance(Data::class, $data);
     }
 
+    // TODO: Refact this method, sadly it is not optimal as the instantiation is done when setting not when retrieving [emul]
     protected function setInstance(string $id, $object): self
     {
         $this[$id] = function ($container) use ($object) {

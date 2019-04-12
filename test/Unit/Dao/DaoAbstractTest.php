@@ -5,7 +5,7 @@ namespace YapepBase\Test\Unit\Dao;
 
 use Mockery;
 use Mockery\MockInterface;
-use YapepBase\Database\DbConnection;
+use YapepBase\Database\ConnectionHandler;
 use YapepBase\Test\Unit\TestAbstract;
 
 class DaoAbstractTest extends TestAbstract
@@ -19,7 +19,7 @@ class DaoAbstractTest extends TestAbstract
     {
         parent::setUp();
 
-        $this->connection = Mockery::mock(DbConnection::class);
+        $this->connection = Mockery::mock(ConnectionHandler::class);
 
         $this->dao = new DaoStub();
         $this->dao->setConnection($this->connection);
