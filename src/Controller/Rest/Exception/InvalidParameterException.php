@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace YapepBase\Controller\Rest\Exception;
 
-class InvalidParameterException extends Exception
+class InvalidParameterException extends ExceptionAbstract
 {
     const REASON_MISSING       = 'missing';
     const REASON_DUPLICATE     = 'duplicate';
@@ -25,10 +25,5 @@ class InvalidParameterException extends Exception
     public function getRecommendedHttpStatusCode(): int
     {
         return 400;
-    }
-
-    public function getCodeString(): string
-    {
-        return 'ParameterError';
     }
 }

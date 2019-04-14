@@ -4,13 +4,13 @@ declare(strict_types=1);
 namespace YapepBase\Test\Unit\Controller\Rest;
 
 use YapepBase\Controller\Rest\ControllerAbstract;
-use YapepBase\Controller\Rest\Exception\Exception;
+use YapepBase\Controller\Rest\Exception\InternalErrorException;
 use YapepBase\View\Data\SimpleData;
 use YapepBase\View\Template\JsonTemplate;
 
 class ControllerAbstractStub extends ControllerAbstract
 {
-    /** @var Exception */
+    /** @var InternalErrorException */
     public $exception;
 
     public function getTest(): JsonTemplate

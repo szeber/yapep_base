@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace YapepBase\Controller\Rest;
 
-use YapepBase\Controller\Rest\Entity\RestError;
-use YapepBase\Controller\Rest\Exception\Exception;
+use YapepBase\Controller\Rest\Exception\IException;
+use YapepBase\Controller\Rest\Exception\InternalErrorException;
 use YapepBase\Controller\Rest\Exception\ResourceDoesNotExistException;
 use YapepBase\Exception\HttpException;
 use YapepBase\Exception\RedirectException;
@@ -44,7 +44,7 @@ abstract class ControllerAbstract extends \YapepBase\Controller\ControllerAbstra
             }
 
             parent::run($action);
-        } catch (Exception $e) {
+        } catch (IException $e) {
             $this->sendHeadersAccordingToError($e);
             $this->setErrorResponse($e);
         } catch (HttpException | RedirectException $e) {
@@ -53,24 +53,23 @@ abstract class ControllerAbstract extends \YapepBase\Controller\ControllerAbstra
         } catch (\Exception $e) {
             trigger_error(
                 'Unhandled exception of ' . get_class($e) . ' while serving api response. Error: ' . $e->getMessage(),
-                E_RECOVERABLE_ERROR
+                E_USER_ERROR
             );
 
             $this->response->setStatusCode(500);
-            $this->setErrorResponse(new Exception());
+            $this->setErrorResponse(new InternalErrorException());
         }
     }
 
-    private function setErrorResponse(Exception $exception): void
+    private function setErrorResponse(IException $exception): void
     {
-        $error    = new RestError($exception->getCodeString(), $exception->getMessage(), $exception->getRequestParams());
-        $viewData = new SimpleData($error->toArray());
+        $viewData = new SimpleData($exception->toArray());
         $view     = new JsonTemplate($viewData);
 
         $this->response->setBody($view);
     }
 
-    private function sendHeadersAccordingToError(Exception $e): void
+    private function sendHeadersAccordingToError(IException $e): void
     {
         $validMethodsForCurrentAction = $this->getValidMethodsForAction();
 
@@ -105,12 +104,12 @@ abstract class ControllerAbstract extends \YapepBase\Controller\ControllerAbstra
     }
 
     /**
-     * @throws Exception
+     * @throws InternalErrorException
      */
     private function getCalledAction(): string
     {
         if (is_null($this->calledAction)) {
-            throw new Exception('Action not called yet');
+            throw new InternalErrorException('Action not called yet');
         }
 
         return $this->calledAction;

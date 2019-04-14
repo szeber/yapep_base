@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace YapepBase\Controller\Rest\Exception;
 
-class UnauthenticatedException extends Exception
+class UnauthenticatedException extends ExceptionAbstract
 {
     public function __construct()
     {
@@ -13,10 +13,5 @@ class UnauthenticatedException extends Exception
     public function getRecommendedHttpStatusCode(): int
     {
         return 401;
-    }
-
-    public function getCodeString(): string
-    {
-        return 'UnauthenticatedError';
     }
 }

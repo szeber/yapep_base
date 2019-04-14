@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace YapepBase\Controller\Rest\Exception;
 
-class InvalidPayloadException extends Exception
+class InvalidPayloadException extends ExceptionAbstract
 {
     public function __construct(string $jsonDecodeError)
     {
@@ -14,10 +14,5 @@ class InvalidPayloadException extends Exception
     public function getRecommendedHttpStatusCode(): int
     {
         return 422;
-    }
-
-    public function getCodeString(): string
-    {
-        return 'InvalidPayloadError';
     }
 }

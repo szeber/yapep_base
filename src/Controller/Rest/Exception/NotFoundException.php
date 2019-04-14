@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace YapepBase\Controller\Rest\Exception;
 
-class ResourceDoesNotExistException extends ExceptionAbstract
+class NotFoundException extends ExceptionAbstract
 {
     public function __construct(string $method, string $resource)
     {
@@ -13,6 +13,6 @@ class ResourceDoesNotExistException extends ExceptionAbstract
 
     public function getRecommendedHttpStatusCode(): int
     {
-        return 405;
+        return 404;
     }
 }

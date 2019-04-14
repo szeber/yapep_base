@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace YapepBase\Controller\Rest\Exception;
 
-class PaymentRequiredException extends Exception
+class PaymentRequiredException extends ExceptionAbstract
 {
     public function __construct()
     {
@@ -13,10 +13,5 @@ class PaymentRequiredException extends Exception
     public function getRecommendedHttpStatusCode(): int
     {
         return 402;
-    }
-
-    public function getCodeString(): string
-    {
-        return 'PaymentRequired';
     }
 }

@@ -5,8 +5,8 @@ namespace YapepBase\Test\Unit\Controller\Rest;
 
 use Mockery\MockInterface;
 use PHPUnit\Framework\Error\Error;
-use YapepBase\Controller\Rest\Entity\RestError;
-use YapepBase\Controller\Rest\Exception\Exception;
+use YapepBase\Controller\Rest\Exception\ExceptionAbstract;
+use YapepBase\Controller\Rest\Exception\InternalErrorException;
 use YapepBase\Controller\Rest\Exception\ResourceDoesNotExistException;
 use YapepBase\Controller\Rest\Exception\UnauthenticatedException;
 use YapepBase\Exception\HttpException;
@@ -188,8 +188,9 @@ class ControllerAbstractTest extends TestAbstract
 
         $this->expectRequestMethod(Request::METHOD_HTTP_GET);
         $this->expectSetStatusCode(500);
-        $this->expectBodySetToResponse($this->getErrorResponse(new Exception()));
-        @$this->controller->run('exception');
+        $this->expectBodySetToResponse($this->getErrorResponse(new InternalErrorException()));
+        $this->swallowErrors();
+        $this->controller->run('exception');
     }
 
     protected function expectRequestMethod(string $method)
@@ -231,10 +232,9 @@ class ControllerAbstractTest extends TestAbstract
             ->andReturn($statusCode);
     }
 
-    protected function getErrorResponse(Exception $exception): JsonTemplate
+    protected function getErrorResponse(ExceptionAbstract $exception): JsonTemplate
     {
-        $error    = new RestError($exception->getCodeString(), $exception->getMessage(), $exception->getRequestParams());
-        $viewData = new SimpleData($error->toArray());
+        $viewData = new SimpleData($exception->toArray());
 
         return new JsonTemplate($viewData);
     }
