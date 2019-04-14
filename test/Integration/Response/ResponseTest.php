@@ -6,13 +6,13 @@ namespace YapepBase\Test\Integration\Response;
 use Lukasoppermann\Httpstatus\Httpstatus;
 use YapepBase\Response\Entity\Cookie;
 use YapepBase\Response\Entity\Header;
-use YapepBase\Response\HttpResponse;
+use YapepBase\Response\Response;
 use YapepBase\Response\OutputBufferHandler;
 use YapepBase\Response\OutputHandler;
 use YapepBase\Test\Integration\TestAbstract;
 use YapepBase\View\IRenderable;
 
-class HttpResponseTest extends TestAbstract
+class ResponseTest extends TestAbstract
 {
     /** @var string */
     protected $renderedBody = 'renderedBody';
@@ -49,21 +49,21 @@ class HttpResponseTest extends TestAbstract
         $this->cookie                    = new Cookie('Cookie1', '3');
     }
 
-    protected function getHttpResponseBuffered(): HttpResponse
+    protected function getHttpResponseBuffered(): Response
     {
         $bufferHandler = new OutputBufferHandler();
         $statusHelper  = new Httpstatus();
         $outputHandler = new OutputHandler(false, $bufferHandler);
 
-        return new HttpResponse($outputHandler, $statusHelper);
+        return new Response($outputHandler, $statusHelper);
     }
 
-    protected function getHttpResponse(): HttpResponse
+    protected function getHttpResponse(): Response
     {
         $statusHelper  = new Httpstatus();
         $outputHandler = new OutputHandler(false);
 
-        return new HttpResponse($outputHandler, $statusHelper);
+        return new Response($outputHandler, $statusHelper);
     }
 
     /**

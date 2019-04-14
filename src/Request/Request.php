@@ -4,16 +4,12 @@ declare(strict_types=1);
 namespace YapepBase\Request;
 
 use Emul\Server\ServerData;
-use YapepBase\Application;
-use YapepBase\Helper\ArrayHelper;
 use YapepBase\Request\Source\CustomParams;
 use YapepBase\Request\Source\IFiles;
 use YapepBase\Request\Source\ISource;
 
-/**
- * Stores the details for the current request.
- */
-class HttpRequest implements IRequest
+
+class Request implements IRequest
 {
     const METHOD_HTTP_GET     = 'GET';
     const METHOD_HTTP_POST    = 'POST';
@@ -104,9 +100,6 @@ class HttpRequest implements IRequest
         return $this->customParams;
     }
 
-    /**
-     * Returns the requested param from Customer, Query or Pos params in the mentioned order
-     */
     public function getParamAsInt(string $name, ?int $default = null): ?int
     {
         $queryParam  = $this->queryParams->getAsInt($name);
@@ -116,9 +109,6 @@ class HttpRequest implements IRequest
         return $this->getValueInOrder($customParam, $queryParam, $postParam, $default);
     }
 
-    /**
-     * Returns the requested param from Customer, Query or Pos params in the mentioned order
-     */
     public function getParamAsString(string $name, ?string $default = null): ?string
     {
         $queryParam  = $this->queryParams->getAsString($name);
@@ -128,9 +118,6 @@ class HttpRequest implements IRequest
         return $this->getValueInOrder($customParam, $queryParam, $postParam, $default);
     }
 
-    /**
-     * Returns the requested param from Customer, Query or Pos params in the mentioned order
-     */
     public function getParamAsFloat(string $name, ?float $default = null): ?float
     {
         $queryParam  = $this->queryParams->getAsFloat($name);
@@ -140,9 +127,6 @@ class HttpRequest implements IRequest
         return $this->getValueInOrder($customParam, $queryParam, $postParam, $default);
     }
 
-    /**
-     * Returns the requested param from Customer, Query or Pos params in the mentioned order
-     */
     public function getParamAsArray(string $name, ?array $default = []): ?array
     {
         $queryParam  = $this->queryParams->getAsArray($name, null);
@@ -152,9 +136,6 @@ class HttpRequest implements IRequest
         return $this->getValueInOrder($customParam, $queryParam, $postParam, $default);
     }
 
-    /**
-     * Returns the requested param from Customer, Query or Pos params in the mentioned order
-     */
     public function getParamAsBool(string $name, ?bool $default = null): ?bool
     {
         $queryParam  = $this->queryParams->getAsBool($name);
@@ -164,12 +145,7 @@ class HttpRequest implements IRequest
         return $this->getValueInOrder($customParam, $queryParam, $postParam, $default);
     }
 
-    protected function getValueInOrder($customParam, $queryParam, $postParam, $default)
-    {
-        return $customParam ?? $queryParam ?? $postParam ?? $default;
-    }
-
-    public function getTarget(): string
+    public function getTargetUri(): string
     {
         return parse_url($this->server->getRequestUri(), PHP_URL_PATH);
     }
@@ -185,9 +161,8 @@ class HttpRequest implements IRequest
             ? self::PROTOCOL_HTTPS
             : self::PROTOCOL_HTTP;
     }
-
-    protected function getArrayHelper(): ArrayHelper
+    protected function getValueInOrder($customParam, $queryParam, $postParam, $default)
     {
-        return Application::getInstance()->getDiContainer()->get(ArrayHelper::class);
+        return $customParam ?? $queryParam ?? $postParam ?? $default;
     }
 }

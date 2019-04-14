@@ -17,6 +17,8 @@ abstract class TestAbstract extends TestCase
     protected $pimpleContainer;
     /** @var Container */
     protected $diContainer;
+    /** @var bool */
+    private $errorHandlerOverwritten = false;
 
     protected function setUp(): void
     {
@@ -29,6 +31,11 @@ abstract class TestAbstract extends TestCase
     {
         $this->addToAssertionCount(Mockery::getContainer()->mockery_getExpectationCount());
         Mockery::close();
+
+        if ($this->errorHandlerOverwritten) {
+            restore_error_handler();
+        }
+
         parent::tearDown();
     }
 
@@ -61,5 +68,13 @@ abstract class TestAbstract extends TestCase
         $actualHtml   = $textHelper->stripWhitespaceDuplicates($actualHtml);
 
         $this->assertSame($expectedHtml, $actualHtml);
+    }
+
+    protected function swallowErrors(): void
+    {
+        $this->errorHandlerOverwritten = true;
+        set_error_handler(function () {
+            return true;
+        });
     }
 }
