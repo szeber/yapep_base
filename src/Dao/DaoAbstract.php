@@ -3,14 +3,49 @@ declare(strict_types=1);
 
 namespace YapepBase\Dao;
 
-use YapepBase\Database\DbConnection;
+use YapepBase\DataBase\Exception\Exception;
+use YapepBase\Database\IConnectionHandler;
+use YapepBase\Database\Result;
 
 /**
  * Common ancestor of Data Access Objects.
  */
 abstract class DaoAbstract
 {
-    abstract protected function getConnection(): DbConnection;
+    /** @var IConnectionHandler */
+    private $connectionHandler;
+
+    public function __construct(IConnectionHandler $connectionHandler)
+    {
+        $this->connectionHandler = $connectionHandler;
+    }
+
+    /**
+     * Runs a paginated query, and returns the result.
+     *
+     * You can't use LIMIT or OFFSET clause in your query, because then it will be duplicated in the method.
+     *
+     * Be warned! You have to write the SELECT keyword in uppercase in order to work properly.
+     *
+     * @throws Exception
+     */
+    protected function queryPaged(string $query, array $params, int $pageNumber, int $itemsPerPage, ?int &$itemCount = null): Result
+    {
+        if ($itemCount !== null) {
+            $query = preg_replace('#SELECT#', '$0 SQL_CALC_FOUND_ROWS', $query, 1);
+        }
+
+        $offset = ($pageNumber - 1) * $itemsPerPage;
+        $query .= ' LIMIT ' . $itemsPerPage . ' OFFSET ' . $offset;
+
+        $result = $this->connectionHandler->query($query, $params);
+
+        if ($itemCount !== null) {
+            $itemCount = (int)$this->connectionHandler->query('SELECT FOUND_ROWS()')->fetchColumn();
+        }
+
+        return $result;
+    }
 
     /**
      * Generates a condition like [tableAlias].[fieldName] = [expectedValue]
@@ -34,7 +69,7 @@ abstract class DaoAbstract
         $paramName = $this->getParamName($fieldName, $tableAlias);
         $fieldName = $this->getPrefixedField($tableAlias, $fieldName);
 
-        $conditions[]            = $fieldName . ' = :' . $this->getConnection()->getParamPrefix() . $paramName;
+        $conditions[]            = $fieldName . ' = :' . $this->connectionHandler->getParamPrefix() . $paramName;
         $queryParams[$paramName] = $expectation;
     }
 
@@ -53,7 +88,7 @@ abstract class DaoAbstract
             return;
         }
 
-        $paramPrefix = $this->getConnection()->getParamPrefix();
+        $paramPrefix = $this->connectionHandler->getParamPrefix();
         $paramNames  = [];
         foreach ($values as $index => $item) {
             $paramName = $this->getParamName($fieldName, $tableAlias, $index);

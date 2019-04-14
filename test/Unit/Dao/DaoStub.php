@@ -4,19 +4,19 @@ declare(strict_types=1);
 namespace YapepBase\Test\Unit\Dao;
 
 use YapepBase\Dao\DaoAbstract;
-use YapepBase\Database\DbConnection;
+use YapepBase\Database\ConnectionHandler;
 
 class DaoStub extends DaoAbstract
 {
-    /** @var DbConnection */
+    /** @var ConnectionHandler */
     protected $connection;
 
-    protected function getConnection(): DbConnection
+    protected function getConnection(): ConnectionHandler
     {
         return $this->connection;
     }
 
-    public function setConnection(DbConnection $connection)
+    public function setConnection(ConnectionHandler $connection)
     {
         $this->connection = $connection;
     }
