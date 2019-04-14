@@ -11,14 +11,6 @@ class Exception extends \YapepBase\Exception\Exception
     /** Numeric value out of range error code. */
     const ERR_NUMERIC_VALUE_OUT_OF_RANGE = 22003;
 
-    /**
-     * @throws Exception
-     */
-    public static function throwByPdoException(\PDOException $exception): void
-    {
-        throw self::createByPdoException($exception);
-    }
-
     public static function createByPdoException(\PDOException $exception): self
     {
         $message = '';
@@ -29,9 +21,17 @@ class Exception extends \YapepBase\Exception\Exception
     }
 
     /**
+     * @throws Exception
+     */
+    public static function throwByPdoException(\PDOException $exception): void
+    {
+        throw self::createByPdoException($exception);
+    }
+
+    /**
      * Parses the message and code from the specified PDOException.
      */
-    public static function parsePdoException(\PDOException $exception, string &$message, int &$code): void
+    private static function parsePdoException(\PDOException $exception, string &$message, int &$code): void
     {
         $message = $exception->getMessage();
         $code    = (int)$exception->getCode();

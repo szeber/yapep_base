@@ -20,9 +20,8 @@ class SqliteConnection implements IConnection
     /** @var PDO */
     protected $pdoConnection;
 
-    public function __construct(string $dsn, string $path, array $pdoOptions = [])
+    public function __construct(string $path, array $pdoOptions = [])
     {
-        $this->dsn        = $dsn;
         $this->path       = $path;
         $this->pdoOptions = $pdoOptions;
         $this->dsn        = 'sqlite:' . $this->path;

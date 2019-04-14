@@ -7,12 +7,12 @@ use Mockery\MockInterface;
 use YapepBase\Database\ConnectionHandler;
 use YapepBase\DataBase\Exception\Exception;
 use YapepBase\Database\IConnection;
-use YapepBase\Database\IHandlesTransactions;
 use YapepBase\Database\MysqlConnection;
 use YapepBase\Debug\DataHandlerRegistry;
 use YapepBase\Debug\ICanReturnItems;
 use YapepBase\Debug\Item\SqlQuery;
 use YapepBase\Helper\DateHelper;
+use YapepBase\Test\Unit\TestAbstract;
 
 class ConnectionHandlerTest extends TestAbstract
 {

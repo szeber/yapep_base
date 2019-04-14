@@ -5,6 +5,7 @@ namespace YapepBase\Test\Unit\Database;
 
 use YapepBase\DataBase\Exception\Exception;
 use YapepBase\Database\MysqlConnection;
+use YapepBase\Test\Unit\TestAbstract;
 
 class MysqlConnectionTest extends TestAbstract
 {

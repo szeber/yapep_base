@@ -33,11 +33,28 @@ class Result
     }
 
     /**
-     * Returns all rows from the result set.
+     * Returns one row represented in the given class.
+     *
+     * @return null|object
      */
-    public function fetchAll(): array
+    public function fetchClass(string $className): ?object
     {
-        return $this->statement->fetchAll(PDO::FETCH_ASSOC);
+        $this->statement->setFetchMode(PDO::FETCH_CLASS, $className);
+
+        $result = $this->statement->fetch();
+        return $result === false
+            ? null
+            : $result;
+    }
+
+    /**
+     * Returns every row as a dictionary (key => value pairs)
+     *
+     * The first column will be the key and everything else a value as an associative array
+     */
+    public function fetchDictionary(): array
+    {
+        return $this->statement->fetchAll(PDO::FETCH_UNIQUE);
     }
 
     /**
@@ -55,6 +72,16 @@ class Result
     }
 
     /**
+     * Returns two Columns as a dictionary (key => value pairs).
+     *
+     * The first column will be the key and the second one the value.
+     */
+    public function fetchColumnDictionary(): array
+    {
+        return $this->statement->fetchAll(PDO::FETCH_KEY_PAIR);
+    }
+
+    /**
      * Return a simple 1 dimensional array which stores the required columns value from every row.
      */
     public function fetchColumnAll(int $columnIndex = 0): array
@@ -68,6 +95,14 @@ class Result
     }
 
     /**
+     * Returns all rows from the result set.
+     */
+    public function fetchAll(): array
+    {
+        return $this->statement->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
      * Returns all the rows represented in the given class.
      *
      * @return object[]
@@ -77,21 +112,6 @@ class Result
         $this->statement->setFetchMode(PDO::FETCH_CLASS, $className);
 
         return $this->statement->fetchAll();
-    }
-
-    /**
-     * Returns one row represented in the given class.
-     *
-     * @return null|object
-     */
-    public function fetchClass(string $className): ?object
-    {
-        $this->statement->setFetchMode(PDO::FETCH_CLASS, $className);
-
-        $result = $this->statement->fetch();
-        return $result === false
-            ? null
-            : $result;
     }
 
     /**
