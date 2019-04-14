@@ -11,14 +11,14 @@ use YapepBase\Response\Entity\Cookie;
 use YapepBase\Response\Entity\Header;
 use YapepBase\Response\Exception\Exception;
 use YapepBase\Response\Exception\ResponseSentException;
-use YapepBase\Response\HttpResponse;
+use YapepBase\Response\Response;
 use YapepBase\Response\IOutputHandler;
 use YapepBase\Test\Unit\Response\Entity\TestAbstract;
 use YapepBase\View\ViewAbstract;
 
 class HttpResponseTest extends TestAbstract
 {
-    /** @var HttpResponse */
+    /** @var Response */
     protected $httpResponse;
     /** @var MockInterface */
     protected $outputHandler;
@@ -41,7 +41,7 @@ class HttpResponseTest extends TestAbstract
 
         $this->outputHandler = \Mockery::mock(IOutputHandler::class);
         $this->statusHelper  = \Mockery::mock(Httpstatus::class);
-        $this->httpResponse  = new HttpResponse($this->outputHandler, $this->statusHelper);
+        $this->httpResponse  = new Response($this->outputHandler, $this->statusHelper);
         $this->view          = \Mockery::mock(ViewAbstract::class);
     }
 
@@ -176,7 +176,7 @@ class HttpResponseTest extends TestAbstract
         $this->httpResponse->setStatusCode($this->statusCode, $this->statusMessage);
 
         $this->assertSame($this->statusCode, $this->httpResponse->getStatusCode());
-        $this->assertSame(HttpResponse::STATUS_MESSAGE_NON_STANDARD, $this->httpResponse->getStatusMessage());
+        $this->assertSame(Response::STATUS_MESSAGE_NON_STANDARD, $this->httpResponse->getStatusMessage());
     }
 
     public function testRedirect_shouldThrowRedirectException()

@@ -12,9 +12,9 @@ use YapepBase\Controller\Rest\Exception\UnauthenticatedException;
 use YapepBase\Exception\HttpException;
 use YapepBase\Exception\RedirectException;
 use YapepBase\Mime\MimeType;
-use YapepBase\Request\HttpRequest;
+use YapepBase\Request\Request;
 use YapepBase\Response\Entity\Header;
-use YapepBase\Response\HttpResponse;
+use YapepBase\Response\Response;
 use YapepBase\Response\IOutputHandler;
 use YapepBase\Test\Unit\TestAbstract;
 use YapepBase\View\Data\SimpleData;
@@ -25,9 +25,9 @@ class ControllerAbstractTest extends TestAbstract
 {
     /** @var ControllerAbstractStub */
     protected $controller;
-    /** @var MockInterface|HttpRequest */
+    /** @var MockInterface|Request */
     protected $request;
-    /** @var MockInterface|HttpResponse */
+    /** @var MockInterface|Response */
     protected $response;
     /** @var MockInterface|IOutputHandler */
     protected $outputHandler;
@@ -36,8 +36,8 @@ class ControllerAbstractTest extends TestAbstract
     {
         parent::setUp();
 
-        $this->request    = \Mockery::mock(HttpRequest::class);
-        $this->response   = \Mockery::mock(HttpResponse::class);
+        $this->request    = \Mockery::mock(Request::class);
+        $this->response   = \Mockery::mock(Response::class);
         $this->controller = new ControllerAbstractStub();
 
         $this->controller->setRequest($this->request);
@@ -51,10 +51,10 @@ class ControllerAbstractTest extends TestAbstract
     public function methodProvider(): array
     {
         return [
-            [HttpRequest::METHOD_HTTP_GET, 'getTest'],
-            [HttpRequest::METHOD_HTTP_POST, 'postTest'],
-            [HttpRequest::METHOD_HTTP_PUT, 'putTest'],
-            [HttpRequest::METHOD_HTTP_DELETE, 'deleteTest'],
+            [Request::METHOD_HTTP_GET, 'getTest'],
+            [Request::METHOD_HTTP_POST, 'postTest'],
+            [Request::METHOD_HTTP_PUT, 'putTest'],
+            [Request::METHOD_HTTP_DELETE, 'deleteTest'],
         ];
     }
 
@@ -72,7 +72,7 @@ class ControllerAbstractTest extends TestAbstract
 
     public function testRunWhenActionDoesNotExist_shouldReturnError()
     {
-        $method    = HttpRequest::METHOD_HTTP_GET;
+        $method    = Request::METHOD_HTTP_GET;
         $action    = 'nonExistent';
         $exception = new ResourceDoesNotExistException($method, $action);
 
@@ -85,13 +85,13 @@ class ControllerAbstractTest extends TestAbstract
 
     public function testRunWhenActionDoesNotExistAndOptionCalled_shouldSendAllowHeader()
     {
-        $method         = HttpRequest::METHOD_HTTP_OPTIONS;
+        $method         = Request::METHOD_HTTP_OPTIONS;
         $action         = 'test';
         $allowedMethods = [
-            HttpRequest::METHOD_HTTP_GET,
-            HttpRequest::METHOD_HTTP_POST,
-            HttpRequest::METHOD_HTTP_PUT,
-            HttpRequest::METHOD_HTTP_DELETE,
+            Request::METHOD_HTTP_GET,
+            Request::METHOD_HTTP_POST,
+            Request::METHOD_HTTP_PUT,
+            Request::METHOD_HTTP_DELETE,
         ];
 
         $this->expectRequestMethod($method);
@@ -103,7 +103,7 @@ class ControllerAbstractTest extends TestAbstract
     {
         $this->controller->exception = new UnauthenticatedException();
 
-        $this->expectRequestMethod(HttpRequest::METHOD_HTTP_GET);
+        $this->expectRequestMethod(Request::METHOD_HTTP_GET);
         $this->expectGetStatusCode(200);
         $this->expectSetStatusCode($this->controller->exception->getRecommendedHttpStatusCode());
         $this->expectHeaderExistenceChecked('WWW-Authenticate', false);
@@ -116,7 +116,7 @@ class ControllerAbstractTest extends TestAbstract
     {
         $this->controller->exception = new UnauthenticatedException();
 
-        $this->expectRequestMethod(HttpRequest::METHOD_HTTP_GET);
+        $this->expectRequestMethod(Request::METHOD_HTTP_GET);
         $this->expectGetStatusCode(200);
         $this->expectSetStatusCode($this->controller->exception->getRecommendedHttpStatusCode());
         $this->expectHeaderExistenceChecked('WWW-Authenticate', true);
@@ -126,7 +126,7 @@ class ControllerAbstractTest extends TestAbstract
 
     public function testRunWhenResourceDoesNotExistExceptionThrown_shouldSendAuthHeader()
     {
-        $method                      = HttpRequest::METHOD_HTTP_GET;
+        $method                      = Request::METHOD_HTTP_GET;
         $action                      = 'exception';
         $this->controller->exception = new ResourceDoesNotExistException($method, $action);
 
@@ -134,18 +134,18 @@ class ControllerAbstractTest extends TestAbstract
         $this->expectGetStatusCode(200);
         $this->expectSetStatusCode($this->controller->exception->getRecommendedHttpStatusCode());
         $this->expectHeaderExistenceChecked('Allow', false);
-        $this->expectAllowHeaderSent([HttpRequest::METHOD_HTTP_GET]);
+        $this->expectAllowHeaderSent([Request::METHOD_HTTP_GET]);
         $this->expectBodySetToResponse($this->getErrorResponse($this->controller->exception));
         $this->controller->run($action);
     }
 
     public function testRunWhenResourceDoesNotExistExceptionThrownAndAllowHeaderAlreadySent_shouldNotSendAuthHeaderAgain()
     {
-        $method                      = HttpRequest::METHOD_HTTP_GET;
+        $method                      = Request::METHOD_HTTP_GET;
         $action                      = 'exception';
         $this->controller->exception = new ResourceDoesNotExistException($method, $action);
 
-        $this->expectRequestMethod(HttpRequest::METHOD_HTTP_GET);
+        $this->expectRequestMethod(Request::METHOD_HTTP_GET);
         $this->expectGetStatusCode(200);
         $this->expectSetStatusCode($this->controller->exception->getRecommendedHttpStatusCode());
         $this->expectHeaderExistenceChecked('Allow', true);
@@ -168,7 +168,7 @@ class ControllerAbstractTest extends TestAbstract
     {
         $this->controller->exception = $exception;
 
-        $this->expectRequestMethod(HttpRequest::METHOD_HTTP_GET);
+        $this->expectRequestMethod(Request::METHOD_HTTP_GET);
         $this->expectExceptionObject($exception);
         $this->controller->run('exception');
     }
@@ -177,7 +177,7 @@ class ControllerAbstractTest extends TestAbstract
     {
         $this->controller->exception = new \Exception();
 
-        $this->expectRequestMethod(HttpRequest::METHOD_HTTP_GET);
+        $this->expectRequestMethod(Request::METHOD_HTTP_GET);
         $this->expectException(Error::class);
         $this->controller->run('exception');
     }
@@ -186,7 +186,7 @@ class ControllerAbstractTest extends TestAbstract
     {
         $this->controller->exception = new \Exception();
 
-        $this->expectRequestMethod(HttpRequest::METHOD_HTTP_GET);
+        $this->expectRequestMethod(Request::METHOD_HTTP_GET);
         $this->expectSetStatusCode(500);
         $this->expectBodySetToResponse($this->getErrorResponse(new Exception()));
         @$this->controller->run('exception');

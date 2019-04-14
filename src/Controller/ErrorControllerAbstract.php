@@ -9,7 +9,7 @@ use YapepBase\View\IRenderable;
 /**
  * Base class for error controllers.
  */
-abstract class ErrorControllerAbstract extends HttpControllerAbstract
+abstract class ErrorControllerAbstract extends ControllerAbstract
 {
     protected function runBeforeAction(): void
     {

@@ -17,7 +17,7 @@ use YapepBase\View\ViewAbstract;
 /**
  * Class responsible for handling a HTTP response
  */
-class HttpResponse implements IResponse, IHttpResponse
+class Response implements IResponse
 {
     const STATUS_MESSAGE_NON_STANDARD = 'Non-Standard Response';
 

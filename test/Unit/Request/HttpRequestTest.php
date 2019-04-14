@@ -5,7 +5,7 @@ namespace YapepBase\Test\Unit\Request;
 
 use Emul\Server\ServerData;
 use YapepBase\Helper\ArrayHelper;
-use YapepBase\Request\HttpRequest;
+use YapepBase\Request\Request;
 use YapepBase\Request\Source\Files;
 use YapepBase\Request\Source\IFiles;
 use YapepBase\Request\Source\ISource;
@@ -29,7 +29,7 @@ class HttpRequestTest extends TestAbstract
     /** @var ServerData */
     protected $server;
 
-    /** @var HttpRequest */
+    /** @var Request */
     protected $httpRequest;
 
     protected function setUp(): void
@@ -42,7 +42,7 @@ class HttpRequestTest extends TestAbstract
         array $queryParams = [],
         array $postParams = [],
         array $server = []
-    ): HttpRequest {
+    ): Request {
         $this->queryParams = new Params($queryParams);
         $this->postParams  = new Params($postParams);
         $this->cookies     = new Params([]);
@@ -51,7 +51,7 @@ class HttpRequestTest extends TestAbstract
         $this->files       = new Files([]);
         $this->server      = new ServerData($server);
 
-        return new HttpRequest(
+        return new Request(
             $this->queryParams,
             $this->postParams,
             $this->cookies,
@@ -201,7 +201,7 @@ class HttpRequestTest extends TestAbstract
     {
         $requestUri = '/test/whatever?param=1';
         $server     = ['REQUEST_URI' => $requestUri];
-        $target     = $this->getHttpRequest([], [], $server)->getTarget();
+        $target     = $this->getHttpRequest([], [], $server)->getTargetUri();
 
         $expectedTarget = '/test/whatever';
 
@@ -220,8 +220,8 @@ class HttpRequestTest extends TestAbstract
     public function protocolProvider()
     {
         return [
-            'https' => ['On', HttpRequest::PROTOCOL_HTTPS],
-            'http'  => ['',   HttpRequest::PROTOCOL_HTTP],
+            'https' => ['On', Request::PROTOCOL_HTTPS],
+            'http'  => ['',   Request::PROTOCOL_HTTP],
         ];
     }
 

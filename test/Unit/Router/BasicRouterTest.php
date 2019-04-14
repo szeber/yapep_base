@@ -107,7 +107,7 @@ class BasicRouterTest extends TestAbstract
                 ->once()
                 ->andReturn('GET')
                 ->getMock()
-            ->shouldReceive('getTarget')
+            ->shouldReceive('getTargetUri')
                 ->once()
                 ->andReturn($this->parameterisedPath)
                 ->getMock();

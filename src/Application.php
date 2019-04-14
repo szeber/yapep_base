@@ -12,7 +12,7 @@ use YapepBase\Exception\Exception;
 use YapepBase\Exception\HttpException;
 use YapepBase\Exception\RedirectException;
 use YapepBase\Exception\RouterException;
-use YapepBase\Request\HttpRequest;
+use YapepBase\Request\Request;
 use YapepBase\Router\Entity\ControllerAction;
 
 /**
@@ -208,7 +208,7 @@ class Application
      */
     protected function handleFatalException(\Exception $exception): void
     {
-        if ($this->diContainer->getRequest() instanceof HttpRequest) {
+        if ($this->diContainer->getRequest() instanceof Request) {
             $this->diContainer->getErrorHandlerRegistry()->handleException($exception);
             // We have an HTTP request, try to run
             try {

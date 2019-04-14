@@ -13,7 +13,7 @@ class InvalidPayloadException extends Exception
 
     public function getRecommendedHttpStatusCode(): int
     {
-        return 400;
+        return 422;
     }
 
     public function getCodeString(): string

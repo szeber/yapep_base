@@ -3,10 +3,12 @@ declare(strict_types=1);
 
 namespace YapepBase\Controller;
 
+use YapepBase\Application;
 use YapepBase\Controller\Exception\ActionNotFoundException;
 use YapepBase\Controller\Exception\Exception;
 use YapepBase\Controller\Exception\InvalidActionResultException;
 use YapepBase\Exception\RedirectException;
+use YapepBase\Exception\RouterException;
 use YapepBase\Request\IRequest;
 use YapepBase\Response\IResponse;
 use YapepBase\View\IRenderable;
@@ -59,6 +61,16 @@ abstract class ControllerAbstract implements IController
             }
         }
         $this->runAfterResultSetToResponse();
+    }
+
+    public function getRequest(): IRequest
+    {
+        return $this->request;
+    }
+
+    public function getResponse(): IResponse
+    {
+        return $this->response;
     }
 
     /**
@@ -121,6 +133,45 @@ abstract class ControllerAbstract implements IController
     protected function getActionPrefix(): string
     {
         return 'do';
+    }
+
+    /**
+     * Redirects the client to the specified URL.
+     *
+     * @throws RedirectException
+     */
+    protected function redirectToUrl(string $url, int $statusCode = 303): void
+    {
+        $this->response->redirect($url, $statusCode);
+    }
+
+    /**
+     * Redirects the client to the URL specified by the controller and action.
+     *
+     * @throws RedirectException
+     * @throws RouterException
+     */
+    protected function redirectToRoute(
+        string $controller,
+        string $action,
+        array $routeParams = [],
+        array $getParams = [],
+        string $anchor = '',
+        int $statusCode = 303
+    ): void {
+        $url = Application::getInstance()->getDiContainer()->getRouter()->getPathByControllerAndAction(
+            $controller,
+            $action,
+            $routeParams
+        );
+
+        if (!empty($getParams)) {
+            $url .= '?' . \http_build_query($getParams, '', '&');
+        }
+        if (!empty($anchor)) {
+            $url .= '#' . $anchor;
+        }
+        $this->redirectToUrl($url, $statusCode);
     }
 
     /**

@@ -79,7 +79,7 @@ class BasicRouter implements IRouter
 
     public function getControllerActionByRequest(IRequest $request): ControllerAction
     {
-        return $this->getControllerActionByMethodAndPath($request->getMethod(), $request->getTarget());
+        return $this->getControllerActionByMethodAndPath($request->getMethod(), $request->getTargetUri());
     }
 
     /**

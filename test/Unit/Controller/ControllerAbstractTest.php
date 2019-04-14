@@ -9,6 +9,7 @@ use YapepBase\Controller\Exception\InvalidActionResultException;
 use YapepBase\Exception\RedirectException;
 use YapepBase\Request\IRequest;
 use YapepBase\Response\IResponse;
+use YapepBase\Router\IRouter;
 use YapepBase\Test\Unit\TestAbstract;
 
 class ControllerAbstractTest extends TestAbstract
@@ -19,6 +20,14 @@ class ControllerAbstractTest extends TestAbstract
     protected $request;
     /** @var MockInterface */
     protected $response;
+    /** @var string */
+    protected $redirectUrl = '/test';
+    /** @var int */
+    protected $redirectStatusCode = 301;
+    /** @var string */
+    protected $controllerToRedirect = 'IndexController';
+    /** @var string */
+    protected $actionToRedirect = 'Index';
 
     protected function setUp(): void
     {
@@ -77,6 +86,41 @@ class ControllerAbstractTest extends TestAbstract
         $this->assertTrue($this->controller->isRedirected);
     }
 
+    public function testRedirectToUrl_shouldRedirect()
+    {
+        $this->expectRedirect($this->redirectUrl);
+        $this->controller->redirectToUrl($this->redirectUrl, $this->redirectStatusCode);
+    }
+
+    public function testRedirectToRoute_shouldRedirectToRetrievedUrl()
+    {
+        $routerParams = ['test' => 1];
+        $this->expectGetPathFromRouter($routerParams);
+        $this->expectRedirect($this->redirectUrl);
+
+        $this->controller->redirectToRoute($this->controllerToRedirect, $this->actionToRedirect, $routerParams, [], '', $this->redirectStatusCode);
+    }
+
+    public function testRedirectToRouteWhenGetParamsGiven_shouldAddToUrl()
+    {
+        $getParams = ['test' => 1];
+        $url       = $this->redirectUrl . '?test=1';
+
+        $this->expectGetPathFromRouter([]);
+        $this->expectRedirect($url);
+        $this->controller->redirectToRoute($this->controllerToRedirect, $this->actionToRedirect, [], $getParams, '', $this->redirectStatusCode);
+    }
+
+    public function testRedirectToRouteWhenAnchorGiven_shouldAddToUrl()
+    {
+        $anchor = 'test';
+        $url    = $this->redirectUrl . '#test';
+
+        $this->expectGetPathFromRouter([]);
+        $this->expectRedirect($url);
+        $this->controller->redirectToRoute($this->controllerToRedirect, $this->actionToRedirect, [], [], $anchor, $this->redirectStatusCode);
+    }
+
     protected function expectStringResponseSet()
     {
         $this->response
@@ -117,5 +161,26 @@ class ControllerAbstractTest extends TestAbstract
             ->shouldReceive('runAfterResultSetToResponse')
                 ->ordered()
                 ->getMock();
+    }
+
+    protected function expectRedirect(string $expectedUrl)
+    {
+        $this->response
+            ->shouldReceive('redirect')
+            ->once()
+            ->with($expectedUrl, $this->redirectStatusCode);
+    }
+
+    protected function expectGetPathFromRouter(array $params = [])
+    {
+        /** @var IRouter|MockInterface $router */
+        $router = \Mockery::mock(IRouter::class)
+            ->shouldReceive('getPathByControllerAndAction')
+            ->once()
+            ->with($this->controllerToRedirect, $this->actionToRedirect, $params)
+            ->andReturn($this->redirectUrl)
+            ->getMock();
+
+        $this->pimpleContainer->setRouter($router);
     }
 }

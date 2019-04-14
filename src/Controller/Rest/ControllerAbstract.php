@@ -3,14 +3,13 @@ declare(strict_types=1);
 
 namespace YapepBase\Controller\Rest;
 
-use YapepBase\Controller\HttpControllerAbstract;
 use YapepBase\Controller\Rest\Entity\RestError;
 use YapepBase\Controller\Rest\Exception\Exception;
 use YapepBase\Controller\Rest\Exception\ResourceDoesNotExistException;
 use YapepBase\Exception\HttpException;
 use YapepBase\Exception\RedirectException;
 use YapepBase\Mime\MimeType;
-use YapepBase\Request\HttpRequest;
+use YapepBase\Request\Request;
 use YapepBase\Response\Entity\Header;
 use YapepBase\View\Data\SimpleData;
 use YapepBase\View\Template\JsonTemplate;
@@ -18,7 +17,7 @@ use YapepBase\View\Template\JsonTemplate;
 /**
  * Base class for restful API controllers.
  */
-abstract class ControllerAbstract extends HttpControllerAbstract
+abstract class ControllerAbstract extends \YapepBase\Controller\ControllerAbstract
 {
     /** @var string|null */
     private $calledAction;
@@ -35,7 +34,7 @@ abstract class ControllerAbstract extends HttpControllerAbstract
             $actionMethodName = $this->getActionPrefix() . $action;
 
             if (!method_exists($this, $actionMethodName)) {
-                if ($this->request->getMethod() === HttpRequest::METHOD_HTTP_OPTIONS) {
+                if ($this->request->getMethod() === Request::METHOD_HTTP_OPTIONS) {
                     $this->response->sendHeader(new Header('Allow', implode(', ', $validMethodsForCurrentAction)));
 
                     return;

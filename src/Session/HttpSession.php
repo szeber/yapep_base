@@ -10,8 +10,8 @@ namespace YapepBase\Session;
 
 use YapepBase\Exception\ConfigException;
 use YapepBase\Exception\Exception;
-use YapepBase\Request\HttpRequest;
-use YapepBase\Response\HttpResponse;
+use YapepBase\Request\Request;
+use YapepBase\Response\Response;
 use YapepBase\Storage\IStorage;
 
 /**
@@ -37,14 +37,14 @@ class HttpSession extends SessionAbstract
     /**
      * The request instance.
      *
-     * @var \YapepBase\Request\HttpRequest
+     * @var \YapepBase\Request\Request
      */
     protected $request;
 
     /**
      * The response instance.
      *
-     * @var \YapepBase\Response\HttpResponse
+     * @var \YapepBase\Response\Response
      */
     protected $response;
 
@@ -79,11 +79,11 @@ class HttpSession extends SessionAbstract
     /**
      * Constructor
      *
-     * @param string                           $configName     Name of the session config.
-     * @param \YapepBase\Storage\IStorage      $storage        The storage object.
-     * @param \YapepBase\Request\HttpRequest   $request        The request object.
-     * @param \YapepBase\Response\HttpResponse $response       The response object.
-     * @param bool                             $autoRegister   If TRUE, it will automatically register as an event
+     * @param string                       $configName         Name of the session config.
+     * @param \YapepBase\Storage\IStorage  $storage            The storage object.
+     * @param \YapepBase\Request\Request   $request            The request object.
+     * @param \YapepBase\Response\Response $response           The response object.
+     * @param bool                         $autoRegister       If TRUE, it will automatically register as an event
      *                                                         handler.
      *
      * @throws \YapepBase\Exception\ConfigException   On configuration problems
@@ -92,8 +92,8 @@ class HttpSession extends SessionAbstract
     public function __construct(
         $configName,
         IStorage $storage,
-        HttpRequest $request,
-        HttpResponse $response,
+        Request $request,
+        Response $response,
         $autoRegister = true
     ) {
         $this->request  = $request;
@@ -129,11 +129,11 @@ class HttpSession extends SessionAbstract
      */
     protected function validateConfig(array $config)
     {
-        if (!($this->request instanceof HttpRequest)) {
+        if (!($this->request instanceof Request)) {
             throw new Exception('The request object is not an HttpRequest instance');
         }
 
-        if (!($this->response instanceof HttpResponse)) {
+        if (!($this->response instanceof Response)) {
             throw new Exception('The response object is not an HttpResponse instance');
         }
 

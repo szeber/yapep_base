@@ -6,8 +6,8 @@ namespace YapepBase\Test\Unit\Controller;
 use Mockery\MockInterface;
 use PHPUnit\Framework\Error\Warning;
 use YapepBase\Controller\DefaultErrorController;
-use YapepBase\Request\HttpRequest;
-use YapepBase\Response\HttpResponse;
+use YapepBase\Request\Request;
+use YapepBase\Response\Response;
 use YapepBase\Response\IOutputHandler;
 use YapepBase\Test\Unit\TestAbstract;
 use YapepBase\View\Data\SimpleData;
@@ -16,9 +16,9 @@ use YapepBase\View\Template\SimpleHtmlTemplate;
 
 class DefaultErrorControllerTest extends TestAbstract
 {
-    /** @var MockInterface|HttpRequest */
+    /** @var MockInterface|Request */
     protected $request;
-    /** @var MockInterface|HttpResponse */
+    /** @var MockInterface|Response */
     protected $response;
     /** @var MockInterface|IOutputHandler */
     protected $outputHandler;
@@ -30,8 +30,8 @@ class DefaultErrorControllerTest extends TestAbstract
         parent::setUp();
 
         $this->outputHandler = \Mockery::mock(IOutputHandler::class);
-        $this->request       = \Mockery::mock(HttpRequest::class);
-        $this->response      = \Mockery::mock(HttpResponse::class)
+        $this->request       = \Mockery::mock(Request::class);
+        $this->response      = \Mockery::mock(Response::class)
             ->shouldReceive('getOutputHandler')
             ->andReturn($this->outputHandler)
             ->getMock();
