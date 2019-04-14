@@ -11,7 +11,7 @@ use YapepBase\Test\Unit\TestAbstract;
 class DaoAbstractTest extends TestAbstract
 {
     /** @var MockInterface */
-    protected $connection;
+    protected $connectionHandler;
     /** @var DaoStub */
     protected $dao;
 
@@ -19,10 +19,9 @@ class DaoAbstractTest extends TestAbstract
     {
         parent::setUp();
 
-        $this->connection = Mockery::mock(ConnectionHandler::class);
+        $this->connectionHandler = Mockery::mock(ConnectionHandler::class);
 
-        $this->dao = new DaoStub();
-        $this->dao->setConnection($this->connection);
+        $this->dao = new DaoStub($this->connectionHandler);
     }
 
     public function emptyExpectationProvider(): array
@@ -179,7 +178,7 @@ class DaoAbstractTest extends TestAbstract
 
     protected function expectGetParamPrefix(string $expectedResult)
     {
-        $this->connection
+        $this->connectionHandler
             ->shouldReceive('getParamPrefix')
             ->once()
             ->andReturn($expectedResult);

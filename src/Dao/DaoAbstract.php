@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace YapepBase\Dao;
 
-use YapepBase\Database\ConnectionHandler;
 use YapepBase\DataBase\Exception\Exception;
+use YapepBase\Database\IConnectionHandler;
 use YapepBase\Database\Result;
 
 /**
@@ -12,7 +12,13 @@ use YapepBase\Database\Result;
  */
 abstract class DaoAbstract
 {
-    abstract protected function getConnection(): ConnectionHandler;
+    /** @var IConnectionHandler */
+    private $connectionHandler;
+
+    public function __construct(IConnectionHandler $connectionHandler)
+    {
+        $this->connectionHandler = $connectionHandler;
+    }
 
     /**
      * Runs a paginated query, and returns the result.
@@ -32,10 +38,10 @@ abstract class DaoAbstract
         $offset = ($pageNumber - 1) * $itemsPerPage;
         $query .= ' LIMIT ' . $itemsPerPage . ' OFFSET ' . $offset;
 
-        $result = $this->getConnection()->query($query, $params);
+        $result = $this->connectionHandler->query($query, $params);
 
         if ($itemCount !== null) {
-            $itemCount = (int)$this->getConnection()->query('SELECT FOUND_ROWS()')->fetchColumn();
+            $itemCount = (int)$this->connectionHandler->query('SELECT FOUND_ROWS()')->fetchColumn();
         }
 
         return $result;
@@ -63,7 +69,7 @@ abstract class DaoAbstract
         $paramName = $this->getParamName($fieldName, $tableAlias);
         $fieldName = $this->getPrefixedField($tableAlias, $fieldName);
 
-        $conditions[]            = $fieldName . ' = :' . $this->getConnection()->getParamPrefix() . $paramName;
+        $conditions[]            = $fieldName . ' = :' . $this->connectionHandler->getParamPrefix() . $paramName;
         $queryParams[$paramName] = $expectation;
     }
 
@@ -82,7 +88,7 @@ abstract class DaoAbstract
             return;
         }
 
-        $paramPrefix = $this->getConnection()->getParamPrefix();
+        $paramPrefix = $this->connectionHandler->getParamPrefix();
         $paramNames  = [];
         foreach ($values as $index => $item) {
             $paramName = $this->getParamName($fieldName, $tableAlias, $index);

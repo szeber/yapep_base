@@ -15,7 +15,7 @@ use YapepBase\Helper\DateHelper;
 /**
  * Base class for database connections.
  */
-class ConnectionHandler
+class ConnectionHandler implements IConnectionHandler
 {
     /** @var DateHelper */
     protected $dateHelper;
@@ -43,28 +43,17 @@ class ConnectionHandler
         $this->connect();
     }
 
-    /**
-     * Sets the prefix of parameters.
-     *
-     * @return static
-     */
     public function setParamPrefix(string $paramPrefix)
     {
         $this->paramPrefix = $paramPrefix;
         return $this;
     }
 
-    /**
-     * Returns the parameter prefix.
-     */
     public function getParamPrefix(): string
     {
         return $this->paramPrefix;
     }
 
-    /**
-     * @throws Exception
-     */
     public function query(string $query, array $params = []): Result
     {
         $this->getCaller($callerClass, $callerMethod);
@@ -79,11 +68,6 @@ class ConnectionHandler
         return new Result($statement);
     }
 
-    /**
-     * Returns the last insert id for the connection.
-     *
-     * @throws Exception
-     */
     public function getLastInsertId(?string $name = null): string
     {
         try {
@@ -94,11 +78,6 @@ class ConnectionHandler
         }
     }
 
-    /**
-     * Returns the provided string, with all wildcard characters escaped.
-     *
-     * This method should be used to escape the string part in the "LIKE 'string' ESCAPE 'escapeCharacter'" statement.
-     */
     public function escapeWildcards(string $string, string $escapeCharacter = '\\'): string
     {
         return preg_replace(
@@ -108,13 +87,6 @@ class ConnectionHandler
         );
     }
 
-    /**
-     * Begins a transaction.
-     *
-     * If there already is an open transaction, it just increments the transaction counter.
-     *
-     * @throws Exception
-     */
     public function beginTransaction(): int
     {
         $this->requireTransactionHandling();
@@ -127,15 +99,6 @@ class ConnectionHandler
         return ++$this->openTransactionCount;
     }
 
-    /**
-     * Completes (commits or rolls back) a transaction.
-     *
-     * If there is more then 1 open transaction, it only decrements the transaction count by one, and returns the
-     * current transaction status. It is possible for these transactions to fail and be eventually rolled back,
-     * if any further statements fail.
-     *
-     * @throws Exception
-     */
     public function completeTransaction(): bool
     {
         $this->requireTransactionHandling();
@@ -156,9 +119,6 @@ class ConnectionHandler
         return $this->transactionFailed;
     }
 
-    /**
-     * Sets a transaction's status to failed.
-     */
     public function failTransaction(): void
     {
         $this->transactionFailed = true;
@@ -198,11 +158,6 @@ class ConnectionHandler
         }
     }
 
-    /**
-     * Returns the PDO data type for the specified value.
-     *
-     * Also casts the specified value if it's necessary.
-     */
     private function castParamAndGetType(&$value): int
     {
         if (is_integer($value)) {

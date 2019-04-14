@@ -41,7 +41,7 @@ class Result
     {
         $this->statement->setFetchMode(PDO::FETCH_CLASS, $className);
 
-        $result = $this->statement->fetch();
+        $result = $this->statement->fetchObject();
         return $result === false
             ? null
             : $result;
