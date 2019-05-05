@@ -22,19 +22,19 @@ interface IErrorHandlerRegistry
     /**
      * Adds an error handler to the container.
      */
-    public function addErrorHandler(IErrorHandler $errorHandler): void;
+    public function add(IErrorHandler $errorHandler): void;
 
     /**
      * Removes an error handler from the container.
      */
-    public function removeErrorHandler(IErrorHandler $errorHandler): void;
+    public function remove(IErrorHandler $errorHandler): void;
 
     /**
      * Returns the error handlers assigned to the container.
      *
      * @return IErrorHandler[]
      */
-    public function getErrorHandlers(): array;
+    public function getAll(): array;
 
     /**
      * Handles an error.

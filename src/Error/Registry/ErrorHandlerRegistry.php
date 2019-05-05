@@ -80,12 +80,12 @@ class ErrorHandlerRegistry implements IErrorHandlerRegistry
         $this->isRegistered = false;
     }
 
-    public function addErrorHandler(IErrorHandler $errorHandler): void
+    public function add(IErrorHandler $errorHandler): void
     {
         $this->errorHandlers[] = $errorHandler;
     }
 
-    public function removeErrorHandler(IErrorHandler $errorHandler): void
+    public function remove(IErrorHandler $errorHandler): void
     {
         $index = array_search($errorHandler, $this->errorHandlers);
 
@@ -95,7 +95,7 @@ class ErrorHandlerRegistry implements IErrorHandlerRegistry
     /**
      * @return IErrorHandler[]
      */
-    public function getErrorHandlers(): array
+    public function getAll(): array
     {
         return $this->errorHandlers;
     }

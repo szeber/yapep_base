@@ -67,10 +67,10 @@ class ErrorHandlerRegistryTest extends TestAbstract
         $handler1 = \Mockery::mock(IErrorHandler::class);
         $handler2 = \Mockery::mock(IErrorHandler::class);
 
-        $registry->addErrorHandler($handler1);
-        $registry->addErrorHandler($handler2);
+        $registry->add($handler1);
+        $registry->add($handler2);
 
-        $registeredErrorHandlers = $registry->getErrorHandlers();
+        $registeredErrorHandlers = $registry->getAll();
         $this->assertSame($handler1, $registeredErrorHandlers[0]);
         $this->assertSame($handler2, $registeredErrorHandlers[1]);
     }
@@ -81,11 +81,11 @@ class ErrorHandlerRegistryTest extends TestAbstract
         $handler1 = \Mockery::mock(IErrorHandler::class);
         $handler2 = \Mockery::mock(IErrorHandler::class);
 
-        $registry->addErrorHandler($handler1);
-        $registry->addErrorHandler($handler2);
-        $registry->removeErrorHandler($handler1);
+        $registry->add($handler1);
+        $registry->add($handler2);
+        $registry->remove($handler1);
 
-        $registeredErrorHandlers = $registry->getErrorHandlers();
+        $registeredErrorHandlers = $registry->getAll();
         $this->assertSame($handler2, $registeredErrorHandlers[1]);
         $this->assertCount(1, $registeredErrorHandlers);
     }
@@ -99,7 +99,7 @@ class ErrorHandlerRegistryTest extends TestAbstract
     public function testHandleErrorWhenErrorReportingIgnoresError_shouldDoNothing()
     {
         $registry = $this->getErrorHandlerRegistry();
-        $registry->addErrorHandler($this->errorHandler);
+        $registry->add($this->errorHandler);
 
         error_reporting(0);
         $registry->handleError(1, 'message', 'file', 2);
@@ -109,7 +109,7 @@ class ErrorHandlerRegistryTest extends TestAbstract
     public function testHandleError_shouldUseErrorHandler()
     {
         $registry = $this->getErrorHandlerRegistry();
-        $registry->addErrorHandler($this->errorHandler);
+        $registry->add($this->errorHandler);
 
         $this->expectIdGenerated();
         $this->expectErrorHandled();
@@ -121,7 +121,7 @@ class ErrorHandlerRegistryTest extends TestAbstract
     public function testHandleErrorWhenFatal_shouldSendResponseAndExit()
     {
         $registry = $this->getErrorHandlerRegistry($this->response);
-        $registry->addErrorHandler($this->errorHandler);
+        $registry->add($this->errorHandler);
 
         $this->expectIdGenerated();
         $this->expectErrorHandled();
@@ -144,7 +144,7 @@ class ErrorHandlerRegistryTest extends TestAbstract
     public function testHandleException_shouldUseErrorHandler()
     {
         $registry = $this->getErrorHandlerRegistry();
-        $registry->addErrorHandler($this->errorHandler);
+        $registry->add($this->errorHandler);
 
         $this->expectIdGenerated();
         $this->expectExceptionHandled();
@@ -230,7 +230,7 @@ class ErrorHandlerRegistryTest extends TestAbstract
     public function testHandleShutdown_shouldCallErrorHandlers()
     {
         $errorHandlerRegistry = $this->getErrorHandlerRegistry();
-        $errorHandlerRegistry->addErrorHandler($this->errorHandler);
+        $errorHandlerRegistry->add($this->errorHandler);
 
         $this->expectLastError(new Error($this->errorCode, $this->message, $this->file, $this->line));
         $this->expectEventChecked(Event::TYPE_APPLICATION_AFTER_RUN, false);
