@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace YapepBase\Event;
 
+use YapepBase\Event\Entity\Event;
+
 /**
  * Registry class storing the registered event handlers.
  *
@@ -25,7 +27,7 @@ interface IEventHandlerRegistry
      *
      * @return IEventHandler[]
      */
-    public function getEventHandlers(string $eventType): array;
+    public function get(string $eventType): array;
 
     /**
      * Clears all event handlers for an event type

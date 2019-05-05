@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace YapepBase\Event;
+namespace YapepBase\Event\Entity;
 
 class Event
 {

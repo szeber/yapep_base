@@ -10,7 +10,7 @@ namespace YapepBase\Session;
 
 use YapepBase\Application;
 use YapepBase\Config;
-use YapepBase\Event\Event;
+use YapepBase\Event\Entity\Event;
 use YapepBase\Exception\ConfigException;
 use YapepBase\Exception\Exception;
 use YapepBase\Storage\IStorage;
@@ -306,7 +306,7 @@ abstract class SessionAbstract implements ISession
     /**
      * Handles the application start and finish events to load and save the session.
      *
-     * @param \YapepBase\Event\Event $event   The event.
+     * @param \YapepBase\Event\Entity\Event $event The event.
      *
      * @return void
      *

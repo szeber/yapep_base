@@ -7,7 +7,7 @@ use YapepBase\Controller\Exception\Exception as ControllerException;
 use YapepBase\Controller\IController;
 use YapepBase\DependencyInjection\Container;
 use YapepBase\DependencyInjection\IContainer;
-use YapepBase\Event\Event;
+use YapepBase\Event\Entity\Event;
 use YapepBase\Exception\Exception;
 use YapepBase\Exception\HttpException;
 use YapepBase\Exception\RedirectException;

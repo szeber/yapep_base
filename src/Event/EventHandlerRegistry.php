@@ -3,16 +3,27 @@ declare(strict_types=1);
 
 namespace YapepBase\Event;
 
+use YapepBase\Event\Entity\Event;
+use YapepBase\Helper\DateHelper;
+
 /**
  * Registry class storing the registered event handlers.
  */
 class EventHandlerRegistry implements IEventHandlerRegistry
 {
+    /** @var DateHelper */
+    private $dateHelper;
+
     /** @var IEventHandler[][] */
     private $handlersByEvent = [];
 
     /** @var float[][] */
-    private $raiseTimesInMsByEvent = [];
+    private $raiseTimesInUsByEvent = [];
+
+    public function __construct(DateHelper $dateHelper)
+    {
+        $this->dateHelper = $dateHelper;
+    }
 
     public function add(string $event, IEventHandler $eventHandler): void
     {
@@ -35,9 +46,17 @@ class EventHandlerRegistry implements IEventHandlerRegistry
         }
     }
 
-    public function getEventHandlers(string $event): array
+    public function get(string $event): array
     {
         return isset($this->handlersByEvent[$event]) ? $this->handlersByEvent[$event] : [];
+    }
+
+    /**
+     * @return IEventHandler[][]
+     */
+    public function getAll(): array
+    {
+        return $this->handlersByEvent;
     }
 
     public function clear(string $event): void
@@ -53,7 +72,7 @@ class EventHandlerRegistry implements IEventHandlerRegistry
     public function raise(Event $event): void
     {
         $name                                 = $event->getName();
-        $this->raiseTimesInMsByEvent[$name][] = microtime(true);
+        $this->raiseTimesInUsByEvent[$name][] = $this->dateHelper->getCurrentTimestampUs();
 
         if (!empty($this->handlersByEvent[$name])) {
             /** @var IEventHandler $handler */
@@ -65,18 +84,18 @@ class EventHandlerRegistry implements IEventHandlerRegistry
 
     public function isRaised(string $event): bool
     {
-        return isset($this->raiseTimesInMsByEvent[$event]);
+        return isset($this->raiseTimesInUsByEvent[$event]);
     }
 
     public function getRaiseTimes(string $event): array
     {
-        return isset($this->raiseTimesInMsByEvent[$event])
-            ? $this->raiseTimesInMsByEvent[$event]
+        return isset($this->raiseTimesInUsByEvent[$event])
+            ? $this->raiseTimesInUsByEvent[$event]
             : [];
     }
 
     public function getAllRaiseTimes(): array
     {
-        return $this->raiseTimesInMsByEvent;
+        return $this->raiseTimesInUsByEvent;
     }
 }

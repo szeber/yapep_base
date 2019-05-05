@@ -15,7 +15,7 @@ namespace YapepBase\Batch;
 use YapepBase\Application;
 use YapepBase\DependencyInjection\Container;
 use YapepBase\ErrorHandler\ITerminatable;
-use YapepBase\Event\Event;
+use YapepBase\Event\Entity\Event;
 use YapepBase\Exception\ParameterException;
 use YapepBase\Mime\MimeType;
 use YapepBase\View\Data\Data;
