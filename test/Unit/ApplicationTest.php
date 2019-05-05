@@ -137,12 +137,12 @@ class ApplicationTest extends TestAbstract
 
     protected function expectAllEventsRaised()
     {
-        $this->expectEventRaised(Event::TYPE_APPLICATION_BEFORE_RUN);
-        $this->expectEventRaised(Event::TYPE_APPLICATION_BEFORE_CONTROLLER_RUN);
-        $this->expectEventRaised(Event::TYPE_APPLICATION_AFTER_CONTROLLER_RUN);
-        $this->expectEventRaised(Event::TYPE_APPLICATION_BEFORE_OUTPUT_SEND);
-        $this->expectEventRaised(Event::TYPE_APPLICATION_AFTER_OUTPUT_SEND);
-        $this->expectEventRaised(Event::TYPE_APPLICATION_AFTER_RUN);
+        $this->expectEventRaised(Event::APPLICATION_STARTED);
+        $this->expectEventRaised(Event::APPLICATION_CONTROLLER_BEFORE_RUN);
+        $this->expectEventRaised(Event::APPLICATION_CONTROLLER_FINISHED);
+        $this->expectEventRaised(Event::APPLICATION_OUTPUT_BEFORE_SEND);
+        $this->expectEventRaised(Event::APPLICATION_OUTPUT_SENT);
+        $this->expectEventRaised(Event::APPLICATION_FINISHED);
     }
 
     protected function expectEventRaised(string $expectedType)
@@ -152,7 +152,7 @@ class ApplicationTest extends TestAbstract
         $this->eventHandlerRegistry
             ->shouldReceive('raise')
             ->with(Mockery::on(function () use ($expectedType, $event) {
-                return $expectedType === $event->getType();
+                return $expectedType === $event->getName();
             }));
     }
 

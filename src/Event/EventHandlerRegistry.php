@@ -8,67 +8,75 @@ namespace YapepBase\Event;
  */
 class EventHandlerRegistry implements IEventHandlerRegistry
 {
-    /**
-     * @var array
-     */
-    protected $eventHandlersByType = [];
+    /** @var IEventHandler[][] */
+    private $handlersByEvent = [];
 
-    /**
-     * @var array
-     */
-    protected $lastRaisedByTypeInMs = [];
+    /** @var float[][] */
+    private $raiseTimesInMsByEvent = [];
 
-    public function registerEventHandler(string $eventType, IEventHandler $eventHandler): void
+    public function add(string $event, IEventHandler $eventHandler): void
     {
-        if (!isset($this->eventHandlersByType[$eventType])) {
-            $this->eventHandlersByType[$eventType] = [];
+        if (!isset($this->handlersByEvent[$event])) {
+            $this->handlersByEvent[$event] = [];
         }
-        $this->eventHandlersByType[$eventType][] = $eventHandler;
+
+        $this->handlersByEvent[$event][] = $eventHandler;
     }
 
-    public function removeEventHandler(string $eventType, IEventHandler $eventHandler): void
+    public function remove(string $event, IEventHandler $eventHandler): void
     {
-        if (!empty($this->eventHandlersByType[$eventType]) && false !== ($key = array_search(
-            $eventHandler,
-            $this->eventHandlersByType[$eventType],
-            true
-        ))) {
-            unset($this->eventHandlersByType[$eventType][$key]);
+        $indexOfHandler = false;
+        if (!empty($this->handlersByEvent[$event])) {
+            $indexOfHandler = array_search($eventHandler, $this->handlersByEvent[$event], true);
+        }
+
+        if ($indexOfHandler !== false) {
+            unset($this->handlersByEvent[$event][$indexOfHandler]);
         }
     }
 
-    public function getEventHandlers(string $eventType): array
+    public function getEventHandlers(string $event): array
     {
-        return isset($this->eventHandlersByType[$eventType]) ? $this->eventHandlersByType[$eventType] : [];
+        return isset($this->handlersByEvent[$event]) ? $this->handlersByEvent[$event] : [];
     }
 
-    public function clear(string $eventType): void
+    public function clear(string $event): void
     {
-        $this->eventHandlersByType[$eventType] = [];
+        $this->handlersByEvent[$event] = [];
     }
 
     public function clearAll(): void
     {
-        $this->eventHandlersByType = [];
+        $this->handlersByEvent = [];
     }
 
     public function raise(Event $event): void
     {
-        $type                              = $event->getType();
-        $this->lastRaisedByTypeInMs[$type] = microtime(true);
+        $name                                 = $event->getName();
+        $this->raiseTimesInMsByEvent[$name][] = microtime(true);
 
-        if (!empty($this->eventHandlersByType[$type])) {
+        if (!empty($this->handlersByEvent[$name])) {
             /** @var IEventHandler $handler */
-            foreach ($this->eventHandlersByType[$type] as $handler) {
+            foreach ($this->handlersByEvent[$name] as $handler) {
                 $handler->handleEvent($event);
             }
         }
     }
 
-    public function getLastRaisedInMs(string $eventType): ?float
+    public function isRaised(string $event): bool
     {
-        return isset($this->lastRaisedByTypeInMs[$eventType])
-            ? $this->lastRaisedByTypeInMs[$eventType]
-            : null;
+        return isset($this->raiseTimesInMsByEvent[$event]);
+    }
+
+    public function getRaiseTimes(string $event): array
+    {
+        return isset($this->raiseTimesInMsByEvent[$event])
+            ? $this->raiseTimesInMsByEvent[$event]
+            : [];
+    }
+
+    public function getAllRaiseTimes(): array
+    {
+        return $this->raiseTimesInMsByEvent;
     }
 }

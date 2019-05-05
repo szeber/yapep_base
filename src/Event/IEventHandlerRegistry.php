@@ -13,12 +13,12 @@ interface IEventHandlerRegistry
     /**
      * Registers a new event handler for the given event type
      */
-    public function registerEventHandler(string $eventType, IEventHandler $eventHandler): void;
+    public function add(string $eventType, IEventHandler $eventHandler): void;
 
     /**
      * Removes an event handler
      */
-    public function removeEventHandler(string $eventType, IEventHandler $eventHandler): void;
+    public function remove(string $eventType, IEventHandler $eventHandler): void;
 
     /**
      * Returns an array containing all the event handlers registered to the event type
@@ -43,7 +43,21 @@ interface IEventHandlerRegistry
     public function raise(Event $event): void;
 
     /**
-     * Returns the timestamp of the time the given event type was last raised in Micro Seconds.
+     * Tells if the event has been raised already.
      */
-    public function getLastRaisedInMs(string $eventType): ?float;
+    public function isRaised(string $event): bool;
+
+    /**
+     * Returns the timestamp of the time the given event type was last raised in Micro Seconds.
+     *
+     * @return float[]
+     */
+    public function getRaiseTimes(string $eventType): array;
+
+    /**
+     * Returns the last raise time of all raised events.
+     *
+     * @return float[][]
+     */
+    public function getAllRaiseTimes(): array;
 }
