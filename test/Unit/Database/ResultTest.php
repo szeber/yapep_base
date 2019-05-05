@@ -10,6 +10,17 @@ use YapepBase\Test\Unit\TestAbstract;
 
 class ResultTest extends TestAbstract
 {
+    /** @var \PDOStatement|MockInterface */
+    private $statement;
+    /** @var string  */
+    private $className = 'class';
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->statement = \Mockery::mock(\PDOStatement::class);
+    }
+
     public function fetchResultProvider(): array
     {
         return [
@@ -23,22 +34,42 @@ class ResultTest extends TestAbstract
      */
     public function testFetch_shouldReturnRetrievedDataOrNull($fetchResult, $expectedResult)
     {
-        $statement = \Mockery::mock(\PDOStatement::class);
-        $result    = new Result($statement);
+        $result    = new Result($this->statement);
 
-        $this->expectFetch($statement, $fetchResult);
+        $this->expectFetch($fetchResult);
         $fetchResult = $result->fetch();
+
+        $this->assertSame($expectedResult, $fetchResult);
+    }
+
+    public function fetchObjectResultProvider(): array
+    {
+        $object = new \stdClass();
+        return [
+            [$object, $object],
+            [false, null]
+        ];
+    }
+
+    /**
+     * @dataProvider fetchObjectResultProvider
+     */
+    public function testFetchClass_shouldReturnFetchedDataAsObject($fetchResult, $expectedResult)
+    {
+        $result    = new Result($this->statement);
+
+        $this->expectFetchObject($fetchResult);
+        $fetchResult = $result->fetchClass($this->className);
 
         $this->assertSame($expectedResult, $fetchResult);
     }
 
     public function testFetchAll_shouldReturnRetrievedAssociativeData()
     {
-        $statement = \Mockery::mock(\PDOStatement::class);
-        $result    = new Result($statement);
+        $result    = new Result($this->statement);
         $expectedResult = [['test' => 1]];
 
-        $this->expectFetchAll($statement, $expectedResult);
+        $this->expectFetchAll($expectedResult);
         $fetchResult = $result->fetchAll();
 
         $this->assertSame($expectedResult, $fetchResult);
@@ -49,11 +80,10 @@ class ResultTest extends TestAbstract
      */
     public function testFetchColumn_shouldReturnRetrievedDataOrNull($fetchResult, $expectedResult)
     {
-        $statement   = \Mockery::mock(\PDOStatement::class);
-        $result      = new Result($statement);
+        $result      = new Result($this->statement);
         $columnIndex = 2;
 
-        $this->expectFetchColumn($statement, $columnIndex, $fetchResult);
+        $this->expectFetchColumn($columnIndex, $fetchResult);
         $fetchResult = $result->fetchColumn($columnIndex);
 
         $this->assertSame($expectedResult, $fetchResult);
@@ -61,13 +91,12 @@ class ResultTest extends TestAbstract
 
     public function testFetchColumnAll_shouldReturnColumn()
     {
-        $statement   = \Mockery::mock(\PDOStatement::class);
-        $result      = new Result($statement);
+        $result      = new Result($this->statement);
         $columnIndex = 2;
 
-        $this->expectFetchColumn($statement, $columnIndex, 'one');
-        $this->expectFetchColumn($statement, $columnIndex, 'two');
-        $this->expectFetchColumn($statement, $columnIndex, false);
+        $this->expectFetchColumn($columnIndex, 'one');
+        $this->expectFetchColumn($columnIndex, 'two');
+        $this->expectFetchColumn($columnIndex, false);
         $fetchResult = $result->fetchColumnAll($columnIndex);
 
         $this->assertSame(['one', 'two'], $fetchResult);
@@ -75,46 +104,45 @@ class ResultTest extends TestAbstract
 
     public function testFetchClassAll_shouldReturnRetrievedDataAsObjects()
     {
-        $statement   = \Mockery::mock(\PDOStatement::class);
-        $result      = new Result($statement);
+        $result      = new Result($this->statement);
         $fetchResult = [['test' => 1]];
         $className   = \stdClass::class;
 
-        $this->expectFetchAllClass($statement, $className, $fetchResult);
+        $this->expectFetchAllClass($className, $fetchResult);
         $result = $result->fetchAllClass($className);
 
         $this->assertSame($fetchResult, $result);
     }
 
-    private function expectFetch(MockInterface $statement, $expectedResult)
+    private function expectFetch($expectedResult)
     {
-        $statement
+        $this->statement
             ->shouldReceive('fetch')
             ->once()
             ->andReturn($expectedResult);
     }
 
-    private function expectFetchAll(MockInterface $statement, $expectedResult)
+    private function expectFetchAll($expectedResult)
     {
-        $statement
+        $this->statement
             ->shouldReceive('fetchAll')
             ->once()
             ->with(\PDO::FETCH_ASSOC)
             ->andReturn($expectedResult);
     }
 
-    private function expectFetchColumn(MockInterface $statement, int $columnIndex, $expectedResult)
+    private function expectFetchColumn(int $columnIndex, $expectedResult)
     {
-        $statement
+        $this->statement
             ->shouldReceive('fetchColumn')
             ->once()
             ->with($columnIndex)
             ->andReturn($expectedResult);
     }
 
-    private function expectFetchAllClass(MockInterface $statement, string $className, $expectedResult)
+    private function expectFetchAllClass(string $className, $expectedResult)
     {
-        $statement
+        $this->statement
             ->shouldReceive('setFetchMode')
                 ->once()
                 ->with(PDO::FETCH_CLASS, $className)
@@ -122,5 +150,14 @@ class ResultTest extends TestAbstract
             ->shouldReceive('fetchAll')
                 ->once()
                 ->andReturn($expectedResult);
+    }
+
+    private function expectFetchObject($expectedResult): void
+    {
+        $this->statement
+            ->shouldReceive('fetchObject')
+            ->once()
+            ->with($this->className)
+            ->andReturn($expectedResult);
     }
 }
