@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace YapepBase\DataObject;
+namespace YapepBase\Entity;
 
 /**
  * Class which represents a value what has never been set.
