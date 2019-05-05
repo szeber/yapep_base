@@ -8,15 +8,14 @@ namespace YapepBase\Event;
  */
 class EventHandlerRegistry implements IEventHandlerRegistry
 {
-    /**
-     * @var array
-     */
+    /** @var array*/
     protected $eventHandlersByType = [];
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $lastRaisedByTypeInMs = [];
+
+    /** @var array  */
+    protected $raisedEvents = [];
 
     public function registerEventHandler(string $eventType, IEventHandler $eventHandler): void
     {
@@ -54,15 +53,16 @@ class EventHandlerRegistry implements IEventHandlerRegistry
 
     public function raise(Event $event): void
     {
-        $type                              = $event->getType();
-        $this->lastRaisedByTypeInMs[$type] = microtime(true);
+        $eventName                              = $event->getType();
+        $this->lastRaisedByTypeInMs[$eventName] = microtime(true);
 
-        if (!empty($this->eventHandlersByType[$type])) {
+        if (!empty($this->eventHandlersByType[$eventName])) {
             /** @var IEventHandler $handler */
-            foreach ($this->eventHandlersByType[$type] as $handler) {
+            foreach ($this->eventHandlersByType[$eventName] as $handler) {
                 $handler->handleEvent($event);
             }
         }
+        $this->raisedEvents[] = $eventName;
     }
 
     public function getLastRaisedInMs(string $eventType): ?float
@@ -70,5 +70,10 @@ class EventHandlerRegistry implements IEventHandlerRegistry
         return isset($this->lastRaisedByTypeInMs[$eventType])
             ? $this->lastRaisedByTypeInMs[$eventType]
             : null;
+    }
+
+    public function isRaised(string $eventName): bool
+    {
+        return in_array($eventName, $this->raisedEvents);
     }
 }

@@ -17,6 +17,9 @@ use YapepBase\Config;
  */
 class ErrorMessage extends MessageAbstract
 {
+    const FIELD_ERROR_ID = 'error_id';
+    const FIELD_TYPE     = 'type';
+
     /**
      * Retuns the log tag
      *
@@ -43,9 +46,9 @@ class ErrorMessage extends MessageAbstract
     {
         $this->message = $errorMessage;
         $this->fields  = [
-            'error_id' => $errorId,
-            'type'     => $errorType,
-            'app'      => Config::getInstance()->get('system.application.name', ''),
+            self::FIELD_ERROR_ID => $errorId,
+            self::FIELD_TYPE     => $errorType,
+            'app'                => Config::getInstance()->get('system.application.name', ''),
         ];
 
         $this->priority = $priority;

@@ -1,69 +1,36 @@
 <?php
 declare(strict_types=1);
-/**
- * This file is part of YAPEPBase.
- *
- * @copyright    2011 The YAPEP Project All rights reserved.
- * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
- */
-namespace YapepBase\ErrorHandler;
 
-/**
- * Contains helper methods for error handlers.
- */
-class ErrorHandlerHelper
+namespace YapepBase\Error\Helper;
+
+use YapepBase\Error\Entity\Error;
+
+class ErrorHelper
 {
     /** Code of the error represents an exception. (2^30) */
     const E_EXCEPTION = 1073741824;
 
-    // Error descriptions
-    /** PHP Error description */
     const E_ERROR_DESCRIPTION             = 'E_ERROR';
-    /** PHP Warning description */
     const E_WARNING_DESCRIPTION           = 'E_WARNING';
-    /** Parse error description */
     const E_PARSE_DESCRIPTION             = 'E_PARSE';
-    /** PHP Notice description */
     const E_NOTICE_DESCRIPTION            = 'E_NOTICE';
-    /** Core error description */
     const E_CORE_ERROR_DESCRIPTION        = 'E_CORE_ERROR';
-    /** Core warning description */
     const E_CORE_WARNING_DESCRIPTION      = 'E_CORE_WARNING';
-    /** Compile error description */
     const E_COMPILE_ERROR_DESCRIPTION     = 'E_COMPILE_ERROR';
-    /** Compile warning desription */
     const E_COMPILE_WARNING_DESCRIPTION   = 'E_COMPILE_WARNINING';
-    /** User error description */
     const E_USER_ERROR_DESCRIPTION        = 'E_USER_ERROR';
-    /** User warning description */
     const E_USER_WARNING_DESCRIPTION      = 'E_USER_WARNING';
-    /** User notice description */
     const E_USER_NOTICE_DESCRIPTION       = 'E_USER_NOTICE';
-    /** Strict error description */
     const E_STRICT_DESCRIPTION            = 'E_STRICT';
-    /** Catchable fatal error description */
     const E_RECOVERABLE_ERROR_DESCRIPTION = 'E_RECOVERABLE_ERROR';
-    /** Deprecated description */
     const E_DEPRECATED_DESCRIPTION        = 'E_DEPRECATED';
-    /** User deprecated description */
     const E_USER_DEPRECATED_DESCRIPTION   = 'E_USER_DEPRECATED';
-    /** Exception description */
-    const E_EXCEPTION_DESCRIPTION           = 'E_EXCEPTION';
-    /** Unknown error level description */
-    const UNKNOWN_DESCRIPTION             = 'UNKOWN';
+    const E_EXCEPTION_DESCRIPTION         = 'E_EXCEPTION';
+    const UNKNOWN_DESCRIPTION             = 'UNKNOWN';
 
-    /**
-     * Returns the description for the provided error level
-     *
-     * @param int $errorLevel   The error level to check.
-     *
-     * @return string
-     *
-     * @codeCoverageIgnore
-     */
-    public function getPhpErrorLevelDescription($errorLevel)
+    public function getDescription(int $errorCode): string
     {
-        switch ($errorLevel) {
+        switch ($errorCode) {
             case E_ERROR:
                 $description = self::E_ERROR_DESCRIPTION;
                 break;
@@ -136,17 +103,9 @@ class ErrorHandlerHelper
         return $description;
     }
 
-    /**
-     * Returns the applicable log priority for the specified errorlevel
-     *
-     * @param int $errorLevel   The error level to check.
-     *
-     * @return int
-     * @codeCoverageIgnore
-     */
-    public function getLogPriorityForErrorLevel($errorLevel)
+    public function getLogPriorityForErrorCode(int $errorCode): int
     {
-        switch ($errorLevel) {
+        switch ($errorCode) {
             case E_ERROR:
             case E_PARSE:
             case E_CORE_ERROR:
@@ -175,5 +134,39 @@ class ErrorHandlerHelper
         }
 
         return $logLevel;
+    }
+
+    public function isFatal(int $errorCode): bool
+    {
+        switch ($errorCode) {
+            case E_ERROR:
+            case E_PARSE:
+            case E_CORE_ERROR:
+            case E_COMPILE_ERROR:
+            case E_RECOVERABLE_ERROR:
+                return true;
+                break;
+        }
+
+        return false;
+    }
+
+    public function getLastError(): ?Error
+    {
+        $error = error_get_last();
+
+        return empty($error)
+            ? null
+            : new Error((int)$error['type'], $error['message'], $error['file'], (int)$error['line']);
+    }
+
+    public function log(string $message): void
+    {
+        error_log($message, 4);
+    }
+
+    public function exit(): void
+    {
+        exit;
     }
 }

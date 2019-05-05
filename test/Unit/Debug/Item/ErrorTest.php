@@ -12,18 +12,16 @@ class ErrorTest extends TestAbstract
     protected $message = 'message';
     protected $file    = 'file.php';
     protected $line    = 2;
-    protected $context = ['test' => 1];
     protected $id      = 'errorId';
 
     public function testConstructorWhenEverythingSet_shouldStoreGivenValues()
     {
-        $error = new Error($this->code, $this->message, $this->file, $this->line, $this->context, $this->id);
+        $error = new Error($this->code, $this->message, $this->file, $this->line, $this->id);
 
         $this->assertSame($this->code, $error->getCode());
         $this->assertSame($this->message, $error->getMessage());
         $this->assertSame($this->file, $error->getFile());
         $this->assertSame($this->line, $error->getLine());
-        $this->assertSame($this->context, $error->getContext());
         $this->assertSame($this->id, $error->getId());
     }
 }

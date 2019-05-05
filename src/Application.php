@@ -29,9 +29,6 @@ class Application
     /** @var string */
     protected $errorControllerName;
 
-    /** @var bool */
-    protected $isStarted = false;
-
     /**
      * Singleton constructor
      */
@@ -107,8 +104,6 @@ class Application
 
         $eventHandlerRegistry = $this->diContainer->getEventHandlerRegistry();
 
-        $this->isStarted = true;
-
         try {
             $eventHandlerRegistry->raise(new Event(Event::TYPE_APPLICATION_BEFORE_RUN));
             $controllerAction = null;
@@ -139,11 +134,6 @@ class Application
         $this->raiseRequiredEventsIfNotRaisedYet();
 
         $eventHandlerRegistry->raise(new Event(Event::TYPE_APPLICATION_AFTER_RUN));
-    }
-
-    public function isStarted(): bool
-    {
-        return $this->isStarted;
     }
 
     /**
@@ -257,7 +247,7 @@ class Application
     /**
      * Sends an error to the output.
      */
-    public function outputError(): void
+    private function outputError(): void
     {
         try {
             $this->diContainer->getResponse()->sendError();

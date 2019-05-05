@@ -46,4 +46,9 @@ interface IEventHandlerRegistry
      * Returns the timestamp of the time the given event type was last raised in Micro Seconds.
      */
     public function getLastRaisedInMs(string $eventType): ?float;
+
+    /**
+     * Tells if an event has been already raised or not
+     */
+    public function isRaised(string $eventName): bool;
 }

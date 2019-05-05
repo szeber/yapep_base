@@ -10,6 +10,8 @@ namespace YapepBase\Event;
 
 /**
  * Class that describes an event.
+ *
+ * @todo Refactor this. Remove the type prefixes as they are names not types. And find better names where needed [emul]
  */
 class Event
 {

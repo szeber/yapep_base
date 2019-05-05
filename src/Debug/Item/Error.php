@@ -16,18 +16,15 @@ class Error extends ItemAbstract
     protected $file;
     /** @var int */
     protected $line;
-    /** @var array */
-    protected $context = [];
     /** @var string */
     protected $id;
 
-    public function __construct(int $code, string $message, string $file, int $line, array $context, string $id)
+    public function __construct(int $code, string $message, string $file, int $line, string $id)
     {
         $this->code    = $code;
         $this->message = $message;
         $this->file    = $file;
         $this->line    = $line;
-        $this->context = $context;
         $this->id      = $id;
     }
 
@@ -51,11 +48,6 @@ class Error extends ItemAbstract
         return $this->line;
     }
 
-    public function getContext(): array
-    {
-        return $this->context;
-    }
-
     public function getId(): string
     {
         return $this->id;
@@ -68,7 +60,6 @@ class Error extends ItemAbstract
             'message' => $this->message,
             'file'    => $this->file,
             'line'    => $this->line,
-            'context' => $this->context,
             'id'      => $this->id,
         ];
     }
