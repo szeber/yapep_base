@@ -95,10 +95,10 @@ class UrlHelper extends HelperAbstract
      */
     public function getCurrentUrl($withParams = true, array $extraParams = [])
     {
-        /** @var \YapepBase\Request\HttpRequest $request */
+        /** @var \YapepBase\Request\Request $request */
         $request = Application::getInstance()->getRequest();
 
-        $url    = $request->getTarget();
+        $url    = $request->getTargetUri();
         $params = [];
 
         if ($withParams) {
@@ -134,11 +134,11 @@ class UrlHelper extends HelperAbstract
     public function checkIsCurrentUri($controller, $action, array $params)
     {
         $application = Application::getInstance();
-        /** @var \YapepBase\Request\HttpRequest $request */
+        /** @var \YapepBase\Request\Request $request */
         $request = $application->getRequest();
         $router  = $application->getRouter();
 
-        $uri = rtrim($request->getTarget(), '/');
+        $uri = rtrim($request->getTargetUri(), '/');
 
         return $uri == rtrim($router->getPathByControllerAction($controller, $action, $params), '/');
     }

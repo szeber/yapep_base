@@ -1,45 +1,64 @@
 <?php
 declare(strict_types=1);
-/**
- * This file is part of YAPEPBase.
- *
- * @copyright    2011 The YAPEP Project All rights reserved.
- * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
- */
+
 namespace YapepBase\Database;
 
 use PDO;
+use YapepBase\DataBase\Exception\Exception;
 
 /**
  * Sqlite database connection implementation.
  */
-class SqliteConnection extends DbConnection
+class SqliteConnection implements IConnection
 {
-    /**
-     * Opens the connection.
-     *
-     * @param array $configuration   The configuration for the connection.
-     *
-     * @return void
-     *
-     * @throws \PDOException   On connection errors.
-     */
-    protected function connect(array $configuration)
-    {
-        $dsn     = 'sqlite:' . $configuration['path'];
-        $options = ((!empty($configuration['options']) && is_array($configuration['options']))
-            ? $configuration['options'] : []);
+    /** @var string */
+    protected $dsn;
+    /** @var string  */
+    protected $path;
+    /** @var array */
+    protected $pdoOptions = [];
+    /** @var PDO */
+    protected $pdoConnection;
 
-        $this->connection = new PDO($dsn, null, null, $options);
+    public function __construct(string $path, array $pdoOptions = [])
+    {
+        $this->path       = $path;
+        $this->pdoOptions = $pdoOptions;
+        $this->dsn        = 'sqlite:' . $this->path;
     }
 
-    /**
-     * Returns the backend type for the given conneciton {@uses DbFactory::BACKEND_TYPE_*}
-     *
-     * @return string
-     */
-    protected function getBackendType()
+    public function connect(): void
     {
-        return DbFactory::BACKEND_TYPE_SQLITE;
+        try {
+            $this->pdoConnection = new PDO($this->dsn, '', '', $this->pdoOptions);
+        }
+        catch (\PDOException $e) {
+            Exception::throwByPdoException($e);
+        }
+    }
+
+    public function disconnect(): void
+    {
+        $this->pdoConnection = null;
+    }
+
+    public function getDsn(): string
+    {
+       return $this->dsn;
+    }
+
+    public function getInitialiseQueries(): array
+    {
+        return [];
+    }
+
+    public function prepareStatement(string $query): \PDOStatement
+    {
+        return $this->pdoConnection->prepare($query);
+    }
+
+    public function getLastInsertId(?string $name): string
+    {
+        return $this->pdoConnection->lastInsertId($name);
     }
 }

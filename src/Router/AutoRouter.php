@@ -14,7 +14,7 @@ class AutoRouter implements IRouter
 {
     public function getControllerActionByRequest(IRequest $request): ControllerAction
     {
-        return $this->getControllerActionByMethodAndPath($request->getMethod(), $request->getTarget());
+        return $this->getControllerActionByMethodAndPath($request->getMethod(), $request->getTargetUri());
     }
 
     public function getControllerActionByMethodAndPath(string $method, string $path): ControllerAction

@@ -1,73 +1,41 @@
 <?php
 declare(strict_types=1);
-/**
- * This file is part of YAPEPBase.
- *
- * @copyright    2011 The YAPEP Project All rights reserved.
- * @license      http://www.opensource.org/licenses/bsd-license.php BSD License
- */
+
 namespace YapepBase\Controller;
 
-use YapepBase\Exception\ControllerException;
+use YapepBase\Controller\Exception\ActionNotFoundException;
+use YapepBase\View\IRenderable;
 
 /**
  * Base class for error controllers.
  */
-abstract class ErrorControllerAbstract extends HttpControllerAbstract
+abstract class ErrorControllerAbstract extends ControllerAbstract
 {
-    /**
-     * Runs before the action.
-     *
-     * @return void
-     *
-     * @throws \YapepBase\Exception\ControllerException   On error.
-     */
-    protected function before()
+    protected function runBeforeAction(): void
     {
-        // Clear all previous output before rendering
         $this->response->getOutputHandler()->clear();
-        parent::before();
+        parent::runBeforeAction();
     }
 
     /**
      * Runs on page not found (404) errors
-     *
-     * @return \YapepBase\View\TemplateAbstract|string
      */
-    abstract protected function do404();
+    abstract protected function do404(): IRenderable;
 
     /**
-     * Runs on internal server error (500) erorrs
-     *
-     * @return \YapepBase\View\TemplateAbstract|string
+     * Runs on internal server error (500) errors
      */
-    abstract protected function do500();
+    abstract protected function do500(): IRenderable;
 
-    /**
-     * Runs the specified action
-     *
-     * @param int $errorCode The name of the action (without the controller specific prefix)
-     *
-     * @return void
-     *
-     * @throws \YapepBase\Exception\ControllerException   On controller specific error.
-     * @throws \YapepBase\Exception\Exception             On framework related errors.
-     * @throws \YapepBase\Exception\RedirectException     On redirections.
-     * @throws \Exception                                 On non-framework related errors.
-     */
-    public function run($errorCode)
+    public function run(string $errorCode): void
     {
         try {
-            $this->response->setStatusCode($errorCode);
+            $this->response->setStatusCode((int)$errorCode);
             parent::run($errorCode);
-        } catch (ControllerException $exception) {
-            if ($exception->getCode() != ControllerException::ERR_ACTION_NOT_FOUND) {
-                // We only handle the exception if it's because of a missing action
-                throw $exception;
-            }
+        } catch (ActionNotFoundException $exception) {
             // Action not found for the specified error code, log the error and run with 500 instead.
-            trigger_error('Action not found for error code: ' . $errorCode, E_USER_WARNING);
-            $this->run(500);
+            trigger_error($exception->getMessage(), E_USER_WARNING);
+            $this->run('500');
         }
     }
 }

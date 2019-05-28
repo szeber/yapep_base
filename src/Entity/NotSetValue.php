@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace YapepBase\DataObject;
+namespace YapepBase\Entity;
 
 /**
  * Class which represents a value what has never been set.
@@ -13,7 +13,7 @@ class NotSetValue implements \JsonSerializable
         return null;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return '';
     }
