@@ -15,7 +15,7 @@ namespace YapepBase\Batch;
 use YapepBase\Application;
 use YapepBase\DependencyInjection\Container;
 use YapepBase\ErrorHandler\ITerminatable;
-use YapepBase\Event\Event;
+use YapepBase\Event\Entity\Event;
 use YapepBase\Exception\ParameterException;
 use YapepBase\Mime\MimeType;
 use YapepBase\View\Data\Data;
@@ -222,7 +222,7 @@ abstract class BatchScript implements ITerminatable
     {
         $this->setAsTerminator();
         $eventHandlerRegistry = Application::getInstance()->getDiContainer()->getEventHandlerRegistry();
-        $eventHandlerRegistry->raise(new Event(Event::TYPE_APPLICATION_BEFORE_RUN));
+        $eventHandlerRegistry->raise(new Event(Event::APPLICATION_STARTED));
 
         $this->prepareSwitches();
 
@@ -261,7 +261,7 @@ abstract class BatchScript implements ITerminatable
         $this->removeSignalHandler();
 
         $this->runAfter();
-        $eventHandlerRegistry->raise(new Event(Event::TYPE_APPLICATION_AFTER_RUN));
+        $eventHandlerRegistry->raise(new Event(Event::APPLICATION_FINISHED));
     }
 
     /**
