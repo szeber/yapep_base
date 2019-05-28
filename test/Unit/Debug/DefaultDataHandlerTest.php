@@ -36,7 +36,7 @@ class DefaultDataHandlerTest extends TestAbstract
 
     public function testAddError_shouldStoreGivenItem()
     {
-        $item = new Error(1, 'm', 'file', 1, [], '1');
+        $item = new Error(1, 'm', 'file', 1, '1');
         $this->dataHandler->addError($item);
 
         $this->assertGivenItemStoredOnly($this->dataHandler->getErrorItems(), $item);

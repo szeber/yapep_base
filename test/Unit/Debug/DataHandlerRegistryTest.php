@@ -93,7 +93,7 @@ class DataHandlerRegistryTest extends TestAbstract
     public function testAddError_shouldAddToAllHandlers()
     {
         $this->registerHandlers();
-        $item = new Error(1, 'm', 'file', 1, [], '1');
+        $item = new Error(1, 'm', 'file', 1, '1');
 
         $this->expectAddItemCalledOnHandlers('addError', $item);
         $this->registry->addError($item);
