@@ -73,7 +73,7 @@ class FileHandlerMock
             ->shouldReceive('makeDirectory')
             ->once()
             ->with($this->path, 0644 | 0111, true)
-            ->andThrows(new \YapepBase\Exception\File\Exception('Create Failed'));
+            ->andThrows(new \YapepBase\File\Exception\Exception('Create Failed'));
 
         return $this;
     }
@@ -83,7 +83,7 @@ class FileHandlerMock
         $this->fileHandler
             ->shouldReceive('write')
             ->once()
-            ->andThrows(new \YapepBase\Exception\File\Exception('Test'));
+            ->andThrows(new \YapepBase\File\Exception\Exception('Test'));
 
         return $this;
     }
@@ -161,7 +161,7 @@ class FileHandlerMock
             ->shouldReceive('removeDirectory')
             ->once()
             ->with($this->path, true)
-            ->andThrows(new \YapepBase\Exception\File\Exception('test'));
+            ->andThrows(new \YapepBase\File\Exception\Exception('test'));
 
         return $this;
     }

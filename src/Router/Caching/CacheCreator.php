@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace YapepBase\Router\Caching;
 
-use YapepBase\Exception\File\Exception;
+use YapepBase\File\Exception\Exception;
 use YapepBase\File\IFileHandler;
 use YapepBase\Router\Collector\IRouteCollector;
 

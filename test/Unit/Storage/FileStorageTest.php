@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace YapepBase\Test\Unit\Storage;
 
 use YapepBase\Debug\Item\Storage;
-use YapepBase\Exception\File\Exception;
-use YapepBase\Exception\File\NotFoundException;
+use YapepBase\File\Exception\Exception;
+use YapepBase\File\Exception\NotFoundException;
 use YapepBase\Exception\InvalidArgumentException;
 use YapepBase\Exception\StorageException;
 use YapepBase\Storage\Entity\File;
