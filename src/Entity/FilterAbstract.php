@@ -5,16 +5,19 @@ namespace YapepBase\Entity;
 
 use YapepBase\Exception\InvalidArgumentException;
 
-class FilterAbstract
+/**
+ * Represents a filter object.
+ */
+abstract class FilterAbstract
 {
     /** @var int|null */
-    private $page;
+    protected $page;
     /** @var int|null */
-    private $itemsPerPage;
+    protected $itemsPerPage;
     /** @var string|null */
-    private $orderField;
-    /** @var int|null */
-    private $orderDirection;
+    protected $orderField;
+    /** @var bool */
+    protected $isOrderReversed = false;
 
     /**
      * @return static
@@ -51,9 +54,9 @@ class FilterAbstract
     /**
      * @return static
      */
-    public function setOrderField(string $orderField)
+    public function setOrderField(string $order)
     {
-        $this->orderField = $orderField;
+        $this->orderField = $order;
 
         return $this;
     }
@@ -61,18 +64,9 @@ class FilterAbstract
     /**
      * @return static
      */
-    public function setOrderDirectionAscending()
+    public function setReverseOrder()
     {
-        $this->orderDirection = 1;
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    public function setOrderDirectionDescending()
-    {
-        $this->orderDirection = -1;
+        $this->isOrderReversed = true;
         return $this;
     }
 
@@ -81,9 +75,9 @@ class FilterAbstract
         return $this->orderField;
     }
 
-    public function getOrderDirection(): ?int
+    public function isOrderReversed(): bool
     {
-        return $this->orderDirection;
+        return $this->isOrderReversed;
     }
 
     public function getPage(): ?int
@@ -94,12 +88,5 @@ class FilterAbstract
     public function getItemsPerPage(): ?int
     {
         return $this->itemsPerPage;
-    }
-
-    public function getId(): string
-    {
-        $properties = (string)print_r($this, true);
-
-        return md5($properties);
     }
 }

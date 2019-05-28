@@ -13,7 +13,7 @@ class NotSetValue implements \JsonSerializable
         return null;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return '';
     }
