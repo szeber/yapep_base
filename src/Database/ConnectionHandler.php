@@ -23,9 +23,6 @@ class ConnectionHandler implements IConnectionHandler
     /** @var IConnection|IHandlesTransactions */
     protected $connection;
 
-    /** @var string */
-    protected $connectionName;
-
     /** @var int */
     protected $openTransactionCount = 0;
 

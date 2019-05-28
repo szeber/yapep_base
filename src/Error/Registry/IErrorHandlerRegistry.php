@@ -1,8 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace YapepBase\ErrorHandler;
+namespace YapepBase\Error\Registry;
 
+use YapepBase\Error\Handler\IErrorHandler;
+use YapepBase\ErrorHandler\ITerminatable;
 use YapepBase\Exception\Exception;
 
 interface IErrorHandlerRegistry
@@ -20,48 +22,40 @@ interface IErrorHandlerRegistry
     /**
      * Adds an error handler to the container.
      */
-    public function addErrorHandler(IErrorHandler $errorHandler): void;
+    public function add(IErrorHandler $errorHandler): void;
 
     /**
      * Removes an error handler from the container.
      */
-    public function removeErrorHandler(IErrorHandler $errorHandler): void;
+    public function remove(IErrorHandler $errorHandler): void;
 
     /**
      * Returns the error handlers assigned to the container.
      *
      * @return IErrorHandler[]
      */
-    public function getErrorHandlers(): array;
+    public function getAll(): array;
 
     /**
      * Handles an error.
      *
      * Should not be called manually, only by PHP.
      *
-     * @param int    $errorLevel The error code {@uses E_*}
-     * @param string $message    The error message.
-     * @param string $file       The file where the error occurred.
-     * @param int    $line       The line in the file where the error occurred.
-     * @param array  $context    The context of the error. (All variables that exist in the scope the error occurred)
-     *
      * @return bool   TRUE if we were able to handle the error, FALSE otherwise.
      */
-    public function handleError(int $errorLevel, string $message, string $file, int $line, array $context): bool;
+    public function handleError(int $errorCode, string $message, string $file, int $line): bool;
 
     /**
      * Handles an unhandled exception
      *
      * Should not be called manually, only by PHP.
-     *
-     * @param \Exception $exception The exception to handle.
      */
-    public function handleException(Exception $exception): void;
+    public function handleException(\Exception $exception): void;
 
     /**
      * Sets the terminator object.
      *
-     * @throws \YapepBase\Exception\Exception   If trying to add a terminator when a terminator is already set.
+     * @throws Exception
      */
     public function setTerminator(ITerminatable $terminator): void;
 

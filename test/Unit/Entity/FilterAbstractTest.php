@@ -43,26 +43,4 @@ class FilterAbstractTest extends TestAbstract
 
         $this->assertSame($itemsPerPage, $filter->getItemsPerPage());
     }
-
-    public function testGetId_shouldReturnTheSameIfFilterHasSameProperties()
-    {
-        $filter1 = new FilterStub();
-        $filter2 = new FilterStub();
-
-        $filter1->setTest(1);
-        $filter2->setTest(1);
-
-        $this->assertSame($filter1->getId(), $filter2->getId());
-    }
-
-    public function testGetId_shouldReturnTheDifferentIfFilterHasDifferentProperties()
-    {
-        $filter1 = new FilterStub();
-        $filter2 = new FilterStub();
-
-        $filter1->setTest(1);
-        $filter2->setTest(2);
-
-        $this->assertNotEquals($filter1->getId(), $filter2->getId());
-    }
 }

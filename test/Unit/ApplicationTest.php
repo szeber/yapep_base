@@ -73,8 +73,6 @@ class ApplicationTest extends TestAbstract
     {
         $this->expectException(Exception::class);
         $this->application->run();
-
-        $this->assertTrue($this->application->isStarted());
     }
 
     public function testGetDiContainerWhenSet_shouldReturnSetContainer()
