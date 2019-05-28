@@ -7,8 +7,8 @@ use Mockery;
 use Mockery\MockInterface;
 use YapepBase\Application;
 use YapepBase\Controller\IController;
-use YapepBase\Event\Event;
-use YapepBase\Event\EventHandlerRegistry;
+use YapepBase\Event\Entity\Event;
+use YapepBase\Event\IEventHandlerRegistry;
 use YapepBase\Exception\Exception;
 use YapepBase\Exception\RedirectException;
 use YapepBase\Exception\RouterException;
@@ -20,21 +20,23 @@ use YapepBase\Router\IRouter;
 class ApplicationTest extends TestAbstract
 {
     /** @var Application */
-    protected $application;
-    /** @var MockInterface */
-    protected $eventHandlerRegistry;
+    private $application;
+    /** @var IEventHandlerRegistry|MockInterface */
+    private $eventHandlerRegistry;
 
     /** @var string */
-    protected $errorControllerName = 'ErrorController';
+    private $errorControllerName = 'ErrorController';
     /** @var string */
-    protected $controllerName = 'TestController';
+    private $controllerName = 'TestController';
     /** @var string */
-    protected $actionName = 'testAction';
+    private $actionName = 'testAction';
 
-    /** @var MockInterface */
-    protected $request;
-    /** @var MockInterface */
-    protected $response;
+    /** @var IRequest|MockInterface */
+    private $request;
+    /** @var IResponse|MockInterface */
+    private $response;
+    /** @var IRouter|MockInterface */
+    private $router;
 
     protected function setUp(): void
     {
@@ -45,25 +47,26 @@ class ApplicationTest extends TestAbstract
         $this->registerRequestAndResponse();
     }
 
-    protected function registerEventHandler()
+    private function registerEventHandler()
     {
-        $this->eventHandlerRegistry = Mockery
-            ::mock(EventHandlerRegistry::class)
-            ->shouldReceive('getLastRaisedInMs')
+        $this->eventHandlerRegistry = Mockery::mock(IEventHandlerRegistry::class)
+            ->shouldReceive('isRaised')
             ->zeroOrMoreTimes()
-            ->andReturn(1)
+            ->andReturn(true)
             ->getMock();
         $this->pimpleContainer->setEventHandlerRegistry($this->eventHandlerRegistry);
     }
 
-    protected function registerRequestAndResponse()
+    private function registerRequestAndResponse()
     {
         $this->request  = Mockery::mock(IRequest::class);
         $this->response = Mockery::mock(IResponse::class);
+        $this->router   = Mockery::mock(IRouter::class);
 
         $this->pimpleContainer
             ->setRequest($this->request)
-            ->setResponse($this->response);
+            ->setResponse($this->response)
+            ->setRouter($this->router);
     }
 
     public function testRunWhenErrorControllerNotSet_shouldThrowException()
@@ -128,60 +131,52 @@ class ApplicationTest extends TestAbstract
         $this->application->run();
     }
 
-    protected function setErrorController()
+    private function setErrorController()
     {
         $this->application->setErrorController($this->errorControllerName);
     }
 
-    protected function expectAllEventsRaised()
+    private function expectAllEventsRaised()
     {
-        $this->expectEventRaised(Event::TYPE_APPLICATION_BEFORE_RUN);
-        $this->expectEventRaised(Event::TYPE_APPLICATION_BEFORE_CONTROLLER_RUN);
-        $this->expectEventRaised(Event::TYPE_APPLICATION_AFTER_CONTROLLER_RUN);
-        $this->expectEventRaised(Event::TYPE_APPLICATION_BEFORE_OUTPUT_SEND);
-        $this->expectEventRaised(Event::TYPE_APPLICATION_AFTER_OUTPUT_SEND);
-        $this->expectEventRaised(Event::TYPE_APPLICATION_AFTER_RUN);
+        $this->expectEventRaised(Event::APPLICATION_STARTED);
+        $this->expectEventRaised(Event::APPLICATION_CONTROLLER_BEFORE_RUN);
+        $this->expectEventRaised(Event::APPLICATION_CONTROLLER_FINISHED);
+        $this->expectEventRaised(Event::APPLICATION_OUTPUT_BEFORE_SEND);
+        $this->expectEventRaised(Event::APPLICATION_OUTPUT_SENT);
+        $this->expectEventRaised(Event::APPLICATION_FINISHED);
     }
 
-    protected function expectEventRaised(string $expectedType)
+    private function expectEventRaised(string $expectedType)
     {
         $event = new Event($expectedType);
 
         $this->eventHandlerRegistry
             ->shouldReceive('raise')
             ->with(Mockery::on(function () use ($expectedType, $event) {
-                return $expectedType === $event->getType();
+                return $expectedType === $event->getName();
             }));
     }
 
-    protected function expectGetRoute()
+    private function expectGetRoute(): void
     {
         $controllerAction = new ControllerAction($this->controllerName, $this->actionName, [], []);
-        $router           = Mockery
-            ::mock(IRouter::class)
+        $this->router
             ->shouldReceive('getControllerActionByRequest')
             ->once()
             ->with($this->request)
-            ->andReturn($controllerAction)
-            ->getMock();
-
-        $this->pimpleContainer->setRouter($router);
+            ->andReturn($controllerAction);
     }
 
-    protected function expectGetRouteThrowsException(\Exception $expectedException)
+    private function expectGetRouteThrowsException(\Exception $expectedException)
     {
-        $router = Mockery
-            ::mock(IRouter::class)
+        $this->router
             ->shouldReceive('getControllerActionByRequest')
             ->once()
             ->with($this->request)
-            ->andThrows($expectedException)
-            ->getMock();
-
-        $this->pimpleContainer->setRouter($router);
+            ->andThrows($expectedException);
     }
 
-    protected function expectRunActionOnController(string $controllerName, string $actionName)
+    private function expectRunActionOnController(string $controllerName, string $actionName)
     {
         $controllerMock = Mockery
             ::mock(IController::class)
@@ -205,7 +200,7 @@ class ApplicationTest extends TestAbstract
         $this->pimpleContainer[$controllerName] = $controllerMock;
     }
 
-    protected function expectResponseSent()
+    private function expectResponseSent()
     {
         $this->response
             ->shouldReceive('render')
@@ -215,7 +210,7 @@ class ApplicationTest extends TestAbstract
                 ->once();
     }
 
-    protected function expectErrorSentToOutput()
+    private function expectErrorSentToOutput()
     {
         $this->response
             ->shouldReceive('sendError')

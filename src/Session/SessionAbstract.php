@@ -10,7 +10,7 @@ namespace YapepBase\Session;
 
 use YapepBase\Application;
 use YapepBase\Config;
-use YapepBase\Event\Event;
+use YapepBase\Event\Entity\Event;
 use YapepBase\Exception\ConfigException;
 use YapepBase\Exception\Exception;
 use YapepBase\Storage\IStorage;
@@ -184,8 +184,8 @@ abstract class SessionAbstract implements ISession
     public function registerEventHandler()
     {
         $registry = Application::getInstance()->getDiContainer()->getEventHandlerRegistry();
-        $registry->registerEventHandler(Event::TYPE_APPLICATION_BEFORE_CONTROLLER_RUN, $this);
-        $registry->registerEventHandler(Event::TYPE_APPLICATION_AFTER_CONTROLLER_RUN, $this);
+        $registry->add(Event::APPLICATION_CONTROLLER_BEFORE_RUN, $this);
+        $registry->add(Event::APPLICATION_CONTROLLER_FINISHED, $this);
     }
 
     /**
@@ -196,8 +196,8 @@ abstract class SessionAbstract implements ISession
     public function removeEventHandler()
     {
         $registry = Application::getInstance()->getDiContainer()->getEventHandlerRegistry();
-        $registry->removeEventHandler(Event::TYPE_APPLICATION_BEFORE_CONTROLLER_RUN, $this);
-        $registry->removeEventHandler(Event::TYPE_APPLICATION_AFTER_CONTROLLER_RUN, $this);
+        $registry->remove(Event::APPLICATION_CONTROLLER_BEFORE_RUN, $this);
+        $registry->remove(Event::APPLICATION_CONTROLLER_FINISHED, $this);
     }
 
     /**
@@ -306,7 +306,7 @@ abstract class SessionAbstract implements ISession
     /**
      * Handles the application start and finish events to load and save the session.
      *
-     * @param \YapepBase\Event\Event $event   The event.
+     * @param \YapepBase\Event\Entity\Event $event The event.
      *
      * @return void
      *
@@ -314,12 +314,12 @@ abstract class SessionAbstract implements ISession
      */
     public function handleEvent(Event $event)
     {
-        switch ($event->getType()) {
-            case Event::TYPE_APPLICATION_BEFORE_CONTROLLER_RUN:
+        switch ($event->getName()) {
+            case Event::APPLICATION_CONTROLLER_BEFORE_RUN:
                 $this->loadSession();
                 break;
 
-            case Event::TYPE_APPLICATION_AFTER_CONTROLLER_RUN:
+            case Event::APPLICATION_CONTROLLER_FINISHED:
                 $this->saveSession();
                 break;
         }

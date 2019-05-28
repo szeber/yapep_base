@@ -9,7 +9,7 @@ use YapepBase\Error\Helper\ErrorHelper;
 use YapepBase\Error\Entity\Error;
 use YapepBase\Error\Entity\ExceptionEntity;
 use YapepBase\ErrorHandler\ITerminatable;
-use YapepBase\Event\Event;
+use YapepBase\Event\Entity\Event;
 use YapepBase\Exception\Exception;
 use YapepBase\Response\IResponse;
 
@@ -292,7 +292,7 @@ class ErrorHandlerRegistry implements IErrorHandlerRegistry
             ::getInstance()
             ->getDiContainer()
             ->getEventHandlerRegistry()
-            ->isRaised(Event::TYPE_APPLICATION_AFTER_RUN);
+            ->isRaised(Event::APPLICATION_FINISHED);
     }
 
     private function isApplicationStarted(): bool
@@ -301,6 +301,6 @@ class ErrorHandlerRegistry implements IErrorHandlerRegistry
             ::getInstance()
             ->getDiContainer()
             ->getEventHandlerRegistry()
-            ->isRaised(Event::TYPE_APPLICATION_BEFORE_RUN);
+            ->isRaised(Event::APPLICATION_STARTED);
     }
 }

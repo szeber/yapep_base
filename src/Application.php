@@ -7,7 +7,7 @@ use YapepBase\Controller\Exception\Exception as ControllerException;
 use YapepBase\Controller\IController;
 use YapepBase\DependencyInjection\Container;
 use YapepBase\DependencyInjection\IContainer;
-use YapepBase\Event\Event;
+use YapepBase\Event\Entity\Event;
 use YapepBase\Exception\Exception;
 use YapepBase\Exception\HttpException;
 use YapepBase\Exception\RedirectException;
@@ -105,7 +105,7 @@ class Application
         $eventHandlerRegistry = $this->diContainer->getEventHandlerRegistry();
 
         try {
-            $eventHandlerRegistry->raise(new Event(Event::TYPE_APPLICATION_BEFORE_RUN));
+            $eventHandlerRegistry->raise(new Event(Event::APPLICATION_STARTED));
             $controllerAction = null;
 
             try {
@@ -133,7 +133,7 @@ class Application
 
         $this->raiseRequiredEventsIfNotRaisedYet();
 
-        $eventHandlerRegistry->raise(new Event(Event::TYPE_APPLICATION_AFTER_RUN));
+        $eventHandlerRegistry->raise(new Event(Event::APPLICATION_FINISHED));
     }
 
     /**
@@ -148,11 +148,11 @@ class Application
         $eventHandlerRegistry = $this->diContainer->getEventHandlerRegistry();
         $controller           = $this->getController($controllerAction->getController());
 
-        $eventHandlerRegistry->raise(new Event(Event::TYPE_APPLICATION_BEFORE_CONTROLLER_RUN));
+        $eventHandlerRegistry->raise(new Event(Event::APPLICATION_CONTROLLER_BEFORE_RUN));
 
         $controller->run($controllerAction->getAction());
 
-        $eventHandlerRegistry->raise(new Event(Event::TYPE_APPLICATION_AFTER_CONTROLLER_RUN));
+        $eventHandlerRegistry->raise(new Event(Event::APPLICATION_CONTROLLER_FINISHED));
     }
 
     protected function getController(string $controllerName): IController
@@ -169,11 +169,11 @@ class Application
     protected function raiseRequiredEventsIfNotRaisedYet(): void
     {
         $requiredEventTypes = [
-            Event::TYPE_APPLICATION_BEFORE_RUN,
-            Event::TYPE_APPLICATION_BEFORE_CONTROLLER_RUN,
-            Event::TYPE_APPLICATION_AFTER_CONTROLLER_RUN,
-            Event::TYPE_APPLICATION_BEFORE_OUTPUT_SEND,
-            Event::TYPE_APPLICATION_AFTER_OUTPUT_SEND,
+            Event::APPLICATION_STARTED,
+            Event::APPLICATION_CONTROLLER_BEFORE_RUN,
+            Event::APPLICATION_CONTROLLER_FINISHED,
+            Event::APPLICATION_OUTPUT_BEFORE_SEND,
+            Event::APPLICATION_OUTPUT_SENT,
         ];
 
         foreach ($requiredEventTypes as $eventType) {
@@ -188,9 +188,9 @@ class Application
 
         $response->render();
 
-        $eventHandlerRegistry->raise(new Event(Event::TYPE_APPLICATION_BEFORE_OUTPUT_SEND));
+        $eventHandlerRegistry->raise(new Event(Event::APPLICATION_OUTPUT_BEFORE_SEND));
         $response->send();
-        $eventHandlerRegistry->raise(new Event(Event::TYPE_APPLICATION_AFTER_OUTPUT_SEND));
+        $eventHandlerRegistry->raise(new Event(Event::APPLICATION_OUTPUT_SENT));
     }
 
     /**
@@ -220,16 +220,16 @@ class Application
         /** @var IController $controller */
         $controller = $this->getController($this->errorControllerName);
 
-        $this->raiseEventIfNotRaisedYet(Event::TYPE_APPLICATION_BEFORE_CONTROLLER_RUN);
+        $this->raiseEventIfNotRaisedYet(Event::APPLICATION_CONTROLLER_BEFORE_RUN);
         $controller->run((string)$errorCode);
-        $this->raiseEventIfNotRaisedYet(Event::TYPE_APPLICATION_AFTER_CONTROLLER_RUN);
+        $this->raiseEventIfNotRaisedYet(Event::APPLICATION_CONTROLLER_FINISHED);
 
         $response = $this->diContainer->getResponse();
         $response->render();
 
-        $this->raiseEventIfNotRaisedYet(Event::TYPE_APPLICATION_BEFORE_OUTPUT_SEND);
+        $this->raiseEventIfNotRaisedYet(Event::APPLICATION_OUTPUT_BEFORE_SEND);
         $response->send();
-        $this->raiseEventIfNotRaisedYet(Event::TYPE_APPLICATION_AFTER_OUTPUT_SEND);
+        $this->raiseEventIfNotRaisedYet(Event::APPLICATION_OUTPUT_SENT);
     }
 
     /**
@@ -239,7 +239,7 @@ class Application
     {
         $eventHandlerRegistry = $this->diContainer->getEventHandlerRegistry();
 
-        if (is_null($eventHandlerRegistry->getLastRaisedInMs($eventType))) {
+        if (!$eventHandlerRegistry->isRaised($eventType)) {
             $eventHandlerRegistry->raise(new Event($eventType));
         }
     }

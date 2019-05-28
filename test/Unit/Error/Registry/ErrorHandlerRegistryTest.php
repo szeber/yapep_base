@@ -11,7 +11,7 @@ use YapepBase\Error\Helper\ErrorHelper;
 use YapepBase\Error\Registry\ErrorHandlerRegistry;
 use YapepBase\Error\Registry\IIdGenerator;
 use YapepBase\ErrorHandler\ITerminatable;
-use YapepBase\Event\Event;
+use YapepBase\Event\Entity\Event;
 use YapepBase\Event\IEventHandlerRegistry;
 use YapepBase\Response\IResponse;
 use YapepBase\Test\Unit\TestAbstract;
@@ -157,7 +157,7 @@ class ErrorHandlerRegistryTest extends TestAbstract
         $errorHandlerRegistry = $this->getErrorHandlerRegistry();
 
         $this->expectLastError(null);
-        $this->expectEventChecked(Event::TYPE_APPLICATION_BEFORE_RUN, true);
+        $this->expectEventChecked(Event::APPLICATION_STARTED, true);
         $this->expectExit();
 
         $errorHandlerRegistry->handleShutdown();
@@ -168,9 +168,9 @@ class ErrorHandlerRegistryTest extends TestAbstract
         $errorHandlerRegistry = $this->getErrorHandlerRegistry();
 
         $this->expectLastError(new Error($this->errorCode, $this->message, $this->file, $this->line));
-        $this->expectEventChecked(Event::TYPE_APPLICATION_AFTER_RUN, false);
+        $this->expectEventChecked(Event::APPLICATION_FINISHED, false);
         $this->expectCheckedIfErrorIsFatal(false);
-        $this->expectEventChecked(Event::TYPE_APPLICATION_BEFORE_RUN, true);
+        $this->expectEventChecked(Event::APPLICATION_STARTED, true);
         $this->expectExit();
 
         $errorHandlerRegistry->handleShutdown();
@@ -181,8 +181,8 @@ class ErrorHandlerRegistryTest extends TestAbstract
         $errorHandlerRegistry = $this->getErrorHandlerRegistry();
 
         $this->expectLastError(new Error($this->errorCode, $this->message, $this->file, $this->line));
-        $this->expectEventChecked(Event::TYPE_APPLICATION_AFTER_RUN, true);
-        $this->expectEventChecked(Event::TYPE_APPLICATION_BEFORE_RUN, true);
+        $this->expectEventChecked(Event::APPLICATION_FINISHED, true);
+        $this->expectEventChecked(Event::APPLICATION_STARTED, true);
         $this->expectExit();
 
         $errorHandlerRegistry->handleShutdown();
@@ -193,7 +193,7 @@ class ErrorHandlerRegistryTest extends TestAbstract
         $errorHandlerRegistry = $this->getErrorHandlerRegistry($this->response);
 
         $this->expectLastError(null);
-        $this->expectEventChecked(Event::TYPE_APPLICATION_BEFORE_RUN, false);
+        $this->expectEventChecked(Event::APPLICATION_STARTED, false);
         $this->expectSendErrorResponse();
         $this->expectExit();
 
@@ -207,7 +207,7 @@ class ErrorHandlerRegistryTest extends TestAbstract
         $this->expectTerminatorCalled(false);
         $errorHandlerRegistry->setTerminator($this->terminator);
         $this->expectLastError(null);
-        $this->expectEventChecked(Event::TYPE_APPLICATION_BEFORE_RUN, true);
+        $this->expectEventChecked(Event::APPLICATION_STARTED, true);
         $this->expectExit();
 
         $errorHandlerRegistry->handleShutdown();
@@ -218,9 +218,9 @@ class ErrorHandlerRegistryTest extends TestAbstract
         $errorHandlerRegistry = $this->getErrorHandlerRegistry();
 
         $this->expectLastError(new Error($this->errorCode, $this->message, $this->file, $this->line));
-        $this->expectEventChecked(Event::TYPE_APPLICATION_AFTER_RUN, false);
+        $this->expectEventChecked(Event::APPLICATION_FINISHED, false);
         $this->expectCheckedIfErrorIsFatal(true);
-        $this->expectEventChecked(Event::TYPE_APPLICATION_BEFORE_RUN, true);
+        $this->expectEventChecked(Event::APPLICATION_STARTED, true);
         $this->expectErrorLoggedDirectly('No error handlers are defined and a fatal error occurred');
         $this->expectExit();
 
@@ -233,9 +233,9 @@ class ErrorHandlerRegistryTest extends TestAbstract
         $errorHandlerRegistry->add($this->errorHandler);
 
         $this->expectLastError(new Error($this->errorCode, $this->message, $this->file, $this->line));
-        $this->expectEventChecked(Event::TYPE_APPLICATION_AFTER_RUN, false);
+        $this->expectEventChecked(Event::APPLICATION_FINISHED, false);
         $this->expectCheckedIfErrorIsFatal(true);
-        $this->expectEventChecked(Event::TYPE_APPLICATION_BEFORE_RUN, true);
+        $this->expectEventChecked(Event::APPLICATION_STARTED, true);
         $this->expectIdGenerated();
         $this->expectShutdownHandled();
         $this->expectExit();
