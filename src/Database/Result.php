@@ -39,9 +39,7 @@ class Result
      */
     public function fetchClass(string $className): ?object
     {
-        $this->statement->setFetchMode(PDO::FETCH_CLASS, $className);
-
-        $result = $this->statement->fetchObject();
+        $result = $this->statement->fetchObject($className);
         return $result === false
             ? null
             : $result;
