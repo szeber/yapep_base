@@ -11,9 +11,9 @@ use YapepBase\Helper\DateHelper;
 
 abstract class TestAbstract extends \YapepBase\Test\Unit\TestAbstract
 {
-    /** @var MockInterface */
+    /** @var ICanReturnItems|MockInterface */
     protected $debugDataHandler;
-    /** @var MockInterface */
+    /** @var DateHelper|MockInterface */
     protected $dateHelper;
     /** @var float */
     protected $debugStartedAt  = 1.0;

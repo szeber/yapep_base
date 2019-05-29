@@ -10,6 +10,7 @@ use YapepBase\Exception\InvalidArgumentException;
 use YapepBase\Exception\StorageException;
 use YapepBase\Storage\Entity\File;
 use YapepBase\Storage\FileStorage;
+use YapepBase\Storage\Key\Generator;
 
 class FileStorageTest extends TestAbstract
 {
@@ -39,7 +40,7 @@ class FileStorageTest extends TestAbstract
         parent::setUp();
 
         $this->fileHandler  = new FileHandlerMock($this->fileModeOctal, $this->path, $this->pathWithoutTrailingSlash, $this->fullPath);
-        $this->keyGenerator = new \YapepBase\Storage\Key\Generator(false);
+        $this->keyGenerator = new Generator(false);
 
         $this->initDebugDataHandler();
     }
@@ -194,10 +195,10 @@ class FileStorageTest extends TestAbstract
         $this->fileHandler
             ->expectCheckPathExists($this->fullPath, true)
             ->expectCheckIsFileReadable(true)
-            ->expectGetFileContent(false);
+            ->expectGetFileContent('');
 
         $this->expectException(StorageException::class);
-        $this->expectExceptionMessage('Unable to read file');
+        $this->expectExceptionMessage('Empty file');
         $fileStorage->get($this->key);
     }
 
@@ -227,7 +228,7 @@ class FileStorageTest extends TestAbstract
         $expiresAt   = 20;
         $currentTime = 18;
         $fileStorage = $this->getStorage($this->path);
-        $file        = new \YapepBase\Storage\Entity\File($this->data, $this->createdAt, $expiresAt);
+        $file        = new File($this->data, $this->createdAt, $expiresAt);
 
         $this->expectDebugTimesRetrieved();
         $this->fileHandler
@@ -270,7 +271,7 @@ class FileStorageTest extends TestAbstract
 
         $this->expectDebugTimesRetrieved();
         $this->expectAddStorageDebug(Storage::METHOD_DELETE, $this->key, null, $this->debugStartedAt, $this->debugFinishedAt);
-        $this->fileHandler->expectRemoveFileFails(new NotFoundException('File not found'));
+        $this->fileHandler->expectRemoveFileFails(new NotFoundException($this->path, 'File not found'));
 
         $storage->delete($this->key);
     }

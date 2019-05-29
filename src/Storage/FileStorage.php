@@ -141,11 +141,14 @@ class FileStorage extends StorageAbstract
         $data     = null;
 
         if ($this->fileHandler->pathExists($fullPath)) {
-            if (
-                !$this->fileHandler->isReadable($fullPath)
-                || ($contents = $this->fileHandler->getAsString($fullPath)) === false
-            ) {
+            if (!$this->fileHandler->isReadable($fullPath)) {
                 throw new StorageException('Unable to read file: ' . $fullPath);
+            }
+
+            $contents = $this->fileHandler->getAsString($fullPath);
+
+            if (empty($contents)) {
+                throw new StorageException('Empty file');
             }
 
             $file = $this->readData($contents);

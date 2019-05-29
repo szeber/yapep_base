@@ -4,7 +4,6 @@ namespace YapepBase\Test\Unit\File;
 
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
-use vendor\project\StatusTest;
 use YapepBase\Exception\InvalidArgumentException;
 use YapepBase\File\Exception\Exception;
 use YapepBase\File\Exception\NotFoundException;
@@ -237,7 +236,168 @@ class FileHandlerPhpTest extends TestAbstract
 
     public function testGetListWhenNotDirectory_shouldThrowException()
     {
+        $fileHandler = $this->getFileHandler();
+        $fileHandler->touch($this->path);
 
+        $this->expectException(Exception::class);
+        $fileHandler->getList($this->path);
+    }
+
+    public function testGetListWhenNoContent_shouldReturnEmptyArray()
+    {
+        $fileHandler = $this->getFileHandler();
+        $fileHandler->makeDirectory($this->path);
+
+        $result = $fileHandler->getList($this->path);
+
+        $this->assertSame([], $result);
+    }
+
+    public function testGetList_shouldReturnContent()
+    {
+        $fileHandler = $this->getFileHandler();
+        $fileHandler->makeDirectory($this->path);
+        $fileHandler->touch($this->path . '/test');
+
+        $result = $fileHandler->getList($this->path);
+
+        $this->assertEqualsCanonicalizing(['test'], $result);
+    }
+
+    public function testGetListByGlobWhenNotDirectory_shouldThrowException()
+    {
+        $fileHandler = $this->getFileHandler();
+        $fileHandler->touch($this->path);
+
+        $this->expectException(Exception::class);
+        $fileHandler->getListByGlob($this->path, '*');
+    }
+
+    public function testGetModificationTimeWhenPathDoesNotExist_shouldThrowException()
+    {
+        $fileHandler = $this->getFileHandler();
+
+        $this->expectException(Exception::class);
+        $fileHandler->getModificationTime($this->path);
+    }
+
+    public function testGetModificationTime_shouldReturnModificationTime()
+    {
+        $fileHandler = $this->getFileHandler();
+        $fileHandler->touch($this->path);
+
+        $result = $fileHandler->getModificationTime($this->path);
+
+        $this->assertIsInt($result);
+    }
+
+    public function testGetSizeWhenPathDoesNotExist_shouldThrowException()
+    {
+        $fileHandler = $this->getFileHandler();
+
+        $this->expectException(Exception::class);
+        $fileHandler->getSize($this->path);
+    }
+
+    public function testGetSize_shouldReturnSize()
+    {
+        $fileHandler = $this->getFileHandler();
+        $fileHandler->write($this->path, '1');
+
+        $result = $fileHandler->getSize($this->path);
+
+        $this->assertSame(1, $result);
+    }
+
+    public function testPathExistsWhenFileDoesNotExist_shouldReturnFalse()
+    {
+        $fileHandler = $this->getFileHandler();
+
+        $result = $fileHandler->pathExists($this->path);
+        $this->assertFalse($result);
+    }
+
+    public function testPathExistsWhenFileExists_shouldReturnTrue()
+    {
+        $fileHandler = $this->getFileHandler();
+        $fileHandler->touch($this->path);
+
+        $result = $fileHandler->pathExists($this->path);
+        $this->assertTrue($result);
+    }
+
+    public function testIsDirectoryWhenFileDoesNotExist_shouldThrowException()
+    {
+        $fileHandler = $this->getFileHandler();
+
+        $this->expectException(Exception::class);
+        $fileHandler->isDirectory($this->path);
+    }
+
+    public function testIsDirectoryWhenFileGiven_shouldReturnFalse()
+    {
+        $fileHandler = $this->getFileHandler();
+        $fileHandler->touch($this->path);
+
+        $result = $fileHandler->isDirectory($this->path);
+
+        $this->assertFalse($result);
+    }
+
+    public function testIsDirectoryWhenDirectoryGiven_shouldReturnTrue()
+    {
+        $fileHandler = $this->getFileHandler();
+        $fileHandler->makeDirectory($this->path);
+
+        $result = $fileHandler->isDirectory($this->path);
+
+        $this->assertTrue($result);
+    }
+
+    public function testIsFileWhenFileDoesNotExist_shouldThrowException()
+    {
+        $fileHandler = $this->getFileHandler();
+
+        $this->expectException(Exception::class);
+        $fileHandler->isFile($this->path);
+    }
+
+    public function testIsFileWhenFileGiven_shouldReturnTrue()
+    {
+        $fileHandler = $this->getFileHandler();
+        $fileHandler->touch($this->path);
+
+        $result = $fileHandler->isFile($this->path);
+
+        $this->assertTrue($result);
+    }
+
+    public function testIsFileWhenDirectoryGiven_shouldReturnFalse()
+    {
+        $fileHandler = $this->getFileHandler();
+        $fileHandler->makeDirectory($this->path);
+
+        $result = $fileHandler->isFile($this->path);
+
+        $this->assertFalse($result);
+    }
+
+    public function testIsSymlinkWhenFileDoesNotExist_shouldThrowException()
+    {
+        $fileHandler = $this->getFileHandler();
+
+        $this->expectException(Exception::class);
+        $fileHandler->isSymlink($this->path);
+    }
+
+    public function testIsSymlinkWhenFileGiven_shouldReturnFalse()
+    {
+        $fileHandler = $this->getFileHandler();
+        $fileHandler->touch($this->path);
+
+        $result = $fileHandler->isSymlink($this->path);
+
+        $this->assertFalse($result);
     }
 
     private function assertStatSame(string $statName, $expected): void

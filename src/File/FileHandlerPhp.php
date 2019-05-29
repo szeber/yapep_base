@@ -46,9 +46,7 @@ class FileHandlerPhp implements IFileHandler
 
     public function changeOwner(string $path, ?string $group = null, ?string $user = null): void
     {
-        if (!$this->pathExists($path)) {
-            throw new NotFoundException($path, 'Resource not found while changing owner: ' . $path);
-        }
+        $this->requirePathToExist($path);
 
         if (!is_null($group) && !chgrp($path, $group)) {
             throw new Exception('Failed to set the group "' . $group . '" of the resource: ' . $path);
@@ -61,9 +59,7 @@ class FileHandlerPhp implements IFileHandler
 
     public function changeMode(string $path, int $mode): void
     {
-        if (!$this->pathExists($path)) {
-            throw new NotFoundException($path, 'Resource not found while changing mode: ' . $path);
-        }
+        $this->requirePathToExist($path);
 
         if (!chmod($path, $mode)) {
             throw new Exception('Failed to set the mode "' . decoct($mode) . '" of the resource: ' . $path);
@@ -72,9 +68,7 @@ class FileHandlerPhp implements IFileHandler
 
     public function copy(string $sourcePath, string $destinationPath): void
     {
-        if (!$this->pathExists($sourcePath)) {
-            throw new NotFoundException($sourcePath, 'Source file not found for copy: ' . $sourcePath);
-        }
+        $this->requirePathToExist($sourcePath);
 
         if (!copy($sourcePath, $destinationPath)) {
             throw new Exception('Failed to copy file from ' . $sourcePath . ' to ' . $destinationPath);
@@ -130,9 +124,7 @@ class FileHandlerPhp implements IFileHandler
 
     public function move(string $sourcePath, string $destinationPath, bool $checkIfIsUploaded = false): void
     {
-        if (!$this->pathExists($sourcePath)) {
-            throw new NotFoundException($sourcePath, 'The source file is not found for a file move: ' . $sourcePath);
-        }
+        $this->requirePathToExist($sourcePath);
 
         if ($checkIfIsUploaded && !is_uploaded_file($sourcePath)) {
             throw new Exception('The given file is not uploaded through HTTP: ' . $sourcePath);
@@ -213,9 +205,8 @@ class FileHandlerPhp implements IFileHandler
 
     public function getModificationTime(string $path): int
     {
-        if (!$this->pathExists($path)) {
-            throw new NotFoundException($path, 'The given path does not exist: ' . $path);
-        }
+        $this->requirePathToExist($path);
+
         $result = filemtime($path);
 
         if ($result === false) {
@@ -227,10 +218,9 @@ class FileHandlerPhp implements IFileHandler
 
     public function getSize(string $path): int
     {
-        if (!$this->pathExists($path)) {
-            throw new NotFoundException($path, 'The given path does not exist: ' . $path);
-        }
-        $result =  filesize($path);
+        $this->requirePathToExist($path);
+
+        $result = filesize($path);
 
         if ($result === false) {
             throw new Exception('Failed to get the size of file: ' . $path);
@@ -246,45 +236,35 @@ class FileHandlerPhp implements IFileHandler
 
     public function isDirectory(string $path): bool
     {
-        if (!$this->pathExists($path)) {
-            throw new NotFoundException($path, 'The given path does not exist: ' . $path);
-        }
+        $this->requirePathToExist($path);
 
         return is_dir($path);
     }
 
     public function isFile(string $path): bool
     {
-        if (!$this->pathExists($path)) {
-            throw new NotFoundException($path, 'The given path does not exist: ' . $path);
-        }
+        $this->requirePathToExist($path);
 
         return is_file($path);
     }
 
     public function isSymlink(string $path): bool
     {
-        if (!$this->pathExists($path)) {
-            throw new NotFoundException($path, 'The given path does not exist: ' . $path);
-        }
+        $this->requirePathToExist($path);
 
         return is_link($path);
     }
 
     public function isReadable(string $path): bool
     {
-        if (!$this->pathExists($path)) {
-            throw new NotFoundException($path, 'The given path does not exist: ' . $path);
-        }
+        $this->requirePathToExist($path);
 
         return is_readable($path);
     }
 
     public function isWritable(string $path): bool
     {
-        if (!$this->pathExists($path)) {
-            throw new NotFoundException($path, 'The given path does not exist: ' . $path);
-        }
+        $this->requirePathToExist($path);
 
         return is_writable($path);
     }
@@ -292,5 +272,15 @@ class FileHandlerPhp implements IFileHandler
     public function getBaseName(string $path, ?string $suffix = null): string
     {
         return basename($path, $suffix);
+    }
+
+    /**
+     * @throws NotFoundException
+     */
+    private function requirePathToExist(string $path)
+    {
+        if (!$this->pathExists($path)) {
+            throw new NotFoundException($path, 'The given path does not exist: ' . $path);
+        }
     }
 }
