@@ -445,7 +445,7 @@ class HttpResponse implements IResponse {
 			 * Technically this is correct, but it's not nice. We don't allow it
 			 * to avoid user agent bugs.
 			 */
-			if (!$value) {
+			if ((string)$value === '') {
 				throw new \YapepBase\Exception\ParameterException('Value for header is empty: ' . $header);
 			}
 			if ($this->isBufferingEnabled) {
