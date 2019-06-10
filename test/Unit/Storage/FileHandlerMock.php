@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace YapepBase\Test\Unit\Storage;
 
 use Mockery\MockInterface;
+use YapepBase\File\Exception\Exception;
 use YapepBase\File\IFileHandler;
 
 class FileHandlerMock
@@ -37,7 +38,7 @@ class FileHandlerMock
     public function expectCheckPathExists(string $path, bool $expectedResult): self
     {
         $this->fileHandler
-            ->shouldReceive('checkIsPathExists')
+            ->shouldReceive('pathExists')
             ->once()
             ->with($path)
             ->andReturn($expectedResult);
@@ -48,7 +49,7 @@ class FileHandlerMock
     public function expectCheckIsDirectory(bool $expectedResult): self
     {
         $this->fileHandler
-            ->shouldReceive('checkIsDirectory')
+            ->shouldReceive('isDirectory')
             ->once()
             ->with($this->pathWithoutTrailingSlash)
             ->andReturn($expectedResult);
@@ -59,7 +60,7 @@ class FileHandlerMock
     public function expectCheckIsWritable(bool $expectedResult): self
     {
         $this->fileHandler
-            ->shouldReceive('checkIsWritable')
+            ->shouldReceive('isWritable')
             ->once()
             ->with($this->path)
             ->andReturn($expectedResult);
@@ -73,7 +74,7 @@ class FileHandlerMock
             ->shouldReceive('makeDirectory')
             ->once()
             ->with($this->path, 0644 | 0111, true)
-            ->andThrows(new \YapepBase\Exception\File\Exception('Create Failed'));
+            ->andThrows(new Exception('Create Failed'));
 
         return $this;
     }
@@ -83,7 +84,7 @@ class FileHandlerMock
         $this->fileHandler
             ->shouldReceive('write')
             ->once()
-            ->andThrows(new \YapepBase\Exception\File\Exception('Test'));
+            ->andThrows(new Exception('Test'));
 
         return $this;
     }
@@ -105,7 +106,7 @@ class FileHandlerMock
     public function expectCheckIsFileReadable(bool $expectedResult): self
     {
         $this->fileHandler
-            ->shouldReceive('checkIsReadable')
+            ->shouldReceive('isReadable')
             ->once()
             ->with($this->fullPath)
             ->andReturn($expectedResult);
@@ -161,7 +162,7 @@ class FileHandlerMock
             ->shouldReceive('removeDirectory')
             ->once()
             ->with($this->path, true)
-            ->andThrows(new \YapepBase\Exception\File\Exception('test'));
+            ->andThrows(new Exception('test'));
 
         return $this;
     }

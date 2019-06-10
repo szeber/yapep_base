@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace YapepBase\Storage;
 
 use YapepBase\Debug\Item\Storage;
-use YapepBase\Exception\File\Exception as FileException;
-use YapepBase\Exception\File\NotFoundException;
+use YapepBase\File\Exception\Exception as FileException;
+use YapepBase\File\Exception\NotFoundException;
 use YapepBase\Exception\InvalidArgumentException;
 use YapepBase\Exception\StorageException;
 use YapepBase\File\FileHandlerPhp;
@@ -83,17 +83,17 @@ class FileStorage extends StorageAbstract
      */
     protected function initAndValidatePath()
     {
-        if (!$this->fileHandler->checkIsPathExists($this->path)) {
+        if (!$this->fileHandler->pathExists($this->path)) {
             try {
                 $this->fileHandler->makeDirectory($this->path, ($this->fileModeOctal | 0111), true);
             } catch (FileException $e) {
                 throw new StorageException('Can not create directory for FileStorage: ' . $this->path, 0, $e);
             }
-        } elseif (!$this->fileHandler->checkIsDirectory(rtrim($this->path, '/'))) {
+        } elseif (!$this->fileHandler->isDirectory(rtrim($this->path, '/'))) {
             throw new StorageException('Path is not a directory for FileStorage: ' . $this->path);
         }
 
-        if (!$this->readOnly && !$this->fileHandler->checkIsWritable($this->path)) {
+        if (!$this->readOnly && !$this->fileHandler->isWritable($this->path)) {
             throw new StorageException('Path is not writable for FileStorage: ' . $this->path);
         }
     }
@@ -140,12 +140,15 @@ class FileStorage extends StorageAbstract
         $fullPath = $this->getFullPath($key);
         $data     = null;
 
-        if ($this->fileHandler->checkIsPathExists($fullPath)) {
-            if (
-                !$this->fileHandler->checkIsReadable($fullPath)
-                || ($contents = $this->fileHandler->getAsString($fullPath)) === false
-            ) {
+        if ($this->fileHandler->pathExists($fullPath)) {
+            if (!$this->fileHandler->isReadable($fullPath)) {
                 throw new StorageException('Unable to read file: ' . $fullPath);
+            }
+
+            $contents = $this->fileHandler->getAsString($fullPath);
+
+            if (empty($contents)) {
+                throw new StorageException('Empty file');
             }
 
             $file = $this->readData($contents);
