@@ -441,13 +441,6 @@ class HttpResponse implements IResponse {
 				$header = trim($data[0]);
 				$value = trim($data[1]);
 			}
-			/**
-			 * Technically this is correct, but it's not nice. We don't allow it
-			 * to avoid user agent bugs.
-			 */
-			if ((string)$value === '') {
-				throw new \YapepBase\Exception\ParameterException('Value for header is empty: ' . $header);
-			}
 			if ($this->isBufferingEnabled) {
 				if (!array_key_exists($header, $this->headers)) {
 					$this->headers[$header] = array();
