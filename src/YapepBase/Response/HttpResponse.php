@@ -202,6 +202,10 @@ class HttpResponse implements IResponse {
 	 * @throws \YapepBase\Exception\StandardsComplianceException   If a standards compliance problem is found.
 	 */
 	protected function checkStandards($renderedBody) {
+        if (Config::getInstance()->get('system.disableStandardsComplianceCheck', false)) {
+            return;
+        }
+
 		switch ($this->statusCode) {
 			case 204:
 				/**
