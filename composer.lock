@@ -1,10 +1,10 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0a2586c0378f1cbf7f15ad6350395109",
+    "content-hash": "99f2b5b75db350eb482f6662632d601c",
     "packages": [
         {
             "name": "lukasoppermann/http-status",
@@ -162,16 +162,16 @@
             "time": "2015-05-11T14:41:42+00:00"
         },
         {
-            "name": "mikey179/vfsStream",
+            "name": "mikey179/vfsstream",
             "version": "v1.6.4",
             "source": {
                 "type": "git",
-                "url": "https://github.com/mikey179/vfsStream.git",
+                "url": "https://github.com/bovigo/vfsStream.git",
                 "reference": "0247f57b2245e8ad2e689d7cee754b45fbabd592"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mikey179/vfsStream/zipball/0247f57b2245e8ad2e689d7cee754b45fbabd592",
+                "url": "https://api.github.com/repos/bovigo/vfsStream/zipball/0247f57b2245e8ad2e689d7cee754b45fbabd592",
                 "reference": "0247f57b2245e8ad2e689d7cee754b45fbabd592",
                 "shasum": ""
             },
@@ -911,6 +911,7 @@
                 "mock",
                 "xunit"
             ],
+            "abandoned": true,
             "time": "2016-12-08T20:27:08+00:00"
         },
         {
