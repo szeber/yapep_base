@@ -18,7 +18,7 @@
     "friendsofphp/php-cs-fixer": "^2.14.2",
     "ext-xdebug": "*",
     "symfony/yaml": "^4.2.3",
-    "mikey179/vfsStream": "^1.6"
+    "mikey179/vfsstream": "^1.6"
   },
   "suggest": {
     "symfony/yaml": "Required for working with YAML files"
