@@ -165,7 +165,8 @@ class ArrayRouterTest extends \YapepBase\BaseTest {
 	 * Tests if the correct error is thrown for a non existing route
 	 */
 	public function testNotFoundRoute() {
-		$this->setExpectedException('\YapepBase\Exception\RouterException', '', RouterException::ERR_NO_ROUTE_FOUND);
+	    $this->expectException(RouterException::class);
+	    $this->expectExceptionCode(RouterException::ERR_NO_ROUTE_FOUND);
 
 		$this->getRouter('/param/simplealpha/test1')->getRoute();
 	}
@@ -174,7 +175,8 @@ class ArrayRouterTest extends \YapepBase\BaseTest {
 	 * Tests if the correct error is thrown for a route with a param syntax error
 	 */
 	public function testSyntaxErrorRoute() {
-		$this->setExpectedException('\YapepBase\Exception\RouterException', '', RouterException::ERR_SYNTAX_PARAM);
+        $this->expectException(RouterException::class);
+   	    $this->expectExceptionCode(RouterException::ERR_SYNTAX_PARAM);
 
 		$this->getRouter('/invalid/syntax/test')->getRoute();
 	}
@@ -183,7 +185,8 @@ class ArrayRouterTest extends \YapepBase\BaseTest {
 	 * Tests if the correct error is thrown for a route with an invalid type
 	 */
 	public function testTypeErrorRoute() {
-		$this->setExpectedException('\YapepBase\Exception\RouterException', '', RouterException::ERR_SYNTAX_PARAM);
+        $this->expectException(RouterException::class);
+   	    $this->expectExceptionCode(RouterException::ERR_SYNTAX_PARAM);
 
 		$this->getRouter('/invalid/paramtype/test')->getRoute();
 	}
@@ -192,7 +195,8 @@ class ArrayRouterTest extends \YapepBase\BaseTest {
 	 * Tests if the correct error is thrown for a route with an invalid type
 	 */
 	public function testDuplicateParamRoute() {
-		$this->setExpectedException('\YapepBase\Exception\RouterException', '', RouterException::ERR_SYNTAX_PARAM);
+        $this->expectException(RouterException::class);
+   	    $this->expectExceptionCode(RouterException::ERR_SYNTAX_PARAM);
 
 		$this->getRouter('/invalid/duplicateparam/test/test')->getRoute();
 	}
@@ -201,7 +205,8 @@ class ArrayRouterTest extends \YapepBase\BaseTest {
 	 * Tests if the correct error is thrown for a route with an enum param without options
 	 */
 	public function testEnumErrorRoute() {
-		$this->setExpectedException('\YapepBase\Exception\RouterException', '', RouterException::ERR_SYNTAX_PARAM);
+        $this->expectException(RouterException::class);
+   	    $this->expectExceptionCode(RouterException::ERR_SYNTAX_PARAM);
 
 		$this->getRouter('/invalid/enum/test')->getRoute();
 	}
@@ -210,7 +215,8 @@ class ArrayRouterTest extends \YapepBase\BaseTest {
 	 * Tests if the correct error is thrown for a route with a regex param without a pattern
 	 */
 	public function testRegexErrorRoute() {
-		$this->setExpectedException('\YapepBase\Exception\RouterException', '', RouterException::ERR_SYNTAX_PARAM);
+        $this->expectException(RouterException::class);
+   	    $this->expectExceptionCode(RouterException::ERR_SYNTAX_PARAM);
 
 		$this->getRouter('/invalid/regex/test')->getRoute();
 	}
@@ -234,17 +240,19 @@ class ArrayRouterTest extends \YapepBase\BaseTest {
 	 * Tests if a correct error is thrown for a non existing route creation
 	 */
 	public function testNonExistingRouteCreation() {
-		$this->setExpectedException('\YapepBase\Exception\RouterException', '', RouterException::ERR_NO_ROUTE_FOUND);
+        $this->expectException(RouterException::class);
+   	    $this->expectExceptionCode(RouterException::ERR_NO_ROUTE_FOUND);
 
-		$router = $this->getRouter()->getTargetForControllerAction('Non', 'Existing');
+		$this->getRouter()->getTargetForControllerAction('Non', 'Existing');
 	}
 
 	/**
 	 * Tests if a correct error is thrown for route creation with a missing required param
 	 */
 	public function testRouteCreationWithMissingParam() {
-		$this->setExpectedException('\YapepBase\Exception\RouterException', '', RouterException::ERR_MISSING_PARAM);
+        $this->expectException(RouterException::class);
+        $this->expectExceptionCode(RouterException::ERR_MISSING_PARAM);
 
-		$router = $this->getRouter()->getTargetForControllerAction('Param', 'SimpleAlpha');
+		$this->getRouter()->getTargetForControllerAction('Param', 'SimpleAlpha');
 	}
 }
