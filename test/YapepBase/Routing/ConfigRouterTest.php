@@ -61,7 +61,8 @@ class ConfigRouterTest extends ArrayRouterTest {
 	 * Tests whether the correct error is thrown for a bad config
 	 */
 	public function testNonExistingError() {
-		$this->setExpectedException('\YapepBase\Exception\RouterException', '', RouterException::ERR_ROUTE_CONFIG);
+	    $this->expectException(RouterException::class);
+	    $this->expectExceptionCode(RouterException::ERR_ROUTE_CONFIG);
 
 		$request = null;
 		$this->getRouter('', IRequest::METHOD_HTTP_GET, $request, 'badRoutes');

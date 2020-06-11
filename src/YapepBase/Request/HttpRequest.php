@@ -97,21 +97,8 @@ class HttpRequest implements IRequest {
 	 * @param array $server               The $_SERVER array
 	 * @param array $env                  The $_ENV array
 	 * @param array $files                The $_FILES array
-	 * @param bool  $magicQuotesEnabled   If TRUE, the get, post, cookie arrays will be recursively stripped of slashes.
 	 */
-	public function __construct(
-		array $get, array $post, array $cookie, array $server, array $env, array $files, $magicQuotesEnabled = null
-	) {
-		if (is_null($magicQuotesEnabled)) {
-			$magicQuotesEnabled = \get_magic_quotes_gpc();
-		}
-
-		if ($magicQuotesEnabled) {
-			$get = TextHelper::stripSlashes($get);
-			$post = TextHelper::stripSlashes($post);
-			$cookie = TextHelper::stripSlashes($cookie);
-		}
-
+	public function __construct(array $get, array $post, array $cookie, array $server, array $env, array $files) {
 		$this->getParams = $get;
 		$this->postParams = $post;
 		$this->cookies = $cookie;

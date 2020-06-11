@@ -234,7 +234,7 @@ class HttpResponseTest extends \YapepBase\BaseTest {
 		} catch (\YapepBase\Exception\ParameterException $e) {}
 
 		try {
-			$this->response->addHeader('X-Test-Header', '');
+			$this->response->addHeader('X-Test-Header', null);
 			$this->fail('Empty setHeader values are not caught!');
 		} catch (\YapepBase\Exception\ParameterException $e) {}
 
