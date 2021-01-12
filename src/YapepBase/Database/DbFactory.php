@@ -110,6 +110,7 @@ class DbFactory {
 				'database',
 				'host',
 				'isPersistent',
+				'options',
 				'password',
 				'path',
 				'port',
