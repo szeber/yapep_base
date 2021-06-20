@@ -169,7 +169,7 @@ class ErrorHandlerRegistry {
 	 *
 	 * @return bool   TRUE if we were able to handle the error, FALSE otherwise.
 	 */
-	public function handleError($errorLevel, $message, $file, $line, $context) {
+	public function handleError($errorLevel, $message, $file, $line, $context = []) {
 		$errorReporting = error_reporting();
 
 		if (!($errorLevel & $errorReporting)) {
